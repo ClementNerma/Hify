@@ -69,6 +69,6 @@ fn analyze_track(from: &Path, id: u64) -> Result<Track, Box<dyn Error>> {
 
         genre: tag.genre().map(ToString::to_string),
 
-        duration: tag.duration().ok_or("File does not have a duration")?,
+        duration: tag.duration(),
     })
 }

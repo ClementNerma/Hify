@@ -27,7 +27,7 @@ pub struct Track {
     // pub day: Option<u8>,
     pub genre: Option<String>,
 
-    pub duration: u32,
+    pub duration: Option<u32>,
     // pub bitrate: u32,
     // pub frequency: u8,
 
