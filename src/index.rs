@@ -14,6 +14,8 @@ pub struct Library {
 pub struct Track {
     pub id: u64,
 
+    pub format: AudioFormat,
+
     pub title: Option<String>,
 
     pub artist: Option<String>,

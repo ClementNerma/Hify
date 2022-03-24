@@ -7,7 +7,7 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::index::{Library, Track};
+use crate::index::{AudioFormat, Library, Track};
 
 pub fn build_index(from: &Path) -> Library {
     let creation_time = SystemTime::now()
@@ -33,11 +33,12 @@ pub fn build_index(from: &Path) -> Library {
                             eprintln!("Failed to analyze file at '{}': {}", path, error);
                             invalid_files.push(path.to_string());
                         }
-                        Ok(track) => {
+                        Ok(Some(track)) => {
                             tracks_files.insert(track.id, path.to_string_lossy().to_string());
                             tracks.push(track);
                             counter += 1;
                         }
+                        Ok(None) => {}
                     }
                 }
             }
@@ -52,11 +53,35 @@ pub fn build_index(from: &Path) -> Library {
     }
 }
 
-fn analyze_track(from: &Path, id: u64) -> Result<Track, Box<dyn Error>> {
-    let tag = Tag::read_from_path(from)?;
+fn analyze_track(from: &Path, id: u64) -> Result<Option<Track>, Box<dyn Error>> {
+    match from.extension() {
+        None => Err("File does not have an extension".into()),
+        Some(ext) => {
+            let ext = ext
+                .to_str()
+                .ok_or("File does not have a valid UTF-8 extension")?
+                .to_ascii_lowercase();
+
+            match ext.as_str() {
+                "mp3" => analyze_mp3_track(from, id).map(Option::Some),
+
+                "flac" => Err("This file format is not supported yet".into()),
+                "wave" => Err("This file format is not supported yet".into()),
+                "ogg" => Err("This file format is not supported yet".into()),
+                "webm" => Err("This file format is not supported yet".into()),
+
+                _ => Ok(None),
+            }
+        }
+    }
+}
+
+fn analyze_mp3_track(file: &Path, id: u64) -> Result<Track, Box<dyn Error>> {
+    let tag = Tag::read_from_path(file)?;
 
     Ok(Track {
         id,
+        format: AudioFormat::MP3,
         title: tag.title().map(ToString::to_string),
 
         artist: tag.artist().map(ToString::to_string),
