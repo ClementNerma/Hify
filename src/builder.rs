@@ -43,60 +43,70 @@ pub fn build_index(from: &Path) -> Result<Library, ()> {
         .collect::<Vec<_>>();
 
     println!("Found {} audio files to analyze.", files.len());
+    println!("Running ExifTool...");
 
-    let files_list_file = Path::new("/tmp/test-to-generate-randomly.txt");
+    let tmpdir = Path::new("/tmp/some-directory-name-to-generate-randomly");
+    fs::create_dir(tmpdir).map_err(|e| eprintln!("Failed to create temporary directory: {}", e))?;
 
-    fs::write(files_list_file, files.join("\n")).unwrap();
+    let exif_out = files.chunks(100).into_iter().enumerate().par_bridge().map(|(i, files)| {
+        let tmpfile_path = tmpdir.join(i.to_string());
+        fs::write(&tmpfile_path, files.join("\n")).map_err(|e| eprintln!("Failed to create temporary file: {}", e))?;
 
-    let cmd = Command::new("exiftool")
-        .args(&[
-            "-json",
-            "-@",
-            files_list_file.to_str().unwrap(),
-            // List of fields to get
-            "-sourcefile",
-            "-filetype",
-            "-title",
-            "-artist",
-            "-composer",
-            "-album",
-            "-albumartist",
-            "-discnumber",
-            "-partofset",
-            "-track",
-            "-tracknumber",
-            "-year",
-            "-date",
-            "-genre",
-            "-duration",
-            "-samplerate",
-            "-bitspersample",
-        ])
-        .output()
-        .map_err(|err| eprintln!("Failed to run ExifTool: {}", err))?;
+        let cmd = Command::new("exiftool")
+            .args(&[
+                "-json",
+                "-@",
+                tmpfile_path.to_str().unwrap(),
+                // List of fields to get
+                "-sourcefile",
+                "-filetype",
+                "-title",
+                "-artist",
+                "-composer",
+                "-album",
+                "-albumartist",
+                "-discnumber",
+                "-partofset",
+                "-track",
+                "-tracknumber",
+                "-year",
+                "-date",
+                "-genre",
+                "-duration",
+                "-samplerate",
+                "-bitspersample",
+            ])
+            .output()
 
-    println!("Finished running ExifTool on all files.");
+            .map_err(|err| eprintln!("Failed to run ExifTool: {}", err))?;
 
-    let stdout = std::str::from_utf8(&cmd.stdout).expect("ExifTool returned invalid UTF-8 data");
+        let stdout = std::str::from_utf8(&cmd.stdout).expect("ExifTool returned invalid UTF-8 data");
 
-    let out = serde_json::from_str::<ExifToolOutput>(stdout)
-        .map_err(|err| eprintln!("Failed to deserialize ExifTool response: {}", err))?;
+        let out = serde_json::from_str::<ExifToolOutput>(stdout)
+            .map_err(|err| eprintln!("Failed to deserialize ExifTool response: {}", err))?;
 
-    if out.0.len() != files.len() {
-        eprintln!(
-            "ExifTool didn't return the same number of items ({}) than the number of analyzed audio files ({})",
-            out.0.len(),
-            files.len()
-        );
-        return Err(());
-    }
+        if out.0.len() != files.len() {
+            eprintln!(
+                "ExifTool didn't return the same number of items ({}) than the number of analyzed audio files ({})",
+                out.0.len(),
+                files.len()
+            );
+            return Err(());
+        }
+
+        Ok(out.0)
+    }).collect::<Result<Vec<_>, _>>()?;
 
     println!("Finished parsing and validating ExifTool's JSON output");
+
+    fs::remove_dir_all(tmpdir).map_err(|e| eprintln!("Failed to remove temporary directory: {}", e))?;
+
+    let exif_out = exif_out.into_iter().flatten().collect::<Vec<_>>();
 
     let mut tracks = vec![];
     let mut tracks_files = HashMap::new();
 
-    for (i, track) in out.0.into_iter().enumerate() {
+    for (i, track) in exif_out.into_iter().enumerate() {
         let file = files.get(i).unwrap();
 
         let format = match track.FileType.as_deref() {
