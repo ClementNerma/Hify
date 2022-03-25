@@ -1,7 +1,5 @@
-use std::{path::PathBuf, sync::RwLock};
-
-use miniserde::json;
 use rocket::{http::Status, routes, State as RocketState};
+use std::{path::PathBuf, sync::RwLock};
 
 use crate::{builder::build_index, index::Library};
 
@@ -17,14 +15,14 @@ pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
 
-#[get("/state?<since>")]
-pub fn state(state: &State, since: u64) -> (Status, String) {
+#[get("/index?<since>")]
+pub fn index(state: &State, since: u64) -> (Status, String) {
     let index = state.index.read().unwrap();
 
     match *index {
         Some(ref index) => {
             if index.creation_time != since {
-                (Status::Ok, json::to_string(index))
+                (Status::Ok, serde_json::to_string(index).unwrap())
             } else {
                 (Status::NotModified, "State didn't change".to_string())
             }
@@ -36,14 +34,14 @@ pub fn state(state: &State, since: u64) -> (Status, String) {
     }
 }
 
-#[get("/state/generate")]
-pub fn generate_state(state: &State) -> String {
-    let index = build_index(&state.root_path);
-    let index_str = json::to_string(&index);
+#[get("/index/generate")]
+pub fn generate_index(state: &State) -> Result<String, ()> {
+    let index = build_index(&state.root_path)?;
+    let index_str = serde_json::to_string(&index).unwrap();
 
     *state.index.write().unwrap() = Some(index);
 
-    return index_str;
+    return Ok(index_str);
 }
 
 pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
@@ -52,7 +50,7 @@ pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
             root_path,
             index: RwLock::new(None),
         })
-        .mount("/", routes![version, state, generate_state])
+        .mount("/", routes![version, index, generate_index])
         .launch()
         .await
 }
