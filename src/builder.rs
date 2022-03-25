@@ -99,9 +99,10 @@ pub fn build_index(from: &Path) -> Result<Library, ()> {
 
     println!("Finished parsing and validating ExifTool's JSON output");
 
-    fs::remove_dir_all(tmpdir).map_err(|e| eprintln!("Failed to remove temporary directory: {}", e))?;
+    fs::remove_dir_all(tmpdir)
+        .map_err(|e| eprintln!("Failed to remove temporary directory: {}", e))?;
 
-    let exif_out = exif_out.into_iter().flatten().collect::<Vec<_>>();
+    let exif_out = exif_out.into_iter().flatten();
 
     let mut tracks = vec![];
     let mut tracks_files = HashMap::new();
