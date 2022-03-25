@@ -45,7 +45,11 @@ pub fn build_index(from: &Path) -> Result<Library, ()> {
     println!("Found {} audio files to analyze.", files.len());
     println!("Running ExifTool...");
 
-    let tmpdir = Path::new("/tmp/some-directory-name-to-generate-randomly");
+    let tmpdir = std::env::temp_dir()
+        .as_path()
+        .join(format!("hify-index-{}", creation_time));
+    let tmpdir = tmpdir.as_path();
+
     fs::create_dir(tmpdir).map_err(|e| eprintln!("Failed to create temporary directory: {}", e))?;
 
     let exif_out = files.chunks(100).into_iter().enumerate().par_bridge().map(|(i, files)| {
@@ -83,7 +87,11 @@ pub fn build_index(from: &Path) -> Result<Library, ()> {
         let stdout = std::str::from_utf8(&cmd.stdout).expect("ExifTool returned invalid UTF-8 data");
 
         let out = serde_json::from_str::<ExifToolOutput>(stdout)
-            .map_err(|err| eprintln!("Failed to deserialize ExifTool response: {}", err))?;
+            .map_err(|err| {
+                let outfile = tmpdir.join(format!("chunk-exif-tools-{}.json", i));
+                fs::write(&outfile, stdout).unwrap();
+                eprintln!("Failed to deserialize ExifTool response: {}\n-- ExifTools output at: {}", err, outfile.to_string_lossy());
+            })?;
 
         if out.0.len() != files.len() {
             eprintln!(
