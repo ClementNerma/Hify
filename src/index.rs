@@ -21,6 +21,8 @@ pub struct Track {
     pub artist: Option<String>,
 
     pub album: Option<String>,
+    pub album_artist: Option<String>,
+
     pub disc: Option<u32>,
     pub track_no: Option<u32>,
 

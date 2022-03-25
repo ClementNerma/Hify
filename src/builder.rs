@@ -1,4 +1,4 @@
-use id3::{Tag, TagLike};
+use id3::{Tag as ID3Tag, TagLike};
 use std::{
     collections::HashMap,
     error::Error,
@@ -77,7 +77,7 @@ fn analyze_track(from: &Path, id: u64) -> Result<Option<Track>, Box<dyn Error>> 
 }
 
 fn analyze_mp3_track(file: &Path, id: u64) -> Result<Track, Box<dyn Error>> {
-    let tag = Tag::read_from_path(file)?;
+    let tag = ID3Tag::read_from_path(file)?;
 
     Ok(Track {
         id,
@@ -89,6 +89,7 @@ fn analyze_mp3_track(file: &Path, id: u64) -> Result<Track, Box<dyn Error>> {
         track_no: tag.track(),
 
         album: tag.album().map(ToString::to_string),
+        album_artist: tag.album_artist().map(ToString::to_string),
 
         year: tag.year(),
 
