@@ -41,7 +41,7 @@ pub fn generate_index(state: &State) -> Result<String, ()> {
 
     *state.index.write().unwrap() = Some(index);
 
-    return Ok(index_str);
+    Ok(index_str)
 }
 
 pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
