@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use rayon::iter::{ParallelBridge, ParallelIterator};
 use regex::Regex;
 use serde::Deserialize;
 use std::{
@@ -22,6 +23,7 @@ pub fn build_index(from: &Path) -> Result<Library, ()> {
     let files = WalkDir::new(from)
         .min_depth(1)
         .into_iter()
+        .par_bridge()
         .filter_map(|item| match item {
             Ok(item) if item.path().is_file() => {
                 item.path().to_str().map(ToString::to_string).or_else(|| {
