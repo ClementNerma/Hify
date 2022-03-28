@@ -50,13 +50,14 @@ pub fn build_index(from: &Path) -> Library {
         path_str.hash(&mut hasher);
         let id = hasher.finish();
 
+        let format = track_metadata.format;
+
         tracks.push(Track {
             id,
-            path: path_str.clone(),
             metadata: track_metadata,
         });
 
-        tracks_files.insert(id, path_str.clone());
+        tracks_files.insert(id, (path_str.clone(), format));
     }
 
     println!("Finished generating the new index.");
