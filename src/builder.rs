@@ -60,8 +60,6 @@ pub fn build_index(from: &Path) -> Library {
         tracks_files.insert(id, (path_str.clone(), format));
     }
 
-    println!("Finished generating the new index.");
-
     Library {
         creation_time: SystemTime::now()
             .duration_since(UNIX_EPOCH)

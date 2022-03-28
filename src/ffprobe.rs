@@ -74,8 +74,6 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
         .map(|(k, v)| (k.to_lowercase(), v))
         .collect::<HashMap<_, _>>();
 
-    println!("{:#?}", tags);
-
     Ok(TrackTags {
         title: tags.remove("title"),
 
@@ -108,11 +106,9 @@ fn parse_set_number(input: &str, category: &'static str) -> Result<u32, String> 
         .captures(input)
         .ok_or_else(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
-            c.get(1)
-                .unwrap()
-                .as_str()
-                .parse::<u32>()
-                .map_err(|_| format!("Internal error: failed to parse validated {category} number: {input}"))
+            c.get(1).unwrap().as_str().parse::<u32>().map_err(|_| {
+                format!("Internal error: failed to parse validated {category} number: {input}")
+            })
         })
 }
 
