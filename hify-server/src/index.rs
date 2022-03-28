@@ -5,8 +5,14 @@ use std::collections::HashMap;
 pub struct Library {
     pub creation_time: u64,
     pub tracks: Vec<Track>,
-    pub tracks_files: HashMap<u64, (String, AudioFormat)>,
+    pub tracks_files: HashMap<u64, QuickFileInfo>,
     pub observations: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct QuickFileInfo {
+    pub path: String,
+    pub format: AudioFormat,
 }
 
 #[derive(Serialize, Deserialize)]

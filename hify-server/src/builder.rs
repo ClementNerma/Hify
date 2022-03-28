@@ -9,8 +9,8 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::ffprobe;
 use crate::index::{Library, Track};
+use crate::{ffprobe, index::QuickFileInfo};
 
 pub fn build_index(from: &Path) -> Library {
     let mut files = vec![];
@@ -57,7 +57,13 @@ pub fn build_index(from: &Path) -> Library {
             metadata: track_metadata,
         });
 
-        tracks_files.insert(id, (path_str.clone(), format));
+        tracks_files.insert(
+            id,
+            QuickFileInfo {
+                path: path_str.clone(),
+                format,
+            },
+        );
     }
 
     Library {
