@@ -1,240 +1,113 @@
-use lazy_static::lazy_static;
-use rayon::iter::{ParallelBridge, ParallelIterator};
-use regex::Regex;
-use serde::Deserialize;
+use rayon::iter::{
+    IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
+};
 use std::{
     collections::{hash_map::DefaultHasher, HashMap},
-    fs,
     hash::{Hash, Hasher},
-    path::Path,
-    process::Command,
+    path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
 
-use crate::index::{AudioFormat, Library, Track, TrackDuration, TrackMetadata};
+use crate::ffprobe;
+use crate::index::{Library, Track};
 
-pub fn build_index(from: &Path) -> Result<Library, ()> {
-    let creation_time = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
-        .as_secs();
+pub fn build_index(from: &Path) -> Library {
+    let mut files = vec![];
+    let mut observations = vec![];
 
-    let files = WalkDir::new(from)
-        .min_depth(1)
-        .into_iter()
-        .par_bridge()
-        .filter_map(|item| match item {
-            Ok(item) if item.path().is_file() => {
-                item.path().to_str().map(ToString::to_string).or_else(|| {
-                    eprintln!(
-                        "Item does not have a valid UTF-8 path: {}",
-                        item.path().to_string_lossy()
-                    );
-                    None
-                })
-            }
-            Ok(_) => None,
-            Err(err) => {
-                eprintln!("Failed to read item: {}", err);
-                None
-            }
-        })
-        .collect::<Vec<_>>();
-
-    println!("Found {} audio files to analyze.", files.len());
-    println!("Running ExifTool...");
-
-    let tmpdir = std::env::temp_dir()
-        .as_path()
-        .join(format!("hify-index-{}", creation_time));
-    let tmpdir = tmpdir.as_path();
-
-    fs::create_dir(tmpdir).map_err(|e| eprintln!("Failed to create temporary directory: {}", e))?;
-
-    let exif_out = files.chunks(100).into_iter().enumerate().par_bridge().map(|(i, files)| {
-        let tmpfile_path = tmpdir.join(i.to_string());
-        fs::write(&tmpfile_path, files.join("\n")).map_err(|e| eprintln!("Failed to create temporary file: {}", e))?;
-
-        let cmd = Command::new("exiftool")
-            .args(&[
-                "-json",
-                "-@",
-                tmpfile_path.to_str().unwrap(),
-                // List of fields to get
-                "-sourcefile",
-                "-filetype",
-                "-title",
-                "-artist",
-                "-composer",
-                "-album",
-                "-albumartist",
-                "-discnumber",
-                "-partofset",
-                "-track",
-                "-tracknumber",
-                "-year",
-                "-date",
-                "-genre",
-                "-duration",
-                "-samplerate",
-                "-bitspersample",
-            ])
-            .output()
-
-            .map_err(|err| eprintln!("Failed to run ExifTool: {}", err))?;
-
-        let stdout = std::str::from_utf8(&cmd.stdout).expect("ExifTool returned invalid UTF-8 data");
-
-        let out = serde_json::from_str::<ExifToolOutput>(stdout)
-            .map_err(|err| {
-                let outfile = tmpdir.join(format!("chunk-exif-tools-{}.json", i));
-                fs::write(&outfile, stdout).unwrap();
-                eprintln!("Failed to deserialize ExifTool response: {}\n-- ExifTools output at: {}", err, outfile.to_string_lossy());
-            })?;
-
-        if out.0.len() != files.len() {
-            eprintln!(
-                "ExifTool didn't return the same number of items ({}) than the number of analyzed audio files ({})",
-                out.0.len(),
-                files.len()
-            );
-            return Err(());
+    for file in build_files_list(from) {
+        match file {
+            Ok(file) => files.push(file),
+            Err(err) => observations.push(err),
         }
+    }
 
-        Ok(out.0)
-    }).collect::<Result<Vec<_>, _>>()?;
+    files.sort();
 
-    println!("Finished parsing and validating ExifTool's JSON output");
-
-    fs::remove_dir_all(tmpdir)
-        .map_err(|e| eprintln!("Failed to remove temporary directory: {}", e))?;
-
-    let exif_out = exif_out.into_iter().flatten();
+    let analyzed = files
+        .par_iter()
+        .enumerate()
+        .map(|(_, file)| ffprobe::run_on(&file.path))
+        .collect::<Vec<_>>();
 
     let mut tracks = vec![];
     let mut tracks_files = HashMap::new();
 
-    for (i, track) in exif_out.into_iter().enumerate() {
-        let file = files.get(i).unwrap();
+    for (i, track_metadata) in analyzed.into_iter().enumerate() {
+        let path_str = &files.get(i).unwrap().path_str;
 
-        let format = match track.FileType.as_deref() {
-            Some("MP3") => AudioFormat::MP3,
-            Some("FLAC") => AudioFormat::FLAC,
-            _ => {
-                println!("{:#?}", track);
-                println!("Ignored non-audio file: {}", file);
+        let track_metadata = match track_metadata {
+            Ok(None) => continue,
+            Ok(Some(mt)) => mt,
+            Err(err) => {
+                observations.push(format!("Error while analyzing file '{path_str}': {err}"));
                 continue;
             }
         };
 
         let mut hasher = DefaultHasher::new();
-        file.hash(&mut hasher);
-
+        path_str.hash(&mut hasher);
         let id = hasher.finish();
 
         tracks.push(Track {
             id,
-            format,
-            metadata: parse_exif_tool_file(track),
+            path: path_str.clone(),
+            metadata: track_metadata,
         });
 
-        tracks_files.insert(id, file.clone());
+        tracks_files.insert(id, path_str.clone());
     }
 
     println!("Finished generating the new index.");
 
-    Ok(Library {
-        creation_time,
+    Library {
+        creation_time: SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
+            .as_secs(),
         tracks,
         tracks_files,
-    })
-}
-
-#[derive(Debug, Deserialize)]
-struct ExifToolOutput(Vec<ExifToolFile>);
-
-#[derive(Debug, Deserialize)]
-#[allow(non_snake_case)]
-struct ExifToolFile {
-    FileType: Option<String>,
-
-    Title: Option<String>,
-
-    Artist: Option<String>,
-    Composer: Option<String>,
-
-    Album: Option<String>,
-    Albumartist: Option<String>,
-
-    Discnumber: Option<String>,
-    PartOfSet: Option<String>,
-    Track: Option<u32>,
-    Tracknumber: Option<u32>,
-
-    Year: Option<u32>,
-    Date: Option<u32>,
-
-    Genre: Option<String>,
-
-    Duration: Option<String>,
-
-    SampleRate: Option<u32>,
-    BitsPerSample: Option<u8>,
-}
-
-lazy_static! {
-    static ref PARSE_DISC_NUMBER: Regex = Regex::new(r"^(\d+)(/\d+)?$").unwrap();
-    static ref PARSE_TRACK_DURATION: Regex =
-        Regex::new(r"^(\d+):(\d+):(\d+)(\s\(approx\))?$").unwrap();
-    static ref PARSE_ALT_TRACK_DURATION: Regex =
-        Regex::new(r"^(\d+)\.\d+\ss(\s\(approx\))?$").unwrap();
-}
-
-// TODO: Return reports for invalid fields value etc.
-fn parse_exif_tool_file(input: ExifToolFile) -> TrackMetadata {
-    TrackMetadata {
-        title: input.Title,
-        artist: input.Artist,
-        composer: input.Composer,
-        album: input.Album,
-        album_artist: input.Albumartist,
-        disc: input.Discnumber.or(input.PartOfSet).and_then(|disc| {
-            PARSE_DISC_NUMBER
-                .captures(&disc)
-                .map(|disc| disc.get(1).unwrap())
-                .and_then(|disc| disc.as_str().parse::<u32>().ok())
-        }),
-        track_no: input.Track.or(input.Tracknumber),
-        year: input.Year.or(input.Date),
-        genre: input.Genre,
-        duration: input.Duration.and_then(|duration| {
-            PARSE_TRACK_DURATION
-                .captures(&duration)
-                .and_then(|duration| {
-                    Some(TrackDuration {
-                        hours: duration.get(1).unwrap().as_str().parse::<u8>().ok()?,
-                        minutes: duration.get(2).unwrap().as_str().parse::<u8>().ok()?,
-                        seconds: duration.get(3).unwrap().as_str().parse::<u8>().ok()?,
-                        approx: duration.get(4).is_some(),
-                    })
-                })
-                .or_else(|| {
-                    PARSE_ALT_TRACK_DURATION
-                        .captures(&duration)
-                        .and_then(|duration| {
-                            let seconds = duration.get(1).unwrap().as_str().parse::<u32>().ok()?;
-
-                            Some(TrackDuration {
-                                hours: (seconds / 3600) as u8,
-                                minutes: (seconds / 60) as u8,
-                                seconds: (seconds % 60) as u8,
-                                approx: duration.get(2).is_some(),
-                            })
-                        })
-                })
-        }),
-        bitrate: input.SampleRate,
-        resolution: input.BitsPerSample,
+        observations,
     }
+}
+
+fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
+    WalkDir::new(from)
+        .min_depth(1)
+        .into_iter()
+        .par_bridge()
+        .filter_map(|item| {
+            let item = match item {
+                Ok(item) => item,
+                Err(err) => return Some(Err(format!("Failed to read directory entry: {err}"))),
+            };
+
+            if !item.path().is_file() {
+                return None;
+            }
+
+            let result = item
+                .path()
+                .to_str()
+                .map(|path| FoundFile {
+                    path: item.path().to_path_buf(),
+                    path_str: path.to_string(),
+                })
+                .ok_or_else(|| {
+                    format!(
+                        "Item does not have a valid UTF-8 path: {}",
+                        item.path().to_string_lossy()
+                    )
+                });
+
+            Some(result)
+        })
+        .collect()
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
+struct FoundFile {
+    path: PathBuf,
+    path_str: String,
 }

@@ -35,13 +35,13 @@ pub fn index(state: &State, since: u64) -> (Status, String) {
 }
 
 #[get("/index/generate")]
-pub fn generate_index(state: &State) -> Result<String, ()> {
-    let index = build_index(&state.root_path)?;
+pub fn generate_index(state: &State) -> String {
+    let index = build_index(&state.root_path);
     let index_str = serde_json::to_string(&index).unwrap();
 
     *state.index.write().unwrap() = Some(index);
 
-    Ok(index_str)
+    index_str
 }
 
 pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {

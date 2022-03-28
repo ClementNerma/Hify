@@ -4,6 +4,7 @@
 use std::path::PathBuf;
 
 mod builder;
+mod ffprobe;
 mod index;
 mod server;
 

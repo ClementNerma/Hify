@@ -5,19 +5,28 @@ use std::collections::HashMap;
 pub struct Library {
     pub creation_time: u64,
     pub tracks: Vec<Track>,
-    // pub invalid_files: Vec<String>,
     pub tracks_files: HashMap<u64, String>,
+    pub observations: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct Track {
     pub id: u64,
-    pub format: AudioFormat,
+    pub path: String,
     pub metadata: TrackMetadata,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct TrackMetadata {
+    pub format: AudioFormat,
+    pub size: u64,
+    pub duration: u32,
+    pub bitrate: u32,
+    pub tags: TrackTags,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct TrackTags {
     pub title: Option<String>,
 
     pub artist: Option<String>,
@@ -29,14 +38,8 @@ pub struct TrackMetadata {
     pub disc: Option<u32>,
     pub track_no: Option<u32>,
 
-    pub year: Option<u32>,
-    // pub month: Option<u8>,
-    // pub day: Option<u8>,
+    pub date: Option<TrackDate>,
     pub genre: Option<String>,
-
-    pub duration: Option<TrackDuration>,
-    pub bitrate: Option<u32>,
-    pub resolution: Option<u8>,
     // pub note: Option<u8>,
 }
 
@@ -47,9 +50,8 @@ pub enum AudioFormat {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct TrackDuration {
-    pub hours: u8,
-    pub minutes: u8,
-    pub seconds: u8,
-    pub approx: bool,
+pub struct TrackDate {
+    pub year: u16,
+    pub month: Option<u8>,
+    pub day: Option<u8>,
 }
