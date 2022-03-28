@@ -52,13 +52,13 @@ fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
 
-#[get("/index?<since>")]
-async fn index(state: &State, since: u64) -> FaillibleResponse<String> {
+#[get("/index?<fingerprint>")]
+async fn index(state: &State, fingerprint: String) -> FaillibleResponse<String> {
     let index = state.index.read().await;
 
     match *index {
         Some(ref index) => {
-            if index.creation_time != since {
+            if index.creation_time != fingerprint {
                 Ok(serde_json::to_string(index).unwrap())
             } else {
                 Err(server_error(
@@ -85,7 +85,7 @@ async fn generate_index(state: &State) -> Json<String> {
 }
 
 #[get("/stream/<id>")]
-async fn stream(state: &State, id: u64) -> FaillibleResponse<Custom<File>> {
+async fn stream(state: &State, id: String) -> FaillibleResponse<Custom<File>> {
     let library = state.index.read().await;
     let library = library.as_ref().ok_or_else(|| {
         server_error(
@@ -94,21 +94,20 @@ async fn stream(state: &State, id: u64) -> FaillibleResponse<Custom<File>> {
         )
     })?;
 
-    let file_info = library
-        .tracks_files
-        .get(&id)
+    let track = library
+        .tracks
+        .iter()
+        .find(|track| track.id == id)
         .ok_or_else(|| server_error(Status::NotFound, "Track ID was not found".to_string()))?;
 
-    let file = File::open(Path::new(&file_info.path))
-        .await
-        .map_err(|err| {
-            server_error(
-                Status::InternalServerError,
-                format!("Failed to open track file: {err}"),
-            )
-        })?;
+    let file = File::open(Path::new(&track.path)).await.map_err(|err| {
+        server_error(
+            Status::InternalServerError,
+            format!("Failed to open track file: {err}"),
+        )
+    })?;
 
-    Ok(Custom(mime_type(file_info.format), file))
+    Ok(Custom(mime_type(track.metadata.format), file))
 }
 
 pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {

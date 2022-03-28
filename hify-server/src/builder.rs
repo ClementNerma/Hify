@@ -2,15 +2,15 @@ use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::hash_map::DefaultHasher,
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
 
+use crate::ffprobe;
 use crate::index::{Library, Track};
-use crate::{ffprobe, index::QuickFileInfo};
 
 pub fn build_index(from: &Path) -> Library {
     let mut files = vec![];
@@ -32,10 +32,9 @@ pub fn build_index(from: &Path) -> Library {
         .collect::<Vec<_>>();
 
     let mut tracks = vec![];
-    let mut tracks_files = HashMap::new();
 
     for (i, track_metadata) in analyzed.into_iter().enumerate() {
-        let path_str = &files.get(i).unwrap().path_str;
+        let FoundFile { path_str, .. } = &files.get(i).unwrap();
 
         let track_metadata = match track_metadata {
             Ok(None) => continue,
@@ -48,31 +47,22 @@ pub fn build_index(from: &Path) -> Library {
 
         let mut hasher = DefaultHasher::new();
         path_str.hash(&mut hasher);
-        let id = hasher.finish();
-
-        let format = track_metadata.format;
+        let id = hasher.finish().to_string();
 
         tracks.push(Track {
             id,
+            path: path_str.clone(),
             metadata: track_metadata,
         });
-
-        tracks_files.insert(
-            id,
-            QuickFileInfo {
-                path: path_str.clone(),
-                format,
-            },
-        );
     }
 
     Library {
         creation_time: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
-            .as_secs(),
+            .as_secs()
+            .to_string(),
         tracks,
-        tracks_files,
         observations,
     }
 }

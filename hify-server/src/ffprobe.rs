@@ -50,19 +50,22 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         name => return Err(format!("Unknown file format: {name}")),
     };
 
+    let size = data
+        .size
+        .parse::<u64>()
+        .map_err(|e| format!("Failed to parse file size: {e}"))?;
+
     Ok(Some(TrackMetadata {
         format,
-        size: data
-            .size
-            .parse::<u64>()
-            .map_err(|e| format!("Failed to parse file size: {e}"))?,
+        size: i32::try_from(size)
+            .map_err(|_| format!("Size is too big to be returned to GraphQL: {size}"))?,
         duration: data
             .duration
             .parse::<f64>()
-            .map_err(|e| format!("Failed to parse duration: {e}"))? as u32,
+            .map_err(|e| format!("Failed to parse duration: {e}"))?,
         bitrate: data
             .bit_rate
-            .parse::<u32>()
+            .parse::<i32>()
             .map_err(|e| format!("Failed to parse bit rate: {e}"))?,
         tags: parse_ffprobe_tags(data.tags)?,
     }))
@@ -101,14 +104,19 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
     })
 }
 
-fn parse_set_number(input: &str, category: &'static str) -> Result<u32, String> {
+fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32, String> {
     PARSE_DISC_NUMBER
         .captures(input)
         .ok_or_else(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
-            c.get(1).unwrap().as_str().parse::<u32>().map_err(|_| {
-                format!("Internal error: failed to parse validated {category} number: {input}")
-            })
+            c.get(1)
+                .unwrap()
+                .as_str()
+                .parse::<u16>()
+                .map(i32::from)
+                .map_err(|_| {
+                    format!("Internal error: failed to parse validated {category} number: {input}")
+                })
         })
 }
 
@@ -122,13 +130,16 @@ fn parse_date(input: &str) -> Result<TrackDate, String> {
                 .unwrap()
                 .as_str()
                 .parse::<u16>()
+                .map(i32::from)
                 .expect("Invalid year number"),
             month: captured
                 .get(2)
-                .map(|month| month.as_str().parse::<u8>().expect("Invalid month number")),
+                .map(|month| month.as_str().parse::<u8>().expect("Invalid month number"))
+                .map(i32::from),
             day: captured
                 .get(3)
-                .map(|day| day.as_str().parse::<u8>().expect("Invalid day number")),
+                .map(|day| day.as_str().parse::<u8>().expect("Invalid day number"))
+                .map(i32::from),
         })
 }
 

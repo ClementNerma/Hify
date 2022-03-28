@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+juniper = "0.15.9"
 lazy_static = "1.4.0"
 rayon = "1.5.1"
 regex = "1.5.5"
