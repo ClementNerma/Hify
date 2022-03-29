@@ -10,9 +10,9 @@ use std::{
 use walkdir::WalkDir;
 
 use crate::ffprobe;
-use crate::index::{Library, Track};
+use crate::index::{Index, Track};
 
-pub fn build_index(from: &Path) -> Library {
+pub fn build_index(from: &Path) -> Index {
     let mut files = vec![];
     let mut observations = vec![];
 
@@ -56,7 +56,7 @@ pub fn build_index(from: &Path) -> Library {
         });
     }
 
-    Library {
+    Index {
         creation_time: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH

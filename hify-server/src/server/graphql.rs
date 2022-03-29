@@ -3,13 +3,13 @@ use rocket::{http::Status, response::content, tokio::sync::RwLock, Rocket, State
 use std::{path::PathBuf, sync::Arc};
 
 use super::{cors::CORS, mutations::MutationRoot, queries::QueryRoot};
-use crate::index::Library;
+use crate::index::Index;
 
 type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<GraphQLContext>>;
 
 pub struct GraphQLContext {
     pub root_path: PathBuf,
-    pub index: Arc<RwLock<Option<Library>>>,
+    pub index: Arc<RwLock<Option<Index>>>,
 }
 
 impl Context for GraphQLContext {}

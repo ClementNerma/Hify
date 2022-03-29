@@ -2,7 +2,7 @@ use juniper::{GraphQLEnum, GraphQLObject};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, GraphQLObject, Clone)]
-pub struct Library {
+pub struct Index {
     pub creation_time: String,
     pub tracks: Vec<Track>,
     pub observations: Vec<String>,
