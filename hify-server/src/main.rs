@@ -8,9 +8,6 @@ mod ffprobe;
 mod index;
 mod server;
 
-#[macro_use]
-extern crate rocket;
-
 #[rocket::main]
 async fn main() {
     let root_path = std::env::args().nth(1).expect("Please provide a root path");

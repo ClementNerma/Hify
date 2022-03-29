@@ -543,6 +543,7 @@ name = "hify-server"
 version = "0.1.0"
 dependencies = [
  "juniper",
+ "juniper_rocket",
  "lazy_static",
  "rayon",
  "regex",
@@ -685,6 +686,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "juniper_rocket"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c24868ce3d00537b353d2e18882133a317f504782730bb2979df00c1bfcc575c"
+dependencies = [
+ "futures",
+ "juniper",
+ "rocket",
+ "serde_json",
 ]
 
 [[package]]

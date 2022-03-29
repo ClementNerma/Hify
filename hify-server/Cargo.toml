@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 juniper = "0.15.9"
+juniper_rocket = "0.8.0"
 lazy_static = "1.4.0"
 rayon = "1.5.1"
 regex = "1.5.5"

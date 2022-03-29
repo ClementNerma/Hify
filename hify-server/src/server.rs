@@ -1,122 +1,81 @@
-use rocket::{
-    http::{ContentType, Status},
-    response::{
-        content::{Custom, Json},
-        status,
-    },
-    routes,
-    tokio::{fs::File, sync::RwLock},
-    State as RocketState,
-};
-use serde::Serialize;
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use juniper::{graphql_object, Context, EmptySubscription, RootNode};
+use rocket::{response::content, tokio::sync::RwLock, Rocket, State};
+use std::{path::PathBuf, sync::Arc};
 
-use crate::{
-    builder::build_index,
-    index::{AudioFormat, Library},
-};
+use crate::{builder::build_index, index::Library};
 
-type State = RocketState<ServerState>;
+type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<GraphQLContext>>;
 
-pub struct ServerState {
+struct GraphQLContext {
     root_path: PathBuf,
     index: Arc<RwLock<Option<Library>>>,
 }
 
-#[derive(Serialize)]
-struct ServerError {
-    message: String,
-}
+struct QueryRoot;
 
-type FaillibleResponse<T> = Result<T, status::Custom<String>>;
-
-fn server_error(status: Status, message: String) -> status::Custom<String> {
-    status::Custom(
-        status,
-        serde_json::to_string(&ServerError { message }).unwrap(),
-    )
-}
-
-fn mime_type(audio_format: AudioFormat) -> ContentType {
-    match audio_format {
-        AudioFormat::MP3 => ContentType::MPEG,
-        AudioFormat::FLAC => ContentType::FLAC,
+#[graphql_object(context = GraphQLContext)]
+impl QueryRoot {
+    async fn index(ctx: &GraphQLContext, fingerprint: String) -> Option<Library> {
+        ctx.index
+            .read()
+            .await
+            .clone()
+            .filter(|index| index.creation_time != fingerprint)
     }
 }
 
-#[get("/version")]
-fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
-}
+struct MutationRoot;
 
-#[get("/index?<fingerprint>")]
-async fn index(state: &State, fingerprint: String) -> FaillibleResponse<String> {
-    let index = state.index.read().await;
+#[graphql_object(context = GraphQLContext)]
 
-    match *index {
-        Some(ref index) => {
-            if index.creation_time != fingerprint {
-                Ok(serde_json::to_string(index).unwrap())
-            } else {
-                Err(server_error(
-                    Status::NotModified,
-                    "State didn't change".to_string(),
-                ))
-            }
-        }
-        None => Err(server_error(
-            Status::NotFound,
-            "Please generate a state first".to_string(),
-        )),
+impl MutationRoot {
+    async fn generate_index(ctx: &mut GraphQLContext) -> Library {
+        let index = build_index(&ctx.root_path);
+        *ctx.index.write().await = Some(index.clone());
+        index
     }
 }
 
-#[get("/index/generate")]
-async fn generate_index(state: &State) -> Json<String> {
-    let index = build_index(&state.root_path);
-    let index_str = serde_json::to_string(&index).unwrap();
+impl Context for GraphQLContext {}
 
-    *state.index.write().await = Some(index);
-
-    Json(index_str)
+#[rocket::get("/")]
+fn graphiql() -> content::Html<String> {
+    juniper_rocket::graphiql_source("/graphql", None)
 }
 
-#[get("/stream/<id>")]
-async fn stream(state: &State, id: String) -> FaillibleResponse<Custom<File>> {
-    let library = state.index.read().await;
-    let library = library.as_ref().ok_or_else(|| {
-        server_error(
-            Status::NotFound,
-            "Please generate a state first".to_string(),
-        )
-    })?;
+#[rocket::get("/graphql?<request>")]
+async fn get_graphql_handler(
+    context: &State<GraphQLContext>,
+    request: juniper_rocket::GraphQLRequest,
+    schema: &State<Schema>,
+) -> juniper_rocket::GraphQLResponse {
+    request.execute(&*schema, &*context).await
+}
 
-    let track = library
-        .tracks
-        .iter()
-        .find(|track| track.id == id)
-        .ok_or_else(|| server_error(Status::NotFound, "Track ID was not found".to_string()))?;
-
-    let file = File::open(Path::new(&track.path)).await.map_err(|err| {
-        server_error(
-            Status::InternalServerError,
-            format!("Failed to open track file: {err}"),
-        )
-    })?;
-
-    Ok(Custom(mime_type(track.metadata.format), file))
+#[rocket::post("/graphql", data = "<request>")]
+async fn post_graphql_handler(
+    context: &State<GraphQLContext>,
+    request: juniper_rocket::GraphQLRequest,
+    schema: &State<Schema>,
+) -> juniper_rocket::GraphQLResponse {
+    request.execute(&*schema, &*context).await
 }
 
 pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
-    rocket::build()
-        .manage(ServerState {
+    Rocket::build()
+        .manage(GraphQLContext {
             root_path,
             index: Arc::new(RwLock::new(None)),
         })
-        .mount("/", routes![version, index, generate_index, stream])
+        .manage(Schema::new(
+            QueryRoot,
+            MutationRoot,
+            EmptySubscription::<GraphQLContext>::new(),
+        ))
+        .mount(
+            "/",
+            rocket::routes![graphiql, get_graphql_handler, post_graphql_handler],
+        )
         .launch()
         .await
 }
