@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "useUnknownInCatchVariables": true,
+    "strictPropertyInitialization": true,
+
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "target": "es2017",
+
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+
+  "include": ["src"]
+}

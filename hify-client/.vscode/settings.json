@@ -1,0 +1,10 @@
+{
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ]
+}

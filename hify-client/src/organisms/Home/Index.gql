@@ -1,0 +1,13 @@
+
+query Index($fingerprint: String!) {
+    index(fingerprint: $fingerprint) {
+        creationTime
+        tracks {
+            id
+            path
+            metadata {
+              format
+            }
+        }
+    }
+}

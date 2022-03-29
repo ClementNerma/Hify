@@ -1,0 +1,19 @@
+overwrite: true
+schema: 'http://localhost:8000/graphql'
+documents: 'src/**/*.gql'
+generates:
+  src/graphql/types.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+  src/:
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: graphql/types.ts
+      extension: .generated.ts
+    plugins:
+      - typescript-operations
+      - graphql-codegen-svelte-apollo
+    config:
+      clientPath: ../../apollo-client
+      asyncQuery: true

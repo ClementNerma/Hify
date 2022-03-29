@@ -1,0 +1,47 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json",
+    "sourceType": "module",
+    "extraFileExtensions": [".svelte"]
+  },
+  "plugins": ["svelte3", "@typescript-eslint/eslint-plugin"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.svelte"],
+      "processor": "svelte3/svelte3"
+    }
+  ],
+  "settings": {
+    "svelte3/typescript": true
+  },
+  "root": true,
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "ignorePatterns": [".eslintrc", "node_modules", "**/*.svelte"],
+  "rules": {
+    "prettier/prettier": "error",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-implicit-any-catch": "error",
+    "@typescript-eslint/no-unnecessary-condition": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_+$"
+      }
+    ],
+    "@typescript-eslint/strict-boolean-expressions": "error",
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/require-await": "off"
+  }
+}
