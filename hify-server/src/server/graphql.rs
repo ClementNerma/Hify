@@ -1,5 +1,5 @@
 use juniper::{Context, EmptySubscription, RootNode};
-use rocket::{response::content, tokio::sync::RwLock, Rocket, State};
+use rocket::{http::Status, response::content, tokio::sync::RwLock, Rocket, State};
 use std::{path::PathBuf, sync::Arc};
 
 use super::{cors::CORS, mutations::MutationRoot, queries::QueryRoot};
@@ -17,6 +17,11 @@ impl Context for GraphQLContext {}
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
     juniper_rocket::graphiql_source("/graphql", None)
+}
+
+#[rocket::options("/graphql")]
+async fn graphql_preflight_handler() -> Status {
+    Status::NoContent
 }
 
 #[rocket::get("/graphql?<request>")]
@@ -51,7 +56,12 @@ pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
         ))
         .mount(
             "/",
-            rocket::routes![graphiql, get_graphql_handler, post_graphql_handler],
+            rocket::routes![
+                graphiql,
+                graphql_preflight_handler,
+                get_graphql_handler,
+                post_graphql_handler
+            ],
         )
         .launch()
         .await
