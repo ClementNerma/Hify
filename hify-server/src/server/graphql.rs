@@ -1,39 +1,15 @@
-use juniper::{graphql_object, Context, EmptySubscription, RootNode};
+use juniper::{Context, EmptySubscription, RootNode};
 use rocket::{response::content, tokio::sync::RwLock, Rocket, State};
 use std::{path::PathBuf, sync::Arc};
 
-use crate::{builder::build_index, index::Library};
+use super::{mutations::MutationRoot, queries::QueryRoot};
+use crate::index::Library;
 
 type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<GraphQLContext>>;
 
-struct GraphQLContext {
-    root_path: PathBuf,
-    index: Arc<RwLock<Option<Library>>>,
-}
-
-struct QueryRoot;
-
-#[graphql_object(context = GraphQLContext)]
-impl QueryRoot {
-    async fn index(ctx: &GraphQLContext, fingerprint: String) -> Option<Library> {
-        ctx.index
-            .read()
-            .await
-            .clone()
-            .filter(|index| index.creation_time != fingerprint)
-    }
-}
-
-struct MutationRoot;
-
-#[graphql_object(context = GraphQLContext)]
-
-impl MutationRoot {
-    async fn generate_index(ctx: &mut GraphQLContext) -> Library {
-        let index = build_index(&ctx.root_path);
-        *ctx.index.write().await = Some(index.clone());
-        index
-    }
+pub struct GraphQLContext {
+    pub root_path: PathBuf,
+    pub index: Arc<RwLock<Option<Library>>>,
 }
 
 impl Context for GraphQLContext {}
