@@ -1,17 +1,16 @@
 use juniper::graphql_object;
 
-use crate::{builder::build_index, index::Index};
-
-use super::graphql::GraphQLContext;
+use super::graphql::{GraphQLContext, OkScalar};
+use crate::builder::build_index;
 
 pub struct MutationRoot;
 
 #[graphql_object(context = GraphQLContext)]
 
 impl MutationRoot {
-    async fn generate_index(ctx: &mut GraphQLContext) -> Index {
+    async fn generate_index(ctx: &mut GraphQLContext) -> OkScalar {
         let index = build_index(&ctx.root_path);
-        *ctx.index.write().await = Some(index.clone());
-        index
+        *ctx.index.write().await = Some(index);
+        OkScalar
     }
 }
