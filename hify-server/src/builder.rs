@@ -10,7 +10,7 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::index::{AlbumID, Index, Track, TrackID};
+use crate::index::{AlbumID, AlbumInfos, Index, Track, TrackID};
 use crate::{ffprobe, index::IndexCache};
 
 fn log(time: SystemTime, message: &str) {
@@ -175,8 +175,10 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
 
     let mut artists_albums = HashMap::<String, HashSet<AlbumID>>::new();
     let mut artists_tracks = HashMap::<String, HashSet<TrackID>>::new();
-    let mut album_artists_albums = HashMap::<String, HashSet<AlbumID>>::new();
-    let mut album_tracks = HashMap::<AlbumID, HashSet<TrackID>>::new();
+    let mut albums_artists_albums = HashMap::<String, HashSet<AlbumID>>::new();
+    let mut albums_tracks = HashMap::<AlbumID, HashSet<TrackID>>::new();
+
+    let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
     for track in tracks {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
@@ -195,12 +197,16 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
             no_album_artist_tracks.insert(track.id.clone());
         }
 
-        if let Some(album_id) = tags.get_album_id() {
+        if let Some(album_infos) = tags.get_album_infos() {
+            let album_id = album_infos.get_id();
+
+            albums_infos.insert(album_id.clone(), album_infos);
+
             if let Some(artist) = tags.artist.as_ref().or(tags.album_artist.as_ref()) {
                 artists_albums
                     .entry(artist.clone())
                     .or_default()
-                    .insert(album_id);
+                    .insert(album_id.clone());
 
                 artists_tracks
                     .entry(artist.clone())
@@ -209,20 +215,16 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
             }
 
             if let Some(ref album_artist) = tags.album_artist {
-                if let Some(album_id) = tags.get_album_id() {
-                    album_artists_albums
-                        .entry(album_artist.clone())
-                        .or_default()
-                        .insert(album_id.clone());
-                }
+                albums_artists_albums
+                    .entry(album_artist.clone())
+                    .or_default()
+                    .insert(album_id.clone());
             }
 
-            if let Some(album_id) = tags.get_album_id() {
-                album_tracks
-                    .entry(album_id.clone())
-                    .or_default()
-                    .insert(track.id.clone());
-            }
+            albums_tracks
+                .entry(album_id.clone())
+                .or_default()
+                .insert(track.id.clone());
         }
     }
 
@@ -234,7 +236,8 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
         no_album_artist_tracks,
         artists_albums,
         artists_tracks,
-        album_artists_albums,
-        album_tracks,
+        albums_artists_albums,
+        albums_tracks,
+        albums_infos,
     }
 }

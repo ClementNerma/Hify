@@ -28,9 +28,25 @@ pub struct IndexCache {
     pub artists_albums: HashMap<String, HashSet<AlbumID>>,
     pub artists_tracks: HashMap<String, HashSet<TrackID>>,
 
-    pub album_artists_albums: HashMap<String, HashSet<AlbumID>>,
+    pub albums_artists_albums: HashMap<String, HashSet<AlbumID>>,
 
-    pub album_tracks: HashMap<AlbumID, HashSet<TrackID>>,
+    pub albums_tracks: HashMap<AlbumID, HashSet<TrackID>>,
+
+    pub albums_infos: HashMap<AlbumID, AlbumInfos>,
+}
+
+#[derive(GraphQLObject, Serialize, Deserialize, Hash)]
+pub struct AlbumInfos {
+    pub name: String,
+    pub album_artist: Option<String>,
+}
+
+impl AlbumInfos {
+    pub fn get_id(&self) -> AlbumID {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        AlbumID(hasher.finish().to_string())
+    }
 }
 
 #[derive(
@@ -80,12 +96,11 @@ pub struct TrackTags {
 }
 
 impl TrackTags {
-    pub fn get_album_id(&self) -> Option<AlbumID> {
-        let mut hasher = DefaultHasher::new();
-        self.album.as_ref()?.hash(&mut hasher);
-        self.album_artist.hash(&mut hasher);
-        // self.date.as_ref().map(|date| date.year).hash(&mut hasher);
-        Some(AlbumID(hasher.finish().to_string()))
+    pub fn get_album_infos(&self) -> Option<AlbumInfos> {
+        Some(AlbumInfos {
+            name: self.album.as_ref()?.clone(),
+            album_artist: self.album_artist.clone(),
+        })
     }
 }
 
