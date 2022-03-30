@@ -1,6 +1,10 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::{hash_map::DefaultHasher, HashMap, HashSet},
+    hash::{Hash, Hasher},
+    path::PathBuf,
+};
 
-use juniper::{GraphQLEnum, GraphQLObject};
+use juniper::{GraphQLEnum, GraphQLObject, GraphQLScalarValue};
 
 pub struct Index {
     pub fingerprint: String,
@@ -10,15 +14,31 @@ pub struct Index {
 }
 
 pub struct IndexCache {
-    pub tracks_paths: HashMap<String, PathBuf>,
-    pub no_title_tracks: Vec<String>,
-    pub no_album_tracks: Vec<String>,
-    pub no_album_artist_tracks: Vec<String>,
+    pub tracks_paths: HashMap<TrackID, PathBuf>,
+
+    pub no_title_tracks: HashSet<TrackID>,
+    pub no_album_tracks: HashSet<TrackID>,
+    pub no_album_artist_tracks: HashSet<TrackID>,
+
+    pub artists_albums: HashMap<String, HashSet<AlbumID>>,
+    pub artists_tracks: HashMap<String, HashSet<TrackID>>,
+
+    pub album_artists_albums: HashMap<String, HashSet<AlbumID>>,
+
+    pub album_tracks: HashMap<AlbumID, HashSet<TrackID>>,
 }
+
+#[derive(GraphQLScalarValue, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[graphql(transparent)]
+pub struct TrackID(pub String);
+
+#[derive(GraphQLScalarValue, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[graphql(transparent)]
+pub struct AlbumID(pub String);
 
 #[derive(GraphQLObject, Clone)]
 pub struct Track {
-    pub id: String,
+    pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,
 }
@@ -48,6 +68,16 @@ pub struct TrackTags {
     pub date: Option<TrackDate>,
     pub genre: Option<String>,
     // pub note: Option<u8>,
+}
+
+impl TrackTags {
+    pub fn get_album_id(&self) -> Option<AlbumID> {
+        let mut hasher = DefaultHasher::new();
+        self.album.as_ref()?.hash(&mut hasher);
+        self.album_artist.hash(&mut hasher);
+        // self.date.as_ref().map(|date| date.year).hash(&mut hasher);
+        Some(AlbumID(hasher.finish().to_string()))
+    }
 }
 
 #[derive(GraphQLEnum, Clone, Copy)]

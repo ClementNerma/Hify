@@ -2,14 +2,14 @@ use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
 
-use crate::index::{Index, Track};
+use crate::index::{AlbumID, Index, Track, TrackID};
 use crate::{ffprobe, index::IndexCache};
 
 pub fn build_index(from: &Path) -> Index {
@@ -48,7 +48,7 @@ pub fn build_index(from: &Path) -> Index {
 
         let mut hasher = DefaultHasher::new();
         path_str.hash(&mut hasher);
-        let id = hasher.finish().to_string();
+        let id = TrackID(hasher.finish().to_string());
 
         tracks_paths.insert(id.clone(), path.clone());
 
@@ -111,24 +111,61 @@ struct FoundFile {
     path_str: String,
 }
 
-fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -> IndexCache {
-    let mut no_title_tracks = vec![];
-    let mut no_album_tracks = vec![];
-    let mut no_album_artist_tracks = vec![];
+// TODO: lots of optimization to perform here
+fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) -> IndexCache {
+    println!("Generating cache...");
+    let mut no_title_tracks = HashSet::new();
+    let mut no_album_tracks = HashSet::new();
+    let mut no_album_artist_tracks = HashSet::new();
+
+    let mut artists_albums = HashMap::<String, HashSet<AlbumID>>::new();
+    let mut artists_tracks = HashMap::<String, HashSet<TrackID>>::new();
+    let mut album_artists_albums = HashMap::<String, HashSet<AlbumID>>::new();
+    let mut album_tracks = HashMap::<AlbumID, HashSet<TrackID>>::new();
 
     for track in tracks {
         let tags = &track.metadata.tags;
 
         if tags.title.is_none() {
-            no_title_tracks.push(track.id.clone());
+            no_title_tracks.insert(track.id.clone());
         }
 
         if tags.album.is_none() {
-            no_album_tracks.push(track.id.clone());
+            no_album_tracks.insert(track.id.clone());
         }
 
         if tags.album_artist.is_none() {
-            no_album_artist_tracks.push(track.id.clone());
+            no_album_artist_tracks.insert(track.id.clone());
+        }
+
+        if let Some(album_id) = tags.get_album_id() {
+            if let Some(artist) = tags.artist.as_ref().or_else(|| tags.album_artist.as_ref()) {
+                artists_albums
+                    .entry(artist.clone())
+                    .or_default()
+                    .insert(album_id);
+
+                artists_tracks
+                    .entry(artist.clone())
+                    .or_default()
+                    .insert(track.id.clone());
+            }
+
+            if let Some(ref album_artist) = tags.album_artist {
+                if let Some(album_id) = tags.get_album_id() {
+                    album_artists_albums
+                        .entry(album_artist.clone())
+                        .or_default()
+                        .insert(album_id.clone());
+                }
+            }
+
+            if let Some(album_id) = tags.get_album_id() {
+                album_tracks
+                    .entry(album_id.clone())
+                    .or_default()
+                    .insert(track.id.clone());
+            }
         }
     }
 
@@ -137,5 +174,9 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -
         no_title_tracks,
         no_album_tracks,
         no_album_artist_tracks,
+        artists_albums,
+        artists_tracks,
+        album_artists_albums,
+        album_tracks,
     }
 }
