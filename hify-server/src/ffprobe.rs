@@ -7,12 +7,16 @@ use serde::Deserialize;
 use crate::index::{AudioFormat, TrackDate, TrackMetadata, TrackTags};
 
 pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
-    let audio_ext = file
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .filter(|ext| matches!(ext.to_ascii_lowercase().as_str(), "mp3" | "flac"));
+    let audio_ext = match file.extension().and_then(|ext| ext.to_str()) {
+        Some(ext) => ext.to_ascii_lowercase(),
+        None => return Ok(None),
+    };
 
-    if audio_ext.is_none() {
+    if matches!(audio_ext.as_str(), "m4a" | "mpeg" | "ogg" | "opus") {
+        return Err(format!("Unsupported audio extension: {}", audio_ext));
+    }
+
+    if !matches!(audio_ext.as_str(), "mp3" | "flac") {
         return Ok(None);
     }
 
