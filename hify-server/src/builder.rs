@@ -87,7 +87,7 @@ pub fn build_index(from: PathBuf) -> Index {
 
         let mut hasher = DefaultHasher::new();
         path_str.hash(&mut hasher);
-        let id = TrackID(hasher.finish().to_string());
+        let id = TrackID(format!("{:x}", hasher.finish()));
 
         tracks_paths.insert(id.clone(), path.clone());
 

@@ -45,7 +45,7 @@ impl AlbumInfos {
     pub fn get_id(&self) -> AlbumID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
-        AlbumID(hasher.finish().to_string())
+        AlbumID(format!("{:x}", hasher.finish()))
     }
 }
 
