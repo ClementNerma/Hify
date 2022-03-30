@@ -1,6 +1,5 @@
 pub(self) mod cors;
 pub(self) mod graphql;
-pub(self) mod mutations;
-pub(self) mod queries;
+pub(self) mod http;
 
-pub use graphql::launch;
+pub use http::launch;

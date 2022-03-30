@@ -1,6 +1,6 @@
 use juniper::graphql_object;
 
-use super::graphql::GraphQLContext;
+use super::GraphQLContext;
 
 pub struct QueryRoot;
 

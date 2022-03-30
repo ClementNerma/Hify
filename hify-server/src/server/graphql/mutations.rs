@@ -1,6 +1,6 @@
 use juniper::graphql_object;
 
-use super::graphql::{GraphQLContext, OkScalar};
+use super::{entrypoint::OkScalar, GraphQLContext};
 use crate::builder::build_index;
 
 pub struct MutationRoot;

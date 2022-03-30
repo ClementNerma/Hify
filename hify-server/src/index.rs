@@ -19,6 +19,7 @@ pub struct Index {
 #[derive(Serialize, Deserialize)]
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
+    pub tracks_formats: HashMap<TrackID, AudioFormat>,
 
     pub no_title_tracks: HashSet<TrackID>,
     pub no_album_tracks: HashSet<TrackID>,
