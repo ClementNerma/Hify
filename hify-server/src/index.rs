@@ -5,7 +5,9 @@ use std::{
 };
 
 use juniper::{GraphQLEnum, GraphQLObject, GraphQLScalarValue};
+use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
@@ -14,6 +16,7 @@ pub struct Index {
     pub cache: IndexCache,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
@@ -29,22 +32,26 @@ pub struct IndexCache {
     pub album_tracks: HashMap<AlbumID, HashSet<TrackID>>,
 }
 
-#[derive(GraphQLScalarValue, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    GraphQLScalarValue, Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,
+)]
 #[graphql(transparent)]
 pub struct TrackID(pub String);
 
-#[derive(GraphQLScalarValue, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    GraphQLScalarValue, Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,
+)]
 #[graphql(transparent)]
 pub struct AlbumID(pub String);
 
-#[derive(GraphQLObject, Clone)]
+#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
 pub struct Track {
     pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,
 }
 
-#[derive(GraphQLObject, Clone)]
+#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
@@ -53,7 +60,7 @@ pub struct TrackMetadata {
     pub tags: TrackTags,
 }
 
-#[derive(GraphQLObject, Clone)]
+#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
 pub struct TrackTags {
     pub title: Option<String>,
 
@@ -81,14 +88,14 @@ impl TrackTags {
     }
 }
 
-#[derive(GraphQLEnum, Clone, Copy)]
+#[derive(GraphQLEnum, Serialize, Deserialize, Clone, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum AudioFormat {
     MP3,
     FLAC,
 }
 
-#[derive(GraphQLObject, Clone)]
+#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
 pub struct TrackDate {
     pub year: i32,
     pub month: Option<i32>,
