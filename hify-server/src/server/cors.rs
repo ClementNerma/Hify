@@ -2,6 +2,7 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::{Request, Response};
 
+#[allow(clippy::upper_case_acronyms)]
 pub struct CORS;
 
 #[rocket::async_trait]

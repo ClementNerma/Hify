@@ -30,8 +30,7 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         .map_err(|e| format!("Failed to launch FFProbe: {e}"))?;
 
     if !ffprobe_out.status.success() {
-        let stderr =
-            std::str::from_utf8(&ffprobe_out.stderr).unwrap_or_else(|_| "<invalid UTF-8 output>");
+        let stderr = std::str::from_utf8(&ffprobe_out.stderr).unwrap_or("<invalid UTF-8 output>");
 
         return Err(format!("FFProbe failed: {stderr}"));
     }
@@ -39,7 +38,7 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
     let json_str = std::str::from_utf8(&ffprobe_out.stdout)
         .map_err(|e| format!("FFProbe returned an invalid UTF-8 response: {e}"))?;
 
-    let parsed_output = serde_json::from_str::<FFProbeOutput>(&json_str)
+    let parsed_output = serde_json::from_str::<FFProbeOutput>(json_str)
         .map_err(|e| format!("Failed to parse FFProbe output: {e}"))?;
 
     let data = parsed_output.format;

@@ -42,6 +42,7 @@ pub struct TrackTags {
 }
 
 #[derive(GraphQLEnum, Clone, Copy)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum AudioFormat {
     MP3,
     FLAC,
