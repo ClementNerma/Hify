@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use juniper::{GraphQLEnum, GraphQLObject, GraphQLScalarValue};
+use juniper::{GraphQLEnum, GraphQLObject};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -20,6 +20,7 @@ pub struct Index {
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
     pub tracks_formats: HashMap<TrackID, AudioFormat>,
+    pub tracks_index: HashMap<TrackID, usize>,
 
     pub no_title_tracks: HashSet<TrackID>,
     pub no_album_tracks: HashSet<TrackID>,
@@ -49,16 +50,10 @@ impl AlbumInfos {
     }
 }
 
-#[derive(
-    GraphQLScalarValue, Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,
-)]
-#[graphql(transparent)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TrackID(pub String);
 
-#[derive(
-    GraphQLScalarValue, Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,
-)]
-#[graphql(transparent)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AlbumID(pub String);
 
 #[derive(Serialize, Deserialize, Clone)]

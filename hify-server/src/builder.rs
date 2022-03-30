@@ -168,6 +168,7 @@ struct FoundFile {
 // TODO: lots of optimization to perform here
 fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) -> IndexCache {
     let mut tracks_formats = HashMap::new();
+    let mut tracks_index = HashMap::new();
 
     let mut no_title_tracks = HashSet::new();
     let mut no_album_tracks = HashSet::new();
@@ -180,8 +181,9 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
 
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
-    for track in tracks {
+    for (i, track) in tracks.iter().enumerate() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
+        tracks_index.insert(track.id.clone(), i);
 
         let tags = &track.metadata.tags;
 
@@ -239,5 +241,6 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
         albums_artists_albums,
         albums_tracks,
         albums_infos,
+        tracks_index,
     }
 }

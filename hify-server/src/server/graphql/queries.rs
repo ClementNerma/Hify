@@ -2,7 +2,7 @@ use juniper::{graphql_object, FieldResult};
 
 use crate::{
     graphql_into,
-    index::{AudioFormat, Track, TrackDate, TrackMetadata, TrackTags},
+    index::{AlbumID, AudioFormat, Track, TrackDate, TrackID, TrackMetadata, TrackTags},
 };
 
 use super::{utils::GraphQLInto, GraphQLContext};
@@ -25,9 +25,27 @@ impl IndexGraph {
         index.fingerprint.clone()
     }
 
-    async fn tracks<'c>(
+    async fn albums(
         &self,
-        context: &'c GraphQLContext,
+        context: &GraphQLContext,
+        from: i32,
+        take: i32,
+    ) -> FieldResult<Vec<AlbumID>> {
+        let index = context.index.read().await;
+        let albums = index
+            .cache
+            .albums_infos
+            .keys()
+            .skip(graphql_into!(from))
+            .take(graphql_into!(take))
+            .cloned()
+            .collect();
+        Ok(albums)
+    }
+
+    async fn tracks(
+        &self,
+        context: &GraphQLContext,
         from: i32,
         take: i32,
     ) -> FieldResult<Vec<Track>> {
@@ -125,5 +143,43 @@ impl TrackTags {
 
     fn genre(&self) -> Option<&str> {
         self.genre.as_deref()
+    }
+}
+
+#[graphql_object(context = GraphQLContext)]
+impl TrackID {
+    fn id(&self) -> &str {
+        &self.0
+    }
+
+    async fn infos(&self, context: &GraphQLContext) -> Track {
+        let index = context.index.read().await;
+        let track_index = index.cache.tracks_index.get(self).unwrap();
+        index.tracks.get(*track_index).unwrap().clone()
+    }
+}
+
+#[graphql_object(context = GraphQLContext)]
+impl AlbumID {
+    fn id(&self) -> &str {
+        &self.0
+    }
+
+    async fn name(&self, context: &GraphQLContext) -> String {
+        let index = context.index.read().await;
+        let album_infos = index.cache.albums_infos.get(self).unwrap();
+        album_infos.name.clone()
+    }
+
+    async fn album_artist(&self, context: &GraphQLContext) -> Option<String> {
+        let index = context.index.read().await;
+        let album_infos = index.cache.albums_infos.get(self).unwrap();
+        album_infos.album_artist.clone()
+    }
+
+    async fn tracks(&self, context: &GraphQLContext) -> Vec<TrackID> {
+        let index = context.index.read().await;
+        let album_tracks = index.cache.albums_tracks.get(self).unwrap();
+        album_tracks.iter().cloned().collect()
     }
 }
