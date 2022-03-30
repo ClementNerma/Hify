@@ -123,22 +123,35 @@ fn parse_date(input: &str) -> Result<TrackDate, String> {
     PARSE_TRACK_YEAR_OR_DATE
         .captures(input)
         .ok_or_else(|| format!("Invalid date value: {input}"))
-        .map(|captured| TrackDate {
-            year: captured
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse::<u16>()
-                .map(i32::from)
-                .expect("Invalid year number"),
-            month: captured
-                .get(2)
-                .map(|month| month.as_str().parse::<u8>().expect("Invalid month number"))
-                .map(i32::from),
-            day: captured
-                .get(3)
-                .map(|day| day.as_str().parse::<u8>().expect("Invalid day number"))
-                .map(i32::from),
+        .and_then(|captured| {
+            Ok(TrackDate {
+                year: captured
+                    .get(1)
+                    .unwrap()
+                    .as_str()
+                    .parse::<u16>()
+                    .map(i32::from)
+                    .map_err(|e| format!("Invalid year number: {e}"))?,
+                month: captured
+                    .get(2)
+                    .map(|month| {
+                        month
+                            .as_str()
+                            .parse::<u8>()
+                            .map_err(|e| format!("Invalid month number: {e}"))
+                    })
+                    .transpose()?
+                    .map(i32::from),
+                day: captured
+                    .get(3)
+                    .map(|day| {
+                        day.as_str()
+                            .parse::<u8>()
+                            .map_err(|e| format!("Invalid day number: {e}"))
+                    })
+                    .transpose()?
+                    .map(i32::from),
+            })
         })
 }
 
