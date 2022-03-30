@@ -175,9 +175,9 @@ type FFProbeTags = HashMap<String, String>;
 lazy_static! {
     static ref PARSE_DISC_NUMBER: Regex = Regex::new(r"^(\d+)(/\d+)?$").unwrap();
     static ref PARSE_TRACK_YEAR_OR_DATE_1: Regex =
-        Regex::new(r"^(?P<year>\d\d\d\d)[-/\.\s](?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})$").unwrap();
+        Regex::new(r"^(?P<year>\d\d\d\d)[-/\.\s](?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})(?:T\d\d:\d\d:\d\dZ)?$").unwrap();
     static ref PARSE_TRACK_YEAR_OR_DATE_2: Regex =
-        Regex::new(r"^(?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})[-/\.\s](?P<year>\d\d\d\d)$").unwrap();
+        Regex::new(r"^(?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})[-/\.\s](?P<year>\d\d\d\d)(?:T\d\d:\d\d:\d\dZ)?$").unwrap();
     static ref PARSE_TRACK_YEAR_OR_DATE_3: Regex =
         Regex::new(r"^(?P<year>\d\d\d\d)(?:;.*)?$").unwrap();
 }
