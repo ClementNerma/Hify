@@ -2,7 +2,7 @@ use juniper::{graphql_object, FieldResult};
 
 use crate::{
     graphql_into,
-    index::{AudioFormat, Track, TrackDate},
+    index::{AudioFormat, Track, TrackDate, TrackMetadata, TrackTags},
 };
 
 use super::{utils::GraphQLInto, GraphQLContext};
@@ -53,63 +53,77 @@ impl Track {
         &self.path
     }
 
-    fn format(&self) -> AudioFormat {
-        self.metadata.format
+    fn metadata(&self) -> &TrackMetadata {
+        &self.metadata
     }
 
-    fn size(&self) -> i32 {
-        self.metadata.size
+    fn tags(&self) -> &TrackTags {
+        &self.metadata.tags
     }
 
-    fn duration(&self) -> f64 {
-        self.metadata.duration
-    }
-
-    fn bitrate(&self) -> i32 {
-        self.metadata.bitrate
-    }
-
-    fn title(&self) -> Option<&str> {
-        self.metadata.tags.title.as_deref()
-    }
-
-    fn artist(&self) -> Option<&str> {
-        self.metadata.tags.artist.as_deref()
-    }
-
-    fn composer(&self) -> Option<&str> {
-        self.metadata.tags.composer.as_deref()
-    }
-
-    fn album(&self) -> Option<&str> {
-        self.metadata.tags.album.as_deref()
-    }
-
-    fn album_artist(&self) -> Option<&str> {
-        self.metadata.tags.album_artist.as_deref()
-    }
-
-    fn disc(&self) -> Option<i32> {
-        self.metadata.tags.disc
-    }
-
-    fn track_no(&self) -> Option<i32> {
-        self.metadata.tags.track_no
-    }
-
-    fn date(&self) -> Option<TrackDate> {
-        self.metadata.tags.date
-    }
-
-    fn genre(&self) -> Option<&str> {
-        self.metadata.tags.genre.as_deref()
-    }
-
-    fn album_id(&self) -> Option<String> {
+    fn album(&self) -> Option<String> {
         self.metadata
             .tags
             .get_album_infos()
             .map(|infos| infos.get_id())
             .map(|id| id.0)
+    }
+}
+
+#[graphql_object]
+impl TrackMetadata {
+    fn format(&self) -> AudioFormat {
+        self.format
+    }
+
+    fn size(&self) -> i32 {
+        self.size
+    }
+
+    fn duration(&self) -> f64 {
+        self.duration
+    }
+
+    fn bitrate(&self) -> i32 {
+        self.bitrate
+    }
+}
+
+#[graphql_object]
+impl TrackTags {
+    fn title(&self) -> Option<&str> {
+        self.title.as_deref()
+    }
+
+    fn artist(&self) -> Option<&str> {
+        self.artist.as_deref()
+    }
+
+    fn composer(&self) -> Option<&str> {
+        self.composer.as_deref()
+    }
+
+    fn album(&self) -> Option<&str> {
+        self.album.as_deref()
+    }
+
+    fn album_artist(&self) -> Option<&str> {
+        self.album_artist.as_deref()
+    }
+
+    fn disc(&self) -> Option<i32> {
+        self.disc
+    }
+
+    fn track_no(&self) -> Option<i32> {
+        self.track_no
+    }
+
+    fn date(&self) -> Option<TrackDate> {
+        self.date
+    }
+
+    fn genre(&self) -> Option<&str> {
+        self.genre.as_deref()
     }
 }
