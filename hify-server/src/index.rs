@@ -11,6 +11,9 @@ pub struct Index {
 
 pub struct IndexCache {
     pub tracks_paths: HashMap<String, PathBuf>,
+    pub no_title_tracks: Vec<String>,
+    pub no_album_tracks: Vec<String>,
+    pub no_artist_tracks: Vec<String>,
 }
 
 #[derive(GraphQLObject, Clone)]

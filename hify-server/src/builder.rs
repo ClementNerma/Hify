@@ -65,9 +65,9 @@ pub fn build_index(from: &Path) -> Index {
             .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
             .as_secs()
             .to_string(),
+        cache: build_index_cache(&tracks, tracks_paths),
         tracks,
         observations,
-        cache: IndexCache { tracks_paths },
     }
 }
 
@@ -109,4 +109,33 @@ fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
 struct FoundFile {
     path: PathBuf,
     path_str: String,
+}
+
+fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -> IndexCache {
+    let mut no_title_tracks = vec![];
+    let mut no_album_tracks = vec![];
+    let mut no_artist_tracks = vec![];
+
+    for track in tracks {
+        let tags = &track.metadata.tags;
+
+        if tags.title.is_none() {
+            no_title_tracks.push(track.id.clone());
+        }
+
+        if tags.album.is_none() {
+            no_album_tracks.push(track.id.clone());
+        }
+
+        if tags.artist.is_none() {
+            no_artist_tracks.push(track.id.clone());
+        }
+    }
+
+    IndexCache {
+        tracks_paths,
+        no_title_tracks,
+        no_album_tracks,
+        no_artist_tracks,
+    }
 }
