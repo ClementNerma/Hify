@@ -1,9 +1,16 @@
+use std::{collections::HashMap, path::PathBuf};
+
 use juniper::{GraphQLEnum, GraphQLObject};
 
 pub struct Index {
     pub fingerprint: String,
     pub tracks: Vec<Track>,
     pub observations: Vec<String>,
+    pub cache: IndexCache,
+}
+
+pub struct IndexCache {
+    pub tracks_paths: HashMap<String, PathBuf>,
 }
 
 #[derive(GraphQLObject, Clone)]

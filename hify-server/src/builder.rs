@@ -2,15 +2,15 @@ use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
 use std::{
-    collections::hash_map::DefaultHasher,
+    collections::{hash_map::DefaultHasher, HashMap},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
 
-use crate::ffprobe;
 use crate::index::{Index, Track};
+use crate::{ffprobe, index::IndexCache};
 
 pub fn build_index(from: &Path) -> Index {
     let mut files = vec![];
@@ -32,9 +32,10 @@ pub fn build_index(from: &Path) -> Index {
         .collect::<Vec<_>>();
 
     let mut tracks = vec![];
+    let mut tracks_paths = HashMap::new();
 
     for (i, track_metadata) in analyzed.into_iter().enumerate() {
-        let FoundFile { path_str, .. } = &files.get(i).unwrap();
+        let FoundFile { path, path_str } = &files.get(i).unwrap();
 
         let track_metadata = match track_metadata {
             Ok(None) => continue,
@@ -48,6 +49,8 @@ pub fn build_index(from: &Path) -> Index {
         let mut hasher = DefaultHasher::new();
         path_str.hash(&mut hasher);
         let id = hasher.finish().to_string();
+
+        tracks_paths.insert(id.clone(), path.clone());
 
         tracks.push(Track {
             id,
@@ -64,6 +67,7 @@ pub fn build_index(from: &Path) -> Index {
             .to_string(),
         tracks,
         observations,
+        cache: IndexCache { tracks_paths },
     }
 }
 
