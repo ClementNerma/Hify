@@ -104,4 +104,12 @@ impl Track {
     fn genre(&self) -> Option<&str> {
         self.metadata.tags.genre.as_deref()
     }
+
+    fn album_id(&self) -> Option<String> {
+        self.metadata
+            .tags
+            .get_album_infos()
+            .map(|infos| infos.get_id())
+            .map(|id| id.0)
+    }
 }
