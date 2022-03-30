@@ -1,6 +1,6 @@
 use juniper::{Context, EmptySubscription, RootNode};
 use rocket::{http::Status, response::content, tokio::sync::RwLock, Rocket, State};
-use std::{path::PathBuf, sync::Arc};
+use std::sync::Arc;
 
 use super::{cors::CORS, mutations::MutationRoot, queries::QueryRoot};
 use crate::index::Index;
@@ -8,8 +8,7 @@ use crate::index::Index;
 type Schema = RootNode<'static, QueryRoot, MutationRoot, EmptySubscription<GraphQLContext>>;
 
 pub struct GraphQLContext {
-    pub root_path: PathBuf,
-    pub index: Arc<RwLock<Option<Index>>>,
+    pub index: Arc<RwLock<Index>>,
 }
 
 impl Context for GraphQLContext {}
@@ -59,12 +58,11 @@ async fn post_graphql_handler(
     request.execute(&*schema, &*context).await
 }
 
-pub async fn launch(root_path: PathBuf) -> Result<(), rocket::Error> {
+pub async fn launch(index: Index) -> Result<(), rocket::Error> {
     Rocket::build()
         .attach(CORS)
         .manage(GraphQLContext {
-            root_path,
-            index: Arc::new(RwLock::new(None)),
+            index: Arc::new(RwLock::new(index)),
         })
         .manage(Schema::new(
             QueryRoot,

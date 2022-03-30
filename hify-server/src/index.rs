@@ -7,6 +7,7 @@ use std::{
 use juniper::{GraphQLEnum, GraphQLObject, GraphQLScalarValue};
 
 pub struct Index {
+    pub from: PathBuf,
     pub fingerprint: String,
     pub tracks: Vec<Track>,
     pub observations: Vec<String>,

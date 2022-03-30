@@ -6,11 +6,7 @@ pub struct QueryRoot;
 
 #[graphql_object(context = GraphQLContext)]
 impl QueryRoot {
-    async fn index_fingerprint(ctx: &GraphQLContext) -> Option<String> {
-        ctx.index
-            .read()
-            .await
-            .as_ref()
-            .map(|index| index.fingerprint.clone())
+    async fn index_fingerprint(ctx: &GraphQLContext) -> String {
+        ctx.index.read().await.fingerprint.clone()
     }
 }

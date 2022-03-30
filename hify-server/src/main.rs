@@ -17,5 +17,7 @@ async fn main() {
         panic!("Please provide a root directory");
     }
 
-    server::launch(root_path).await.unwrap();
+    let index = builder::build_index(root_path);
+
+    server::launch(index).await.unwrap();
 }

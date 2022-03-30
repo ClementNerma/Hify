@@ -12,11 +12,24 @@ use walkdir::WalkDir;
 use crate::index::{AlbumID, Index, Track, TrackID};
 use crate::{ffprobe, index::IndexCache};
 
-pub fn build_index(from: &Path) -> Index {
+fn log(time: SystemTime, message: &str) {
+    let elapsed = match time.elapsed() {
+        Ok(time) => time.as_secs().to_string(),
+        Err(_) => "?".to_string(),
+    };
+
+    println!("[{: >4}s] {message}", elapsed);
+}
+
+pub fn build_index(from: PathBuf) -> Index {
+    let started = SystemTime::now();
+
+    log(started, "Starting index building...");
+
     let mut files = vec![];
     let mut observations = vec![];
 
-    for file in build_files_list(from) {
+    for file in build_files_list(&from) {
         match file {
             Ok(file) => files.push(file),
             Err(err) => observations.push(err),
@@ -25,11 +38,18 @@ pub fn build_index(from: &Path) -> Index {
 
     files.sort();
 
+    log(
+        started,
+        &format!("Found {} files, analyzing with FFProbe...", files.len()),
+    );
+
     let analyzed = files
         .par_iter()
         .enumerate()
         .map(|(_, file)| ffprobe::run_on(&file.path))
         .collect::<Vec<_>>();
+
+    log(started, "Collecting tracks...");
 
     let mut tracks = vec![];
     let mut tracks_paths = HashMap::new();
@@ -59,14 +79,24 @@ pub fn build_index(from: &Path) -> Index {
         });
     }
 
+    log(
+        started,
+        &format!("Collected {} tracks, generating cache...", tracks.len()),
+    );
+
+    let cache = build_index_cache(&tracks, tracks_paths);
+
+    log(started, "Index has been generated.");
+
     Index {
         fingerprint: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
             .as_secs()
             .to_string(),
-        cache: build_index_cache(&tracks, tracks_paths),
+        from,
         tracks,
+        cache,
         observations,
     }
 }
@@ -113,7 +143,6 @@ struct FoundFile {
 
 // TODO: lots of optimization to perform here
 fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) -> IndexCache {
-    println!("Generating cache...");
     let mut no_title_tracks = HashSet::new();
     let mut no_album_tracks = HashSet::new();
     let mut no_album_artist_tracks = HashSet::new();
@@ -139,7 +168,7 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
         }
 
         if let Some(album_id) = tags.get_album_id() {
-            if let Some(artist) = tags.artist.as_ref().or_else(|| tags.album_artist.as_ref()) {
+            if let Some(artist) = tags.artist.as_ref().or(tags.album_artist.as_ref()) {
                 artists_albums
                     .entry(artist.clone())
                     .or_default()
