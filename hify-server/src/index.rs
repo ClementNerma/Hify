@@ -1,6 +1,6 @@
 use juniper::{GraphQLEnum, GraphQLObject};
 
-#[derive(GraphQLObject, Clone)]
+#[derive(GraphQLObject)]
 pub struct Index {
     pub creation_time: String,
     pub tracks: Vec<Track>,
