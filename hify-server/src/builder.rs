@@ -100,6 +100,11 @@ pub fn build_index(from: PathBuf) -> Index {
 
     log(
         started,
+        &format!("Emitted {} observations.", observations.len()),
+    );
+
+    log(
+        started,
         &format!("Collected {} tracks, generating cache...", tracks.len()),
     );
 
