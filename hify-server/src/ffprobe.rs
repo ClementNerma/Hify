@@ -12,7 +12,10 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         None => return Ok(None),
     };
 
-    if matches!(audio_ext.as_str(), "m4a" | "mpeg" | "ogg" | "opus") {
+    if matches!(
+        audio_ext.as_str(),
+        "m4a" | "mpeg" | "ogg" | "opus" | "alac" | "aac" | "wav" | "aiff" | "dsf" | "webm"
+    ) {
         return Err(format!("Unsupported audio extension: {}", audio_ext));
     }
 
