@@ -61,14 +61,14 @@ pub struct TrackID(pub String);
 #[graphql(transparent)]
 pub struct AlbumID(pub String);
 
-#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Track {
     pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
@@ -77,7 +77,7 @@ pub struct TrackMetadata {
     pub tags: TrackTags,
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TrackTags {
     pub title: Option<String>,
 
