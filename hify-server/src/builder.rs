@@ -5,6 +5,7 @@ use std::{
     collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
+    sync::atomic::{AtomicU32, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
@@ -43,10 +44,26 @@ pub fn build_index(from: PathBuf) -> Index {
         &format!("Found {} files, analyzing with FFProbe...", files.len()),
     );
 
+    let counter = AtomicU32::new(0);
+
     let analyzed = files
         .par_iter()
         .enumerate()
         .map(|(_, file)| ffprobe::run_on(&file.path))
+        .inspect(|_| {
+            let counter = counter.fetch_add(1, Ordering::SeqCst);
+            if counter % 1000 == 0 {
+                let progress_percent = f64::from(counter * 100) / files.len() as f64;
+                log(
+                    started,
+                    &format!(
+                        "Index building progress: {:.1}% ({counter}/{} files)",
+                        progress_percent,
+                        files.len(),
+                    ),
+                );
+            }
+        })
         .collect::<Vec<_>>();
 
     log(started, "Collecting tracks...");
