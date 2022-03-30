@@ -120,39 +120,40 @@ fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32, 
 }
 
 fn parse_date(input: &str) -> Result<TrackDate, String> {
-    PARSE_TRACK_YEAR_OR_DATE
+    let captured = PARSE_TRACK_YEAR_OR_DATE_1
         .captures(input)
-        .ok_or_else(|| format!("Invalid date value: {input}"))
-        .and_then(|captured| {
-            Ok(TrackDate {
-                year: captured
-                    .get(1)
-                    .unwrap()
+        .or_else(|| PARSE_TRACK_YEAR_OR_DATE_2.captures(input))
+        .or_else(|| PARSE_TRACK_YEAR_OR_DATE_3.captures(input))
+        .ok_or_else(|| format!("Invalid date value: {input}"))?;
+
+    Ok(TrackDate {
+        year: captured
+            .name("year")
+            .unwrap()
+            .as_str()
+            .parse::<u16>()
+            .map(i32::from)
+            .map_err(|e| format!("Invalid year number: {e}"))?,
+        month: captured
+            .name("month")
+            .map(|month| {
+                month
                     .as_str()
-                    .parse::<u16>()
-                    .map(i32::from)
-                    .map_err(|e| format!("Invalid year number: {e}"))?,
-                month: captured
-                    .get(2)
-                    .map(|month| {
-                        month
-                            .as_str()
-                            .parse::<u8>()
-                            .map_err(|e| format!("Invalid month number: {e}"))
-                    })
-                    .transpose()?
-                    .map(i32::from),
-                day: captured
-                    .get(3)
-                    .map(|day| {
-                        day.as_str()
-                            .parse::<u8>()
-                            .map_err(|e| format!("Invalid day number: {e}"))
-                    })
-                    .transpose()?
-                    .map(i32::from),
+                    .parse::<u8>()
+                    .map_err(|e| format!("Invalid month number: {e}"))
             })
-        })
+            .transpose()?
+            .map(i32::from),
+        day: captured
+            .name("day")
+            .map(|day| {
+                day.as_str()
+                    .parse::<u8>()
+                    .map_err(|e| format!("Invalid day number: {e}"))
+            })
+            .transpose()?
+            .map(i32::from),
+    })
 }
 
 #[derive(Deserialize)]
@@ -173,6 +174,10 @@ type FFProbeTags = HashMap<String, String>;
 
 lazy_static! {
     static ref PARSE_DISC_NUMBER: Regex = Regex::new(r"^(\d+)(/\d+)?$").unwrap();
-    static ref PARSE_TRACK_YEAR_OR_DATE: Regex =
-        Regex::new(r"^(\d+)(?:-(\d+)-(\d+)(?:(T\d+:.*))?)?$").unwrap();
+    static ref PARSE_TRACK_YEAR_OR_DATE_1: Regex =
+        Regex::new(r"^(?P<year>\d\d\d\d)[-/\.\s](?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})$").unwrap();
+    static ref PARSE_TRACK_YEAR_OR_DATE_2: Regex =
+        Regex::new(r"^(?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})[-/\.\s](?P<year>\d\d\d\d)$").unwrap();
+    static ref PARSE_TRACK_YEAR_OR_DATE_3: Regex =
+        Regex::new(r"^(?P<year>\d\d\d\d)(?:;.*)?$").unwrap();
 }
