@@ -2,7 +2,7 @@ use juniper::{GraphQLEnum, GraphQLObject};
 
 #[derive(GraphQLObject)]
 pub struct Index {
-    pub creation_time: String,
+    pub fingerprint: String,
     pub tracks: Vec<Track>,
     pub observations: Vec<String>,
 }

@@ -57,7 +57,7 @@ pub fn build_index(from: &Path) -> Index {
     }
 
     Index {
-        creation_time: SystemTime::now()
+        fingerprint: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
             .as_secs()

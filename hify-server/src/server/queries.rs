@@ -11,6 +11,6 @@ impl QueryRoot {
             .read()
             .await
             .as_ref()
-            .map(|index| index.creation_time.clone())
+            .map(|index| index.fingerprint.clone())
     }
 }
