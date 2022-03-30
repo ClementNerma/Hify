@@ -114,7 +114,7 @@ struct FoundFile {
 fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -> IndexCache {
     let mut no_title_tracks = vec![];
     let mut no_album_tracks = vec![];
-    let mut no_artist_tracks = vec![];
+    let mut no_album_artist_tracks = vec![];
 
     for track in tracks {
         let tags = &track.metadata.tags;
@@ -127,8 +127,8 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -
             no_album_tracks.push(track.id.clone());
         }
 
-        if tags.artist.is_none() {
-            no_artist_tracks.push(track.id.clone());
+        if tags.album_artist.is_none() {
+            no_album_artist_tracks.push(track.id.clone());
         }
     }
 
@@ -136,6 +136,6 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<String, PathBuf>) -
         tracks_paths,
         no_title_tracks,
         no_album_tracks,
-        no_artist_tracks,
+        no_album_artist_tracks,
     }
 }
