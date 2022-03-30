@@ -1,21 +1,20 @@
 use juniper::{GraphQLEnum, GraphQLObject};
-use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(GraphQLObject, Clone)]
 pub struct Index {
     pub creation_time: String,
     pub tracks: Vec<Track>,
     pub observations: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(GraphQLObject, Clone)]
 pub struct Track {
     pub id: String,
     pub path: String,
     pub metadata: TrackMetadata,
 }
 
-#[derive(Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(GraphQLObject, Clone)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
@@ -24,7 +23,7 @@ pub struct TrackMetadata {
     pub tags: TrackTags,
 }
 
-#[derive(Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(GraphQLObject, Clone)]
 pub struct TrackTags {
     pub title: Option<String>,
 
@@ -42,13 +41,13 @@ pub struct TrackTags {
     // pub note: Option<u8>,
 }
 
-#[derive(Serialize, Deserialize, GraphQLEnum, Clone, Copy)]
+#[derive(GraphQLEnum, Clone, Copy)]
 pub enum AudioFormat {
     MP3,
     FLAC,
 }
 
-#[derive(Serialize, Deserialize, GraphQLObject, Clone)]
+#[derive(GraphQLObject, Clone)]
 pub struct TrackDate {
     pub year: i32,
     pub month: Option<i32>,
