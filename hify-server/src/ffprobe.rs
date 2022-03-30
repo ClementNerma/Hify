@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::Path, process::Command};
+use std::{collections::BTreeMap, path::Path, process::Command};
 
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -81,7 +81,7 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
     let mut tags = std::mem::take(&mut tags)
         .into_iter()
         .map(|(k, v)| (k.to_lowercase(), v))
-        .collect::<HashMap<_, _>>();
+        .collect::<BTreeMap<_, _>>();
 
     Ok(TrackTags {
         title: tags.remove("title"),
@@ -177,7 +177,7 @@ struct FFProbeFormat {
     tags: FFProbeTags,
 }
 
-type FFProbeTags = HashMap<String, String>;
+type FFProbeTags = BTreeMap<String, String>;
 
 lazy_static! {
     static ref PARSE_DISC_NUMBER: Regex = Regex::new(r"^(\d+)(/\d+)?$").unwrap();

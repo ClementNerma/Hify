@@ -1,5 +1,5 @@
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap, HashSet},
+    collections::{hash_map::DefaultHasher, BTreeMap, BTreeSet},
     hash::{Hash, Hasher},
     path::PathBuf,
 };
@@ -18,22 +18,22 @@ pub struct Index {
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexCache {
-    pub tracks_paths: HashMap<TrackID, PathBuf>,
-    pub tracks_formats: HashMap<TrackID, AudioFormat>,
-    pub tracks_index: HashMap<TrackID, usize>,
+    pub tracks_paths: BTreeMap<TrackID, PathBuf>,
+    pub tracks_formats: BTreeMap<TrackID, AudioFormat>,
+    pub tracks_index: BTreeMap<TrackID, usize>,
 
-    pub no_title_tracks: HashSet<TrackID>,
-    pub no_album_tracks: HashSet<TrackID>,
-    pub no_album_artist_tracks: HashSet<TrackID>,
+    pub no_title_tracks: BTreeSet<TrackID>,
+    pub no_album_tracks: BTreeSet<TrackID>,
+    pub no_album_artist_tracks: BTreeSet<TrackID>,
 
-    pub artists_albums: HashMap<String, HashSet<AlbumID>>,
-    pub artists_tracks: HashMap<String, HashSet<TrackID>>,
+    pub artists_albums: BTreeMap<String, BTreeSet<AlbumID>>,
+    pub artists_tracks: BTreeMap<String, BTreeSet<TrackID>>,
 
-    pub albums_artists_albums: HashMap<String, HashSet<AlbumID>>,
+    pub albums_artists_albums: BTreeMap<String, BTreeSet<AlbumID>>,
 
-    pub albums_tracks: HashMap<AlbumID, HashSet<TrackID>>,
+    pub albums_tracks: BTreeMap<AlbumID, BTreeSet<TrackID>>,
 
-    pub albums_infos: HashMap<AlbumID, AlbumInfos>,
+    pub albums_infos: BTreeMap<AlbumID, AlbumInfos>,
 }
 
 #[derive(GraphQLObject, Serialize, Deserialize, Hash)]
