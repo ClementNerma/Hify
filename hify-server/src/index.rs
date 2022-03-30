@@ -111,7 +111,7 @@ pub enum AudioFormat {
     FLAC,
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Clone)]
+#[derive(GraphQLObject, Serialize, Deserialize, Clone, Copy)]
 pub struct TrackDate {
     pub year: i32,
     pub month: Option<i32>,

@@ -1,6 +1,9 @@
 use juniper::{graphql_object, FieldResult};
 
-use crate::{graphql_into, index::Track};
+use crate::{
+    graphql_into,
+    index::{AudioFormat, Track, TrackDate},
+};
 
 use super::{utils::GraphQLInto, GraphQLContext};
 
@@ -44,5 +47,61 @@ impl IndexGraph {
 impl Track {
     fn id(&self) -> &str {
         self.id.0.as_str()
+    }
+
+    fn path(&self) -> &str {
+        &self.path
+    }
+
+    fn format(&self) -> AudioFormat {
+        self.metadata.format
+    }
+
+    fn size(&self) -> i32 {
+        self.metadata.size
+    }
+
+    fn duration(&self) -> f64 {
+        self.metadata.duration
+    }
+
+    fn bitrate(&self) -> i32 {
+        self.metadata.bitrate
+    }
+
+    fn title(&self) -> Option<&str> {
+        self.metadata.tags.title.as_deref()
+    }
+
+    fn artist(&self) -> Option<&str> {
+        self.metadata.tags.artist.as_deref()
+    }
+
+    fn composer(&self) -> Option<&str> {
+        self.metadata.tags.composer.as_deref()
+    }
+
+    fn album(&self) -> Option<&str> {
+        self.metadata.tags.album.as_deref()
+    }
+
+    fn album_artist(&self) -> Option<&str> {
+        self.metadata.tags.album_artist.as_deref()
+    }
+
+    fn disc(&self) -> Option<i32> {
+        self.metadata.tags.disc
+    }
+
+    fn track_no(&self) -> Option<i32> {
+        self.metadata.tags.track_no
+    }
+
+    fn date(&self) -> Option<TrackDate> {
+        self.metadata.tags.date
+    }
+
+    fn genre(&self) -> Option<&str> {
+        self.metadata.tags.genre.as_deref()
     }
 }
