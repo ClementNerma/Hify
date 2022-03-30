@@ -78,7 +78,9 @@ pub fn build_index(from: PathBuf) -> Index {
             Ok(None) => continue,
             Ok(Some(mt)) => mt,
             Err(err) => {
-                observations.push(format!("Error while analyzing file '{path_str}': {err}"));
+                let err = format!("Error while analyzing file '{path_str}': {err}");
+                eprintln!("{err}");
+                observations.push(err);
                 continue;
             }
         };
