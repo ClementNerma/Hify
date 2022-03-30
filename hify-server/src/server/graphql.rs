@@ -33,7 +33,7 @@ impl<S: ScalarValue> GraphQLScalar for OkScalar {
 
 #[rocket::get("/")]
 fn graphiql() -> content::Html<String> {
-    juniper_rocket::graphiql_source("/graphql", None)
+    juniper_rocket::playground_source("/graphql", None)
 }
 
 #[rocket::options("/graphql")]
