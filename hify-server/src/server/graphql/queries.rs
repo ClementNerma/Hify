@@ -215,7 +215,7 @@ impl ArtistID {
 
     async fn albums(&self, context: &GraphQLContext) -> Option<Vec<AlbumID>> {
         let index = context.index.read().await;
-        let albums_ids = index.cache.albums_artists_albums.get(self).unwrap();
+        let albums_ids = index.cache.albums_artists_albums.get(self)?;
         Some(albums_ids.iter().cloned().collect())
     }
 
