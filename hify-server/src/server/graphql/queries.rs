@@ -97,12 +97,11 @@ impl Track {
         &self.metadata.tags
     }
 
-    fn album(&self) -> Option<String> {
+    fn album(&self) -> Option<AlbumID> {
         self.metadata
             .tags
             .get_album_infos()
             .map(|infos| infos.get_id())
-            .map(|id| id.0)
     }
 }
 
