@@ -26,13 +26,14 @@ pub struct IndexCache {
     pub no_album_tracks: BTreeSet<TrackID>,
     pub no_album_artist_tracks: BTreeSet<TrackID>,
 
-    pub artists_albums: BTreeMap<String, BTreeSet<AlbumID>>,
-    pub artists_tracks: BTreeMap<String, BTreeSet<TrackID>>,
+    pub artists_albums: BTreeMap<ArtistID, BTreeSet<AlbumID>>,
+    pub artists_tracks: BTreeMap<ArtistID, BTreeSet<TrackID>>,
 
-    pub albums_artists_albums: BTreeMap<String, BTreeSet<AlbumID>>,
+    pub albums_artists_albums: BTreeMap<ArtistID, BTreeSet<AlbumID>>,
 
     pub albums_tracks: BTreeMap<AlbumID, BTreeSet<TrackID>>,
 
+    pub artists_infos: BTreeMap<ArtistID, ArtistInfos>,
     pub albums_infos: BTreeMap<AlbumID, AlbumInfos>,
 }
 
@@ -50,11 +51,27 @@ impl AlbumInfos {
     }
 }
 
+#[derive(GraphQLObject, Serialize, Deserialize, Hash)]
+pub struct ArtistInfos {
+    pub name: String,
+}
+
+impl ArtistInfos {
+    pub fn get_id(&self) -> ArtistID {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        ArtistID(format!("{:x}", hasher.finish()))
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TrackID(pub String);
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AlbumID(pub String);
+
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ArtistID(pub String);
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Track {
@@ -95,6 +112,26 @@ impl TrackTags {
         Some(AlbumInfos {
             name: self.album.as_ref()?.clone(),
             album_artist: self.album_artist.clone(),
+        })
+    }
+
+    pub fn get_artist_infos(&self) -> Option<ArtistInfos> {
+        Some(ArtistInfos {
+            name: self
+                .artist
+                .as_ref()
+                .or_else(|| self.album_artist.as_ref())?
+                .clone(),
+        })
+    }
+
+    pub fn get_album_artist_infos(&self) -> Option<ArtistInfos> {
+        Some(ArtistInfos {
+            name: self
+                .artist
+                .as_ref()
+                .or_else(|| self.album_artist.as_ref())?
+                .clone(),
         })
     }
 }

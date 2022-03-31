@@ -2,7 +2,7 @@ use juniper::{graphql_object, FieldResult};
 
 use crate::{
     graphql_into,
-    index::{AlbumID, AudioFormat, Track, TrackDate, TrackID, TrackMetadata, TrackTags},
+    index::{AlbumID, ArtistID, AudioFormat, Track, TrackDate, TrackID, TrackMetadata, TrackTags},
 };
 
 use super::{utils::GraphQLInto, GraphQLContext};
@@ -55,9 +55,27 @@ impl IndexGraph {
             .iter()
             .skip(graphql_into!(from))
             .take(graphql_into!(take))
-            .map(Track::clone)
+            .cloned()
             .collect();
         Ok(tracks)
+    }
+
+    async fn artists(
+        &self,
+        context: &GraphQLContext,
+        from: i32,
+        take: i32,
+    ) -> FieldResult<Vec<ArtistID>> {
+        let index = context.index.read().await;
+        let artists = index
+            .cache
+            .artists_infos
+            .keys()
+            .skip(graphql_into!(from))
+            .take(graphql_into!(take))
+            .cloned()
+            .collect();
+        Ok(artists)
     }
 }
 
@@ -181,5 +199,30 @@ impl AlbumID {
         let index = context.index.read().await;
         let album_tracks = index.cache.albums_tracks.get(self).unwrap();
         album_tracks.iter().cloned().collect()
+    }
+}
+
+#[graphql_object(context = GraphQLContext)]
+impl ArtistID {
+    fn id(&self) -> &str {
+        &self.0
+    }
+
+    async fn name(&self, context: &GraphQLContext) -> String {
+        let index = context.index.read().await;
+        let album_infos = index.cache.artists_infos.get(self).unwrap();
+        album_infos.name.clone()
+    }
+
+    async fn albums(&self, context: &GraphQLContext) -> Option<Vec<AlbumID>> {
+        let index = context.index.read().await;
+        let albums_ids = index.cache.albums_artists_albums.get(self).unwrap();
+        Some(albums_ids.iter().cloned().collect())
+    }
+
+    async fn album_participations(&self, context: &GraphQLContext) -> Option<Vec<AlbumID>> {
+        let index = context.index.read().await;
+        let albums_ids = index.cache.artists_albums.get(self).unwrap();
+        Some(albums_ids.iter().cloned().collect())
     }
 }

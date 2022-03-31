@@ -10,7 +10,7 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::index::{AlbumID, AlbumInfos, Index, Track, TrackID};
+use crate::index::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Index, Track, TrackID};
 use crate::{ffprobe, index::IndexCache};
 
 fn log(time: SystemTime, message: &str) {
@@ -174,11 +174,12 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
     let mut no_album_tracks = BTreeSet::new();
     let mut no_album_artist_tracks = BTreeSet::new();
 
-    let mut artists_albums = BTreeMap::<String, BTreeSet<AlbumID>>::new();
-    let mut artists_tracks = BTreeMap::<String, BTreeSet<TrackID>>::new();
-    let mut albums_artists_albums = BTreeMap::<String, BTreeSet<AlbumID>>::new();
+    let mut artists_albums = BTreeMap::<ArtistID, BTreeSet<AlbumID>>::new();
+    let mut artists_tracks = BTreeMap::<ArtistID, BTreeSet<TrackID>>::new();
+    let mut albums_artists_albums = BTreeMap::<ArtistID, BTreeSet<AlbumID>>::new();
     let mut albums_tracks = BTreeMap::<AlbumID, BTreeSet<TrackID>>::new();
 
+    let mut artists_infos = BTreeMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = BTreeMap::<AlbumID, AlbumInfos>::new();
 
     for (i, track) in tracks.iter().enumerate() {
@@ -204,21 +205,25 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
 
             albums_infos.insert(album_id.clone(), album_infos);
 
-            if let Some(artist) = tags.artist.as_ref().or(tags.album_artist.as_ref()) {
+            if let Some(artist_infos) = tags.get_artist_infos() {
+                let artist_id = artist_infos.get_id();
+
+                artists_infos.insert(artist_id.clone(), artist_infos);
+
                 artists_albums
-                    .entry(artist.clone())
+                    .entry(artist_id.clone())
                     .or_default()
                     .insert(album_id.clone());
 
                 artists_tracks
-                    .entry(artist.clone())
+                    .entry(artist_id.clone())
                     .or_default()
                     .insert(track.id.clone());
             }
 
-            if let Some(ref album_artist) = tags.album_artist {
+            if let Some(album_artist_infos) = tags.get_album_artist_infos() {
                 albums_artists_albums
-                    .entry(album_artist.clone())
+                    .entry(album_artist_infos.get_id())
                     .or_default()
                     .insert(album_id.clone());
             }
@@ -232,15 +237,20 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
 
     IndexCache {
         tracks_paths,
+        tracks_index,
         tracks_formats,
+
         no_title_tracks,
         no_album_tracks,
         no_album_artist_tracks,
+
         artists_albums,
         artists_tracks,
+
         albums_artists_albums,
         albums_tracks,
+
+        artists_infos,
         albums_infos,
-        tracks_index,
     }
 }
