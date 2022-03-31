@@ -80,6 +80,7 @@ pub struct ArtistID(pub String);
 #[derive(Serialize, Deserialize, Clone, SimpleObject)]
 #[graphql(complex)]
 pub struct Track {
+    #[graphql(skip)]
     pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,

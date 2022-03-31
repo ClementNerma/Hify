@@ -96,6 +96,10 @@ impl IndexGraph {
 
 #[ComplexObject]
 impl Track {
+    async fn id(&self) -> &str {
+        self.id.0.as_str()
+    }
+
     async fn album(&self) -> Option<AlbumID> {
         self.metadata
             .tags
