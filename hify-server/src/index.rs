@@ -121,21 +121,13 @@ impl TrackTags {
 
     pub fn get_artist_infos(&self) -> Option<ArtistInfos> {
         Some(ArtistInfos {
-            name: self
-                .artist
-                .as_ref()
-                .or_else(|| self.album_artist.as_ref())?
-                .clone(),
+            name: self.artist.as_ref()?.clone(),
         })
     }
 
     pub fn get_album_artist_infos(&self) -> Option<ArtistInfos> {
         Some(ArtistInfos {
-            name: self
-                .artist
-                .as_ref()
-                .or_else(|| self.album_artist.as_ref())?
-                .clone(),
+            name: self.album_artist.as_ref()?.clone(),
         })
     }
 }

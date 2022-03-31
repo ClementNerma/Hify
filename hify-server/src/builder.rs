@@ -206,12 +206,33 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
 
             albums_infos.insert(album_id.clone(), album_infos);
 
+            if let Some(album_artist_infos) = tags.get_album_artist_infos() {
+                let album_artist_id = album_artist_infos.get_id();
+
+                albums_artists_infos.insert(album_artist_id.clone(), album_artist_infos.clone());
+
+                albums_artists_albums
+                    .entry(album_artist_id.clone())
+                    .or_default()
+                    .insert(album_id.clone());
+
+                artists_infos.insert(album_artist_id.clone(), album_artist_infos.clone());
+
+                artists_albums
+                    .entry(album_artist_id.clone())
+                    .or_default()
+                    .insert(album_id.clone());
+
+                artists_tracks
+                    .entry(album_artist_id.clone())
+                    .or_default()
+                    .insert(track.id.clone());
+            }
+
             if let Some(artist_infos) = tags.get_artist_infos() {
                 let artist_id = artist_infos.get_id();
 
                 artists_infos.insert(artist_id.clone(), artist_infos.clone());
-
-                albums_artists_infos.insert(artist_id.clone(), artist_infos.clone());
 
                 artists_albums
                     .entry(artist_id.clone())
@@ -222,11 +243,6 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
                     .entry(artist_id.clone())
                     .or_default()
                     .insert(track.id.clone());
-            } else if let Some(album_artist_infos) = tags.get_album_artist_infos() {
-                albums_artists_albums
-                    .entry(album_artist_infos.get_id())
-                    .or_default()
-                    .insert(album_id.clone());
             }
 
             albums_tracks
