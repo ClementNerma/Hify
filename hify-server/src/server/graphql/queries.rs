@@ -152,8 +152,8 @@ impl TrackTags {
         self.artists.as_slice()
     }
 
-    fn composer(&self) -> Option<&str> {
-        self.composer.as_deref()
+    fn composers(&self) -> &[String] {
+        self.composers.as_slice()
     }
 
     fn album(&self) -> Option<&str> {

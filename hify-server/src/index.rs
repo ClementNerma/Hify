@@ -98,7 +98,7 @@ pub struct TrackTags {
     pub title: Option<String>,
 
     pub artists: Vec<String>,
-    pub composer: Option<String>,
+    pub composers: Vec<String>,
 
     pub album: Option<String>,
     pub album_artists: Vec<String>,

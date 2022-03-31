@@ -90,9 +90,14 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
             .remove("artist")
             .map(|str| str.split(";").map(str::to_string).collect())
             .unwrap_or(vec![]),
-        composer: tags.remove("composer"),
+
+        composers: tags
+            .remove("compsoer")
+            .map(|str| str.split(";").map(str::to_string).collect())
+            .unwrap_or(vec![]),
 
         album: tags.remove("album"),
+
         album_artists: tags
             .remove("album_artist")
             .map(|str| str.split(";").map(str::to_string).collect())
@@ -102,6 +107,7 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
             .remove("disc")
             .map(|disc| parse_set_number(&disc, "disc"))
             .transpose()?,
+
         track_no: tags
             .remove("track")
             .map(|track| parse_set_number(&track, "track number"))
