@@ -35,6 +35,10 @@ pub struct IndexCache {
 
     pub artists_infos: BTreeMap<ArtistID, ArtistInfos>,
     pub albums_infos: BTreeMap<AlbumID, AlbumInfos>,
+
+    pub ordered_artists: Vec<ArtistID>,
+    pub ordered_albums_artists: Vec<ArtistID>,
+    pub ordered_albums: Vec<AlbumID>,
 }
 
 #[derive(GraphQLObject, Serialize, Deserialize, Hash)]
@@ -51,7 +55,7 @@ impl AlbumInfos {
     }
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Hash)]
+#[derive(GraphQLObject, Serialize, Deserialize, Hash, Clone)]
 pub struct ArtistInfos {
     pub name: String,
 }

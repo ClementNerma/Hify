@@ -180,6 +180,7 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
     let mut albums_tracks = BTreeMap::<AlbumID, BTreeSet<TrackID>>::new();
 
     let mut artists_infos = BTreeMap::<ArtistID, ArtistInfos>::new();
+    let mut albums_artists_infos = BTreeMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = BTreeMap::<AlbumID, AlbumInfos>::new();
 
     for (i, track) in tracks.iter().enumerate() {
@@ -208,7 +209,9 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
             if let Some(artist_infos) = tags.get_artist_infos() {
                 let artist_id = artist_infos.get_id();
 
-                artists_infos.insert(artist_id.clone(), artist_infos);
+                artists_infos.insert(artist_id.clone(), artist_infos.clone());
+
+                albums_artists_infos.insert(artist_id.clone(), artist_infos.clone());
 
                 artists_albums
                     .entry(artist_id.clone())
@@ -235,6 +238,27 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
         }
     }
 
+    let mut ordered_artists = artists_infos.iter().collect::<Vec<_>>();
+    ordered_artists.sort_by(|a, b| a.1.name.cmp(&b.1.name));
+    let ordered_artists = ordered_artists
+        .into_iter()
+        .map(|(id, _)| id.clone())
+        .collect();
+
+    let mut ordered_albums_artists = albums_artists_infos.iter().collect::<Vec<_>>();
+    ordered_albums_artists.sort_by(|a, b| a.1.name.cmp(&b.1.name));
+    let ordered_albums_artists = ordered_albums_artists
+        .into_iter()
+        .map(|(id, _)| id.clone())
+        .collect();
+
+    let mut ordered_albums = albums_infos.iter().collect::<Vec<_>>();
+    ordered_albums.sort_by(|a, b| a.1.name.cmp(&b.1.name));
+    let ordered_albums = ordered_albums
+        .into_iter()
+        .map(|(id, _)| id.clone())
+        .collect();
+
     IndexCache {
         tracks_paths,
         tracks_index,
@@ -252,5 +276,9 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
 
         artists_infos,
         albums_infos,
+
+        ordered_artists,
+        ordered_albums_artists,
+        ordered_albums,
     }
 }

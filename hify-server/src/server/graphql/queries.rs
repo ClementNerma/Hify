@@ -34,13 +34,31 @@ impl IndexGraph {
         let index = context.index.read().await;
         let albums = index
             .cache
-            .albums_infos
-            .keys()
+            .ordered_albums
+            .iter()
             .skip(graphql_into!(from))
             .take(graphql_into!(take))
             .cloned()
             .collect();
         Ok(albums)
+    }
+
+    async fn artists(
+        &self,
+        context: &GraphQLContext,
+        from: i32,
+        take: i32,
+    ) -> FieldResult<Vec<ArtistID>> {
+        let index = context.index.read().await;
+        let artists = index
+            .cache
+            .ordered_artists
+            .iter()
+            .skip(graphql_into!(from))
+            .take(graphql_into!(take))
+            .cloned()
+            .collect();
+        Ok(artists)
     }
 
     async fn tracks(
@@ -58,24 +76,6 @@ impl IndexGraph {
             .cloned()
             .collect();
         Ok(tracks)
-    }
-
-    async fn artists(
-        &self,
-        context: &GraphQLContext,
-        from: i32,
-        take: i32,
-    ) -> FieldResult<Vec<ArtistID>> {
-        let index = context.index.read().await;
-        let artists = index
-            .cache
-            .artists_infos
-            .keys()
-            .skip(graphql_into!(from))
-            .take(graphql_into!(take))
-            .cloned()
-            .collect();
-        Ok(artists)
     }
 }
 
