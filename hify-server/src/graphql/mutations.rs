@@ -1,7 +1,7 @@
 use async_graphql::{Context, Object};
 
 use super::GraphQLContext;
-use crate::builder::build_index;
+use crate::index::build_index;
 
 pub struct MutationRoot;
 

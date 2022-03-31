@@ -8,10 +8,8 @@ use rocket::{
 };
 use serde::Serialize;
 
-use super::{
-    cors::CORS,
-    graphql::{get_graphql_routes, get_graphql_schema, AppSchema},
-};
+use super::cors::CORS;
+use crate::graphql::{get_graphql_routes, get_graphql_schema, AppSchema};
 use crate::index::{AudioFormat, Index, TrackID};
 
 pub async fn launch(index: Index) -> Result<(), rocket::Error> {

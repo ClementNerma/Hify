@@ -10,8 +10,10 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::index::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Index, Track, TrackID};
-use crate::{ffprobe, index::IndexCache};
+use super::{
+    data::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Index, IndexCache, Track, TrackID},
+    ffprobe,
+};
 
 fn log(time: SystemTime, message: &str) {
     let elapsed = match time.elapsed() {

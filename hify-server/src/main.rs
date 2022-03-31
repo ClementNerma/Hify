@@ -3,14 +3,13 @@
 
 use clap::StructOpt;
 
-mod builder;
 mod cmd;
-mod ffprobe;
+mod graphql;
 mod index;
-mod save;
-mod server;
+mod rocket;
+mod utils;
 
-#[rocket::main]
+#[::rocket::main]
 async fn main() {
     let args = cmd::Command::parse();
 
@@ -22,16 +21,16 @@ async fn main() {
         panic!("Index file must not be a directory");
     } else if args.index_file.is_file() {
         println!("> Loading index from disk...");
-        let index = save::load_index(&args.index_file).unwrap();
+        let index = utils::save::load_index(&args.index_file).unwrap();
 
         println!("> Done.");
 
         index
     } else {
         println!("> Generating index...");
-        let index = builder::build_index(args.music_dir);
+        let index = index::build_index(args.music_dir);
 
-        save::save_index(&args.index_file, &index).unwrap();
+        utils::save::save_index(&args.index_file, &index).unwrap();
         println!("> Index saved on disk.");
 
         index
@@ -39,5 +38,5 @@ async fn main() {
 
     println!("> Launching server...");
 
-    server::launch(index).await.unwrap();
+    rocket::launch(index).await.unwrap();
 }
