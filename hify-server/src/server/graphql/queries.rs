@@ -61,6 +61,24 @@ impl IndexGraph {
         Ok(artists)
     }
 
+    async fn album_artists(
+        &self,
+        context: &GraphQLContext,
+        from: i32,
+        take: i32,
+    ) -> FieldResult<Vec<ArtistID>> {
+        let index = context.index.read().await;
+        let artists = index
+            .cache
+            .ordered_albums_artists
+            .iter()
+            .skip(graphql_into!(from))
+            .take(graphql_into!(take))
+            .cloned()
+            .collect();
+        Ok(artists)
+    }
+
     async fn tracks(
         &self,
         context: &GraphQLContext,
