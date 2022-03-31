@@ -1,3 +1,4 @@
+use juniper_rocket::{GraphQLRequest, GraphQLResponse};
 use rocket::{http::Status, response::content, Route, State};
 
 use super::{entrypoint::Schema, GraphQLContext};
@@ -15,18 +16,18 @@ pub async fn graphql_preflight_handler() -> Status {
 #[rocket::get("/?<request>")]
 pub async fn get_graphql_handler(
     context: &State<GraphQLContext>,
-    request: juniper_rocket::GraphQLRequest,
+    request: GraphQLRequest,
     schema: &State<Schema>,
-) -> juniper_rocket::GraphQLResponse {
+) -> GraphQLResponse {
     request.execute(&*schema, &*context).await
 }
 
 #[rocket::post("/", data = "<request>")]
 pub async fn post_graphql_handler(
     context: &State<GraphQLContext>,
-    request: juniper_rocket::GraphQLRequest,
+    request: GraphQLRequest,
     schema: &State<Schema>,
-) -> juniper_rocket::GraphQLResponse {
+) -> GraphQLResponse {
     request.execute(&*schema, &*context).await
 }
 
