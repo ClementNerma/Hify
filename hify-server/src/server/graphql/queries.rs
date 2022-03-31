@@ -148,7 +148,7 @@ impl TrackTags {
         self.title.as_deref()
     }
 
-    fn artist(&self) -> &[String] {
+    fn artists(&self) -> &[String] {
         self.artists.as_slice()
     }
 
