@@ -1,11 +1,12 @@
-use juniper_rocket::{GraphQLRequest, GraphQLResponse};
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use async_graphql_rocket::{GraphQLQuery, GraphQLRequest, GraphQLResponse};
 use rocket::{http::Status, response::content, Route, State};
 
-use super::{entrypoint::Schema, GraphQLContext};
+use super::entrypoint::AppSchema;
 
 #[rocket::get("/")]
-pub fn graphiql() -> content::Html<String> {
-    juniper_rocket::playground_source("/graphql", None)
+pub fn graphql_playground() -> content::Html<String> {
+    content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
 #[rocket::options("/")]
@@ -13,29 +14,21 @@ pub async fn graphql_preflight_handler() -> Status {
     Status::NoContent
 }
 
-#[rocket::get("/?<request>")]
-pub async fn get_graphql_handler(
-    context: &State<GraphQLContext>,
-    request: GraphQLRequest,
-    schema: &State<Schema>,
-) -> GraphQLResponse {
-    request.execute(&*schema, &*context).await
+#[rocket::get("/?<query..>")]
+async fn graphql_query(schema: &State<AppSchema>, query: GraphQLQuery) -> GraphQLResponse {
+    query.execute(schema).await
 }
 
-#[rocket::post("/", data = "<request>")]
-pub async fn post_graphql_handler(
-    context: &State<GraphQLContext>,
-    request: GraphQLRequest,
-    schema: &State<Schema>,
-) -> GraphQLResponse {
-    request.execute(&*schema, &*context).await
+#[rocket::post("/", data = "<request>", format = "application/json")]
+async fn graphql_request(schema: &State<AppSchema>, request: GraphQLRequest) -> GraphQLResponse {
+    request.execute(schema).await
 }
 
 pub fn get_graphql_routes() -> Vec<Route> {
     rocket::routes![
-        graphiql,
+        graphql_playground,
         graphql_preflight_handler,
-        get_graphql_handler,
-        post_graphql_handler
+        graphql_query,
+        graphql_request
     ]
 }

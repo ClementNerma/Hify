@@ -5,6 +5,6 @@ pub(self) mod routes;
 pub(self) mod state;
 pub(self) mod utils;
 
-pub use entrypoint::get_graphql_schema;
+pub use entrypoint::{get_graphql_schema, AppSchema};
 pub use routes::get_graphql_routes;
 pub use state::GraphQLContext;

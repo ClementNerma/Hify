@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use juniper::{GraphQLEnum, GraphQLObject};
+use async_graphql::{Enum, SimpleObject};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -41,7 +41,7 @@ pub struct IndexCache {
     pub ordered_albums: Vec<AlbumID>,
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Hash)]
+#[derive(Serialize, Deserialize, Hash)]
 pub struct AlbumInfos {
     pub name: String,
     pub album_artists: Vec<String>,
@@ -55,7 +55,7 @@ impl AlbumInfos {
     }
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Hash, Clone)]
+#[derive(Serialize, Deserialize, Hash, Clone)]
 pub struct ArtistInfos {
     pub name: String,
 }
@@ -77,14 +77,15 @@ pub struct AlbumID(pub String);
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArtistID(pub String);
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, SimpleObject)]
+#[graphql(complex)]
 pub struct Track {
     pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, SimpleObject)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
@@ -93,7 +94,7 @@ pub struct TrackMetadata {
     pub tags: TrackTags,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, SimpleObject)]
 pub struct TrackTags {
     pub title: Option<String>,
 
@@ -132,14 +133,14 @@ impl TrackTags {
     }
 }
 
-#[derive(GraphQLEnum, Serialize, Deserialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Enum)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum AudioFormat {
     MP3,
     FLAC,
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, SimpleObject)]
 pub struct TrackDate {
     pub year: i32,
     pub month: Option<i32>,

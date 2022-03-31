@@ -1,7 +1,7 @@
-use juniper::FieldResult;
+use async_graphql::Result;
 
 pub trait GraphQLInto<T>: Sized + TryInto<T> {
-    fn graphql_into(self, field_name: &'static str) -> FieldResult<T> {
+    fn graphql_into(self, field_name: &'static str) -> Result<T> {
         self.try_into()
             .map_err(|_| format!("Invalid GraphQL value provided for field '{field_name}'").into())
     }

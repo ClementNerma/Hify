@@ -89,19 +89,19 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
         artists: tags
             .remove("artist")
             .map(|str| str.split(";").map(str::to_string).collect())
-            .unwrap_or(vec![]),
+            .unwrap_or_default(),
 
         composers: tags
-            .remove("compsoer")
+            .remove("composer")
             .map(|str| str.split(";").map(str::to_string).collect())
-            .unwrap_or(vec![]),
+            .unwrap_or_default(),
 
         album: tags.remove("album"),
 
         album_artists: tags
             .remove("album_artist")
             .map(|str| str.split(";").map(str::to_string).collect())
-            .unwrap_or(vec![]),
+            .unwrap_or_default(),
 
         disc: tags
             .remove("disc")
