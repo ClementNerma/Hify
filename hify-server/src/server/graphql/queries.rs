@@ -148,8 +148,8 @@ impl TrackTags {
         self.title.as_deref()
     }
 
-    fn artist(&self) -> Option<&str> {
-        self.artist.as_deref()
+    fn artist(&self) -> &[String] {
+        self.artists.as_slice()
     }
 
     fn composer(&self) -> Option<&str> {
@@ -160,8 +160,8 @@ impl TrackTags {
         self.album.as_deref()
     }
 
-    fn album_artist(&self) -> Option<&str> {
-        self.album_artist.as_deref()
+    fn album_artists(&self) -> &[String] {
+        self.album_artists.as_slice()
     }
 
     fn disc(&self) -> Option<i32> {
@@ -206,10 +206,10 @@ impl AlbumID {
         album_infos.name.clone()
     }
 
-    async fn album_artist(&self, context: &GraphQLContext) -> Option<String> {
+    async fn album_artists(&self, context: &GraphQLContext) -> Vec<String> {
         let index = context.index.read().await;
         let album_infos = index.cache.albums_infos.get(self).unwrap();
-        album_infos.album_artist.clone()
+        album_infos.album_artists.clone()
     }
 
     async fn tracks(&self, context: &GraphQLContext) -> Vec<TrackID> {

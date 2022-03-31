@@ -44,7 +44,7 @@ pub struct IndexCache {
 #[derive(GraphQLObject, Serialize, Deserialize, Hash)]
 pub struct AlbumInfos {
     pub name: String,
-    pub album_artist: Option<String>,
+    pub album_artists: Vec<String>,
 }
 
 impl AlbumInfos {
@@ -97,11 +97,11 @@ pub struct TrackMetadata {
 pub struct TrackTags {
     pub title: Option<String>,
 
-    pub artist: Option<String>,
+    pub artists: Vec<String>,
     pub composer: Option<String>,
 
     pub album: Option<String>,
-    pub album_artist: Option<String>,
+    pub album_artists: Vec<String>,
 
     pub disc: Option<i32>,
     pub track_no: Option<i32>,
@@ -115,20 +115,20 @@ impl TrackTags {
     pub fn get_album_infos(&self) -> Option<AlbumInfos> {
         Some(AlbumInfos {
             name: self.album.as_ref()?.clone(),
-            album_artist: self.album_artist.clone(),
+            album_artists: self.album_artists.clone(),
         })
     }
 
-    pub fn get_artist_infos(&self) -> Option<ArtistInfos> {
-        Some(ArtistInfos {
-            name: self.artist.as_ref()?.clone(),
-        })
+    pub fn get_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
+        self.artists
+            .iter()
+            .map(|name| ArtistInfos { name: name.clone() })
     }
 
-    pub fn get_album_artist_infos(&self) -> Option<ArtistInfos> {
-        Some(ArtistInfos {
-            name: self.album_artist.as_ref()?.clone(),
-        })
+    pub fn get_album_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
+        self.album_artists
+            .iter()
+            .map(|name| ArtistInfos { name: name.clone() })
     }
 }
 
