@@ -222,9 +222,7 @@ fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>)
                     .entry(artist_id.clone())
                     .or_default()
                     .insert(track.id.clone());
-            }
-
-            if let Some(album_artist_infos) = tags.get_album_artist_infos() {
+            } else if let Some(album_artist_infos) = tags.get_album_artist_infos() {
                 albums_artists_albums
                     .entry(album_artist_infos.get_id())
                     .or_default()
