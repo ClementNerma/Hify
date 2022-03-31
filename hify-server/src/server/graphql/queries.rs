@@ -43,6 +43,11 @@ impl IndexGraph {
         Ok(albums)
     }
 
+    async fn album(&self, context: &GraphQLContext, id: String) -> FieldResult<Option<AlbumID>> {
+        let index = context.index.read().await;
+        Ok(Some(AlbumID(id)).filter(|id| index.cache.albums_infos.contains_key(id)))
+    }
+
     async fn artists(
         &self,
         context: &GraphQLContext,
@@ -59,6 +64,11 @@ impl IndexGraph {
             .cloned()
             .collect();
         Ok(artists)
+    }
+
+    async fn artist(&self, context: &GraphQLContext, id: String) -> FieldResult<Option<ArtistID>> {
+        let index = context.index.read().await;
+        Ok(Some(ArtistID(id)).filter(|id| index.cache.artists_infos.contains_key(id)))
     }
 
     async fn album_artists(
@@ -94,6 +104,12 @@ impl IndexGraph {
             .cloned()
             .collect();
         Ok(tracks)
+    }
+
+    async fn track(&self, context: &GraphQLContext, id: String) -> FieldResult<Option<Track>> {
+        let index = context.index.read().await;
+        let track_index = index.cache.tracks_index.get(&TrackID(id));
+        Ok(track_index.map(|track_index| index.tracks.get(*track_index).unwrap().clone()))
     }
 }
 
