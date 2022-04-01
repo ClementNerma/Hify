@@ -1,4 +1,8 @@
-use std::{collections::HashMap, hash::Hash, slice::Iter};
+use std::{
+    collections::{hash_map::Keys, HashMap},
+    hash::Hash,
+    slice::Iter,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -56,6 +60,14 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         self.indexes.get(key).copied()
     }
 
+    // pub fn iter(&self) -> SortedMapIter<K, V> {
+    //     SortedMapIter::from(self)
+    // }
+
+    pub fn keys(&self) -> Keys<K, usize> {
+        self.indexes.keys()
+    }
+
     pub fn values(&self) -> Iter<V> {
         self.values.iter()
     }
@@ -65,17 +77,26 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     }
 }
 
-pub struct SortedMapIter<'a, K: Eq + Hash, V: Ord> {
-    parent: &'a SortedMap<K, V>,
-    index: usize,
-}
+// pub struct SortedMapIter<'a, K: Eq + Hash, V: Ord> {
+//     parent: &'a SortedMap<K, V>,
+//     index: usize,
+// }
 
-impl<'a, K: Eq + Hash, V: Ord> Iterator for SortedMapIter<'a, K, V> {
-    type Item = &'a V;
+// impl<'a, K: Eq + Hash, V: Ord> SortedMapIter<'a, K, V> {
+//     fn from(sorted_map: &'a SortedMap<K, V>) -> Self {
+//         Self {
+//             parent: sorted_map,
+//             index: 0,
+//         }
+//     }
+// }
 
-    fn next(&mut self) -> Option<Self::Item> {
-        let item = self.parent.values.get(self.index)?;
-        self.index += 1;
-        Some(item)
-    }
-}
+// impl<'a, K: Eq + Hash, V: Ord> Iterator for SortedMapIter<'a, K, V> {
+//     type Item = (&'a K, &'a V);
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         let item = self.parent.values.get(self.index)?;
+//         self.index += 1;
+//         Some(item)
+//     }
+// }

@@ -15,6 +15,7 @@ pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
     pub tracks: SortedMap<TrackID, Track>,
+    pub albums_arts: HashMap<AlbumID, Option<PathBuf>>,
     pub observations: Vec<String>,
     pub cache: IndexCache,
 }

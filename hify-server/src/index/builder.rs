@@ -115,6 +115,42 @@ pub fn build_index(from: PathBuf) -> Index {
 
     let cache = build_index_cache(&tracks, tracks_paths);
 
+    log(started, "Searching for album arts...");
+
+    let found_album_arts = AtomicUsize::new(0);
+
+    let album_ids: Vec<_> = cache.albums_infos.keys().collect();
+    let albums_arts: HashMap<_, _> = album_ids
+        .par_iter()
+        .map(|id| ((*id).clone(), find_album_art(id, &cache)))
+        .inspect(|(album_id, art_path)| {
+            if art_path.is_some() {
+                found_album_arts.fetch_add(1, Ordering::SeqCst);
+            } else {
+                let album_infos = cache.albums_infos.get(album_id).unwrap();
+                eprintln!(
+                    "Warning: no album art found for album '{}' by '{}'",
+                    album_infos.name,
+                    album_infos
+                        .album_artists
+                        .iter()
+                        .map(|artist| artist.name.clone())
+                        .collect::<Vec<_>>()
+                        .join(" / ")
+                );
+            }
+        })
+        .collect();
+
+    log(
+        started,
+        &format!(
+            "Found {}/{} album arts.",
+            found_album_arts.load(Ordering::SeqCst),
+            cache.albums_infos.len()
+        ),
+    );
+
     log(started, "Index has been generated.");
 
     let fingerprint = SystemTime::now()
@@ -127,6 +163,7 @@ pub fn build_index(from: PathBuf) -> Index {
         fingerprint,
         from,
         tracks,
+        albums_arts,
         cache,
         observations,
     }
@@ -170,6 +207,37 @@ fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
 struct FoundFile {
     path: PathBuf,
     path_str: String,
+}
+
+static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
+static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
+
+fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<PathBuf> {
+    let album_tracks_ids = cache.albums_tracks.get(album_id).unwrap();
+
+    // Cannot fail as albums need at least one track to be registered
+    let first_track_id = album_tracks_ids.get(0).unwrap();
+
+    let track_path = cache.tracks_paths.get(first_track_id).unwrap();
+
+    for dir in track_path.ancestors() {
+        for filename in COVER_FILENAMES {
+            for extension in COVER_EXTENSIONS {
+                let mut art_file = PathBuf::new();
+                art_file.set_file_name(filename);
+                art_file.set_extension(extension);
+
+                let mut art_path = dir.to_path_buf();
+                art_path.push(art_file);
+
+                if art_path.is_file() {
+                    return Some(art_path);
+                }
+            }
+        }
+    }
+
+    None
 }
 
 // TODO: lots of optimization to perform here
