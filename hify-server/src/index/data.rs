@@ -151,13 +151,19 @@ pub struct TrackMetadata {
 }
 
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
+#[graphql(complex)]
 pub struct TrackTags {
     pub title: Option<String>,
 
+    #[graphql(skip)]
     pub artists: Vec<String>,
+
     pub composers: Vec<String>,
 
+    #[graphql(skip)]
     pub album: Option<String>,
+
+    #[graphql(skip)]
     pub album_artists: Vec<String>,
 
     pub disc: Option<i32>,

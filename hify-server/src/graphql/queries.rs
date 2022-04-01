@@ -2,7 +2,7 @@ use async_graphql::{ComplexObject, Context, Object, Result};
 
 use crate::{
     graphql_index,
-    index::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, SortedMap, Track, TrackID},
+    index::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, SortedMap, Track, TrackID, TrackTags},
     transparent_cursor_type,
 };
 
@@ -95,17 +95,20 @@ impl Track {
     async fn id(&self) -> &str {
         self.id.0.as_str()
     }
+}
 
+#[ComplexObject]
+impl TrackTags {
     async fn album(&self) -> Option<AlbumInfos> {
-        self.metadata.tags.get_album_infos()
+        self.get_album_infos()
     }
 
     async fn artists(&self) -> Vec<ArtistInfos> {
-        self.metadata.tags.get_artists_infos().collect()
+        self.get_artists_infos().collect()
     }
 
     async fn album_artists(&self) -> Vec<ArtistInfos> {
-        self.metadata.tags.get_album_artists_infos().collect()
+        self.get_album_artists_infos().collect()
     }
 }
 
