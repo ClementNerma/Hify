@@ -37,7 +37,10 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     }
 
     pub fn empty() -> Self {
-        Self { values: vec![], indexes: HashMap::new() }
+        Self {
+            values: vec![],
+            indexes: HashMap::new(),
+        }
     }
 
     // pub fn contains_key(&self, key: &K) -> bool {
@@ -49,7 +52,7 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         Some(self.values.get(*index).unwrap())
     }
 
-    pub fn get_index<'a>(&'a self, key: &K) -> Option<usize> {
+    pub fn get_index(&self, key: &K) -> Option<usize> {
         self.indexes.get(key).copied()
     }
 

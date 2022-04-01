@@ -55,7 +55,7 @@ impl AlbumInfos {
 
 impl PartialOrd for AlbumInfos {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 
@@ -82,7 +82,7 @@ impl ArtistInfos {
 
 impl PartialOrd for ArtistInfos {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 
@@ -112,7 +112,7 @@ pub struct Track {
 
 impl PartialOrd for Track {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
+        Some(self.cmp(other))
     }
 }
 

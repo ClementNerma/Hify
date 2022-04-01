@@ -101,7 +101,7 @@ impl Track {
     }
 
     async fn album(&self) -> Option<AlbumInfos> {
-        self.metadata.tags.get_album_infos().clone()
+        self.metadata.tags.get_album_infos()
     }
 }
 
