@@ -47,6 +47,13 @@ pub struct AlbumInfos {
 }
 
 impl AlbumInfos {
+    fn new(name: String, album_artists: Vec<ArtistInfos>) -> Self {
+        Self {
+            name,
+            album_artists,
+        }
+    }
+
     pub fn get_id(&self) -> AlbumID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
@@ -74,6 +81,10 @@ pub struct ArtistInfos {
 }
 
 impl ArtistInfos {
+    fn new(name: String) -> Self {
+        Self { name }
+    }
+
     pub fn get_id(&self) -> ArtistID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
@@ -159,26 +170,18 @@ pub struct TrackTags {
 
 impl TrackTags {
     pub fn get_album_infos(&self) -> Option<AlbumInfos> {
-        Some(AlbumInfos {
-            name: self.album.as_ref()?.clone(),
-            album_artists: self
-                .album_artists
-                .iter()
-                .map(|name| ArtistInfos { name: name.clone() })
-                .collect(),
-        })
+        Some(AlbumInfos::new(
+            self.album.as_ref()?.clone(),
+            self.get_album_artists_infos().collect(),
+        ))
     }
 
     pub fn get_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
-        self.artists
-            .iter()
-            .map(|name| ArtistInfos { name: name.clone() })
+        self.artists.iter().cloned().map(ArtistInfos::new)
     }
 
     pub fn get_album_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
-        self.album_artists
-            .iter()
-            .map(|name| ArtistInfos { name: name.clone() })
+        self.album_artists.iter().cloned().map(ArtistInfos::new)
     }
 }
 
