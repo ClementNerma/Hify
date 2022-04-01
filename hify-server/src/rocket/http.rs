@@ -55,7 +55,7 @@ pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Cust
                 "Provided track ID was not found".to_string(),
             )
         })?;
-    let track_format = index.cache.tracks_formats.get(&TrackID(id)).unwrap();
+    let track = index.tracks.get(&TrackID(id)).unwrap();
 
     let file = File::open(Path::new(track_path)).await.map_err(|err| {
         rest_server_error(
@@ -64,7 +64,7 @@ pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Cust
         )
     })?;
 
-    let mime_type = match track_format {
+    let mime_type = match track.metadata.format {
         AudioFormat::MP3 => ContentType::MPEG,
         AudioFormat::FLAC => ContentType::FLAC,
     };

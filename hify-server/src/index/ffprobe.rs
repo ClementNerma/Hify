@@ -61,14 +61,23 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         .parse::<u64>()
         .map_err(|e| format!("Failed to parse file size: {e}"))?;
 
+    let f_duration = data
+        .duration
+        .parse::<f64>()
+        .map_err(|e| format!("Failed to parse duration: {e}"))?
+        .round();
+
+    let duration = f_duration as i32;
+
+    if duration as f64 != f_duration {
+        return Err(format!("Invalid duration: {f_duration}"));
+    }
+
     Ok(Some(TrackMetadata {
         format,
         size: i32::try_from(size)
             .map_err(|_| format!("Size is too big to be returned to GraphQL: {size}"))?,
-        duration: data
-            .duration
-            .parse::<f64>()
-            .map_err(|e| format!("Failed to parse duration: {e}"))?,
+        duration,
         bitrate: data
             .bit_rate
             .parse::<i32>()

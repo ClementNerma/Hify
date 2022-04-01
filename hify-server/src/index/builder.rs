@@ -2,7 +2,7 @@ use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeSet, HashMap},
+    collections::{hash_map::DefaultHasher, BTreeSet, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
     sync::atomic::{AtomicU32, Ordering},
@@ -13,6 +13,7 @@ use walkdir::WalkDir;
 use super::{
     data::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Index, IndexCache, Track, TrackID},
     ffprobe,
+    sorted_map::SortedMap,
 };
 
 fn log(time: SystemTime, message: &str) {
@@ -100,17 +101,6 @@ pub fn build_index(from: PathBuf) -> Index {
         });
     }
 
-    tracks.sort_by(|a, b| {
-        let a_tags = &a.metadata.tags;
-        let b_tags = &b.metadata.tags;
-
-        a_tags
-            .get_album_infos()
-            .cmp(&b_tags.get_album_infos())
-            .then_with(|| a_tags.track_no.cmp(&b_tags.track_no))
-            .then_with(|| a.path.cmp(&b.path))
-    });
-
     log(
         started,
         &format!("Emitted {} observations.", observations.len()),
@@ -125,12 +115,16 @@ pub fn build_index(from: PathBuf) -> Index {
 
     log(started, "Index has been generated.");
 
+    let tracks = SortedMap::from_vec(tracks, |track| track.id.clone());
+
+    let fingerprint = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
+        .as_secs()
+        .to_string();
+
     Index {
-        fingerprint: SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
-            .as_secs()
-            .to_string(),
+        fingerprint,
         from,
         tracks,
         cache,
@@ -183,14 +177,14 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
     let mut tracks_formats = HashMap::new();
     let mut tracks_index = HashMap::new();
 
-    let mut no_title_tracks = BTreeSet::new();
-    let mut no_album_tracks = BTreeSet::new();
-    let mut no_album_artist_tracks = BTreeSet::new();
+    let mut no_title_tracks = HashSet::new();
+    let mut no_album_tracks = HashSet::new();
+    let mut no_album_artist_tracks = HashSet::new();
 
-    let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumID>>::new();
-    let mut artists_tracks = HashMap::<ArtistID, BTreeSet<TrackID>>::new();
-    let mut albums_artists_albums = HashMap::<ArtistID, BTreeSet<AlbumID>>::new();
-    let mut albums_tracks = HashMap::<AlbumID, BTreeSet<TrackID>>::new();
+    let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
+    let mut artists_tracks = HashMap::<ArtistID, Vec<TrackID>>::new();
+    let mut albums_artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
+    let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
 
     let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
     let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
@@ -217,7 +211,7 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
         if let Some(album_infos) = tags.get_album_infos() {
             let album_id = album_infos.get_id();
 
-            albums_infos.insert(album_id.clone(), album_infos);
+            albums_infos.insert(album_id.clone(), album_infos.clone());
 
             for album_artist_infos in tags.get_album_artists_infos() {
                 albums_artists_infos
@@ -226,7 +220,7 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
                 albums_artists_albums
                     .entry(album_artist_infos.get_id())
                     .or_default()
-                    .insert(album_id.clone());
+                    .insert(album_infos.clone());
             }
 
             for artist_infos in tags
@@ -240,46 +234,23 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
                 artists_albums
                     .entry(artist_id.clone())
                     .or_default()
-                    .insert(album_id.clone());
+                    .insert(album_infos.clone());
 
                 artists_tracks
                     .entry(artist_id.clone())
                     .or_default()
-                    .insert(track.id.clone());
+                    .push(track.id.clone());
             }
 
             albums_tracks
                 .entry(album_id.clone())
                 .or_default()
-                .insert(track.id.clone());
+                .push(track.id.clone());
         }
     }
 
-    let mut ordered_artists = artists_infos.iter().collect::<Vec<_>>();
-    ordered_artists.sort_by(|a, b| a.1.name.cmp(&b.1.name));
-    let ordered_artists = ordered_artists
-        .into_iter()
-        .map(|(id, _)| id.clone())
-        .collect();
-
-    let mut ordered_albums_artists = albums_artists_infos.iter().collect::<Vec<_>>();
-    ordered_albums_artists.sort_by(|a, b| a.1.name.cmp(&b.1.name));
-    let ordered_albums_artists = ordered_albums_artists
-        .into_iter()
-        .map(|(id, _)| id.clone())
-        .collect();
-
-    let mut ordered_albums = albums_infos.iter().collect::<Vec<_>>();
-    ordered_albums.sort_by(|a, b| a.1.name.cmp(&b.1.name));
-    let ordered_albums = ordered_albums
-        .into_iter()
-        .map(|(id, _)| id.clone())
-        .collect();
-
     IndexCache {
         tracks_paths,
-        tracks_index,
-        tracks_formats,
 
         no_title_tracks,
         no_album_tracks,
@@ -291,11 +262,8 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
         albums_artists_albums,
         albums_tracks,
 
-        artists_infos,
-        albums_infos,
-
-        ordered_artists,
-        ordered_albums_artists,
-        ordered_albums,
+        artists_infos: SortedMap::from_hashmap(artists_infos),
+        albums_artists_infos: SortedMap::from_hashmap(albums_artists_infos),
+        albums_infos: SortedMap::from_hashmap(albums_infos),
     }
 }

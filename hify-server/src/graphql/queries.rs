@@ -1,14 +1,13 @@
 use async_graphql::{connection::Connection, ComplexObject, Context, Object, Result};
 
 use crate::{
-    graphql_index, graphql_into,
-    index::{AlbumID, ArtistID, Track, TrackID},
+    graphql_index,
+    index::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Track, TrackID},
     transparent_cursor_type,
 };
 
 use super::{
     pagination::{paginate, PaginationInput},
-    utils::GraphQLInto,
     GraphQLContext,
 };
 
@@ -29,16 +28,17 @@ impl IndexGraph {
         graphql_index!(ctx).fingerprint.clone()
     }
 
-    async fn albums(&self, ctx: &Context<'_>, from: i32, take: i32) -> Result<Vec<AlbumID>> {
-        let albums = graphql_index!(ctx)
-            .cache
-            .ordered_albums
-            .iter()
-            .skip(graphql_into!(from))
-            .take(graphql_into!(take))
-            .cloned()
-            .collect();
-        Ok(albums)
+    async fn albums(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Result<Connection<AlbumID, AlbumInfos>> {
+        let index = graphql_index!(ctx);
+        paginate(
+            pagination,
+            &index.cache.albums_infos,
+            |album: &AlbumInfos| album.get_id(),
+        )
     }
 
     async fn album(&self, ctx: &Context<'_>, id: String) -> Result<Option<AlbumID>> {
@@ -46,39 +46,30 @@ impl IndexGraph {
         Ok(Some(AlbumID(id)).filter(|id| index.cache.albums_infos.contains_key(id)))
     }
 
-    async fn artists(&self, ctx: &Context<'_>, from: i32, take: i32) -> Result<Vec<ArtistID>> {
+    async fn artists(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Result<Connection<ArtistID, ArtistInfos>> {
         let index = graphql_index!(ctx);
-        let artists = index
-            .cache
-            .ordered_artists
-            .iter()
-            .skip(graphql_into!(from))
-            .take(graphql_into!(take))
-            .cloned()
-            .collect();
-        Ok(artists)
-    }
-
-    async fn artist(&self, ctx: &Context<'_>, id: String) -> Result<Option<ArtistID>> {
-        let index = graphql_index!(ctx);
-        Ok(Some(ArtistID(id)).filter(|id| index.cache.artists_infos.contains_key(id)))
+        paginate(
+            pagination,
+            &index.cache.artists_infos,
+            |artist: &ArtistInfos| artist.get_id(),
+        )
     }
 
     async fn album_artists(
         &self,
         ctx: &Context<'_>,
-        from: i32,
-        take: i32,
-    ) -> Result<Vec<ArtistID>> {
-        let artists = graphql_index!(ctx)
-            .cache
-            .ordered_albums_artists
-            .iter()
-            .skip(graphql_into!(from))
-            .take(graphql_into!(take))
-            .cloned()
-            .collect();
-        Ok(artists)
+        pagination: PaginationInput,
+    ) -> Result<Connection<ArtistID, ArtistInfos>> {
+        let index = graphql_index!(ctx);
+        paginate(
+            pagination,
+            &index.cache.albums_artists_infos,
+            |artist: &ArtistInfos| artist.get_id(),
+        )
     }
 
     async fn tracks<'c>(
@@ -87,18 +78,12 @@ impl IndexGraph {
         pagination: PaginationInput,
     ) -> Result<Connection<TrackID, Track>> {
         let index = graphql_index!(ctx);
-        paginate(
-            pagination,
-            &index.tracks,
-            &index.cache.tracks_index,
-            |track: &Track| track.id.clone(),
-        )
+        paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     }
 
     async fn track(&self, ctx: &Context<'_>, id: String) -> Result<Option<Track>> {
         let index = graphql_index!(ctx);
-        let track_index = index.cache.tracks_index.get(&TrackID(id));
-        Ok(track_index.map(|track_index| index.tracks.get(*track_index).unwrap().clone()))
+        Ok(index.tracks.get(&TrackID(id)).cloned())
     }
 }
 
@@ -124,8 +109,7 @@ impl TrackID {
 
     async fn infos(&self, ctx: &Context<'_>) -> Track {
         let index = graphql_index!(ctx);
-        let track_index = index.cache.tracks_index.get(self).unwrap();
-        index.tracks.get(*track_index).unwrap().clone()
+        index.tracks.get(self).cloned().unwrap()
     }
 }
 
@@ -143,7 +127,7 @@ impl AlbumID {
         album_infos.name.clone()
     }
 
-    async fn album_artists(&self, ctx: &Context<'_>) -> Vec<String> {
+    async fn album_artists(&self, ctx: &Context<'_>) -> Vec<ArtistInfos> {
         let index = graphql_index!(ctx);
         let album_infos = index.cache.albums_infos.get(self).unwrap();
         album_infos.album_artists.clone()
@@ -170,17 +154,45 @@ impl ArtistID {
         album_infos.name.clone()
     }
 
-    async fn albums(&self, ctx: &Context<'_>) -> Option<Vec<AlbumID>> {
+    // TODO: pagination
+    async fn albums(&self, ctx: &Context<'_>) -> Option<Vec<AlbumInfos>> {
         let index = graphql_index!(ctx);
-        let albums_ids = index.cache.albums_artists_albums.get(self)?;
-        Some(albums_ids.iter().cloned().collect())
+        let albums = index.cache.albums_artists_albums.get(self)?;
+        Some(albums.iter().cloned().collect())
     }
 
-    async fn album_participations(&self, ctx: &Context<'_>) -> Option<Vec<AlbumID>> {
+    // TODO: pagination
+    async fn album_participations(&self, ctx: &Context<'_>) -> Option<Vec<AlbumInfos>> {
         let index = graphql_index!(ctx);
-        let albums_ids = index.cache.artists_albums.get(self).unwrap();
-        Some(albums_ids.iter().cloned().collect())
+        let albums = index.cache.artists_albums.get(self).unwrap();
+        Some(albums.iter().cloned().collect())
     }
 }
 
 transparent_cursor_type!(ArtistID);
+
+#[Object]
+impl AlbumInfos {
+    async fn id(&self) -> String {
+        self.get_id().0
+    }
+
+    async fn name(&self) -> &str {
+        &self.name
+    }
+
+    async fn album_artists(&self) -> Vec<ArtistInfos> {
+        self.album_artists.clone()
+    }
+}
+
+#[Object]
+impl ArtistInfos {
+    async fn id(&self) -> String {
+        self.get_id().0
+    }
+
+    async fn name(&self) -> &str {
+        &self.name
+    }
+}

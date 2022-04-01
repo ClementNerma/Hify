@@ -1,9 +1,11 @@
-use std::{collections::HashMap, hash::Hash};
+use std::hash::Hash;
 
 use async_graphql::{
     connection::{Connection, CursorType, Edge},
     InputObject, Result,
 };
+
+use crate::index::SortedMap;
 
 /// Pagination input for GraphQL
 /// Can do one of the following:
@@ -20,10 +22,9 @@ pub struct PaginationInput {
 
 /// Compute a paginated result from a list of items and a [`PaginationInput`]
 /// Requires an index cache to quickly avoid performing a full slice lookup
-pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
+pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone + Ord>(
     pagination: PaginationInput,
-    items: &[T],
-    indexes_cache: &HashMap<C, usize>,
+    items: &SortedMap<C, T>,
     item_cursor: impl Fn(&T) -> C,
 ) -> Result<Connection<C, T>> {
     // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
@@ -71,11 +72,9 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
             let cursor = C::decode_cursor(cursor)
                 .map_err(|e| format!("Failed to decode provided cursor: {}", e))?;
 
-            let index = indexes_cache
-                .get(&cursor)
-                .ok_or("Provided cursor was not found")?;
-
-            *index
+            items
+                .get_index(&cursor)
+                .ok_or("Provided cursor was not found")?
         }
     };
 
@@ -96,7 +95,7 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
 
     // Compute the paginated results' edges lazily
     let edges = items
-        .iter()
+        .values()
         .skip(start_at)
         .take(count)
         .map(|item| Edge::new(item_cursor(item), item.clone()));

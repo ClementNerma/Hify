@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    collections::{hash_map::DefaultHasher, BTreeSet, HashMap},
+    collections::{hash_map::DefaultHasher, BTreeSet, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::PathBuf,
 };
@@ -8,11 +8,13 @@ use std::{
 use async_graphql::{Enum, SimpleObject};
 use serde::{Deserialize, Serialize};
 
+use super::sorted_map::SortedMap;
+
 #[derive(Serialize, Deserialize)]
 pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
-    pub tracks: Vec<Track>,
+    pub tracks: SortedMap<TrackID, Track>,
     pub observations: Vec<String>,
     pub cache: IndexCache,
 }
@@ -20,32 +22,27 @@ pub struct Index {
 #[derive(Serialize, Deserialize)]
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
-    pub tracks_formats: HashMap<TrackID, AudioFormat>,
-    pub tracks_index: HashMap<TrackID, usize>,
 
-    pub no_title_tracks: BTreeSet<TrackID>,
-    pub no_album_tracks: BTreeSet<TrackID>,
-    pub no_album_artist_tracks: BTreeSet<TrackID>,
+    pub no_title_tracks: HashSet<TrackID>,
+    pub no_album_tracks: HashSet<TrackID>,
+    pub no_album_artist_tracks: HashSet<TrackID>,
 
-    pub artists_albums: HashMap<ArtistID, BTreeSet<AlbumID>>,
-    pub artists_tracks: HashMap<ArtistID, BTreeSet<TrackID>>,
+    pub artists_albums: HashMap<ArtistID, BTreeSet<AlbumInfos>>,
+    pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
-    pub albums_artists_albums: HashMap<ArtistID, BTreeSet<AlbumID>>,
+    pub albums_artists_albums: HashMap<ArtistID, BTreeSet<AlbumInfos>>,
 
-    pub albums_tracks: HashMap<AlbumID, BTreeSet<TrackID>>,
+    pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 
-    pub artists_infos: HashMap<ArtistID, ArtistInfos>,
-    pub albums_infos: HashMap<AlbumID, AlbumInfos>,
-
-    pub ordered_artists: Vec<ArtistID>,
-    pub ordered_albums_artists: Vec<ArtistID>,
-    pub ordered_albums: Vec<AlbumID>,
+    pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
+    pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
+    pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
 }
 
-#[derive(Serialize, Deserialize, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct AlbumInfos {
     pub name: String,
-    pub album_artists: Vec<String>,
+    pub album_artists: Vec<ArtistInfos>,
 }
 
 impl AlbumInfos {
@@ -58,9 +55,7 @@ impl AlbumInfos {
 
 impl PartialOrd for AlbumInfos {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.name
-            .partial_cmp(&other.name)
-            .or_else(|| self.album_artists.partial_cmp(&other.album_artists))
+        Some(self.cmp(&other))
     }
 }
 
@@ -72,7 +67,7 @@ impl Ord for AlbumInfos {
     }
 }
 
-#[derive(Serialize, Deserialize, Hash, Clone)]
+#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq)]
 pub struct ArtistInfos {
     pub name: String,
 }
@@ -85,16 +80,28 @@ impl ArtistInfos {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+impl PartialOrd for ArtistInfos {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+
+impl Ord for ArtistInfos {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.name.cmp(&other.name)
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct TrackID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct AlbumID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct ArtistID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, SimpleObject)]
+#[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct Track {
     #[graphql(skip)]
@@ -103,16 +110,35 @@ pub struct Track {
     pub metadata: TrackMetadata,
 }
 
-#[derive(Serialize, Deserialize, Clone, SimpleObject)]
+impl PartialOrd for Track {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+
+impl Ord for Track {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let a_tags = &self.metadata.tags;
+        let b_tags = &other.metadata.tags;
+
+        a_tags
+            .get_album_infos()
+            .cmp(&b_tags.get_album_infos())
+            .then_with(|| a_tags.track_no.cmp(&b_tags.track_no))
+            .then_with(|| self.path.cmp(&other.path))
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
-    pub duration: f64,
+    pub duration: i32,
     pub bitrate: i32,
     pub tags: TrackTags,
 }
 
-#[derive(Serialize, Deserialize, Clone, SimpleObject)]
+#[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 pub struct TrackTags {
     pub title: Option<String>,
 
@@ -134,7 +160,11 @@ impl TrackTags {
     pub fn get_album_infos(&self) -> Option<AlbumInfos> {
         Some(AlbumInfos {
             name: self.album.as_ref()?.clone(),
-            album_artists: self.album_artists.clone(),
+            album_artists: self
+                .album_artists
+                .iter()
+                .map(|name| ArtistInfos { name: name.clone() })
+                .collect(),
         })
     }
 
@@ -158,7 +188,7 @@ pub enum AudioFormat {
     FLAC,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, SimpleObject)]
+#[derive(Serialize, Deserialize, Clone, Copy, SimpleObject, PartialEq, Eq)]
 pub struct TrackDate {
     pub year: i32,
     pub month: Option<i32>,
