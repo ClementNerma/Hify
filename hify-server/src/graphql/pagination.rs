@@ -58,28 +58,25 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
 
     let count = usize::try_from(count).map_err(|_| "Invalid count number provided")?;
 
-    let cursor = cursor
-        .map(|cursor| {
-            C::decode_cursor(&cursor)
-                .map_err(|e| format!("Failed to decode provided cursor: {}", e))
-        })
-        .transpose()?;
+    let index = match cursor {
+        None => 0,
+        Some(ref cursor) => {
+            let cursor = C::decode_cursor(cursor)
+                .map_err(|e| format!("Failed to decode provided cursor: {}", e))?;
 
-    let index = cursor
-        .as_ref()
-        .map(|cursor| {
-            indexes_cache
-                .get(cursor)
-                .ok_or("Provided cursor was not found")
-        })
-        .transpose()?
-        .unwrap_or(&0);
+            let index = indexes_cache
+                .get(&cursor)
+                .ok_or("Provided cursor was not found")?;
+
+            *index
+        }
+    };
 
     let start_at = match direction {
-        Direction::After => *index + if cursor.is_some() { 1 } else { 0 },
+        Direction::After => index + if cursor.is_some() { 1 } else { 0 },
         Direction::Before => {
-            if *index >= count {
-                *index - count
+            if index >= count {
+                index - count
             } else {
                 0
             }
