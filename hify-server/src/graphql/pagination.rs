@@ -20,13 +20,17 @@ pub struct PaginationInput {
     last: Option<i32>,
 }
 
+/// Result of a computed pagination process
+/// Can be returned directly from a GraphQL query
+pub type Paginated<C, T> = Result<Connection<C, T>>;
+
 /// Compute a paginated result from a list of items and a [`PaginationInput`]
 /// Requires an index cache to quickly avoid performing a full slice lookup
 pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone + Ord>(
     pagination: PaginationInput,
     items: &SortedMap<C, T>,
     item_cursor: impl Fn(&T) -> C,
-) -> Result<Connection<C, T>> {
+) -> Paginated<C, T> {
     // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
     let (cursor, count, direction) = match (
         pagination.after,

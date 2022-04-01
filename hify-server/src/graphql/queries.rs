@@ -7,7 +7,7 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, PaginationInput},
+    pagination::{paginate, Paginated, PaginationInput},
     GraphQLContext,
 };
 
@@ -32,7 +32,7 @@ impl IndexGraph {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Result<Connection<AlbumID, AlbumInfos>> {
+    ) -> Paginated<AlbumID, AlbumInfos> {
         let index = graphql_index!(ctx);
         paginate(
             pagination,
@@ -50,7 +50,7 @@ impl IndexGraph {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Result<Connection<ArtistID, ArtistInfos>> {
+    ) -> Paginated<ArtistID, ArtistInfos> {
         let index = graphql_index!(ctx);
         paginate(
             pagination,
@@ -63,7 +63,7 @@ impl IndexGraph {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Result<Connection<ArtistID, ArtistInfos>> {
+    ) -> Paginated<ArtistID, ArtistInfos> {
         let index = graphql_index!(ctx);
         paginate(
             pagination,
@@ -81,7 +81,7 @@ impl IndexGraph {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Result<Connection<TrackID, Track>> {
+    ) -> Paginated<TrackID, Track> {
         let index = graphql_index!(ctx);
         paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     }
