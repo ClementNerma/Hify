@@ -2,7 +2,7 @@ use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeMap, BTreeSet},
+    collections::{hash_map::DefaultHasher, BTreeSet, HashMap},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
     sync::atomic::{AtomicU32, Ordering},
@@ -71,7 +71,7 @@ pub fn build_index(from: PathBuf) -> Index {
     log(started, "Collecting tracks...");
 
     let mut tracks = vec![];
-    let mut tracks_paths = BTreeMap::new();
+    let mut tracks_paths = HashMap::new();
 
     for (i, track_metadata) in analyzed.into_iter().enumerate() {
         let FoundFile { path, path_str } = &files.get(i).unwrap();
@@ -168,22 +168,22 @@ struct FoundFile {
 }
 
 // TODO: lots of optimization to perform here
-fn build_index_cache(tracks: &[Track], tracks_paths: BTreeMap<TrackID, PathBuf>) -> IndexCache {
-    let mut tracks_formats = BTreeMap::new();
-    let mut tracks_index = BTreeMap::new();
+fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) -> IndexCache {
+    let mut tracks_formats = HashMap::new();
+    let mut tracks_index = HashMap::new();
 
     let mut no_title_tracks = BTreeSet::new();
     let mut no_album_tracks = BTreeSet::new();
     let mut no_album_artist_tracks = BTreeSet::new();
 
-    let mut artists_albums = BTreeMap::<ArtistID, BTreeSet<AlbumID>>::new();
-    let mut artists_tracks = BTreeMap::<ArtistID, BTreeSet<TrackID>>::new();
-    let mut albums_artists_albums = BTreeMap::<ArtistID, BTreeSet<AlbumID>>::new();
-    let mut albums_tracks = BTreeMap::<AlbumID, BTreeSet<TrackID>>::new();
+    let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumID>>::new();
+    let mut artists_tracks = HashMap::<ArtistID, BTreeSet<TrackID>>::new();
+    let mut albums_artists_albums = HashMap::<ArtistID, BTreeSet<AlbumID>>::new();
+    let mut albums_tracks = HashMap::<AlbumID, BTreeSet<TrackID>>::new();
 
-    let mut artists_infos = BTreeMap::<ArtistID, ArtistInfos>::new();
-    let mut albums_artists_infos = BTreeMap::<ArtistID, ArtistInfos>::new();
-    let mut albums_infos = BTreeMap::<AlbumID, AlbumInfos>::new();
+    let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
+    let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
+    let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
     for (i, track) in tracks.iter().enumerate() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);

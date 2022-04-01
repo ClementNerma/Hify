@@ -1,5 +1,5 @@
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeMap, BTreeSet},
+    collections::{hash_map::DefaultHasher, BTreeSet, HashMap},
     hash::{Hash, Hasher},
     path::PathBuf,
 };
@@ -18,23 +18,23 @@ pub struct Index {
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexCache {
-    pub tracks_paths: BTreeMap<TrackID, PathBuf>,
-    pub tracks_formats: BTreeMap<TrackID, AudioFormat>,
-    pub tracks_index: BTreeMap<TrackID, usize>,
+    pub tracks_paths: HashMap<TrackID, PathBuf>,
+    pub tracks_formats: HashMap<TrackID, AudioFormat>,
+    pub tracks_index: HashMap<TrackID, usize>,
 
     pub no_title_tracks: BTreeSet<TrackID>,
     pub no_album_tracks: BTreeSet<TrackID>,
     pub no_album_artist_tracks: BTreeSet<TrackID>,
 
-    pub artists_albums: BTreeMap<ArtistID, BTreeSet<AlbumID>>,
-    pub artists_tracks: BTreeMap<ArtistID, BTreeSet<TrackID>>,
+    pub artists_albums: HashMap<ArtistID, BTreeSet<AlbumID>>,
+    pub artists_tracks: HashMap<ArtistID, BTreeSet<TrackID>>,
 
-    pub albums_artists_albums: BTreeMap<ArtistID, BTreeSet<AlbumID>>,
+    pub albums_artists_albums: HashMap<ArtistID, BTreeSet<AlbumID>>,
 
-    pub albums_tracks: BTreeMap<AlbumID, BTreeSet<TrackID>>,
+    pub albums_tracks: HashMap<AlbumID, BTreeSet<TrackID>>,
 
-    pub artists_infos: BTreeMap<ArtistID, ArtistInfos>,
-    pub albums_infos: BTreeMap<AlbumID, AlbumInfos>,
+    pub artists_infos: HashMap<ArtistID, ArtistInfos>,
+    pub albums_infos: HashMap<AlbumID, AlbumInfos>,
 
     pub ordered_artists: Vec<ArtistID>,
     pub ordered_albums_artists: Vec<ArtistID>,
