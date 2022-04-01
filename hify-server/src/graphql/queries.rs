@@ -17,15 +17,6 @@ pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn index(&self) -> IndexGraph {
-        IndexGraph
-    }
-}
-
-pub struct IndexGraph;
-
-#[Object]
-impl IndexGraph {
     async fn fingerprint(&self, ctx: &Context<'_>) -> String {
         graphql_index!(ctx).fingerprint.clone()
     }
