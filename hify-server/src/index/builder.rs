@@ -100,6 +100,17 @@ pub fn build_index(from: PathBuf) -> Index {
         });
     }
 
+    tracks.sort_by(|a, b| {
+        let a_tags = &a.metadata.tags;
+        let b_tags = &b.metadata.tags;
+
+        a_tags
+            .get_album_infos()
+            .cmp(&b_tags.get_album_infos())
+            .then_with(|| a_tags.track_no.cmp(&b_tags.track_no))
+            .then_with(|| a.path.cmp(&b.path))
+    });
+
     log(
         started,
         &format!("Emitted {} observations.", observations.len()),

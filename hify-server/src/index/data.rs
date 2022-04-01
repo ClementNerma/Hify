@@ -1,4 +1,5 @@
 use std::{
+    cmp::Ordering,
     collections::{hash_map::DefaultHasher, BTreeSet, HashMap},
     hash::{Hash, Hasher},
     path::PathBuf,
@@ -41,7 +42,7 @@ pub struct IndexCache {
     pub ordered_albums: Vec<AlbumID>,
 }
 
-#[derive(Serialize, Deserialize, Hash)]
+#[derive(Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct AlbumInfos {
     pub name: String,
     pub album_artists: Vec<String>,
@@ -52,6 +53,22 @@ impl AlbumInfos {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
         AlbumID(format!("{:x}", hasher.finish()))
+    }
+}
+
+impl PartialOrd for AlbumInfos {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.name
+            .partial_cmp(&other.name)
+            .or_else(|| self.album_artists.partial_cmp(&other.album_artists))
+    }
+}
+
+impl Ord for AlbumInfos {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.name
+            .cmp(&other.name)
+            .then_with(|| self.album_artists.cmp(&other.album_artists))
     }
 }
 
