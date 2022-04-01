@@ -99,6 +99,14 @@ impl Track {
     async fn album(&self) -> Option<AlbumInfos> {
         self.metadata.tags.get_album_infos()
     }
+
+    async fn artists(&self) -> Vec<ArtistInfos> {
+        self.metadata.tags.get_artists_infos().collect()
+    }
+
+    async fn album_artists(&self) -> Vec<ArtistInfos> {
+        self.metadata.tags.get_album_artists_infos().collect()
+    }
 }
 
 #[Object]
