@@ -72,9 +72,9 @@ impl IndexGraph {
         )
     }
 
-    async fn artist(&self, ctx: &Context<'_>, id: String) -> Result<Option<ArtistInfos>> {
+    async fn artist(&self, ctx: &Context<'_>, id: String) -> Option<ArtistInfos> {
         let index = graphql_index!(ctx);
-        Ok(index.cache.artists_infos.get(&ArtistID(id)).cloned())
+        index.cache.artists_infos.get(&ArtistID(id)).cloned()
     }
 
     async fn tracks<'c>(
