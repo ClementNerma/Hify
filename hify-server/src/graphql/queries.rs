@@ -1,11 +1,16 @@
-use async_graphql::{ComplexObject, Context, Object, Result};
+use async_graphql::{connection::Connection, ComplexObject, Context, Object, Result};
 
 use crate::{
     graphql_index, graphql_into,
     index::{AlbumID, ArtistID, Track, TrackID},
+    transparent_cursor_type,
 };
 
-use super::{utils::GraphQLInto, GraphQLContext};
+use super::{
+    pagination::{paginate, PaginationInput},
+    utils::GraphQLInto,
+    GraphQLContext,
+};
 
 pub struct QueryRoot;
 
@@ -76,15 +81,18 @@ impl IndexGraph {
         Ok(artists)
     }
 
-    async fn tracks(&self, ctx: &Context<'_>, from: i32, take: i32) -> Result<Vec<Track>> {
-        let tracks = graphql_index!(ctx)
-            .tracks
-            .iter()
-            .skip(graphql_into!(from))
-            .take(graphql_into!(take))
-            .cloned()
-            .collect();
-        Ok(tracks)
+    async fn tracks<'c>(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Result<Connection<TrackID, Track>> {
+        let index = graphql_index!(ctx);
+        paginate(
+            pagination,
+            &index.tracks,
+            &index.cache.tracks_index,
+            |track: &Track| track.id.clone(),
+        )
     }
 
     async fn track(&self, ctx: &Context<'_>, id: String) -> Result<Option<Track>> {
@@ -121,6 +129,8 @@ impl TrackID {
     }
 }
 
+transparent_cursor_type!(TrackID);
+
 #[Object]
 impl AlbumID {
     async fn id(&self) -> &str {
@@ -146,6 +156,8 @@ impl AlbumID {
     }
 }
 
+transparent_cursor_type!(AlbumID);
+
 #[Object]
 impl ArtistID {
     async fn id(&self) -> &str {
@@ -170,3 +182,5 @@ impl ArtistID {
         Some(albums_ids.iter().cloned().collect())
     }
 }
+
+transparent_cursor_type!(ArtistID);
