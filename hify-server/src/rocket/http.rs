@@ -67,6 +67,10 @@ pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Cust
     let mime_type = match track.metadata.format {
         AudioFormat::MP3 => ContentType::MPEG,
         AudioFormat::FLAC => ContentType::FLAC,
+        AudioFormat::WAV => ContentType::WAV,
+        AudioFormat::AAC => ContentType::AAC,
+        AudioFormat::OGG => ContentType::OGG,
+        AudioFormat::M4A => ContentType::MP4,
     };
 
     Ok(Custom(mime_type, file))

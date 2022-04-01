@@ -14,12 +14,17 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
 
     if matches!(
         audio_ext.as_str(),
-        "m4a" | "mpeg" | "ogg" | "opus" | "alac" | "aac" | "wav" | "aiff" | "dsf" | "webm"
+        "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
     ) {
-        return Err(format!("Unsupported audio extension: {}", audio_ext));
+        return Err(format!(
+            "File format unsupported by web players: {audio_ext}"
+        ));
     }
 
-    if !matches!(audio_ext.as_str(), "mp3" | "flac") {
+    if !matches!(
+        audio_ext.as_str(),
+        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
+    ) {
         return Ok(None);
     }
 
@@ -30,6 +35,7 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
             "-print_format",
             "json",
             "-show_format",
+            "-show_streams",
             file.to_str()
                 .ok_or("File doesn't have a valid UTF-8 filename")?,
         ])
@@ -48,13 +54,31 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
     let parsed_output = serde_json::from_str::<FFProbeOutput>(json_str)
         .map_err(|e| format!("Failed to parse FFProbe output: {e}"))?;
 
-    let data = parsed_output.format;
+    let streams: Vec<_> = parsed_output
+        .streams
+        .iter()
+        .filter(|stream| stream.codec_type == "audio")
+        .collect();
 
-    let format = match data.format_name.as_str() {
+    let stream = streams
+        .get(0)
+        .ok_or("File does not contain any audio stream")?;
+
+    if streams.len() > 1 {
+        return Err("File contains multiple audio streams".into());
+    }
+
+    let format = match stream.codec_name.as_str() {
         "flac" => AudioFormat::FLAC,
         "mp3" => AudioFormat::MP3,
-        name => return Err(format!("Unknown file format: {name}")),
+        "wav" => AudioFormat::WAV,
+        "aac" => AudioFormat::AAC,
+        "ogg" => AudioFormat::OGG,
+        "m4a" => AudioFormat::M4A,
+        codec_name => return Err(format!("Unknown codec name: {codec_name}")),
     };
+
+    let data = parsed_output.format;
 
     let size = data
         .size
@@ -187,15 +211,22 @@ fn parse_date(input: &str) -> Result<TrackDate, String> {
 #[derive(Deserialize)]
 struct FFProbeOutput {
     format: FFProbeFormat,
+    streams: Vec<FFProbeStream>,
 }
 
 #[derive(Deserialize)]
 struct FFProbeFormat {
-    format_name: String,
+    // format_name: String,
     duration: String,
     size: String,
     bit_rate: String,
     tags: FFProbeTags,
+}
+
+#[derive(Deserialize)]
+struct FFProbeStream {
+    codec_name: String,
+    codec_type: String,
 }
 
 type FFProbeTags = BTreeMap<String, String>;

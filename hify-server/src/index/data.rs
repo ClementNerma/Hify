@@ -186,6 +186,10 @@ impl TrackTags {
 pub enum AudioFormat {
     MP3,
     FLAC,
+    WAV,
+    AAC,
+    OGG,
+    M4A,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, SimpleObject, PartialEq, Eq)]
