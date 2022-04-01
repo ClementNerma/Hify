@@ -8,14 +8,20 @@ use rocket::{
 };
 use serde::Serialize;
 
-use super::cors::CORS;
-use crate::graphql::{get_graphql_routes, get_graphql_schema, AppSchema};
-use crate::index::{AudioFormat, Index, TrackID};
+use super::{cors::CORS, AppState};
+use crate::index::Index;
+use crate::{
+    graphql::{get_graphql_routes, get_graphql_schema},
+    index::{AudioFormat, TrackID},
+};
 
 pub async fn launch(index: Index) -> Result<(), rocket::Error> {
+    let app_state = AppState::new(index);
+
     Rocket::build()
         .attach(CORS)
-        .manage(get_graphql_schema(index))
+        .manage(get_graphql_schema(app_state.clone()))
+        .manage(app_state)
         .mount("/graphql", get_graphql_routes())
         .mount("/", rocket::routes![stream])
         .launch()
@@ -37,33 +43,31 @@ struct ServerError {
 type FaillibleResponse<T> = Result<T, status::Custom<String>>;
 
 #[rocket::get("/stream/<id>")]
-pub async fn stream(ctx: &State<AppSchema>, id: String) -> FaillibleResponse<Custom<File>> {
-    Err(rest_server_error(
-        Status::NotImplemented,
-        "Not currently supported".to_string(),
-    ))
-    // let track_path = cache
-    //     .tracks_paths
-    //     .get(&TrackID(id.clone()))
-    //     .ok_or_else(|| {
-    //         rest_server_error(
-    //             Status::NotFound,
-    //             "Provided track ID was not found".to_string(),
-    //         )
-    //     })?;
-    // let track_format = cache.tracks_formats.get(&TrackID(id)).unwrap();
+pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+    let index = ctx.index.read().await;
+    let track_path = index
+        .cache
+        .tracks_paths
+        .get(&TrackID(id.clone()))
+        .ok_or_else(|| {
+            rest_server_error(
+                Status::NotFound,
+                "Provided track ID was not found".to_string(),
+            )
+        })?;
+    let track_format = index.cache.tracks_formats.get(&TrackID(id)).unwrap();
 
-    // let file = File::open(Path::new(track_path)).await.map_err(|err| {
-    //     rest_server_error(
-    //         Status::InternalServerError,
-    //         format!("Failed to open track file: {err}"),
-    //     )
-    // })?;
+    let file = File::open(Path::new(track_path)).await.map_err(|err| {
+        rest_server_error(
+            Status::InternalServerError,
+            format!("Failed to open track file: {err}"),
+        )
+    })?;
 
-    // let mime_type = match track_format {
-    //     AudioFormat::MP3 => ContentType::MPEG,
-    //     AudioFormat::FLAC => ContentType::FLAC,
-    // };
+    let mime_type = match track_format {
+        AudioFormat::MP3 => ContentType::MPEG,
+        AudioFormat::FLAC => ContentType::FLAC,
+    };
 
-    // Ok(Custom(mime_type, file))
+    Ok(Custom(mime_type, file))
 }

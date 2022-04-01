@@ -1,18 +1,12 @@
-use std::sync::Arc;
-
-use rocket::tokio::sync::RwLock;
-
-use crate::index::Index;
+use crate::rocket::AppState;
 
 pub struct GraphQLContext {
-    pub index: Arc<RwLock<Index>>,
+    pub app_state: AppState,
 }
 
 impl GraphQLContext {
-    pub fn new(index: Index) -> Self {
-        Self {
-            index: Arc::new(RwLock::new(index)),
-        }
+    pub fn new(app_state: AppState) -> Self {
+        Self { app_state }
     }
 }
 
@@ -20,6 +14,6 @@ impl GraphQLContext {
 macro_rules! graphql_index {
     ($ctx_var: ident) => {{
         let ctx = $ctx_var.data::<GraphQLContext>().unwrap();
-        ctx.index.read().await
+        ctx.app_state.index.read().await
     }};
 }

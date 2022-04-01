@@ -10,8 +10,8 @@ pub struct MutationRoot;
 impl MutationRoot {
     async fn generate_index(&self, ctx: &Context<'_>) -> bool {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
-        let index = build_index(ctx.index.read().await.from.clone());
-        *ctx.index.write().await = index;
+        let index = build_index(ctx.app_state.index.read().await.from.clone());
+        *ctx.app_state.index.write().await = index;
         true
     }
 }
