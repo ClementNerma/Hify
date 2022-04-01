@@ -35,8 +35,11 @@ impl QueryRoot {
     }
 
     async fn album(&self, ctx: &Context<'_>, id: String) -> Option<AlbumInfos> {
-        let index = graphql_index!(ctx);
-        index.cache.albums_infos.get(&AlbumID(id)).cloned()
+        graphql_index!(ctx)
+            .cache
+            .albums_infos
+            .get(&AlbumID(id))
+            .cloned()
     }
 
     async fn artists(
@@ -66,8 +69,11 @@ impl QueryRoot {
     }
 
     async fn artist(&self, ctx: &Context<'_>, id: String) -> Option<ArtistInfos> {
-        let index = graphql_index!(ctx);
-        index.cache.artists_infos.get(&ArtistID(id)).cloned()
+        graphql_index!(ctx)
+            .cache
+            .artists_infos
+            .get(&ArtistID(id))
+            .cloned()
     }
 
     async fn tracks<'c>(
@@ -80,8 +86,7 @@ impl QueryRoot {
     }
 
     async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
-        let index = graphql_index!(ctx);
-        index.tracks.get(&TrackID(id)).cloned()
+        graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
     }
 }
 
