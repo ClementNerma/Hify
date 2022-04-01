@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    collections::{hash_map::DefaultHasher, BTreeSet, HashMap, HashSet},
+    collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::PathBuf,
 };
@@ -27,10 +27,10 @@ pub struct IndexCache {
     pub no_album_tracks: HashSet<TrackID>,
     pub no_album_artist_tracks: HashSet<TrackID>,
 
-    pub artists_albums: HashMap<ArtistID, BTreeSet<AlbumInfos>>,
+    pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
-    pub albums_artists_albums: HashMap<ArtistID, BTreeSet<AlbumInfos>>,
+    pub albums_artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 
     pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 

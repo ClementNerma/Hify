@@ -54,8 +54,8 @@ pub fn build_index(from: PathBuf) -> Index {
         .enumerate()
         .map(|(_, file)| ffprobe::run_on(&file.path))
         .inspect(|_| {
-            let counter = counter.fetch_add(1, Ordering::SeqCst);
-            if counter % 1000 == 0 || counter + 1 == files.len() {
+            let counter = counter.fetch_add(1, Ordering::SeqCst) + 1;
+            if counter % 1000 == 0 || counter == files.len() {
                 let progress_percent = counter as f64 * 100.0 / files.len() as f64;
                 log(
                     started,
@@ -248,6 +248,26 @@ fn build_index_cache(tracks: &[Track], tracks_paths: HashMap<TrackID, PathBuf>) 
                 .push(track.id.clone());
         }
     }
+
+    let artists_albums = artists_albums
+        .into_iter()
+        .map(|(k, v)| {
+            (
+                k,
+                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+            )
+        })
+        .collect();
+
+    let albums_artists_albums = albums_artists_albums
+        .into_iter()
+        .map(|(k, v)| {
+            (
+                k,
+                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+            )
+        })
+        .collect();
 
     IndexCache {
         tracks_paths,

@@ -135,4 +135,9 @@ macro_rules! transparent_cursor_type {
             }
         }
     };
+
+    ($typename: ident, $($typenames: ident),+) => {
+        transparent_cursor_type!{$typename}
+        $(transparent_cursor_type!{$typenames})+
+    }
 }

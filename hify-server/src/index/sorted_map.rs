@@ -36,9 +36,13 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         Self { values, indexes }
     }
 
-    pub fn contains_key(&self, key: &K) -> bool {
-        self.indexes.contains_key(key)
+    pub fn empty() -> Self {
+        Self { values: vec![], indexes: HashMap::new() }
     }
+
+    // pub fn contains_key(&self, key: &K) -> bool {
+    //     self.indexes.contains_key(key)
+    // }
 
     pub fn get<'a>(&'a self, key: &K) -> Option<&'a V> {
         let index = self.indexes.get(key)?;
