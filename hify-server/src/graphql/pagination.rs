@@ -66,16 +66,17 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
         .transpose()?;
 
     let index = cursor
+        .as_ref()
         .map(|cursor| {
             indexes_cache
-                .get(&cursor)
+                .get(cursor)
                 .ok_or("Provided cursor was not found")
         })
         .transpose()?
         .unwrap_or(&0);
 
     let start_at = match direction {
-        Direction::After => *index,
+        Direction::After => *index + if cursor.is_some() { 1 } else { 0 },
         Direction::Before => {
             if *index >= count {
                 *index - count
@@ -85,16 +86,17 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
         }
     };
 
-    let mut connection = Connection::<C, T>::new(*index > 0, index + count < items.len());
+    let mut connection = Connection::<C, T>::new(start_at > 0, start_at + count < items.len());
 
     let edges = items
         .iter()
         .skip(start_at)
+        .take(count)
         .map(|item| Edge::new(item_cursor(item), item.clone()));
 
     match direction {
-        Direction::After => connection.append(edges.take(count)),
-        Direction::Before => connection.append(edges.rev().skip(1).take(count)),
+        Direction::After => connection.append(edges),
+        Direction::Before => connection.append(edges.rev()),
     }
 
     Ok(connection)
