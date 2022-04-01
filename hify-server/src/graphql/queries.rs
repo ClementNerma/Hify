@@ -1,4 +1,4 @@
-use async_graphql::{connection::Connection, ComplexObject, Context, Object, Result};
+use async_graphql::{ComplexObject, Context, Object, Result};
 
 use crate::{
     graphql_index,
@@ -41,9 +41,9 @@ impl IndexGraph {
         )
     }
 
-    async fn album(&self, ctx: &Context<'_>, id: String) -> Result<Option<AlbumID>> {
+    async fn album(&self, ctx: &Context<'_>, id: String) -> Option<AlbumID> {
         let index = graphql_index!(ctx);
-        Ok(Some(AlbumID(id)).filter(|id| index.cache.albums_infos.contains_key(id)))
+        Some(AlbumID(id)).filter(|id| index.cache.albums_infos.contains_key(id))
     }
 
     async fn artists(
@@ -86,9 +86,9 @@ impl IndexGraph {
         paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     }
 
-    async fn track(&self, ctx: &Context<'_>, id: String) -> Result<Option<Track>> {
+    async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
         let index = graphql_index!(ctx);
-        Ok(index.tracks.get(&TrackID(id)).cloned())
+        index.tracks.get(&TrackID(id)).cloned()
     }
 }
 
