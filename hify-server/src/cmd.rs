@@ -10,4 +10,7 @@ pub struct Command {
 
     #[clap(short, long)]
     pub index_file: PathBuf,
+
+    #[clap(long)]
+    pub no_index_file: bool,
 }

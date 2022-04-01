@@ -19,7 +19,7 @@ async fn main() {
 
     let index = if args.index_file.is_dir() {
         panic!("Index file must not be a directory");
-    } else if args.index_file.is_file() {
+    } else if args.index_file.is_file() && !args.no_index_file {
         println!("> Loading index from disk...");
         let index = utils::save::load_index(&args.index_file).unwrap();
 
@@ -30,8 +30,10 @@ async fn main() {
         println!("> Generating index...");
         let index = index::build_index(args.music_dir);
 
-        utils::save::save_index(&args.index_file, &index).unwrap();
-        println!("> Index saved on disk.");
+        if !args.no_index_file {
+            utils::save::save_index(&args.index_file, &index).unwrap();
+            println!("> Index saved on disk.");
+        }
 
         index
     };
