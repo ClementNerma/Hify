@@ -5,6 +5,11 @@ use async_graphql::{
     InputObject, Result,
 };
 
+/// Pagination input for GraphQL
+/// Can do one of the following:
+/// * Fetch the N first items by specifying only `first`
+/// * Fetch the N first items after a given one by specifying only `after` and `first`
+/// * Fetch the N last items before a given one by specifying only `before` and `last`
 #[derive(InputObject)]
 pub struct PaginationInput {
     after: Option<String>,
@@ -13,15 +18,15 @@ pub struct PaginationInput {
     last: Option<i32>,
 }
 
+/// Compute a paginated result from a list of items and a [`PaginationInput`]
+/// Requires an index cache to quickly avoid performing a full slice lookup
 pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
     pagination: PaginationInput,
     items: &[T],
     indexes_cache: &HashMap<C, usize>,
     item_cursor: impl Fn(&T) -> C,
 ) -> Result<Connection<C, T>> {
-    // find item with cursor 'after' or 'before'
-    // get nth items before or after
-
+    // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
     let (cursor, count, direction) = match (
         pagination.after,
         pagination.before,
@@ -56,8 +61,10 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
         }
     };
 
+    // Ensure the count is valid
     let count = usize::try_from(count).map_err(|_| "Invalid count number provided")?;
 
+    // Compute index of the first element to get from the index cache
     let index = match cursor {
         None => 0,
         Some(ref cursor) => {
@@ -72,6 +79,7 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
         }
     };
 
+    // Compute index of the first element to retrieve, considering the direction
     let start_at = match direction {
         Direction::After => index + if cursor.is_some() { 1 } else { 0 },
         Direction::Before => {
@@ -83,19 +91,23 @@ pub fn paginate<'a, C: CursorType + Eq + Hash, T: Clone>(
         }
     };
 
+    // Create a Relay value
     let mut connection = Connection::<C, T>::new(start_at > 0, start_at + count < items.len());
 
+    // Compute the paginated results' edges lazily
     let edges = items
         .iter()
         .skip(start_at)
         .take(count)
         .map(|item| Edge::new(item_cursor(item), item.clone()));
 
+    // Produce the paginated results
     match direction {
         Direction::After => connection.append(edges),
         Direction::Before => connection.append(edges.rev()),
     }
 
+    // Success!
     Ok(connection)
 }
 
@@ -104,6 +116,7 @@ enum Direction {
     After,
 }
 
+/// Implements the [`CursorType`] trait for tuple structs containing a single [`String`] item
 #[macro_export]
 macro_rules! transparent_cursor_type {
     ($typename: ident) => {
