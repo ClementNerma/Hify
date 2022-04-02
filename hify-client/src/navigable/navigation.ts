@@ -38,6 +38,7 @@ export abstract class NavigableCommon {
 
 export abstract class NavigableContainer extends NavigableCommon {
   abstract append(navigable: Navigable): void
+  abstract hasChild(child: Navigable): boolean
   abstract remove(child: Navigable): void
   abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
 
@@ -81,6 +82,10 @@ class NavigablePage {
     }
 
     this.onlyChild = navigable
+  }
+
+  hasChild(child: Navigable): boolean {
+    return child === this.onlyChild
   }
 
   remove(child: Navigable): void {
@@ -148,6 +153,18 @@ export function usePageNavigator(): NavigableContainer {
   return page
 }
 
+export function wasNavigableDestroyed(navigable: Navigable): boolean {
+  while (!(navigable instanceof NavigablePage)) {
+    if (!navigable.parent.hasChild(navigable)) {
+      return true
+    }
+
+    navigable = navigable.parent
+  }
+
+  return false
+}
+
 export function handleKeyboardEvent(e: KeyboardEvent): void {
   if (e.ctrlKey || e.shiftKey || e.altKey) {
     return
@@ -158,7 +175,19 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       return state
     }
 
-    const current = state.focused ?? state.page.firstItemDown(NavigationComingFrom.Above)
+    let __current = state.focused
+
+    if (__current?.identity !== state.page.identity) {
+      console.warn('Previously-focused element has a different identity than the current page, removing focus')
+      __current = null
+    }
+
+    if (__current && wasNavigableDestroyed(__current)) {
+      console.warn('Previously-focused element was destroyed, removing focus')
+      __current = null
+    }
+
+    const current = __current ?? state.page.firstItemDown(NavigationComingFrom.Above)
 
     if (!current) {
       console.warn('No navigable item in this page')

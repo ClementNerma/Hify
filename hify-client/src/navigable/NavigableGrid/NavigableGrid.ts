@@ -17,6 +17,10 @@ export class NavigableGrid extends NavigableContainer {
     this.items.push(navigable)
   }
 
+  hasChild(child: Navigable): boolean {
+    return this.items.indexOf(child) !== -1
+  }
+
   remove(child: Navigable): void {
     const index = this.items.indexOf(child)
 

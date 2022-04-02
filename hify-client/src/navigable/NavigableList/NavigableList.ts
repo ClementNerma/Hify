@@ -17,6 +17,10 @@ export class NavigableList extends NavigableContainer {
     this.rows.splice(index, 1)
   }
 
+  hasChild(child: Navigable): boolean {
+    return this.rows.indexOf(child) !== -1
+  }
+
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
     const rowIndex = this.rows.indexOf(focusedChild)
 

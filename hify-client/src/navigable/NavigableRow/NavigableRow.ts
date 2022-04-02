@@ -7,6 +7,10 @@ export class NavigableRow extends NavigableContainer {
     this.columns.push(navigable)
   }
 
+  hasChild(child: Navigable): boolean {
+    return this.columns.indexOf(child) !== -1
+  }
+
   remove(child: Navigable): void {
     const index = this.columns.indexOf(child)
 

@@ -28,6 +28,10 @@ export class NavigableWithHandlers extends NavigableContainer {
     this.onlyChild = navigable
   }
 
+  hasChild(child: Navigable): boolean {
+    return child === this.onlyChild
+  }
+
   remove(child: Navigable): void {
     if (!this.onlyChild) {
       throw new Error('Cannot remove component from empty navigable with handlers')
