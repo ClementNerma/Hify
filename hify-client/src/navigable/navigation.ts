@@ -23,9 +23,11 @@ export enum NavigationComingFrom {
 
 export abstract class NavigableCommon {
   readonly identity: symbol
+  readonly page: NavigablePage
 
   constructor(readonly parent: NavigableContainer) {
     this.identity = parent.identity
+    this.page = parent.page
   }
 
   abstract firstItemDown(from: NavigationComingFrom): NavigableItem | null
@@ -60,12 +62,17 @@ export abstract class NavigableItem extends NavigableCommon {
   }
 }
 
-class NavigablePage extends NavigableContainer {
+class NavigablePage {
+  readonly identity = Symbol()
+  readonly page: NavigablePage
   private onlyChild: Navigable | null = null
 
   constructor() {
-    const fakeNav: Pick<NavigableContainer, 'identity'> = { identity: Symbol() }
-    super(fakeNav as NavigableContainer)
+    this.page = this
+  }
+
+  get parent(): NavigableContainer {
+    throw new Error("Cannot access parent from the page's root component")
   }
 
   append(navigable: Navigable): void {
@@ -95,6 +102,19 @@ class NavigablePage extends NavigableContainer {
   firstItemDown(from: NavigationComingFrom): NavigableItem | null {
     return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
   }
+
+  canHandleAction(_: NavigationAction): boolean {
+    return false
+  }
+
+  handleAction(_: NavigationAction): NavigableItem | null {
+    throw new Error('Tried to make the navigable page component handle an action')
+  }
+
+  // Required to ensure compatibility with the parent class even without inheritance
+  asContainer(): NavigableContainer {
+    return this
+  }
 }
 
 export function getParentNavigable(): NavigableContainer {
@@ -104,7 +124,7 @@ export function getParentNavigable(): NavigableContainer {
     throw new Error('No parent navigable found in the current context')
   }
 
-  if (!(nav instanceof NavigableContainer)) {
+  if (!(nav instanceof NavigableContainer) && !(nav instanceof NavigablePage)) {
     throw new Error('Context does not contain a navigable value')
   }
 
