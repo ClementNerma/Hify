@@ -1,11 +1,4 @@
-import {
-  NavigableContainer,
-  Navigable,
-  NavigableItem,
-  NavigationAction,
-  NavigationComingFrom,
-  NavigationDirection,
-} from '../navigation'
+import { NavigableContainer, Navigable, NavigableItem, NavigationComingFrom, NavigationDirection } from '../navigation'
 
 export class NavigableRow extends NavigableContainer {
   private readonly columns: Navigable[] = []
@@ -76,9 +69,5 @@ export class NavigableRow extends NavigableContainer {
     }
 
     return null
-  }
-
-  interceptAction(_: NavigationAction): NavigableItem | false {
-    return false
   }
 }

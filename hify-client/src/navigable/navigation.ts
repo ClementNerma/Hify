@@ -79,10 +79,6 @@ class NavigablePage extends NavigableContainer {
     return null
   }
 
-  interceptAction(_: NavigationAction): NavigableItem | false {
-    return false
-  }
-
   firstItemDown(from: NavigationComingFrom): NavigableItem | null {
     return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
   }
