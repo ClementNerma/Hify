@@ -36,6 +36,7 @@ export abstract class NavigableCommon {
 
 export abstract class NavigableContainer extends NavigableCommon {
   abstract append(navigable: Navigable): void
+  abstract remove(child: Navigable): void
   abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
 
   canHandleAction(_: NavigationAction): boolean {
@@ -73,6 +74,18 @@ class NavigablePage extends NavigableContainer {
     }
 
     this.onlyChild = navigable
+  }
+
+  remove(child: Navigable): void {
+    if (!this.onlyChild) {
+      throw new Error('Cannot remove component from empty navigable page')
+    }
+
+    if (this.onlyChild !== child) {
+      throw new Error("Tried to remove another navigable than the page's root one")
+    }
+
+    this.onlyChild = null
   }
 
   navigate(_: NavigableContainer, __: NavigationDirection): NavigableItem | null {
@@ -142,6 +155,7 @@ type NavState = {
 
 const navState = writable<NavState | null>(null)
 
+console.log(document.body)
 document.body.addEventListener('keydown', (e) => {
   if (e.ctrlKey || e.shiftKey || e.altKey) {
     return

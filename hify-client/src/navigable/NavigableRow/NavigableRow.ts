@@ -7,6 +7,16 @@ export class NavigableRow extends NavigableContainer {
     this.columns.push(navigable)
   }
 
+  remove(child: Navigable): void {
+    const index = this.columns.indexOf(child)
+
+    if (index === -1) {
+      throw new Error('Tried to remove unknown child from navigable row')
+    }
+
+    this.columns.splice(index, 1)
+  }
+
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
     const colIndex = this.columns.indexOf(focusedChild)
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
+
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableList } from './NavigableList'
 
@@ -8,6 +10,8 @@
   nav.append(list)
 
   setChildrenNavigable(list)
+
+  onDestroy(() => nav.remove(list))
 </script>
 
 <slot />

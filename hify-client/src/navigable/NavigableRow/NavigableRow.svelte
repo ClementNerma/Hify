@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte'
+
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableRow } from './NavigableRow'
 
@@ -8,6 +10,8 @@
   nav.append(row)
 
   setChildrenNavigable(row)
+
+  onDestroy(() => nav.remove(row))
 </script>
 
 <slot />

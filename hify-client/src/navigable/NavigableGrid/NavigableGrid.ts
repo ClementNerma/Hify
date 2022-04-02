@@ -17,6 +17,16 @@ export class NavigableGrid extends NavigableContainer {
     this.items.push(navigable)
   }
 
+  remove(child: Navigable): void {
+    const index = this.items.indexOf(child)
+
+    if (index === -1) {
+      throw new Error('Tried to remove unknown child from navigable grid')
+    }
+
+    this.items.splice(index, 1)
+  }
+
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
     const itemIndex = this.items.indexOf(focusedChild)
 

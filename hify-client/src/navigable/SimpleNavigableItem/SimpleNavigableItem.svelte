@@ -2,9 +2,9 @@
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
   import { getParentNavigable } from '../navigation'
 
-  export let onPress: SimpleNavigableItemProps['onPress']
+  export let onPress: SimpleNavigableItemProps['onPress'] = undefined
   export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined
-  export let onFocusChange: SimpleNavigableItemProps['onFocusChange']
+  export let onFocusChange: SimpleNavigableItemProps['onFocusChange'] = undefined
   export let onBack: SimpleNavigableItemProps['onBack'] = undefined
 
   const nav = getParentNavigable()

@@ -8,7 +8,7 @@ export class SimpleNavigableItem extends NavigableItem {
   canHandleAction(key: NavigationAction): boolean {
     switch (key) {
       case NavigationAction.Press:
-        return true
+        return !!this.props.onPress
 
       case NavigationAction.LongPress:
         return !!this.props.onLongPress
@@ -21,7 +21,7 @@ export class SimpleNavigableItem extends NavigableItem {
   handleAction(action: NavigationAction): NavigableItem | null {
     switch (action) {
       case NavigationAction.Press:
-        this.props.onPress()
+        this.props.onPress?.()
         break
 
       case NavigationAction.LongPress:
@@ -29,11 +29,7 @@ export class SimpleNavigableItem extends NavigableItem {
         break
 
       case NavigationAction.Back:
-        if (!this.props.onBack) {
-          throw new Error('Tried to call unsupported onBack() on simple navigable item')
-        }
-
-        this.props.onBack()
+        this.props.onBack?.()
         break
     }
 
@@ -49,17 +45,17 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 
   onFocus(): void {
-    this.props.onFocusChange(true)
+    this.props.onFocusChange?.(true)
   }
 
   onUnfocus(): void {
-    this.props.onFocusChange(false)
+    this.props.onFocusChange?.(false)
   }
 }
 
 export type SimpleNavigableItemProps = {
-  onPress: () => void
+  onPress?: () => void
   onLongPress?: () => void
-  onFocusChange: (hasFocus: boolean) => void
+  onFocusChange?: (hasFocus: boolean) => void
   onBack?: () => void
 }
