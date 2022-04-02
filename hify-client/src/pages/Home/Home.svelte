@@ -1,13 +1,13 @@
 <script lang="ts">
   import { usePageNavigator, setChildrenNavigable } from '../../navigable/navigation'
-  import HorizontalLayout from '../../navigable/HorizontalLayout/HorizontalLayout.svelte'
   import AlbumGrid from '../AlbumGrid/AlbumGrid.svelte'
+  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
 
   const nav = usePageNavigator()
 
   setChildrenNavigable(nav)
 </script>
 
-<HorizontalLayout>
+<NavigableList>
   <AlbumGrid />
-</HorizontalLayout>
+</NavigableList>
