@@ -15,8 +15,10 @@
 
 <style>
   .card {
-    flex: 1 1 0px;
-    margin: 0 1%;
+    flex: 1 1 10%;
+    margin: 0 2%;
+    max-width: 12%; /* flex + margin */
+    text-align: center;
   }
 
   .card:hover {

@@ -18,6 +18,5 @@
     justify-content: space-between;
     align-items: flex-start;
     align-content: center;
-    padding: 0 1%;
   }
 </style>
