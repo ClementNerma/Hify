@@ -23,13 +23,6 @@
 </script>
 
 <table>
-  <thead>
-    <tr>
-      <th>🔊</th>
-      <th>N°</th>
-      <th>Title</th>
-    </tr>
-  </thead>
   <tbody>
     {#await albumTracks}
       <tr>
@@ -40,8 +33,8 @@
       {#each tracks as track}
         <tr>
           <td class="play" on:click={() => playAudio(`${API_SERVER_URL}/stream/${track.id}`)}>🔊</td>
-          <td>{track.metadata.tags.trackNo}</td>
-          <td>{track.metadata.tags.title}</td>
+          <td class="trackno">{track.metadata.tags.trackNo}</td>
+          <td class="title">{track.metadata.tags.title}</td>
         </tr>
       {/each}
     {:catch e}
@@ -55,25 +48,31 @@
 
 <style>
   table {
-    width: 100%;
+    width: 90%;
+    margin-left: 5%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
 
-  tbody tr {
+  tr {
     background-color: #e3e3e3;
   }
 
-  tbody tr:hover {
+  tr:hover {
     background-color: #c9c9c9;
   }
 
-  td,
-  th {
-    border: 1px solid black;
+  td {
     padding: 10px;
   }
 
-  .play {
+  td.play {
+    width: 2%;
+    text-align: center;
     cursor: pointer;
+  }
+
+  td.trackno {
+    width: 5%;
   }
 </style>
