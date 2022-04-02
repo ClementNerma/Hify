@@ -6,6 +6,4 @@
   const navigate = useNavigate()
 </script>
 
-<NavigableWithHandlers onBack={() => navigate(-1)}>
-  <AlbumGrid />
-</NavigableWithHandlers>
+<AlbumGrid />
