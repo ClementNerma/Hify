@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store'
 
-export const playingAudio = writable<HTMLAudioElement | null>(null)
+const playingAudio = writable<HTMLAudioElement | null>(null)
 
 export function playAudio(url: string) {
   playingAudio.update((prevAudio) => {
