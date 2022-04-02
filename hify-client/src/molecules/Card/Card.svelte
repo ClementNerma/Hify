@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SimpleNavigableItem from '../../atoms/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../layout/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let pictureUrl: string
   export let pictureAlt: string

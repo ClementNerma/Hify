@@ -1,4 +1,4 @@
-import { NavigableContainer, NavigableItem, NavigationAction, NavigationDirection } from '../../others/navigation'
+import { NavigableContainer, NavigableItem, NavigationAction, NavigationDirection } from '../navigation'
 
 export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {

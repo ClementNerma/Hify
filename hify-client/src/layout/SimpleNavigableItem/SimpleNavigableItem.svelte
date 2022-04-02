@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { getParentNavigable } from '../../others/navigation'
-
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
+  import { getParentNavigable } from '../navigation'
 
   export let onPress: SimpleNavigableItemProps['onPress']
   export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined

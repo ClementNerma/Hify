@@ -1,6 +1,6 @@
 <script lang="ts">
-  import NavigableRow from '../NavigableRow/NavigableRow.svelte'
-  import NavigableList from '../NavigableList/NavigableList.svelte'
+  import NavigableRow from '../../layout/NavigableRow/NavigableRow.svelte'
+  import NavigableList from '../../layout/NavigableList/NavigableList.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
   export let items: Card['$$prop_def'][]

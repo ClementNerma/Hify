@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getParentNavigable, setChildrenNavigable } from '../../others/navigation'
+  import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableList } from './NavigableList'
 
   const nav = getParentNavigable()

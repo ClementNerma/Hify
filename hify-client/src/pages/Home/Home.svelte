@@ -1,7 +1,6 @@
 <script lang="ts">
-  import HorizontalLayout from '../../organisms/HorizontalLayout/HorizontalLayout.svelte'
-
-  import { setChildrenNavigable, usePageNavigator } from '../../others/navigation'
+  import HorizontalLayout from '../../layout/HorizontalLayout/HorizontalLayout.svelte'
+  import { setChildrenNavigable, usePageNavigator } from '../../layout/navigation'
 
   import AlbumGrid from '../AlbumGrid/AlbumGrid.svelte'
 

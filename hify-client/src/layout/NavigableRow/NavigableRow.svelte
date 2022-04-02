@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getParentNavigable, setChildrenNavigable } from '../../others/navigation'
-  import { NavigableRow } from '../NavigableRow/NavigableRow'
+  import { getParentNavigable, setChildrenNavigable } from '../navigation'
+  import { NavigableRow } from './NavigableRow'
 
   const nav = getParentNavigable()
   const row = new NavigableRow(nav)

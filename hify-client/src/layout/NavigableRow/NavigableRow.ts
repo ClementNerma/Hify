@@ -5,7 +5,7 @@ import {
   NavigationAction,
   NavigationComingFrom,
   NavigationDirection,
-} from '../../others/navigation'
+} from '../navigation'
 
 export class NavigableRow extends NavigableContainer {
   private readonly columns: Navigable[] = []
