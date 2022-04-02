@@ -5,30 +5,22 @@
   import Home from './pages/Home/Home.svelte'
 </script>
 
-<div class="container">
-  <Router>
-    <Route path="/">
-      <Home />
-    </Route>
+<Router>
+  <Route path="/">
+    <Home />
+  </Route>
 
-    <Route path="/albums">
-      <AlbumGrid />
-    </Route>
+  <Route path="/albums">
+    <AlbumGrid />
+  </Route>
 
-    <Route path="/album/:id" let:params>
-      <AlbumTracks albumId={params['id']} />
-    </Route>
-  </Router>
-</div>
+  <Route path="/album/:id" let:params>
+    <AlbumTracks albumId={params['id']} />
+  </Route>
+</Router>
 
 <style>
-  .container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  :global(body) {
     background-color: lightgray;
-    overflow: auto;
   }
 </style>

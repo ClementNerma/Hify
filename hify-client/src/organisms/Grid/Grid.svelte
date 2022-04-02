@@ -12,11 +12,8 @@
 
 <style>
   .container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    align-content: center;
+    display: grid;
+    grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
+    grid-gap: 2% 0;
   }
 </style>
