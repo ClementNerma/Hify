@@ -1,5 +1,5 @@
 <script lang="ts">
-  import NavigableGrid from '../../layout/NavigableGrid/NavigableGrid.svelte'
+  import NavigableGrid from '../../navigable/NavigableGrid/NavigableGrid.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
   export let items: Card['$$prop_def'][]
