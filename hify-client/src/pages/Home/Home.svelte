@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { usePageNavigator, setChildrenNavigable } from '../../navigable/navigation'
   import AlbumGrid from '../AlbumGrid/AlbumGrid.svelte'
-  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
+  import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import { useNavigate } from 'svelte-navigator'
 
-  const nav = usePageNavigator()
-
-  setChildrenNavigable(nav)
+  const navigate = useNavigate()
 </script>
 
-<NavigableList>
+<NavigableWithHandlers onBack={() => navigate(-1)}>
   <AlbumGrid />
-</NavigableList>
+</NavigableWithHandlers>

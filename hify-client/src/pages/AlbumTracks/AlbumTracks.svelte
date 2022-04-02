@@ -4,6 +4,9 @@
 
   import { AsyncAlbumTracks } from './AlbumTracks.generated'
 
+  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
+  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+
   export let albumId: string
 
   const albumTracks = AsyncAlbumTracks({
@@ -20,29 +23,44 @@
 
     return album.tracks
   })
+
+  let focusedTrackId: string | null
 </script>
 
 <table>
   <tbody>
-    {#await albumTracks}
-      <tr>
-        <td />
-        <td><em>Loading...</em></td>
-      </tr>
-    {:then tracks}
-      {#each tracks as track}
-        <tr>
-          <td class="play" on:click={() => playAudio(`${API_SERVER_URL}/stream/${track.id}`)}>🔊</td>
-          <td class="trackno">{track.metadata.tags.trackNo}</td>
-          <td class="title">{track.metadata.tags.title}</td>
-        </tr>
-      {/each}
-    {:catch e}
-      <tr>
-        <td />
-        <td><strong>Failed: {e.message}</strong></td>
-      </tr>
-    {/await}
+    <NavigableList>
+      {#await albumTracks}
+        <SimpleNavigableItem>
+          <tr>
+            <td />
+            <td><em>Loading...</em></td>
+          </tr>
+        </SimpleNavigableItem>
+      {:then tracks}
+        {#each tracks as track}
+          <SimpleNavigableItem
+            onPress={() => playAudio(`${API_SERVER_URL}/stream/${track.id}`)}
+            onFocusChange={(has) => {
+              focusedTrackId = has ? track.id : null
+            }}
+          >
+            <tr class={track.id === focusedTrackId ? 'active' : ''}>
+              <td class="play">🔊</td>
+              <td class="trackno">{track.metadata.tags.trackNo}</td>
+              <td class="title">{track.metadata.tags.title}</td>
+            </tr>
+          </SimpleNavigableItem>
+        {/each}
+      {:catch e}
+        <SimpleNavigableItem>
+          <tr>
+            <td />
+            <td><strong>Failed: {e.message}</strong></td>
+          </tr>
+        </SimpleNavigableItem>
+      {/await}
+    </NavigableList>
   </tbody>
 </table>
 
@@ -58,7 +76,7 @@
     background-color: #e3e3e3;
   }
 
-  tr:hover {
+  tr.active {
     background-color: #c9c9c9;
   }
 
