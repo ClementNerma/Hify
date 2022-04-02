@@ -123,40 +123,12 @@ export function usePageNavigator(): NavigableContainer {
     return { page, focused: null }
   })
 
+  setChildrenNavigable(page)
+
   return page
 }
 
-function _getParents(item: NavigableItem): NavigableContainer[] {
-  const parents: NavigableContainer[] = []
-
-  let current: NavigableContainer = item.parent
-
-  while (!(current instanceof NavigablePage)) {
-    parents.push(current)
-    current = current.parent
-  }
-
-  return parents
-}
-
-function _getParentsWithItem(item: NavigableItem): Navigable[] {
-  const out: Navigable[] = [item]
-  return out.concat(_getParents(item))
-}
-
-export type Navigable = NavigableContainer | NavigableItem
-
-const NAVIGATION_CTX = Symbol()
-
-type NavState = {
-  page: NavigablePage
-  focused: NavigableItem | null
-}
-
-const navState = writable<NavState | null>(null)
-
-console.log(document.body)
-document.body.addEventListener('keydown', (e) => {
+export function handleKeyboardEvent(e: KeyboardEvent): void {
   if (e.ctrlKey || e.shiftKey || e.altKey) {
     return
   }
@@ -238,4 +210,33 @@ document.body.addEventListener('keydown', (e) => {
 
     return { page: state.page, focused: next }
   })
-})
+}
+
+function _getParents(item: NavigableItem): NavigableContainer[] {
+  const parents: NavigableContainer[] = []
+
+  let current: NavigableContainer = item.parent
+
+  while (!(current instanceof NavigablePage)) {
+    parents.push(current)
+    current = current.parent
+  }
+
+  return parents
+}
+
+function _getParentsWithItem(item: NavigableItem): Navigable[] {
+  const out: Navigable[] = [item]
+  return out.concat(_getParents(item))
+}
+
+export type Navigable = NavigableContainer | NavigableItem
+
+const NAVIGATION_CTX = Symbol()
+
+type NavState = {
+  page: NavigablePage
+  focused: NavigableItem | null
+}
+
+const navState = writable<NavState | null>(null)
