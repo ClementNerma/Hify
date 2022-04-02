@@ -2,21 +2,20 @@
   import NavigableGrid from '../../navigable/NavigableGrid/NavigableGrid.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
-  export let items: Card['$$prop_def'][]
+  export let columns: number
+
+  const columnsSize = new Array(columns).fill(`${100 / columns}%`).join(' ')
 </script>
 
-<div class="container">
-  <NavigableGrid columns={6}>
-    {#each items as item}
-      <Card {...item} />
-    {/each}
+<div class="container" style="--columns-size: {columnsSize}">
+  <NavigableGrid {columns}>
+    <slot />
   </NavigableGrid>
 </div>
 
 <style>
   .container {
     display: grid;
-    grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
-    /*grid-gap: 2% 0;*/
+    grid-template-columns: var(--columns-size);
   }
 </style>

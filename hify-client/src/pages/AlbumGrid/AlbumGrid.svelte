@@ -3,6 +3,7 @@
   import { useNavigate } from 'svelte-navigator'
 
   import { API_SERVER_URL } from '../../apollo-client'
+  import Card from '../../molecules/Card/Card.svelte'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import { AlbumsQuery, AsyncAlbums } from './Albums.generated'
@@ -21,7 +22,7 @@
       },
     })
 
-  function generateItems(res: ApolloQueryResult<AlbumsQuery>): Grid['$$prop_def']['items'] {
+  function generateItems(res: ApolloQueryResult<AlbumsQuery>): Card['$$prop_def'][] {
     return res.data.albums.edges!.map((edge) => {
       const node = edge!.node
 
@@ -40,7 +41,11 @@
 {#await fetchAlbums()}
   <h2>Loading...</h2>
 {:then data}
-  <Grid items={generateItems(data)} />
+  <Grid columns={6}>
+    {#each generateItems(data) as item}
+      <Card {...item} />
+    {/each}
+  </Grid>
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}
