@@ -22,5 +22,6 @@
 <style>
   :global(body) {
     background-color: lightgray;
+    overflow: hidden;
   }
 </style>
