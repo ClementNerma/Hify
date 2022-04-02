@@ -5,8 +5,8 @@ use clap::StructOpt;
 
 mod cmd;
 mod graphql;
+mod http;
 mod index;
-mod rocket;
 mod utils;
 
 #[::rocket::main]
@@ -40,5 +40,5 @@ async fn main() {
 
     println!("> Launching server...");
 
-    rocket::launch(index).await.unwrap();
+    http::launch(index).await.unwrap();
 }

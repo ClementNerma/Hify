@@ -1,4 +1,4 @@
-use crate::rocket::AppState;
+use crate::http::AppState;
 
 pub struct GraphQLContext {
     pub app_state: AppState,

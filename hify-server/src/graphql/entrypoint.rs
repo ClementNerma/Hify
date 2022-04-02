@@ -1,6 +1,6 @@
 use async_graphql::{EmptySubscription, Schema};
 
-use crate::rocket::AppState;
+use crate::http::AppState;
 
 use super::{mutations::MutationRoot, queries::QueryRoot, GraphQLContext};
 

@@ -2,45 +2,14 @@ use std::path::Path;
 
 use rocket::{
     http::{ContentType, Status},
-    response::{content::Custom, status},
+    response::content::Custom,
     tokio::fs::File,
-    Rocket, State,
-};
-use serde::Serialize;
-
-use super::{cors::CORS, AppState};
-use crate::index::{AlbumID, Index};
-use crate::{
-    graphql::{get_graphql_routes, get_graphql_schema},
-    index::{AudioFormat, TrackID},
+    State,
 };
 
-pub async fn launch(index: Index) -> Result<(), rocket::Error> {
-    let app_state = AppState::new(index);
+use crate::index::{AlbumID, TrackID, AudioFormat};
 
-    Rocket::build()
-        .attach(CORS)
-        .manage(get_graphql_schema(app_state.clone()))
-        .manage(app_state)
-        .mount("/graphql", get_graphql_routes())
-        .mount("/", rocket::routes![art, stream])
-        .launch()
-        .await
-}
-
-fn rest_server_error(status: Status, message: String) -> status::Custom<String> {
-    status::Custom(
-        status,
-        serde_json::to_string(&ServerError { message }).unwrap(),
-    )
-}
-
-#[derive(Serialize)]
-struct ServerError {
-    message: String,
-}
-
-type FaillibleResponse<T> = Result<T, status::Custom<String>>;
+use super::{server::{FaillibleResponse, rest_server_error}, AppState};
 
 #[rocket::get("/art/<id>")]
 pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {

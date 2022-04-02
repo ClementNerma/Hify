@@ -1,0 +1,40 @@
+use rocket::http::Status;
+use rocket::Rocket;
+use serde::Serialize;
+
+use rocket::response::status;
+
+use super::{
+    cors::CORS,
+    routes::{art, stream},
+    AppState,
+};
+use crate::graphql::{get_graphql_routes, get_graphql_schema};
+use crate::index::Index;
+
+pub async fn launch(index: Index) -> Result<(), rocket::Error> {
+    let app_state = AppState::new(index);
+
+    Rocket::build()
+        .attach(CORS)
+        .manage(get_graphql_schema(app_state.clone()))
+        .manage(app_state)
+        .mount("/graphql", get_graphql_routes())
+        .mount("/", rocket::routes![art, stream])
+        .launch()
+        .await
+}
+
+pub fn rest_server_error(status: Status, message: String) -> status::Custom<String> {
+    status::Custom(
+        status,
+        serde_json::to_string(&ServerError { message }).unwrap(),
+    )
+}
+
+#[derive(Serialize)]
+struct ServerError {
+    message: String,
+}
+
+pub type FaillibleResponse<T> = Result<T, status::Custom<String>>;
