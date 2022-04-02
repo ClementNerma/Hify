@@ -6,10 +6,14 @@ use rocket::{
     tokio::fs::File,
     State,
 };
+use rocket_seek_stream::SeekStream;
 
-use crate::index::{AlbumID, TrackID, AudioFormat};
+use crate::index::{AlbumID, AudioFormat, TrackID};
 
-use super::{server::{FaillibleResponse, rest_server_error}, AppState};
+use super::{
+    server::{rest_server_error, FaillibleResponse},
+    AppState,
+};
 
 #[rocket::get("/art/<id>")]
 pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
@@ -55,7 +59,10 @@ pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<
 }
 
 #[rocket::get("/stream/<id>")]
-pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+pub async fn stream<'a>(
+    ctx: &State<AppState>,
+    id: String,
+) -> FaillibleResponse<Custom<SeekStream<'a>>> {
     let index = ctx.index.read().await;
     let track_path = index
         .cache
@@ -70,10 +77,10 @@ pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Cust
 
     let track = index.tracks.get(&TrackID(id)).unwrap();
 
-    let file = File::open(Path::new(track_path)).await.map_err(|err| {
+    let stream = SeekStream::from_path(&track_path).map_err(|err| {
         rest_server_error(
             Status::InternalServerError,
-            format!("Failed to open track file: {err}"),
+            format!("Failed to open seek stream for track file: {}", err),
         )
     })?;
 
@@ -86,5 +93,5 @@ pub async fn stream(ctx: &State<AppState>, id: String) -> FaillibleResponse<Cust
         AudioFormat::M4A => ContentType::MP4,
     };
 
-    Ok(Custom(mime_type, file))
+    Ok(Custom(mime_type, stream))
 }
