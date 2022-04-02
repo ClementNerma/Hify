@@ -1,5 +1,6 @@
 <script lang="ts">
-  import NavigableRow from '../../atoms/NavigableRow.svelte'
+  import NavigableRow from '../NavigableRow/NavigableRow.svelte'
+  import NavigableList from '../NavigableList/NavigableList.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
   export let items: Card['$$prop_def'][]
@@ -8,13 +9,15 @@
 </script>
 
 <div class="container">
-  {#each chunks as chunk}
-    <NavigableRow>
-      {#each chunk as item}
-        <Card {...item} />
-      {/each}
-    </NavigableRow>
-  {/each}
+  <NavigableList>
+    {#each chunks as chunk}
+      <NavigableRow>
+        {#each chunk as item}
+          <Card {...item} />
+        {/each}
+      </NavigableRow>
+    {/each}
+  </NavigableList>
 </div>
 
 <style>

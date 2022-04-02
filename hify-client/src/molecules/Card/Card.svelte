@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Navigable from '../../atoms/Navigable.svelte'
+  import SimpleNavigableItem from '../../atoms/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let pictureUrl: string
   export let pictureAlt: string
@@ -12,7 +12,7 @@
   let focused = false
 </script>
 
-<Navigable
+<SimpleNavigableItem
   onFocusChange={(has) => {
     focused = has
   }}
@@ -24,7 +24,7 @@
     <div class="title">{title}</div>
     <div class="subtitle" on:click|stopPropagation={onSubtitleClick}>{subtitle}</div>
   </div>
-</Navigable>
+</SimpleNavigableItem>
 
 <style>
   .card {

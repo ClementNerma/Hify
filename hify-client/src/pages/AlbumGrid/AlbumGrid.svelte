@@ -3,7 +3,6 @@
   import { useNavigate } from 'svelte-navigator'
 
   import { API_SERVER_URL } from '../../apollo-client'
-  import NavigableView from '../../atoms/NavigableView.svelte'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import { AlbumsQuery, AsyncAlbums } from './Albums.generated'
@@ -38,12 +37,10 @@
   }
 </script>
 
-<NavigableView>
-  {#await fetchAlbums()}
-    <h2>Loading...</h2>
-  {:then data}
-    <Grid items={generateItems(data)} />
-  {:catch e}
-    <h2>Failed: {e.message}</h2>
-  {/await}
-</NavigableView>
+{#await fetchAlbums()}
+  <h2>Loading...</h2>
+{:then data}
+  <Grid items={generateItems(data)} />
+{:catch e}
+  <h2>Failed: {e.message}</h2>
+{/await}
