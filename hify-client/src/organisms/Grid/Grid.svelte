@@ -1,23 +1,16 @@
 <script lang="ts">
-  import NavigableRow from '../../layout/NavigableRow/NavigableRow.svelte'
-  import NavigableList from '../../layout/NavigableList/NavigableList.svelte'
+  import NavigableGrid from '../../layout/NavigableGrid/NavigableGrid.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
   export let items: Card['$$prop_def'][]
-
-  const chunks = new Array(Math.ceil(items.length / 6)).fill(null).map((_, i) => items.slice(i * 6, i * 6 + 6))
 </script>
 
 <div class="container">
-  <NavigableList>
-    {#each chunks as chunk}
-      <NavigableRow>
-        {#each chunk as item}
-          <Card {...item} />
-        {/each}
-      </NavigableRow>
+  <NavigableGrid columns={6}>
+    {#each items as item}
+      <Card {...item} />
     {/each}
-  </NavigableList>
+  </NavigableGrid>
 </div>
 
 <style>
