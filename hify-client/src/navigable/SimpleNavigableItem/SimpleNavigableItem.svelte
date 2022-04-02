@@ -1,6 +1,7 @@
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
   import { getParentNavigable } from '../navigation'
+  import { onDestroy } from 'svelte'
 
   export let onPress: SimpleNavigableItemProps['onPress'] = undefined
   export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined
@@ -17,6 +18,8 @@
   })
 
   nav.append(item)
+
+  onDestroy(() => nav.remove(item))
 </script>
 
 <slot />
