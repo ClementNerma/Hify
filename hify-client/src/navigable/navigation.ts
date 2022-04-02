@@ -118,7 +118,7 @@ function _getParents(item: NavigableItem): NavigableContainer[] {
 
   let current: NavigableContainer = item.parent
 
-  while (!(current.parent instanceof NavigablePage)) {
+  while (!(current instanceof NavigablePage)) {
     parents.push(current)
     current = current.parent
   }
