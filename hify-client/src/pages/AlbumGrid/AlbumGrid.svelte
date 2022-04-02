@@ -16,7 +16,7 @@
       variables: {
         pagination: {
           after: currentCursor,
-          first: 50,
+          first: 25,
         },
       },
     })

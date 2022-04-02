@@ -8,7 +8,7 @@
 </script>
 
 <div class="card" on:click={onClick}>
-  <img width={150} height={150} src={pictureUrl} alt={pictureAlt} />
+  <img width={250} height={250} src={pictureUrl} alt={pictureAlt} />
   <div class="title">{title}</div>
   <div class="subtitle" on:click|stopPropagation={onSubtitleClick}>{subtitle}</div>
 </div>
