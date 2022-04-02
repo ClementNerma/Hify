@@ -1,3 +1,4 @@
+pub(self) mod cache;
 pub(self) mod cors;
 pub(self) mod routes;
 pub(self) mod server;

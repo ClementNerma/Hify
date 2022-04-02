@@ -5,6 +5,7 @@ use serde::Serialize;
 use rocket::response::status;
 
 use super::{
+    cache::CachingStrategy,
     cors::CORS,
     routes::{art, stream},
     AppState,
@@ -12,14 +13,17 @@ use super::{
 use crate::graphql::{get_graphql_routes, get_graphql_schema};
 use crate::index::Index;
 
+pub static GRAPHQL_MOUNTPOINT: &str = "/graphql";
+
 pub async fn launch(index: Index) -> Result<(), rocket::Error> {
     let app_state = AppState::new(index);
 
     Rocket::build()
         .attach(CORS)
+        .attach(CachingStrategy)
         .manage(get_graphql_schema(app_state.clone()))
         .manage(app_state)
-        .mount("/graphql", get_graphql_routes())
+        .mount(GRAPHQL_MOUNTPOINT, get_graphql_routes())
         .mount("/", rocket::routes![art, stream])
         .launch()
         .await
