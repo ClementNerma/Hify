@@ -170,7 +170,7 @@ pub struct TrackTags {
     pub track_no: Option<i32>,
 
     pub date: Option<TrackDate>,
-    pub genre: Option<String>,
+    pub genres: Option<Vec<String>>,
     // pub note: Option<u8>,
 }
 
@@ -187,7 +187,11 @@ impl TrackTags {
     }
 
     pub fn get_album_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
-        let artists = if !self.album_artists.is_empty() { &self.album_artists } else { &self.artists };
+        let artists = if !self.album_artists.is_empty() {
+            &self.album_artists
+        } else {
+            &self.artists
+        };
         artists.iter().cloned().map(ArtistInfos::new)
     }
 }

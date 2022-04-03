@@ -151,7 +151,9 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
             .map(|date| parse_date(&date))
             .transpose()?,
 
-        genre: tags.remove("genre"),
+        genres: tags
+            .remove("genre")
+            .map(|genres| genres.split(';').map(str::to_string).collect()),
     })
 }
 

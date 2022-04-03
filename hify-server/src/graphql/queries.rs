@@ -171,9 +171,10 @@ impl AlbumInfos {
                     .unwrap()
                     .metadata
                     .tags
-                    .genre
+                    .genres
                     .clone()
             })
+            .flatten()
             .collect()
     }
 
