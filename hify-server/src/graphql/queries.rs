@@ -1,4 +1,4 @@
-use async_graphql::{ComplexObject, Context, Object, Result};
+use async_graphql::{ComplexObject, Context, Enum, Object, Result};
 
 use crate::{
     graphql_index,
@@ -135,6 +135,28 @@ impl AlbumInfos {
             .collect()
     }
 
+    async fn year(&self, ctx: &Context<'_>, strategy: AlbumYearStrategy) -> Option<i32> {
+        let index = graphql_index!(ctx);
+        let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
+        let years: Vec<_> = album_tracks
+            .iter()
+            .filter_map(|track_id| index.tracks.get(track_id).unwrap().metadata.tags.date)
+            .map(|date| date.year)
+            .collect();
+
+        let first_track_year = *years.get(0)?;
+
+        if years.iter().all(|year| *year == first_track_year) {
+            return Some(first_track_year);
+        }
+
+        match strategy {
+            AlbumYearStrategy::IdenticalOnly => None,
+            AlbumYearStrategy::IdenticalOrFirstTrack => Some(first_track_year),
+            AlbumYearStrategy::IdenticalOrLowestYear => Some(*years.iter().min().unwrap()),
+        }
+    }
+
     async fn has_art_image(&self, ctx: &Context<'_>) -> bool {
         graphql_index!(ctx)
             .albums_arts
@@ -142,6 +164,14 @@ impl AlbumInfos {
             .unwrap()
             .is_some()
     }
+}
+
+#[derive(Enum, Clone, Copy, PartialEq, Eq)]
+#[allow(clippy::enum_variant_names)]
+pub enum AlbumYearStrategy {
+    IdenticalOnly,
+    IdenticalOrFirstTrack,
+    IdenticalOrLowestYear,
 }
 
 #[Object]
