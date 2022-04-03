@@ -141,6 +141,7 @@ export class NavigableGrid extends NavigableContainer {
   }
 
   navigateToLastItem(): NavigableItem | null {
+    this._lazyLoading()
     return this.items.at(-1)?.navigateToLastItem() ?? null
   }
 }
