@@ -198,16 +198,17 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       }
     }
 
-    if (!__current) {
-      const next = state.page.firstItemDown(NavigationComingFrom.Above)
+    let currentJustFocused = false
 
-      if (!next) {
+    if (!__current) {
+      __current = state.page.firstItemDown(NavigationComingFrom.Above)
+
+      if (!__current) {
         console.warn('No navigable item in this page')
         return state
       }
 
-      next.onFocus()
-      return { page: state.page, focused: next }
+      currentJustFocused = true
     }
 
     const current = __current
@@ -219,6 +220,11 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       case 'ArrowLeft':
       case 'ArrowRight':
       case 'ArrowDown':
+        if (currentJustFocused) {
+          next = current
+          break
+        }
+
         const directions: { [key in typeof e.key]: NavigationDirection } = {
           ArrowUp: NavigationDirection.Up,
           ArrowLeft: NavigationDirection.Left,
@@ -246,6 +252,11 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
         }
 
         const event = events[e.key]
+
+        if (currentJustFocused && event !== NavigationAction.Back) {
+          next = current
+          break
+        }
 
         next = null
 
