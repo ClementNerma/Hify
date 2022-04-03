@@ -3,7 +3,7 @@
 
   const page = usePageNavigator()
 
-  export let onKeyDown: ((e: KeyboardEvent) => null | boolean) | undefined = undefined
+  export let onKeyDown: ((e: KeyboardEvent) => void | boolean) | undefined = undefined
 
   function handleWindowKeyEvent(e: KeyboardEvent) {
     if (onKeyDown?.(e) !== false) {
