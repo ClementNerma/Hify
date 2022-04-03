@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { API_SERVER_URL } from '../../apollo-client'
   import { playAudio } from '../../store'
+  import { getAlbumArtUri, getStreamUri } from '../../rest-api'
 
   import { AsyncAlbumPage } from './AlbumPage.generated'
+  import { AlbumYearStrategy } from '../../graphql/types'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { getAlbumArtUri, getStreamUri } from '../../rest-api'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
-  import NavigableOne from '../../navigable/NavigableOne/NavigableOne.svelte'
+  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let albumId: string
 
   const album = AsyncAlbumPage({
     variables: {
       albumId,
+      strategy: AlbumYearStrategy.IdenticalOnly,
     },
   }).then((res) => {
     const album = res.data.album
@@ -56,6 +56,7 @@
             {/each}
           </NavigableRow>
         </div>
+        <div class="album-year">{album.year ?? '<unknown year>'}</div>
       </div>
     </div>
   </NavigableRow>
@@ -109,6 +110,11 @@
     border: 5px solid pink;
     padding: 2px;
     border-radius: 10px;
+  }
+
+  .album-year {
+    font-size: 1.5em;
+    padding: 7px;
   }
 
   table {

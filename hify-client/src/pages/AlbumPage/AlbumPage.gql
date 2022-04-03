@@ -1,6 +1,7 @@
-query AlbumPage($albumId: String!) {
+query AlbumPage($albumId: String!, $strategy: AlbumYearStrategy!) {
   album(id: $albumId) {
     name
+    year(strategy: $strategy)
     albumArtists {
       id
       name
