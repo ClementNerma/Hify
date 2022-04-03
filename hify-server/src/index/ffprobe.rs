@@ -121,19 +121,19 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
 
         artists: tags
             .remove("artist")
-            .map(|str| str.split(';').map(str::to_string).collect())
+            .map(parse_array_tag)
             .unwrap_or_default(),
 
         composers: tags
             .remove("composer")
-            .map(|str| str.split(';').map(str::to_string).collect())
+            .map(parse_array_tag)
             .unwrap_or_default(),
 
         album: tags.remove("album"),
 
         album_artists: tags
             .remove("album_artist")
-            .map(|str| str.split(';').map(str::to_string).collect())
+            .map(parse_array_tag)
             .unwrap_or_default(),
 
         disc: tags
@@ -153,13 +153,7 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
 
         genres: tags
             .remove("genre")
-            .map(|genres| {
-                genres
-                    .split(';')
-                    .filter(|genre| !genre.is_empty())
-                    .map(str::to_string)
-                    .collect()
-            })
+            .map(parse_array_tag)
             .unwrap_or_default(),
     })
 }
@@ -215,6 +209,16 @@ fn parse_date(input: &str) -> Result<TrackDate, String> {
             .transpose()?
             .map(i32::from),
     })
+}
+
+fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
+    tag_content
+        .as_ref()
+        .split(&[';', ',', '/'])
+        .map(str::trim)
+        .filter(|entry| !entry.is_empty())
+        .map(str::to_string)
+        .collect()
 }
 
 #[derive(Deserialize)]
