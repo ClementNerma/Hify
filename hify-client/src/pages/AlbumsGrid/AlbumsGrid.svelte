@@ -1,33 +1,41 @@
 <script lang="ts">
-  import { ApolloQueryResult } from '@apollo/client/core'
-  import { useNavigate } from 'svelte-navigator'
+  import { AsyncAlbumsGrid } from './AlbumsGrid.generated'
+
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
-
   import Grid from '../../organisms/Grid/Grid.svelte'
-  import { AlbumsGridQuery, AsyncAlbumsGrid } from './AlbumsGrid.generated'
 
-  const currentCursor: string | null = null
+  const ALBUMS_PER_PAGE = 24
 
-  const fetchAlbums = () =>
-    AsyncAlbumsGrid({
+  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+
+  const feedMore = async () => {
+    if (currentPageInfo?.hasNextPage === false) {
+      return
+    }
+
+    const res = await AsyncAlbumsGrid({
       variables: {
         pagination: {
-          after: currentCursor,
-          first: 24,
+          after: currentPageInfo?.endCursor,
+          first: ALBUMS_PER_PAGE,
         },
       },
     })
 
-  function generateItems(res: ApolloQueryResult<AlbumsGridQuery>): Array<AlbumCard['$$prop_def']['album']> {
-    return res.data.albums.edges!.map((edge) => edge!.node)
+    currentPageInfo = res.data.albums.pageInfo
+    const newAlbums = res.data.albums.edges!.map((edge) => edge!.node)
+
+    albums = [...albums, ...newAlbums]
   }
+
+  let albums: Array<AlbumCard['$$prop_def']['album']> = []
 </script>
 
-{#await fetchAlbums()}
+{#await feedMore()}
   <h2>Loading...</h2>
-{:then data}
-  <Grid columns={6}>
-    {#each generateItems(data) as album}
+{:then _}
+  <Grid columns={6} lazy={feedMore}>
+    {#each albums as album}
       <AlbumCard {album} />
     {/each}
   </Grid>

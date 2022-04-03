@@ -10,5 +10,9 @@ query AlbumsGrid($pagination: PaginationInput!) {
           }
         }
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
     }
 }
