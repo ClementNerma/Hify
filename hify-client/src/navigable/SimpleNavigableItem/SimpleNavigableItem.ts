@@ -29,29 +29,52 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 
   handleAction(action: NavigationAction): NavigableItem | null {
-    switch (action) {
-      case NavigationAction.Press:
-        this.props.onPress?.()
-        break
-
-      case NavigationAction.LongPress:
-        this.props.onLongPress?.()
-        break
-
-      case NavigationAction.Back:
-        this.props.onBack?.()
-        break
+    const callbacks: { [action in NavigationAction]: SimpleNavigableItemCallback | undefined } = {
+      [NavigationAction.Press]: this.props.onPress,
+      [NavigationAction.LongPress]: this.props.onLongPress,
+      [NavigationAction.Back]: this.props.onBack,
     }
 
-    return null
+    const fn = callbacks[action]
+
+    if (!fn) {
+      throw new Error('Tried to call unsupported action callback on navigable item')
+    }
+
+    return fn() ?? null
   }
 
-  canHandleDirection(_: NavigationDirection): boolean {
-    return false
+  canHandleDirection(direction: NavigationDirection): boolean {
+    switch (direction) {
+      case NavigationDirection.Up:
+        return !!this.props.onUp
+
+      case NavigationDirection.Left:
+        return !!this.props.onLeft
+
+      case NavigationDirection.Right:
+        return !!this.props.onRight
+
+      case NavigationDirection.Down:
+        return !!this.props.onDown
+    }
   }
 
-  handleDirection(_: NavigationDirection): NavigableItem | null {
-    throw new Error('Tried to make a simple navigable item handle a direction')
+  handleDirection(direction: NavigationDirection): NavigableItem | null {
+    const callbacks: { [action in NavigationDirection]: SimpleNavigableItemCallback | undefined } = {
+      [NavigationDirection.Up]: this.props.onUp,
+      [NavigationDirection.Left]: this.props.onLeft,
+      [NavigationDirection.Right]: this.props.onRight,
+      [NavigationDirection.Down]: this.props.onDown,
+    }
+
+    const fn = callbacks[direction]
+
+    if (!fn) {
+      throw new Error('Tried to call unsupported direction callback on navigable item')
+    }
+
+    return fn() ?? null
   }
 
   onFocus(): void {
@@ -63,10 +86,19 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 }
 
+export type SimpleNavigableItemCallback = () => NavigableItem | null | void
+
 export type SimpleNavigableItemProps = {
-  onPress?: () => void
-  onLongPress?: () => void
   onFocusChange?: (hasFocus: boolean) => void
-  onBack?: () => void
+
+  onPress?: SimpleNavigableItemCallback
+  onLongPress?: SimpleNavigableItemCallback
+  onBack?: SimpleNavigableItemCallback
+
+  onUp?: SimpleNavigableItemCallback
+  onLeft?: SimpleNavigableItemCallback
+  onRight?: SimpleNavigableItemCallback
+  onDown?: SimpleNavigableItemCallback
+
   getUnderlyingElement: () => HTMLNavigableItemWrapperElement
 }

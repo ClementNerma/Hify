@@ -3,21 +3,34 @@
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { onDestroy } from 'svelte'
 
+  export let onFocusChange: SimpleNavigableItemProps['onFocusChange'] = undefined
+
   export let onPress: SimpleNavigableItemProps['onPress'] = undefined
   export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined
-  export let onFocusChange: SimpleNavigableItemProps['onFocusChange'] = undefined
   export let onBack: SimpleNavigableItemProps['onBack'] = undefined
+
+  export let onUp: SimpleNavigableItemProps['onUp'] = undefined
+  export let onLeft: SimpleNavigableItemProps['onLeft'] = undefined
+  export let onRight: SimpleNavigableItemProps['onRight'] = undefined
+  export let onDown: SimpleNavigableItemProps['onDown'] = undefined
 
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
-    onPress,
-    onLongPress,
     onFocusChange: (has) => {
       focused = has
       onFocusChange?.(has)
     },
+
+    onPress,
+    onLongPress,
     onBack,
+
+    onUp,
+    onLeft,
+    onRight,
+    onDown,
+
     getUnderlyingElement: () => {
       if (!wrapper) {
         throw new Error("Tried to access navigable item's underlying wrapper before it is ready")
