@@ -60,7 +60,7 @@ export class NavigableGrid extends NavigableContainer {
           break
         }
 
-        return rows[rowIndex - 1][itemIndex % this.columns].firstItemDown(NavigationComingFrom.Below)
+        return rows[rowIndex - 1][itemIndex % this.columns].navigateToFirstItemDown(NavigationComingFrom.Below)
       }
 
       case NavigationDirection.Down: {
@@ -77,7 +77,7 @@ export class NavigableGrid extends NavigableContainer {
           break
         }
 
-        return rows[rowIndex + 1][itemIndex % this.columns].firstItemDown(NavigationComingFrom.Above)
+        return rows[rowIndex + 1][itemIndex % this.columns].navigateToFirstItemDown(NavigationComingFrom.Above)
       }
 
       case NavigationDirection.Left:
@@ -95,7 +95,7 @@ export class NavigableGrid extends NavigableContainer {
           : row.slice((itemIndex % this.columns) + 1)
 
         for (const colItem of sliced) {
-          const item = colItem.firstItemDown(isLeft ? NavigationComingFrom.Right : NavigationComingFrom.Left)
+          const item = colItem.navigateToFirstItemDown(isLeft ? NavigationComingFrom.Right : NavigationComingFrom.Left)
 
           if (item) {
             return item
@@ -109,7 +109,7 @@ export class NavigableGrid extends NavigableContainer {
     return this.parent.navigate(this, direction)
   }
 
-  firstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
     let rows = this._rows()
 
     switch (from) {
@@ -129,7 +129,7 @@ export class NavigableGrid extends NavigableContainer {
 
     for (const row of rows) {
       for (const col of row) {
-        const item = col.firstItemDown(from)
+        const item = col.navigateToFirstItemDown(from)
 
         if (item) {
           return item

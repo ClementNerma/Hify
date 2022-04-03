@@ -35,8 +35,8 @@ export class NavigableOne extends NavigableContainer {
     return this.parent.navigate(this, direction)
   }
 
-  firstItemDown(from: NavigationComingFrom): NavigableItem | null {
-    return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+    return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
   lastItem(): NavigableItem | null {

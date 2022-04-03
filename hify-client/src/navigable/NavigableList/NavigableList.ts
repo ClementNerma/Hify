@@ -31,7 +31,7 @@ export class NavigableList extends NavigableContainer {
     switch (direction) {
       case NavigationDirection.Up:
         for (const rowItem of [...this.rows.slice(0, rowIndex)].reverse()) {
-          const item = rowItem.firstItemDown(NavigationComingFrom.Below)
+          const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Below)
 
           if (item) {
             return item
@@ -48,7 +48,7 @@ export class NavigableList extends NavigableContainer {
 
       case NavigationDirection.Down:
         for (const rowItem of this.rows.slice(rowIndex + 1)) {
-          const item = rowItem.firstItemDown(NavigationComingFrom.Above)
+          const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Above)
 
           if (item) {
             return item
@@ -59,7 +59,7 @@ export class NavigableList extends NavigableContainer {
     }
   }
 
-  firstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
     let tries: Navigable[]
 
     switch (from) {
@@ -75,7 +75,7 @@ export class NavigableList extends NavigableContainer {
     }
 
     for (const child of tries) {
-      const item = child.firstItemDown(from)
+      const item = child.navigateToFirstItemDown(from)
 
       if (item) {
         return item

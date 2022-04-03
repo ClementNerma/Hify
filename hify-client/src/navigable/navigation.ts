@@ -30,7 +30,7 @@ export abstract class NavigableCommon {
     this.page = parent.page
   }
 
-  abstract firstItemDown(from: NavigationComingFrom): NavigableItem | null
+  abstract navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null
   abstract lastItem(): NavigableItem | null
 
   abstract canHandleAction(key: NavigationAction): boolean
@@ -61,7 +61,7 @@ export abstract class NavigableItem extends NavigableCommon {
   abstract onFocus(): void
   abstract onUnfocus(): void
 
-  firstItemDown(_: NavigationComingFrom): NavigableItem {
+  navigateToFirstItemDown(_: NavigationComingFrom): NavigableItem {
     return this
   }
 
@@ -121,8 +121,8 @@ class NavigablePage {
     return null
   }
 
-  firstItemDown(from: NavigationComingFrom): NavigableItem | null {
-    return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+    return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
   lastItem(): NavigableItem | null {
@@ -222,7 +222,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
   let currentJustFocused = false
 
   if (!__current) {
-    __current = state.page.firstItemDown(NavigationComingFrom.Above)
+    __current = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
 
     if (!__current) {
       console.warn('No navigable item in this page')
@@ -297,7 +297,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
       break
 
     case 'Home':
-      next = state.page.firstItemDown(NavigationComingFrom.Above)
+      next = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
       break
 
     case 'End':
