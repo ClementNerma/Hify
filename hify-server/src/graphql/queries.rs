@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use async_graphql::{ComplexObject, Context, Enum, Object, Result};
 
 use crate::{
@@ -155,6 +157,24 @@ impl AlbumInfos {
             AlbumYearStrategy::IdenticalOrFirstTrack => Some(first_track_year),
             AlbumYearStrategy::IdenticalOrLowestYear => Some(*years.iter().min().unwrap()),
         }
+    }
+
+    async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<String> {
+        let index = graphql_index!(ctx);
+        let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
+        album_tracks
+            .iter()
+            .filter_map(|track_id| {
+                index
+                    .tracks
+                    .get(track_id)
+                    .unwrap()
+                    .metadata
+                    .tags
+                    .genre
+                    .clone()
+            })
+            .collect()
     }
 
     async fn has_art_image(&self, ctx: &Context<'_>) -> bool {
