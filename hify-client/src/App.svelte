@@ -8,6 +8,7 @@
 
   import AlbumsGrid from './pages/AlbumsGrid/AlbumsGrid.svelte'
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
+  import NowPlaying from './pages/NowPlaying/NowPlaying.svelte'
 </script>
 
 <Router primary={false}>
@@ -22,6 +23,10 @@
 
     <Route path="/album/:id" let:params>
       <AlbumPage albumId={params['id']} />
+    </Route>
+
+    <Route path="/playing">
+      <NowPlaying />
     </Route>
 
     <Route>
