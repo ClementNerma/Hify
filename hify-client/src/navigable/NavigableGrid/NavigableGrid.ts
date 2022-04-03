@@ -119,4 +119,8 @@ export class NavigableGrid extends NavigableContainer {
 
     return null
   }
+
+  lastItem(): NavigableItem | null {
+    return this.items.at(-1)?.lastItem() ?? null
+  }
 }

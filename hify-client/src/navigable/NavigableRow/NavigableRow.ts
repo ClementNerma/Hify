@@ -84,4 +84,8 @@ export class NavigableRow extends NavigableContainer {
 
     return null
   }
+
+  lastItem(): NavigableItem | null {
+    return this.columns.at(-1)?.lastItem() ?? null
+  }
 }

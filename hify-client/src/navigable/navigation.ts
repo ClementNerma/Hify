@@ -31,6 +31,7 @@ export abstract class NavigableCommon {
   }
 
   abstract firstItemDown(from: NavigationComingFrom): NavigableItem | null
+  abstract lastItem(): NavigableItem | null
 
   abstract canHandleAction(key: NavigationAction): boolean
   abstract handleAction(key: NavigationAction): NavigableItem | null
@@ -59,6 +60,10 @@ export abstract class NavigableItem extends NavigableCommon {
   abstract onUnfocus(): void
 
   firstItemDown(_: NavigationComingFrom): NavigableItem {
+    return this
+  }
+
+  lastItem(): NavigableItem | null {
     return this
   }
 }
@@ -106,6 +111,10 @@ class NavigablePage {
 
   firstItemDown(from: NavigationComingFrom): NavigableItem | null {
     return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
+  }
+
+  lastItem(): NavigableItem | null {
+    return this.onlyChild ? this.onlyChild.lastItem() : null
   }
 
   canHandleAction(_: NavigationAction): boolean {
@@ -244,6 +253,14 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
           }
         }
 
+        break
+
+      case 'Home':
+        next = state.page.firstItemDown(NavigationComingFrom.Above)
+        break
+
+      case 'End':
+        next = state.page.lastItem()
         break
 
       default:

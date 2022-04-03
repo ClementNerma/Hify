@@ -38,4 +38,8 @@ export class NavigableOne extends NavigableContainer {
   firstItemDown(from: NavigationComingFrom): NavigableItem | null {
     return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
   }
+
+  lastItem(): NavigableItem | null {
+    return this.onlyChild?.lastItem() ?? null
+  }
 }

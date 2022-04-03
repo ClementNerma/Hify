@@ -52,6 +52,10 @@ export class NavigableWithHandlers extends NavigableContainer {
     return this.onlyChild ? this.onlyChild.firstItemDown(from) : null
   }
 
+  lastItem(): NavigableItem | null {
+    return this.onlyChild?.lastItem() ?? null
+  }
+
   override canHandleAction(action: NavigationAction): boolean {
     switch (action) {
       case NavigationAction.Press:
