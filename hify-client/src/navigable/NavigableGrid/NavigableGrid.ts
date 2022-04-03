@@ -2,8 +2,9 @@ import { NavigableContainer, Navigable, NavigableItem, NavigationComingFrom, Nav
 
 export class NavigableGrid extends NavigableContainer {
   private readonly items: Navigable[] = []
+  private itemsBeforeLastLazyLoading = 0
 
-  constructor(parent: NavigableContainer, private readonly columns: number) {
+  constructor(parent: NavigableContainer, private readonly columns: number, private readonly lazyLoader?: () => void) {
     super(parent)
   }
 
@@ -11,6 +12,17 @@ export class NavigableGrid extends NavigableContainer {
     return new Array(Math.ceil(this.items.length / this.columns))
       .fill(null)
       .map((_, i) => this.items.slice(i * this.columns, i * this.columns + this.columns))
+  }
+
+  private _lazyLoading() {
+    if (!this.lazyLoader) {
+      return
+    }
+
+    if (this.itemsBeforeLastLazyLoading !== this.items.length) {
+      this.itemsBeforeLastLazyLoading = this.items.length
+      this.lazyLoader()
+    }
   }
 
   append(navigable: Navigable) {
@@ -53,6 +65,13 @@ export class NavigableGrid extends NavigableContainer {
 
       case NavigationDirection.Down: {
         const rowIndex = Math.floor(itemIndex / this.columns)
+
+        // Required to trigger lazy loader when either:
+        // * We navigate to the last row from the above one
+        // * We navigate to the last row from below
+        if (rowIndex >= rows.length - 2) {
+          this._lazyLoading()
+        }
 
         if (rowIndex === rows.length - 1) {
           break
@@ -103,7 +122,8 @@ export class NavigableGrid extends NavigableContainer {
         break
 
       case NavigationComingFrom.Below:
-        rows = [...rows].reverse()
+        rows = rows.reverse()
+        this._lazyLoading()
         break
     }
 

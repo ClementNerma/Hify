@@ -5,9 +5,10 @@
   import { NavigableGrid } from './NavigableGrid'
 
   export let columns: number
+  export let lazy: (() => void) | undefined = undefined
 
   const nav = getParentNavigable()
-  const row = new NavigableGrid(nav, columns)
+  const row = new NavigableGrid(nav, columns, lazy)
 
   nav.append(row)
 
