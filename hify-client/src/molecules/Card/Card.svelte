@@ -23,10 +23,6 @@
     padding: 10px;
   }
 
-  .card:hover {
-    cursor: pointer;
-  }
-
   .title {
     font-weight: bold;
   }

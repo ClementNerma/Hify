@@ -40,10 +40,7 @@
         <div class="album-artists">
           <NavigableRow>
             {#each album.albumArtists as albumArtist}
-              <SimpleNavigableItem
-                onPress={() => alert("TODO: go to artist's page: " + albumArtist.name)}
-                
-              >
+              <SimpleNavigableItem onPress={() => alert("TODO: go to artist's page: " + albumArtist.name)}>
                 <span class="album-artist">
                   {albumArtist.name}
                 </span>
@@ -55,10 +52,7 @@
         <div class="album-genres">
           <NavigableRow>
             {#each album.genres as genre}
-              <SimpleNavigableItem
-                onPress={() => alert("TODO: go to genre's page: " + genre)}
-                
-              >
+              <SimpleNavigableItem onPress={() => alert("TODO: go to genre's page: " + genre)}>
                 <span class="album-genre">
                   {genre}
                 </span>
@@ -74,10 +68,7 @@
     <table>
       <tbody>
         {#each album.tracks as track}
-          <SimpleNavigableItem
-            onPress={() => playTrack(track.id)}
-            
-          >
+          <SimpleNavigableItem onPress={() => playTrack(track.id)}>
             <tr>
               <td class="play">🔊</td>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
@@ -145,7 +136,6 @@
   td.play {
     width: 2%;
     text-align: center;
-    cursor: pointer;
   }
 
   td.trackno {

@@ -35,7 +35,12 @@
   let focused: boolean
 </script>
 
-<navigable-item-wrapper bind:this={wrapper} class:focused>
+<navigable-item-wrapper
+  on:click={() => onPress?.()}
+  on:contextmenu|preventDefault={() => onLongPress?.()}
+  bind:this={wrapper}
+  class:focused
+>
   <slot />
 </navigable-item-wrapper>
 

@@ -85,7 +85,7 @@ class NavigablePage {
   readonly page: NavigablePage
   private onlyChild: Navigable | null = null
 
-  constructor() {
+  constructor(private readonly onRequestFocus: (item: NavigableItem) => void) {
     this.page = this
   }
 
@@ -141,6 +141,14 @@ class NavigablePage {
   asContainer(): NavigableContainer {
     return this
   }
+
+  requestFocus(item: NavigableItem): void {
+    if (item.parent.page !== this) {
+      throw new Error("Cannot request focus for an element that isn't part of the same page")
+    }
+
+    this.onRequestFocus(item)
+  }
 }
 
 export function getParentNavigable(): NavigableContainer {
@@ -162,7 +170,7 @@ export function setChildrenNavigable(nav: NavigableContainer) {
 }
 
 export function usePageNavigator(): NavigableContainer {
-  const page = new NavigablePage()
+  const page = new NavigablePage(_requestFocus)
 
   navState.update((state) => {
     state?.focused?.onUnfocus()
@@ -299,16 +307,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
         return state
     }
 
-    if (!next) {
-      return state
-    }
-
-    current.onUnfocus()
-    next.onFocus()
-
-    next.scrollTo()
-
-    return { page: state.page, focused: next }
+    return next ? _generateNavState(current, next, state.page) : state
   })
 }
 
@@ -328,6 +327,36 @@ function _getParents(item: NavigableItem): NavigableContainer[] {
 function _getParentsWithItem(item: NavigableItem): Navigable[] {
   const out: Navigable[] = [item]
   return out.concat(_getParents(item))
+}
+
+function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
+  if (item.identity !== page.identity) {
+    console.warn('Previously-focused element has a different identity than the current page, removing focus')
+    item.onUnfocus()
+    return false
+  }
+  if (wasNavigableDestroyed(item)) {
+    console.warn('Previously-focused element was destroyed, removing focus')
+    item.onUnfocus()
+    return false
+  }
+
+  return true
+}
+
+function _requestFocus(item: NavigableItem) {
+  navState.update((state) =>
+    state && _checkItemValidity(item, state.page) ? _generateNavState(state.focused, item, state.page) : state,
+  )
+}
+
+function _generateNavState(oldFocused: NavigableItem | null, newFocused: NavigableItem, page: NavigablePage): NavState {
+  oldFocused?.onUnfocus()
+  newFocused.onFocus()
+
+  newFocused.scrollTo()
+
+  return { page, focused: newFocused }
 }
 
 export type Navigable = NavigableContainer | NavigableItem

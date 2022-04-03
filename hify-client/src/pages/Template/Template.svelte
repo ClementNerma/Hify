@@ -16,9 +16,10 @@
 <style>
   :global(navigable-item-wrapper :first-child) {
     border: 3px solid transparent;
+    cursor: pointer;
   }
 
-  :global(navigable-item-wrapper.focused :first-child) {
+  :global(navigable-item-wrapper.focused :first-child, navigable-item-wrapper:hover :first-child) {
     background-color: pink;
     border: 3px solid pink;
     border-radius: 5px;
