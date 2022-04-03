@@ -177,14 +177,14 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
 
     let __current = state.focused
 
-    if (__current?.identity !== state.page.identity) {
-      console.warn('Previously-focused element has a different identity than the current page, removing focus')
-      __current = null
-    }
-
-    if (__current && wasNavigableDestroyed(__current)) {
-      console.warn('Previously-focused element was destroyed, removing focus')
-      __current = null
+    if (__current) {
+      if (__current.identity !== state.page.identity) {
+        console.warn('Previously-focused element has a different identity than the current page, removing focus')
+        __current = null
+      } else if (wasNavigableDestroyed(__current)) {
+        console.warn('Previously-focused element was destroyed, removing focus')
+        __current = null
+      }
     }
 
     const current = __current ?? state.page.firstItemDown(NavigationComingFrom.Above)
