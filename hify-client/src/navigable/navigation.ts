@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte'
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 
 export enum NavigationDirection {
   Up,
@@ -194,121 +194,126 @@ export function wasNavigableDestroyed(navigable: Navigable): boolean {
   return false
 }
 
-export function handleKeyboardEvent(e: KeyboardEvent): void {
+export function handleKeyboardEvent(e: KeyboardEvent): void | false {
   if (e.ctrlKey || e.shiftKey || e.altKey) {
     return
   }
 
-  navState.update((state) => {
-    if (!state) {
-      return state
+  const state = get(navState)
+
+  if (!state) {
+    return
+  }
+
+  let __current = state.focused
+
+  if (__current) {
+    if (__current.identity !== state.page.identity) {
+      console.warn('Previously-focused element has a different identity than the current page, removing focus')
+      __current.onUnfocus()
+      __current = null
+    } else if (wasNavigableDestroyed(__current)) {
+      console.warn('Previously-focused element was destroyed, removing focus')
+      __current.onUnfocus()
+      __current = null
     }
+  }
 
-    let __current = state.focused
+  let currentJustFocused = false
 
-    if (__current) {
-      if (__current.identity !== state.page.identity) {
-        console.warn('Previously-focused element has a different identity than the current page, removing focus')
-        __current.onUnfocus()
-        __current = null
-      } else if (wasNavigableDestroyed(__current)) {
-        console.warn('Previously-focused element was destroyed, removing focus')
-        __current.onUnfocus()
-        __current = null
-      }
-    }
-
-    let currentJustFocused = false
+  if (!__current) {
+    __current = state.page.firstItemDown(NavigationComingFrom.Above)
 
     if (!__current) {
-      __current = state.page.firstItemDown(NavigationComingFrom.Above)
+      console.warn('No navigable item in this page')
+      return
+    }
 
-      if (!__current) {
-        console.warn('No navigable item in this page')
-        return state
+    currentJustFocused = true
+  }
+
+  const current = __current
+
+  let next: NavigableItem | null
+
+  switch (e.key) {
+    case 'ArrowUp':
+    case 'ArrowLeft':
+    case 'ArrowRight':
+    case 'ArrowDown':
+      if (currentJustFocused) {
+        next = current
+        break
       }
 
-      currentJustFocused = true
-    }
+      const directions: { [key in typeof e.key]: NavigationDirection } = {
+        ArrowUp: NavigationDirection.Up,
+        ArrowLeft: NavigationDirection.Left,
+        ArrowRight: NavigationDirection.Right,
+        ArrowDown: NavigationDirection.Down,
+      }
 
-    const current = __current
+      const direction = directions[e.key]
 
-    let next: NavigableItem | null
+      next = current.canHandleDirection(direction)
+        ? current.handleDirection(direction)
+        : current.parent.navigate(current, direction)
 
-    switch (e.key) {
-      case 'ArrowUp':
-      case 'ArrowLeft':
-      case 'ArrowRight':
-      case 'ArrowDown':
-        if (currentJustFocused) {
-          next = current
+      break
+
+    case 'Enter':
+    case ' ':
+    case 'Backspace':
+    case 'Escape':
+      const events: { [key in typeof e.key]: NavigationAction } = {
+        Enter: NavigationAction.Press,
+        ' ': NavigationAction.LongPress,
+        Backspace: NavigationAction.Back,
+        Escape: NavigationAction.Back,
+      }
+
+      const event = events[e.key]
+
+      if (currentJustFocused && event !== NavigationAction.Back) {
+        next = current
+        break
+      }
+
+      next = null
+
+      for (const nav of _getParentsWithItem(current)) {
+        if (!nav.canHandleAction(event)) {
+          continue
+        }
+
+        const newFocused = nav.handleAction(event)
+
+        if (newFocused) {
+          next = newFocused
           break
         }
+      }
 
-        const directions: { [key in typeof e.key]: NavigationDirection } = {
-          ArrowUp: NavigationDirection.Up,
-          ArrowLeft: NavigationDirection.Left,
-          ArrowRight: NavigationDirection.Right,
-          ArrowDown: NavigationDirection.Down,
-        }
+      break
 
-        const direction = directions[e.key]
+    case 'Home':
+      next = state.page.firstItemDown(NavigationComingFrom.Above)
+      break
 
-        next = current.canHandleDirection(direction)
-          ? current.handleDirection(direction)
-          : current.parent.navigate(current, direction)
+    case 'End':
+      next = state.page.lastItem()
+      break
 
-        break
+    default:
+      return
+  }
 
-      case 'Enter':
-      case ' ':
-      case 'Backspace':
-      case 'Escape':
-        const events: { [key in typeof e.key]: NavigationAction } = {
-          Enter: NavigationAction.Press,
-          ' ': NavigationAction.LongPress,
-          Backspace: NavigationAction.Back,
-          Escape: NavigationAction.Back,
-        }
+  if (next) {
+    navState.set(_generateNavState(current, next, state.page))
+  }
 
-        const event = events[e.key]
-
-        if (currentJustFocused && event !== NavigationAction.Back) {
-          next = current
-          break
-        }
-
-        next = null
-
-        for (const nav of _getParentsWithItem(current)) {
-          if (!nav.canHandleAction(event)) {
-            continue
-          }
-
-          const newFocused = nav.handleAction(event)
-
-          if (newFocused) {
-            next = newFocused
-            break
-          }
-        }
-
-        break
-
-      case 'Home':
-        next = state.page.firstItemDown(NavigationComingFrom.Above)
-        break
-
-      case 'End':
-        next = state.page.lastItem()
-        break
-
-      default:
-        return state
-    }
-
-    return next ? _generateNavState(current, next, state.page) : state
-  })
+  e.preventDefault()
+  return false
 }
 
 function _getParents(item: NavigableItem): NavigableContainer[] {

@@ -7,7 +7,7 @@
 
   function handleWindowKeyEvent(e: KeyboardEvent) {
     if (onKeyDown?.(e) !== false) {
-      handleKeyboardEvent(e)
+      return handleKeyboardEvent(e)
     }
   }
 </script>
