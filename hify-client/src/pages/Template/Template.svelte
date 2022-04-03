@@ -1,14 +1,34 @@
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { useLocation, useNavigate } from 'svelte-navigator'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigablePage from '../../navigable/NavigablePage/NavigablePage.svelte'
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
 
   const navigate = useNavigate()
+  const location = useLocation()
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.ctrlKey || e.altKey || e.shiftKey) {
+      return
+    }
+
+    if (e.key === 'Tab') {
+      if ($location.pathname === '/playing') {
+        navigate(-1)
+      } else {
+        navigate('/playing')
+      }
+
+      e.preventDefault()
+      return false
+    }
+
+    return
+  }
 </script>
 
-<NavigablePage>
+<NavigablePage {onKeyDown}>
   <NavigableWithHandlers onBack={() => navigate(-1)}>
     <NavigableList>
       <slot />
