@@ -28,12 +28,13 @@
 
   let focusedArtistId: string | null
   let focusedTrackId: string | null
+  let focusedGenre: string | null
 </script>
 
 {#await album}
   <h2>Loading...</h2>
 {:then album}
-  <NavigableRow>
+  <NavigableList>
     <div class="album-header">
       <div class="album-art">
         <img width={250} height={250} src={getAlbumArtUri(albumId)} alt={album.name} />
@@ -57,11 +58,25 @@
           </NavigableRow>
         </div>
         <div class="album-year">{album.year ?? '<unknown year>'}</div>
-        <!-- TODO: navigable genres to search from -->
-        <div class="album-genres">{album.genres.join(', ')}</div>
+        <div class="album-genres">
+          <NavigableRow>
+            {#each album.genres as genre}
+              <SimpleNavigableItem
+                onPress={() => alert("TODO: go to genre's page: " + genre)}
+                onFocusChange={(has) => {
+                  focusedGenre = has ? genre : null
+                }}
+              >
+                <span class="album-genre {focusedGenre === genre ? 'focused' : ''}">
+                  {genre}
+                </span>
+              </SimpleNavigableItem>
+            {/each}
+          </NavigableRow>
+        </div>
       </div>
     </div>
-  </NavigableRow>
+  </NavigableList>
 
   <NavigableList>
     <table>
@@ -109,6 +124,17 @@
   }
 
   .album-artist.focused {
+    border: 5px solid pink;
+    padding: 2px;
+    border-radius: 10px;
+  }
+
+  .album-genre {
+    font-size: 1em;
+    padding: 7px;
+  }
+
+  .album-genre.focused {
     border: 5px solid pink;
     padding: 2px;
     border-radius: 10px;
