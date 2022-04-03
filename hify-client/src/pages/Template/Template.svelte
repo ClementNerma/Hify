@@ -12,3 +12,15 @@
     <slot />
   </NavigableList>
 </NavigableWithHandlers>
+
+<style>
+  :global(navigable-item-wrapper :first-child) {
+    border: 3px solid transparent;
+  }
+
+  :global(navigable-item-wrapper.focused :first-child) {
+    background-color: pink;
+    border: 3px solid pink;
+    border-radius: 5px;
+  }
+</style>

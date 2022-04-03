@@ -7,18 +7,10 @@
   export let onPress: () => void
   export let onLongPress: (() => void) | undefined = undefined
   export let subtitle: string
-
-  let focused = false
 </script>
 
-<SimpleNavigableItem
-  onFocusChange={(has) => {
-    focused = has
-  }}
-  {onPress}
-  {onLongPress}
->
-  <div class="card {focused ? 'focused' : ''}" on:click={onPress}>
+<SimpleNavigableItem {onPress} {onLongPress}>
+  <div class="card" on:click={onPress}>
     <img width={250} height={250} src={pictureUrl} alt={pictureAlt} />
     <div class="title">{title}</div>
     <div class="subtitle">{subtitle}</div>
@@ -29,13 +21,6 @@
   .card {
     text-align: center;
     padding: 10px;
-  }
-
-  .card.focused {
-    border: 3px solid pink;
-    background-color: pink;
-    border-radius: 15px;
-    padding: 7px;
   }
 
   .card:hover {

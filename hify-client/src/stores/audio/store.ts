@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 import { getStreamUri } from '../../rest-api'
 import { AsyncAudioTrack, AudioTrackQuery } from './AudioTrack.generated'
 
@@ -9,6 +9,8 @@ type AudioPlayingState = {
 }
 
 const audioPlaying = writable<AudioPlayingState | null>(null)
+
+export const readableAudioPlaying = derived(audioPlaying, (_) => _)
 
 export function playTrack(trackId: string) {
   audioPlaying.update((prevAudio): AudioPlayingState => {

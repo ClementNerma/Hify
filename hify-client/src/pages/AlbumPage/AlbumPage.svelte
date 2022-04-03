@@ -25,10 +25,6 @@
 
     return album
   })
-
-  let focusedArtistId: string | null
-  let focusedTrackId: string | null
-  let focusedGenre: string | null
 </script>
 
 {#await album}
@@ -46,11 +42,9 @@
             {#each album.albumArtists as albumArtist}
               <SimpleNavigableItem
                 onPress={() => alert("TODO: go to artist's page: " + albumArtist.name)}
-                onFocusChange={(has) => {
-                  focusedArtistId = has ? albumArtist.id : null
-                }}
+                
               >
-                <span class="album-artist {focusedArtistId === albumArtist.id ? 'focused' : ''}">
+                <span class="album-artist">
                   {albumArtist.name}
                 </span>
               </SimpleNavigableItem>
@@ -63,11 +57,9 @@
             {#each album.genres as genre}
               <SimpleNavigableItem
                 onPress={() => alert("TODO: go to genre's page: " + genre)}
-                onFocusChange={(has) => {
-                  focusedGenre = has ? genre : null
-                }}
+                
               >
-                <span class="album-genre {focusedGenre === genre ? 'focused' : ''}">
+                <span class="album-genre">
                   {genre}
                 </span>
               </SimpleNavigableItem>
@@ -84,11 +76,9 @@
         {#each album.tracks as track}
           <SimpleNavigableItem
             onPress={() => playTrack(track.id)}
-            onFocusChange={(has) => {
-              focusedTrackId = has ? track.id : null
-            }}
+            
           >
-            <tr class={track.id === focusedTrackId ? 'active' : ''}>
+            <tr>
               <td class="play">🔊</td>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
@@ -123,23 +113,9 @@
     padding: 7px;
   }
 
-  .album-artist.focused {
-    border: 5px solid pink;
-    background-color: pink;
-    padding: 2px;
-    border-radius: 10px;
-  }
-
   .album-genre {
     font-size: 1em;
     padding: 7px;
-  }
-
-  .album-genre.focused {
-    border: 5px solid pink;
-    background-color: pink;
-    padding: 2px;
-    border-radius: 10px;
   }
 
   .album-year {
@@ -158,9 +134,9 @@
     background-color: #e3e3e3;
   }
 
-  tr.active {
+  /* tr.active {
     background-color: #c9c9c9;
-  }
+  } */
 
   td {
     padding: 10px;

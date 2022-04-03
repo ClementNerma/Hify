@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
-  import { getParentNavigable, HTMLItemWrapperElement } from '../navigation'
+  import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { onDestroy } from 'svelte'
 
   export let onPress: SimpleNavigableItemProps['onPress'] = undefined
@@ -13,7 +13,10 @@
   const item = new SimpleNavigableItem(nav, {
     onPress,
     onLongPress,
-    onFocusChange,
+    onFocusChange: (has) => {
+      focused = has
+      onFocusChange?.(has)
+    },
     onBack,
     getUnderlyingElement: () => {
       if (!wrapper) {
@@ -28,9 +31,10 @@
 
   onDestroy(() => nav.remove(item))
 
-  let wrapper: HTMLItemWrapperElement
+  let wrapper: HTMLNavigableItemWrapperElement
+  let focused: boolean
 </script>
 
-<navigable-item-wrapper bind:this={wrapper}>
+<navigable-item-wrapper bind:this={wrapper} class:focused>
   <slot />
 </navigable-item-wrapper>
