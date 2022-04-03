@@ -65,11 +65,11 @@ export class NavigableList extends NavigableContainer {
     switch (from) {
       case NavigationComingFrom.Above:
       case NavigationComingFrom.Left:
-      case NavigationComingFrom.Below:
+      case NavigationComingFrom.Right:
         tries = this.rows
         break
 
-      case NavigationComingFrom.Right:
+      case NavigationComingFrom.Below:
         tries = [...this.rows].reverse()
         break
     }
