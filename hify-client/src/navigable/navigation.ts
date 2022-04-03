@@ -189,9 +189,11 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
     if (__current) {
       if (__current.identity !== state.page.identity) {
         console.warn('Previously-focused element has a different identity than the current page, removing focus')
+        __current.onUnfocus()
         __current = null
       } else if (wasNavigableDestroyed(__current)) {
         console.warn('Previously-focused element was destroyed, removing focus')
+        __current.onUnfocus()
         __current = null
       }
     }
