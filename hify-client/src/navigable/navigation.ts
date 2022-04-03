@@ -72,7 +72,7 @@ export abstract class NavigableItem extends NavigableCommon {
   scrollTo(): void {
     const el = this.underlyingElement()
 
-    if (!(el instanceof HTMLItemWrapperElement)) {
+    if (el.constructor.name !== HTMLItemWrapperElement.name) {
       throw new Error("Item's underlying element is not an " + HTMLItemWrapperElement.name)
     }
 
