@@ -69,21 +69,14 @@ export abstract class NavigableItem extends NavigableCommon {
     return this
   }
 
-  scrollTo(comingFrom: NavigationComingFrom): void {
+  scrollTo(): void {
     const el = this.underlyingElement()
 
     if (el.constructor.name !== HTMLNavigableItemWrapperElement.name) {
       throw new Error("Item's underlying element is not an " + HTMLNavigableItemWrapperElement.name)
     }
 
-    const scrollBlock: { [from in NavigationComingFrom]: ScrollLogicalPosition } = {
-      [NavigationComingFrom.Above]: 'end',
-      [NavigationComingFrom.Left]: 'nearest',
-      [NavigationComingFrom.Right]: 'nearest',
-      [NavigationComingFrom.Below]: 'start',
-    }
-
-    el.scrollIntoView({ behavior: 'smooth', block: scrollBlock[comingFrom], inline: 'nearest' })
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
   }
 }
 
@@ -242,7 +235,6 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
   const current = __current
 
   let next: NavigableItem | null
-  let comingFrom: NavigationComingFrom | null = null
 
   switch (e.key) {
     case 'ArrowUp':
@@ -266,15 +258,6 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
       next = current.canHandleDirection(direction)
         ? current.handleDirection(direction)
         : current.parent.navigate(current, direction)
-
-      const origins: { [key in typeof e.key]: NavigationComingFrom } = {
-        ArrowUp: NavigationComingFrom.Below,
-        ArrowLeft: NavigationComingFrom.Right,
-        ArrowRight: NavigationComingFrom.Left,
-        ArrowDown: NavigationComingFrom.Above,
-      }
-
-      comingFrom = origins[e.key]
 
       break
 
@@ -326,7 +309,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
   }
 
   if (next) {
-    navState.set(_generateNavState(current, comingFrom, next, state.page))
+    navState.set(_generateNavState(current, next, state.page))
   }
 
   e.preventDefault()
@@ -372,16 +355,11 @@ function _requestFocus(item: NavigableItem) {
   )
 }
 
-function _generateNavState(
-  oldFocused: NavigableItem | null,
-  comingFrom: NavigationComingFrom | null,
-  newFocused: NavigableItem,
-  page: NavigablePage,
-): NavState {
+function _generateNavState(oldFocused: NavigableItem | null, newFocused: NavigableItem, page: NavigablePage): NavState {
   oldFocused?.onUnfocus()
   newFocused.onFocus()
 
-  newFocused.scrollTo(comingFrom)
+  newFocused.scrollTo()
 
   return { page, focused: newFocused }
 }
