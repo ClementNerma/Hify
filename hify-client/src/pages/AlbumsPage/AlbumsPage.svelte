@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { AsyncAlbumsGrid } from './AlbumsGrid.generated'
+  import { AsyncAlbumsPage } from './AlbumsPage.generated'
 
-  import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
   import Grid from '../../organisms/Grid/Grid.svelte'
+  import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
 
   const ALBUMS_PER_PAGE = 24
 
@@ -13,7 +13,7 @@
       return
     }
 
-    const res = await AsyncAlbumsGrid({
+    const res = await AsyncAlbumsPage({
       variables: {
         pagination: {
           after: currentPageInfo?.endCursor,

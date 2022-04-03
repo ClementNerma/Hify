@@ -2,13 +2,14 @@
   import { Router, Route } from 'svelte-navigator'
 
   import Template from './pages/Template/Template.svelte'
-  import NotFound from './pages/NotFound/NotFound.svelte'
+  import NotFound from './pages/NotFoundPage/NotFoundPage.svelte'
 
-  import Home from './pages/Home/Home.svelte'
+  import Home from './pages/HomePage/HomePage.svelte'
 
-  import AlbumsGrid from './pages/AlbumsGrid/AlbumsGrid.svelte'
+  import AlbumsPage from './pages/AlbumsPage/AlbumsPage.svelte'
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
-  import NowPlaying from './pages/NowPlaying/NowPlaying.svelte'
+
+  import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -18,7 +19,7 @@
     </Route>
 
     <Route path="/albums">
-      <AlbumsGrid />
+      <AlbumsPage />
     </Route>
 
     <Route path="/album/:id" let:params>

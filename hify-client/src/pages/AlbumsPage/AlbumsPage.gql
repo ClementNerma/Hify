@@ -1,4 +1,4 @@
-query AlbumsGrid($pagination: PaginationInput!) {
+query AlbumsPage($pagination: PaginationInput!) {
     albums(pagination: $pagination) {
       edges {
         node {

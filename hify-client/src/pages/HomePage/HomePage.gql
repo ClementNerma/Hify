@@ -1,0 +1,9 @@
+query HomePage {
+  indexInfos {
+    fingerprint
+    albumsCount
+    albumsArtistsCount
+    artistsCount
+    tracksCount
+  }
+}
