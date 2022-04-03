@@ -153,7 +153,8 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
 
         genres: tags
             .remove("genre")
-            .map(|genres| genres.split(';').map(str::to_string).collect()),
+            .map(|genres| genres.split(';').map(str::to_string).collect())
+            .unwrap_or_default(),
     })
 }
 

@@ -27,6 +27,7 @@ pub struct IndexCache {
     pub no_title_tracks: HashSet<TrackID>,
     pub no_album_tracks: HashSet<TrackID>,
     pub no_album_artist_tracks: HashSet<TrackID>,
+    pub no_genre_tracks: HashSet<TrackID>,
 
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
@@ -38,6 +39,8 @@ pub struct IndexCache {
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
+
+    pub genres_tracks: HashMap<String, TrackID>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -170,7 +173,7 @@ pub struct TrackTags {
     pub track_no: Option<i32>,
 
     pub date: Option<TrackDate>,
-    pub genres: Option<Vec<String>>,
+    pub genres: Vec<String>,
     // pub note: Option<u8>,
 }
 

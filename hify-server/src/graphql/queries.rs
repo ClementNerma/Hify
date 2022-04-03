@@ -164,7 +164,7 @@ impl AlbumInfos {
         let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
         album_tracks
             .iter()
-            .filter_map(|track_id| {
+            .flat_map(|track_id| {
                 index
                     .tracks
                     .get(track_id)
@@ -174,7 +174,6 @@ impl AlbumInfos {
                     .genres
                     .clone()
             })
-            .flatten()
             .collect()
     }
 
