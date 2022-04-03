@@ -196,12 +196,19 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
       }
     }
 
-    const current = __current ?? state.page.firstItemDown(NavigationComingFrom.Above)
+    if (!__current) {
+      const next = state.page.firstItemDown(NavigationComingFrom.Above)
 
-    if (!current) {
-      console.warn('No navigable item in this page')
-      return state
+      if (!next) {
+        console.warn('No navigable item in this page')
+        return state
+      }
+
+      next.onFocus()
+      return { page: state.page, focused: next }
     }
+
+    const current = __current
 
     let next: NavigableItem | null
 
