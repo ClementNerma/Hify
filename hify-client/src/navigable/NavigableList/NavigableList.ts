@@ -85,7 +85,7 @@ export class NavigableList extends NavigableContainer {
     return null
   }
 
-  lastItem(): NavigableItem | null {
-    return this.rows.at(-1)?.lastItem() ?? null
+  navigateToLastItem(): NavigableItem | null {
+    return this.rows.at(-1)?.navigateToLastItem() ?? null
   }
 }

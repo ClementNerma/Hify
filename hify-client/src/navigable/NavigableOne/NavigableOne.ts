@@ -39,7 +39,7 @@ export class NavigableOne extends NavigableContainer {
     return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
-  lastItem(): NavigableItem | null {
-    return this.onlyChild?.lastItem() ?? null
+  navigateToLastItem(): NavigableItem | null {
+    return this.onlyChild?.navigateToLastItem() ?? null
   }
 }

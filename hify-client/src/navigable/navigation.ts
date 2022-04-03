@@ -31,7 +31,7 @@ export abstract class NavigableCommon {
   }
 
   abstract navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null
-  abstract lastItem(): NavigableItem | null
+  abstract navigateToLastItem(): NavigableItem | null
 
   abstract canHandleAction(key: NavigationAction): boolean
   abstract handleAction(key: NavigationAction): NavigableItem | null
@@ -65,7 +65,7 @@ export abstract class NavigableItem extends NavigableCommon {
     return this
   }
 
-  lastItem(): NavigableItem | null {
+  navigateToLastItem(): NavigableItem | null {
     return this
   }
 
@@ -125,8 +125,8 @@ class NavigablePage {
     return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
-  lastItem(): NavigableItem | null {
-    return this.onlyChild ? this.onlyChild.lastItem() : null
+  navigateToLastItem(): NavigableItem | null {
+    return this.onlyChild ? this.onlyChild.navigateToLastItem() : null
   }
 
   canHandleAction(_: NavigationAction): boolean {
@@ -301,7 +301,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
       break
 
     case 'End':
-      next = state.page.lastItem()
+      next = state.page.navigateToLastItem()
       break
 
     default:
