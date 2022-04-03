@@ -55,7 +55,7 @@ impl QueryRoot {
         )
     }
 
-    async fn album_artists(
+    async fn albums_artists(
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
