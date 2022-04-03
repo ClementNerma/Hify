@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { playAudio } from '../../store'
-  import { getAlbumArtUri, getStreamUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../rest-api'
+  import { playTrack } from '../../stores/audio/store'
 
-  import { AsyncAlbumPage } from './AlbumPage.generated'
   import { AlbumYearStrategy } from '../../graphql/types'
+  import { AsyncAlbumPage } from './AlbumPage.generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
@@ -83,7 +83,7 @@
       <tbody>
         {#each album.tracks as track}
           <SimpleNavigableItem
-            onPress={() => playAudio(getStreamUri(track.id))}
+            onPress={() => playTrack(track.id)}
             onFocusChange={(has) => {
               focusedTrackId = has ? track.id : null
             }}

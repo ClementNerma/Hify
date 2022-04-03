@@ -1,0 +1,29 @@
+query AudioTrack($trackId: String!) {
+  track(id: $trackId) {
+    id
+    path
+    metadata {
+      format
+      duration
+      bitrate
+      size
+      tags {
+        title
+        artists {
+          id
+          name
+        }
+        album {
+          id
+          albumArtists {
+            id
+            name
+          }
+        }
+        disc
+        trackNo
+        genres
+      }
+    }
+  }
+}
