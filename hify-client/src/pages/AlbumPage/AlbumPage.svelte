@@ -125,6 +125,7 @@
 
   .album-artist.focused {
     border: 5px solid pink;
+    background-color: pink;
     padding: 2px;
     border-radius: 10px;
   }
@@ -136,6 +137,7 @@
 
   .album-genre.focused {
     border: 5px solid pink;
+    background-color: pink;
     padding: 2px;
     border-radius: 10px;
   }
