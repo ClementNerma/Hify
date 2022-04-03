@@ -1,4 +1,4 @@
-query AudioTrack($trackId: String!) {
+query AudioTrack($trackId: String!, $albumYearStrategy: AlbumYearStrategy!) {
   track(id: $trackId) {
     id
     path
@@ -15,6 +15,8 @@ query AudioTrack($trackId: String!) {
         }
         album {
           id
+          name
+          year(strategy: $albumYearStrategy)
           albumArtists {
             id
             name
