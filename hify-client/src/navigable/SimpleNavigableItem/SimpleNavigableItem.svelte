@@ -38,3 +38,9 @@
 <navigable-item-wrapper bind:this={wrapper} class:focused>
   <slot />
 </navigable-item-wrapper>
+
+<style>
+  navigable-item-wrapper {
+    display: contents;
+  }
+</style>
