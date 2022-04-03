@@ -1,5 +1,5 @@
 import {
-  HTMLItemWrapperElement,
+  HTMLNavigableItemWrapperElement,
   NavigableContainer,
   NavigableItem,
   NavigationAction,
@@ -11,7 +11,7 @@ export class SimpleNavigableItem extends NavigableItem {
     super(parent)
   }
 
-  underlyingElement(): HTMLItemWrapperElement {
+  underlyingElement(): HTMLNavigableItemWrapperElement {
     return this.props.getUnderlyingElement()
   }
 
@@ -68,5 +68,5 @@ export type SimpleNavigableItemProps = {
   onLongPress?: () => void
   onFocusChange?: (hasFocus: boolean) => void
   onBack?: () => void
-  getUnderlyingElement: () => HTMLItemWrapperElement
+  getUnderlyingElement: () => HTMLNavigableItemWrapperElement
 }
