@@ -57,6 +57,8 @@
           </NavigableRow>
         </div>
         <div class="album-year">{album.year ?? '<unknown year>'}</div>
+        <!-- TODO: navigable genres to search from -->
+        <div class="album-genres">{album.genres.join(', ')}</div>
       </div>
     </div>
   </NavigableRow>
