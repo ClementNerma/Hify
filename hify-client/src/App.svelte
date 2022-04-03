@@ -9,7 +9,7 @@
 </script>
 
 <NavigablePage>
-  <Router>
+  <Router primary={false}>
     <Template>
       <Route path="/">
         <Home />
