@@ -1,5 +1,10 @@
-query AlbumTracks($albumId: String!) {
+query AlbumPage($albumId: String!) {
   album(id: $albumId) {
+    name
+    albumArtists {
+      id
+      name
+    }
     tracks {
       id
       metadata {

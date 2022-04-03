@@ -2,8 +2,8 @@
   import { Router, Route } from 'svelte-navigator'
   import NavigablePage from './navigable/NavigablePage/NavigablePage.svelte'
 
-  import AlbumGrid from './pages/AlbumGrid/AlbumGrid.svelte'
-  import AlbumTracks from './pages/AlbumTracks/AlbumTracks.svelte'
+  import AlbumsGrid from './pages/AlbumsGrid/AlbumsGrid.svelte'
+  import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
   import Home from './pages/Home/Home.svelte'
   import Template from './pages/Template/Template.svelte'
 </script>
@@ -16,11 +16,11 @@
       </Route>
 
       <Route path="/albums">
-        <AlbumGrid />
+        <AlbumsGrid />
       </Route>
 
       <Route path="/album/:id" let:params>
-        <AlbumTracks albumId={params['id']} />
+        <AlbumPage albumId={params['id']} />
       </Route>
     </Template>
   </Router>
