@@ -6,6 +6,7 @@
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
   import Home from './pages/Home/Home.svelte'
   import Template from './pages/Template/Template.svelte'
+  import NotFound from './pages/NotFound/NotFound.svelte'
 </script>
 
 <NavigablePage>
@@ -21,6 +22,10 @@
 
       <Route path="/album/:id" let:params>
         <AlbumPage albumId={params['id']} />
+      </Route>
+
+      <Route>
+        <NotFound />
       </Route>
     </Template>
   </Router>
