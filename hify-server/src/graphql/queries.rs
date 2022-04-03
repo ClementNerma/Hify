@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use async_graphql::{ComplexObject, Context, Enum, Object, Result};
+use async_graphql::{ComplexObject, Context, Enum, Object, Result, SimpleObject};
 
 use crate::{
     graphql_index,
@@ -19,8 +19,16 @@ pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn fingerprint(&self, ctx: &Context<'_>) -> String {
-        graphql_index!(ctx).fingerprint.clone()
+    async fn index_infos(&self, ctx: &Context<'_>) -> IndexInfos {
+        let index = graphql_index!(ctx);
+
+        IndexInfos {
+            fingerprint: index.fingerprint.clone(),
+            albums_count: index.cache.albums_infos.len() as i32,
+            albums_artists_count: index.cache.albums_artists_infos.len() as i32,
+            artists_count: index.cache.artists_infos.len() as i32,
+            tracks_count: index.tracks.len() as i32,
+        }
     }
 
     async fn albums(
@@ -90,6 +98,15 @@ impl QueryRoot {
     async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
         graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
     }
+}
+
+#[derive(SimpleObject)]
+pub struct IndexInfos {
+    fingerprint: String,
+    albums_count: i32,
+    artists_count: i32,
+    albums_artists_count: i32,
+    tracks_count: i32,
 }
 
 #[ComplexObject]
