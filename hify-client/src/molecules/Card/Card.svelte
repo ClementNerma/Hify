@@ -7,7 +7,6 @@
   export let onPress: () => void
   export let onLongPress: (() => void) | undefined = undefined
   export let subtitle: string
-  export let onSubtitleClick: () => void
 
   let focused = false
 </script>
@@ -22,7 +21,7 @@
   <div class="card {focused ? 'focused' : ''}" on:click={onPress}>
     <img width={250} height={250} src={pictureUrl} alt={pictureAlt} />
     <div class="title">{title}</div>
-    <div class="subtitle" on:click|stopPropagation={onSubtitleClick}>{subtitle}</div>
+    <div class="subtitle">{subtitle}</div>
   </div>
 </SimpleNavigableItem>
 
