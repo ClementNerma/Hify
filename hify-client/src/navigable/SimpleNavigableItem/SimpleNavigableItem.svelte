@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
-  import { getParentNavigable } from '../navigation'
+  import { getParentNavigable, HTMLItemWrapperElement } from '../navigation'
   import { onDestroy } from 'svelte'
 
   export let onPress: SimpleNavigableItemProps['onPress'] = undefined
@@ -15,11 +15,22 @@
     onLongPress,
     onFocusChange,
     onBack,
+    getUnderlyingElement: () => {
+      if (!wrapper) {
+        throw new Error("Tried to access navigable item's underlying wrapper before it is ready")
+      }
+
+      return wrapper
+    },
   })
 
   nav.append(item)
 
   onDestroy(() => nav.remove(item))
+
+  let wrapper: HTMLItemWrapperElement
 </script>
 
-<slot />
+<navigable-item-wrapper bind:this={wrapper}>
+  <slot />
+</navigable-item-wrapper>

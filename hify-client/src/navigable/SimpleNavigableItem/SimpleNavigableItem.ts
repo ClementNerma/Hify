@@ -1,8 +1,18 @@
-import { NavigableContainer, NavigableItem, NavigationAction, NavigationDirection } from '../navigation'
+import {
+  HTMLItemWrapperElement,
+  NavigableContainer,
+  NavigableItem,
+  NavigationAction,
+  NavigationDirection,
+} from '../navigation'
 
 export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
     super(parent)
+  }
+
+  underlyingElement(): HTMLItemWrapperElement {
+    return this.props.getUnderlyingElement()
   }
 
   canHandleAction(key: NavigationAction): boolean {
@@ -58,4 +68,5 @@ export type SimpleNavigableItemProps = {
   onLongPress?: () => void
   onFocusChange?: (hasFocus: boolean) => void
   onBack?: () => void
+  getUnderlyingElement: () => HTMLItemWrapperElement
 }

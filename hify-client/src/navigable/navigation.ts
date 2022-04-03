@@ -56,6 +56,8 @@ export abstract class NavigableItem extends NavigableCommon {
   abstract canHandleDirection(direction: NavigationDirection): boolean
   abstract handleDirection(direction: NavigationDirection): NavigableItem | null
 
+  abstract underlyingElement(): HTMLItemWrapperElement
+
   abstract onFocus(): void
   abstract onUnfocus(): void
 
@@ -65,6 +67,16 @@ export abstract class NavigableItem extends NavigableCommon {
 
   lastItem(): NavigableItem | null {
     return this
+  }
+
+  scrollTo(): void {
+    const el = this.underlyingElement()
+
+    if (!(el instanceof HTMLItemWrapperElement)) {
+      throw new Error("Item's underlying element is not an " + HTMLItemWrapperElement.name)
+    }
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
   }
 }
 
@@ -294,6 +306,8 @@ export function handleKeyboardEvent(e: KeyboardEvent): void {
     current.onUnfocus()
     next.onFocus()
 
+    next.scrollTo()
+
     return { page: state.page, focused: next }
   })
 }
@@ -326,3 +340,13 @@ type NavState = {
 }
 
 const navState = writable<NavState | null>(null)
+
+export class HTMLItemWrapperElement extends HTMLElement {}
+
+const itemWrapperInPlace = window.customElements.get('navigable-item-wrapper')
+
+if (!itemWrapperInPlace) {
+  window.customElements.define('navigable-item-wrapper', HTMLItemWrapperElement)
+} else if (itemWrapperInPlace.name !== HTMLItemWrapperElement.name) {
+  throw new Error('An invalid item wrapper element is already in place')
+}
