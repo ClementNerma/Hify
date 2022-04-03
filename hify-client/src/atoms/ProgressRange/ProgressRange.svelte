@@ -4,6 +4,7 @@
   export let max: number
   export let value: number | null
   export let onChange: (newValue: number) => void
+  export let onPress: SimpleNavigableItem['$$prop_def']['onPress'] = undefined
 
   let input: HTMLInputElement
 
@@ -26,7 +27,7 @@
   }
 </script>
 
-<SimpleNavigableItem {onLeft} {onRight}>
+<SimpleNavigableItem {onLeft} {onRight} {onPress}>
   <div class="container">
     <input type="range" {max} {value} bind:this={input} on:change={() => onChange(getValue())} />
   </div>
