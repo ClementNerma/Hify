@@ -17,11 +17,3 @@ macro_rules! graphql_index {
         ctx.app_state.index.read().await
     }};
 }
-
-#[macro_export]
-macro_rules! graphql_search_index {
-    ($ctx_var: ident) => {{
-        let ctx = $ctx_var.data::<GraphQLContext>().unwrap();
-        ctx.app_state.search_index.read().await
-    }};
-}

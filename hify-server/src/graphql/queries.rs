@@ -3,10 +3,10 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Enum, Object, Result, SimpleObject};
 
 use crate::{
-    graphql_index, graphql_search_index,
+    graphql_index,
     index::{
-        search_inside_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexSearchResults,
-        SortedMap, Track, TrackID, TrackTags,
+        search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexSearchResults, SortedMap,
+        Track, TrackID, TrackTags,
     },
     transparent_cursor_type,
 };
@@ -102,36 +102,9 @@ impl QueryRoot {
         graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
     }
 
-    async fn search(&self, ctx: &Context<'_>, input: String) -> Result<SearchResults, String> {
+    async fn search(&self, ctx: &Context<'_>, input: String) -> IndexSearchResults {
         let index = graphql_index!(ctx);
-        let search_index = graphql_search_index!(ctx);
-
-        let IndexSearchResults {
-            tracks,
-            albums,
-            artists,
-        } = search_inside_index(&input, &search_index)
-            .map_err(|e| format!("Failed to perform search: {e}"))?;
-
-        Ok(SearchResults {
-            tracks: tracks
-                .iter()
-                .map(|track_id| index.tracks.get(track_id).unwrap())
-                .cloned()
-                .collect(),
-
-            albums: albums
-                .iter()
-                .map(|album_id| index.cache.albums_infos.get(album_id).unwrap())
-                .cloned()
-                .collect(),
-
-            artists: artists
-                .iter()
-                .map(|artist_id| index.cache.artists_infos.get(artist_id).unwrap())
-                .cloned()
-                .collect(),
-        })
+        search_index(&index, &input)
     }
 }
 
