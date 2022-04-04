@@ -84,8 +84,9 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
         }
 
         t_index_writer.add_document(track_doc)?;
-        t_index_writer.commit()?;
     }
+
+    t_index_writer.commit()?;
 
     Ok(TantivyIndexAndSchema {
         index: t_index,
