@@ -17,26 +17,39 @@ async fn main() {
         panic!("Music path is not a directory");
     }
 
-    let index = if args.index_file.is_dir() {
-        panic!("Index file must not be a directory");
-    } else if args.index_file.is_file() && !args.no_index_file {
-        println!("> Loading index from disk...");
-        let index = utils::save::load_index(&args.index_file).unwrap();
+    let index = if let Some(index_file) = args.index_file {
+        if index_file.is_dir() {
+            panic!("Index file must not be a directory");
+        }
 
-        println!("> Done.");
+        if index_file.is_file() {
+            println!("> Loading index from disk...");
+            let index = utils::save::load_index(&index_file).unwrap();
 
-        index
+            println!("> Done.");
+
+            index
+        } else {
+            println!("> Generating index...");
+            let index = index::build_index(args.music_dir);
+            utils::save::save_index(&index_file, &index).unwrap();
+            println!("> Index saved on disk.");
+
+            index
+        }
+    } else if !args.no_index_file {
+        panic!(
+            "Argument '--no-index-file' must be explicitly provided without an index file path."
+        );
     } else {
         println!("> Generating index...");
         let index = index::build_index(args.music_dir);
 
-        if !args.no_index_file {
-            utils::save::save_index(&args.index_file, &index).unwrap();
-            println!("> Index saved on disk.");
-        }
+        println!("> Done.");
 
         index
     };
+
     println!("> Building search index...");
 
     let search_index = index::build_search_index(&index).unwrap();
