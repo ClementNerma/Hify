@@ -37,8 +37,11 @@ async fn main() {
 
         index
     };
+    println!("> Building search index...");
+
+    let search_index = index::build_search_index(&index).unwrap();
 
     println!("> Launching server...");
 
-    http::launch(index).await.unwrap();
+    http::launch(index, search_index).await.unwrap();
 }
