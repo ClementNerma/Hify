@@ -1,6 +1,12 @@
-import { NavigableContainer, Navigable, NavigableItem, NavigationComingFrom, NavigationDirection } from '../navigation'
+import {
+  Navigable,
+  NavigableItem,
+  NavigationComingFrom,
+  NavigationDirection,
+  NavigableArrayContainer,
+} from '../navigation'
 
-export class NavigableRow extends NavigableContainer {
+export class NavigableRow extends NavigableArrayContainer {
   private readonly columns: Navigable[] = []
 
   append(navigable: Navigable) {
@@ -85,7 +91,7 @@ export class NavigableRow extends NavigableContainer {
     return null
   }
 
-  navigateToLastItem(): NavigableItem | null {
-    return this.columns.at(-1)?.navigateToLastItem() ?? null
+  children(): Navigable[] {
+    return this.columns
   }
 }

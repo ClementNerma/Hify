@@ -1,4 +1,11 @@
-import { NavigableContainer, Navigable, NavigableItem, NavigationComingFrom, NavigationDirection } from '../navigation'
+import {
+  NavigableContainer,
+  Navigable,
+  NavigableItem,
+  NavigationComingFrom,
+  NavigationDirection,
+  NavigableArrayContainer,
+} from '../navigation'
 
 export class NavigableGrid extends NavigableContainer {
   private readonly items: Navigable[] = []
@@ -142,6 +149,6 @@ export class NavigableGrid extends NavigableContainer {
 
   navigateToLastItem(): NavigableItem | null {
     this._lazyLoading()
-    return this.items.at(-1)?.navigateToLastItem() ?? null
+    return NavigableArrayContainer.navigateToLastItem(this.items)
   }
 }
