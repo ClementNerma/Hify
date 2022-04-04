@@ -103,7 +103,7 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
 pub fn build_albums_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
     let mut schema_builder = Schema::builder();
 
-    schema_builder.add_text_field(AlbumSearchField::AlbumID.as_str(), STRING);
+    schema_builder.add_text_field(AlbumSearchField::AlbumID.as_str(), STRING | STORED);
     schema_builder.add_text_field(AlbumSearchField::Name.as_str(), TEXT);
     schema_builder.add_text_field(AlbumSearchField::Artists.as_str(), TEXT);
 
@@ -148,7 +148,7 @@ pub fn build_albums_search_index(index: &Index) -> Result<TantivyIndexAndSchema>
 pub fn build_artists_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
     let mut schema_builder = Schema::builder();
 
-    schema_builder.add_text_field(ArtistSearchField::ArtistID.as_str(), STRING);
+    schema_builder.add_text_field(ArtistSearchField::ArtistID.as_str(), STRING | STORED);
     schema_builder.add_text_field(ArtistSearchField::Name.as_str(), TEXT);
 
     let schema = schema_builder.build();
