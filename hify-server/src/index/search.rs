@@ -3,7 +3,7 @@ use rayon::iter::{ParallelBridge, ParallelIterator};
 
 use super::{AlbumInfos, ArtistInfos, Index, Track};
 
-pub fn search_index(index: &Index, input: &str) -> IndexSearchResults {
+pub fn search_index(index: &Index, input: &str, limit: usize) -> IndexSearchResults {
     let words: Vec<_> = input
         .split_whitespace()
         .map(str::trim)
@@ -11,15 +11,16 @@ pub fn search_index(index: &Index, input: &str) -> IndexSearchResults {
         .collect();
 
     IndexSearchResults {
-        tracks: search_and_score(index.tracks.values(), &words),
-        albums: search_and_score(index.cache.albums_infos.values(), &words),
-        artists: search_and_score(index.cache.artists_infos.values(), &words),
+        tracks: search_and_score(index.tracks.values(), &words, limit),
+        albums: search_and_score(index.cache.albums_infos.values(), &words, limit),
+        artists: search_and_score(index.cache.artists_infos.values(), &words, limit),
     }
 }
 
 fn search_and_score<'t, T: Clone + Send + Ord + SearchScoring + 't>(
     items: impl Iterator<Item = &'t T> + Send,
     words: &[&str],
+    limit: usize,
 ) -> Vec<T>
 where
     &'t T: Send,
@@ -50,7 +51,11 @@ where
             .then_with(|| a.item.cmp(&b.item))
     });
 
-    items.into_iter().map(|result| result.item).collect()
+    items
+        .into_iter()
+        .map(|result| result.item)
+        .take(limit)
+        .collect()
 }
 
 trait SearchScoring {

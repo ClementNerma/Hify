@@ -102,9 +102,17 @@ impl QueryRoot {
         graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
     }
 
-    async fn search(&self, ctx: &Context<'_>, input: String) -> IndexSearchResults {
+    async fn search(
+        &self,
+        ctx: &Context<'_>,
+        input: String,
+        limit: i32,
+    ) -> Result<IndexSearchResults, String> {
+        let limit =
+            usize::try_from(limit).map_err(|_| "Invalid value provided for parameter 'limit'")?;
+
         let index = graphql_index!(ctx);
-        search_index(&index, &input)
+        Ok(search_index(&index, &input, limit))
     }
 }
 
