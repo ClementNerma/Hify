@@ -317,11 +317,11 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
       break
 
     case 'Home':
-      next = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
+      next = current.parent.navigateToFirstItemDown(NavigationComingFrom.Above)
       break
 
     case 'End':
-      next = state.page.navigateToLastItem()
+      next = current.parent.navigateToLastItem()
       break
 
     default:
