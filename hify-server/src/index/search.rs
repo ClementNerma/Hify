@@ -232,40 +232,52 @@ pub struct IndexSearchResults {
     pub artists: Vec<ArtistID>,
 }
 
-macro_rules! search_fields {
-    ($typename: ident => $($variant: ident),+) => {
-        enum $typename {
-            $($variant),+
+enum TrackSearchField {
+    TrackID,
+    Title,
+    AlbumName,
+    Artists,
+    AlbumArtists,
+}
+
+impl TrackSearchField {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::TrackID => "id",
+            Self::Title => "title",
+            Self::AlbumName => "album",
+            Self::Artists => "artist",
+            Self::AlbumArtists => "albumArtist",
         }
+    }
+}
 
-        impl $typename {
-            fn as_str(&self) -> &'static str {
-                match self {
-                    $(Self::$variant => stringify!($variant)),+
-                }
-            }
+enum AlbumSearchField {
+    AlbumID,
+    Name,
+    Artists,
+}
+
+impl AlbumSearchField {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::AlbumID => "id",
+            Self::Name => "name",
+            Self::Artists => "artist",
         }
-    };
+    }
 }
 
-search_fields! {
-    TrackSearchField =>
-        TrackID,
-        Title,
-        AlbumName,
-        Artists,
-        AlbumArtists
+enum ArtistSearchField {
+    ArtistID,
+    Name,
 }
 
-search_fields! {
-    AlbumSearchField =>
-        AlbumID,
-        Name,
-        Artists
-}
-
-search_fields! {
-    ArtistSearchField =>
-        ArtistID,
-        Name
+impl ArtistSearchField {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Self::ArtistID => "id",
+            Self::Name => "artist",
+        }
+    }
 }
