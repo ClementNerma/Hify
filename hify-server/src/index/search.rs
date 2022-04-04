@@ -38,7 +38,6 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
     schema_builder.add_text_field(TrackSearchField::Title.as_str(), TEXT);
     schema_builder.add_text_field(TrackSearchField::AlbumName.as_str(), TEXT);
     schema_builder.add_text_field(TrackSearchField::Artists.as_str(), TEXT);
-    schema_builder.add_text_field(TrackSearchField::AlbumArtists.as_str(), TEXT);
 
     let schema = schema_builder.build();
 
@@ -53,9 +52,6 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
         .unwrap();
     let artists_field = schema
         .get_field(TrackSearchField::Artists.as_str())
-        .unwrap();
-    let album_artists_field = schema
-        .get_field(TrackSearchField::AlbumArtists.as_str())
         .unwrap();
 
     let mut t_index_writer =
@@ -79,10 +75,6 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
             track_doc.add_text(artists_field, artist.name);
         }
 
-        for album_artist in tags.get_album_artists_infos() {
-            track_doc.add_text(album_artists_field, album_artist.name);
-        }
-
         t_index_writer.add_document(track_doc)?;
     }
 
@@ -91,12 +83,7 @@ fn build_tracks_search_index(index: &Index) -> Result<TantivyIndexAndSchema> {
     Ok(TantivyIndexAndSchema {
         index: t_index,
         id_field,
-        searchable_fields: vec![
-            title_field,
-            album_name_field,
-            artists_field,
-            album_artists_field,
-        ],
+        searchable_fields: vec![title_field, album_name_field, artists_field],
     })
 }
 
@@ -238,7 +225,6 @@ enum TrackSearchField {
     Title,
     AlbumName,
     Artists,
-    AlbumArtists,
 }
 
 impl TrackSearchField {
@@ -248,7 +234,6 @@ impl TrackSearchField {
             Self::Title => "title",
             Self::AlbumName => "album",
             Self::Artists => "artist",
-            Self::AlbumArtists => "albumArtist",
         }
     }
 }
@@ -263,7 +248,7 @@ impl AlbumSearchField {
     fn as_str(self) -> &'static str {
         match self {
             Self::AlbumID => "id",
-            Self::Name => "name",
+            Self::Name => "album",
             Self::Artists => "artist",
         }
     }
