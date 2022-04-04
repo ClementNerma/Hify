@@ -10,6 +10,7 @@
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
 
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
+  import SearchPage from './pages/SearchPage/SearchPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -28,6 +29,14 @@
 
     <Route path="/playing">
       <NowPlaying />
+    </Route>
+
+    <Route path="/search">
+      <SearchPage />
+    </Route>
+
+    <Route path="/search/:terms" let:params>
+      <SearchPage searchTerms={params['terms']} />
     </Route>
 
     <Route>

@@ -1,0 +1,33 @@
+query SearchPage($input: String!, $limit: Int!) {
+  search(input: $input, limit: $limit) {
+    tracks {
+      id
+      metadata {
+        # duration
+        tags {
+          title
+          album {
+            id
+            name
+          }
+          artists {
+            id
+            name
+          }
+        }
+      }
+    }
+    albums {
+      id
+      name
+      albumArtists {
+        id
+        name
+      }
+    }
+    artists {
+      id
+      name
+    }
+  }
+}
