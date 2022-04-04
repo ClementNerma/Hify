@@ -228,7 +228,7 @@ enum TrackSearchField {
 }
 
 impl TrackSearchField {
-    fn as_str(self) -> &'static str {
+    fn as_str(&self) -> &'static str {
         match self {
             Self::TrackID => "id",
             Self::Title => "title",
@@ -245,7 +245,7 @@ enum AlbumSearchField {
 }
 
 impl AlbumSearchField {
-    fn as_str(self) -> &'static str {
+    fn as_str(&self) -> &'static str {
         match self {
             Self::AlbumID => "id",
             Self::Name => "album",
