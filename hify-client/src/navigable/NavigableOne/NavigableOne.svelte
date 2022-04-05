@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
 
-  import { getParentNavigable, setChildrenNavigable } from '../navigation'
+  import { getParentNavigable, NavigableAttachedData, setChildrenNavigable } from '../navigation'
   import { NavigableOne } from './NavigableOne'
 
+  export let data: NavigableAttachedData = null
+
   const nav = getParentNavigable()
-  const row = new NavigableOne(nav)
+  const row = new NavigableOne(nav, data)
 
   nav.append(row)
 

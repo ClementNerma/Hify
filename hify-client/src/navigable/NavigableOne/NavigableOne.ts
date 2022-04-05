@@ -3,10 +3,6 @@ import { Navigable, NavigableContainer, NavigableItem, NavigationComingFrom, Nav
 export class NavigableOne extends NavigableContainer {
   private onlyChild: Navigable | null = null
 
-  constructor(parent: NavigableContainer) {
-    super(parent)
-  }
-
   append(navigable: Navigable): void {
     if (this.onlyChild) {
       throw new Error('Navigable ones can only contain a single navigable')

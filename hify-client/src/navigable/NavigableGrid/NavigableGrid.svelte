@@ -1,14 +1,15 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
 
-  import { getParentNavigable, setChildrenNavigable } from '../navigation'
-  import { NavigableGrid } from './NavigableGrid'
+  import { getParentNavigable, NavigableAttachedData, setChildrenNavigable } from '../navigation'
+  import { NavigableGrid, NavigableGridProps } from './NavigableGrid'
 
-  export let columns: number
-  export let lazy: (() => void) | undefined = undefined
+  export let columns: NavigableGridProps['columns']
+  export let lazyLoader: NavigableGridProps['lazyLoader'] = undefined
+  export let data: NavigableAttachedData = null
 
   const nav = getParentNavigable()
-  const row = new NavigableGrid(nav, columns, lazy)
+  const row = new NavigableGrid(nav, { columns, lazyLoader, attachedData: data })
 
   nav.append(row)
 

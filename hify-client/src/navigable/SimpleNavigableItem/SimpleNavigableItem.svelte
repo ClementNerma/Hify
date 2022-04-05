@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
-  import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
+  import { getParentNavigable, HTMLNavigableItemWrapperElement, NavigableAttachedData } from '../navigation'
   import { onDestroy } from 'svelte'
 
   export let onFocusChange: SimpleNavigableItemProps['onFocusChange'] = undefined
@@ -13,6 +13,8 @@
   export let onLeft: SimpleNavigableItemProps['onLeft'] = undefined
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
+
+  export let attachedData: NavigableAttachedData = null
 
   const nav = getParentNavigable()
 
@@ -38,6 +40,8 @@
 
       return wrapper
     },
+
+    attachedData,
   })
 
   nav.append(item)

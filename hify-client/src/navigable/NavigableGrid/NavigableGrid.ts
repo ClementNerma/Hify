@@ -5,30 +5,31 @@ import {
   NavigationComingFrom,
   NavigationDirection,
   NavigableArrayContainer,
+  NavigableAttachedData,
 } from '../navigation'
 
 export class NavigableGrid extends NavigableContainer {
   private readonly items: Navigable[] = []
   private itemsBeforeLastLazyLoading = 0
 
-  constructor(parent: NavigableContainer, private readonly columns: number, private readonly lazyLoader?: () => void) {
-    super(parent)
+  constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
+    super(parent, props.attachedData)
   }
 
   private _rows() {
-    return new Array(Math.ceil(this.items.length / this.columns))
+    return new Array(Math.ceil(this.items.length / this.props.columns))
       .fill(null)
-      .map((_, i) => this.items.slice(i * this.columns, i * this.columns + this.columns))
+      .map((_, i) => this.items.slice(i * this.props.columns, i * this.props.columns + this.props.columns))
   }
 
   private _lazyLoading() {
-    if (!this.lazyLoader) {
+    if (!this.props.lazyLoader) {
       return
     }
 
     if (this.itemsBeforeLastLazyLoading !== this.items.length) {
       this.itemsBeforeLastLazyLoading = this.items.length
-      this.lazyLoader()
+      this.props.lazyLoader()
     }
   }
 
@@ -61,17 +62,17 @@ export class NavigableGrid extends NavigableContainer {
 
     switch (direction) {
       case NavigationDirection.Up: {
-        const rowIndex = Math.floor(itemIndex / this.columns)
+        const rowIndex = Math.floor(itemIndex / this.props.columns)
 
         if (rowIndex === 0) {
           break
         }
 
-        return rows[rowIndex - 1][itemIndex % this.columns].navigateToFirstItemDown(NavigationComingFrom.Below)
+        return rows[rowIndex - 1][itemIndex % this.props.columns].navigateToFirstItemDown(NavigationComingFrom.Below)
       }
 
       case NavigationDirection.Down: {
-        const rowIndex = Math.floor(itemIndex / this.columns)
+        const rowIndex = Math.floor(itemIndex / this.props.columns)
 
         // Required to trigger lazy loader when either:
         // * We navigate to the last row from the above one
@@ -85,7 +86,7 @@ export class NavigableGrid extends NavigableContainer {
         }
 
         const newRow = rows[rowIndex + 1]
-        const newItemIndex = Math.min(itemIndex % this.columns, newRow.length - 1)
+        const newItemIndex = Math.min(itemIndex % this.props.columns, newRow.length - 1)
 
         return newRow[newItemIndex].navigateToFirstItemDown(NavigationComingFrom.Above)
       }
@@ -101,8 +102,8 @@ export class NavigableGrid extends NavigableContainer {
         }
 
         const sliced = isLeft
-          ? row.slice(0, itemIndex % this.columns).reverse()
-          : row.slice((itemIndex % this.columns) + 1)
+          ? row.slice(0, itemIndex % this.props.columns).reverse()
+          : row.slice((itemIndex % this.props.columns) + 1)
 
         for (const colItem of sliced) {
           const item = colItem.navigateToFirstItemDown(isLeft ? NavigationComingFrom.Right : NavigationComingFrom.Left)
@@ -154,4 +155,10 @@ export class NavigableGrid extends NavigableContainer {
     this._lazyLoading()
     return NavigableArrayContainer.navigateToLastItem(this.items)
   }
+}
+
+export type NavigableGridProps = {
+  columns: number
+  lazyLoader?: () => void
+  attachedData: NavigableAttachedData
 }
