@@ -6,7 +6,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "compile": "cross-env NODE_ENV=production vite build",
     "check": "svelte-check --human && tsc --noEmit",
     "watch:svelte": "svelte-check --human --watch",

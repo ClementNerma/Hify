@@ -4,3 +4,5 @@
 /src/**/*.generated.ts
 
 /.pnpm-debug.log
+
+.env.*
