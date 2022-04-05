@@ -19,11 +19,11 @@
   }
 
   function onLeft() {
-    onChange(Math.max(getValue() - 1, 0))
+    onChange(Math.max(getValue() - 5, 0))
   }
 
   function onRight() {
-    onChange(Math.min(getValue() + 1, max))
+    onChange(Math.min(getValue() + 5, max))
   }
 </script>
 
