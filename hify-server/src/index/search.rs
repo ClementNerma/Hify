@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, io::Write};
 
 use async_graphql::SimpleObject;
 use rayon::iter::{ParallelBridge, ParallelIterator};
@@ -21,6 +21,9 @@ pub fn search_index(
         .collect();
 
     if let Some(cached) = search_cache.get(&words) {
+        println!("|> Served cached search results.");
+        std::io::stdout().flush().unwrap();
+
         return cached.clone();
     }
 
@@ -36,6 +39,12 @@ pub fn search_index(
     }
 
     search_cache.insert(words, results.clone());
+
+    println!(
+        "|> Search cache now contains {} entries.",
+        search_cache.len()
+    );
+    std::io::stdout().flush().unwrap();
 
     results
 }
