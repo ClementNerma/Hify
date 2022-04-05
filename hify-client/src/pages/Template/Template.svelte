@@ -76,6 +76,7 @@
   }
 
   :global(navigable-item-wrapper.focused :first-child, navigable-item-wrapper:hover :first-child) {
+    outline: none;
     background-color: pink;
     border: 3px solid pink;
     border-radius: 5px;
