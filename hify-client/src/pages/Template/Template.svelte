@@ -8,7 +8,7 @@
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
   import { logVerbose } from '../../stores/audio/debugger'
-  import { toggleAudioPlayback } from '../../stores/audio/store'
+  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio/store'
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -28,6 +28,18 @@
           navigate(ROUTES.nowPlaying)
         }
 
+        break
+
+      case 'MediaPlayPause':
+        toggleAudioPlayback()
+        break
+
+      case 'MediaRewind':
+        setPlayingAudioProgressRelative(-10)
+        break
+
+      case 'MediaFastForward':
+        setPlayingAudioProgressRelative(+10)
         break
 
       default:
