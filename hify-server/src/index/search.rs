@@ -40,9 +40,12 @@ pub fn search_index(
 
     search_cache.insert(words, results.clone());
 
+    let fill_percent = search_cache.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
+
     println!(
-        "|> Search cache now contains {} entries.",
-        search_cache.len()
+        "|> Search cache now contains {} entries ({:.1}% of total capacity).",
+        search_cache.len(),
+        fill_percent
     );
     std::io::stdout().flush().unwrap();
 
