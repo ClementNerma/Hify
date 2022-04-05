@@ -41,6 +41,6 @@
 
   .tab {
     padding: 5px 25px;
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
 </style>

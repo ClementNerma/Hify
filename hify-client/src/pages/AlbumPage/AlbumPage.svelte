@@ -35,7 +35,7 @@
   <NavigableList>
     <div class="album-header">
       <div class="album-art">
-        <img width={250} height={250} src={getAlbumArtUri(albumId)} alt={album.name} />
+        <img width={150} height={150} src={getAlbumArtUri(albumId)} alt={album.name} />
       </div>
       <div class="album-infos">
         <div class="album-name">{album.name}</div>
@@ -89,6 +89,8 @@
   .album-header {
     display: flex;
     flex-direction: row;
+    width: 90%;
+    margin-left: 5%;
   }
 
   .album-infos {
@@ -98,21 +100,20 @@
 
   .album-name {
     font-weight: bold;
-    font-size: 3em;
+    font-size: 2em;
   }
 
   .album-artist {
-    font-size: 2em;
-    padding: 7px;
+    font-size: 1.5rem;
   }
 
   .album-genre {
-    font-size: 1em;
+    font-size: 0.75rem;
     padding: 7px;
   }
 
   .album-year {
-    font-size: 1.5em;
+    font-size: 1rem;
     padding: 7px;
   }
 

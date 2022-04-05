@@ -37,8 +37,8 @@
       <div class="container">
         <div class="album-art">
           <img
-            width={500}
-            height={500}
+            width={250}
+            height={250}
             src={getAlbumArtUri(track.metadata.tags.album.id)}
             alt={track.metadata.tags.album.name}
           />
@@ -118,20 +118,21 @@
   .no-track-infos {
     margin-top: 25%;
     text-align: center;
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .album-art {
     position: fixed;
-    top: calc(35% - 500px / 2);
-    left: calc(50% - 500px / 2);
+    top: calc(35% - 250px / 2);
+    left: calc(50% - 250px / 2);
   }
 
   .track-infos {
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: calc(35% + 500px / 2);
+    top: calc(35% + 250px / 2);
+    padding: 10px;
     width: 100%;
     text-align: center;
   }
@@ -145,11 +146,11 @@
   }
 
   .track-name {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .track-album-name {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
   .track-album-year {
@@ -158,14 +159,14 @@
   }
 
   .track-artists {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
   .player-bottom {
     position: fixed;
-    bottom: 10%;
-    left: calc(50% - 500px / 2);
-    width: 500px;
+    bottom: 5%;
+    left: 25%;
+    width: 50%;
   }
 
   .progress-range,

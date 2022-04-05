@@ -11,7 +11,7 @@
 
 <SimpleNavigableItem {onPress} {onLongPress}>
   <div class="card" on:click={onPress}>
-    <img width={250} height={250} src={pictureUrl} alt={pictureAlt} />
+    <img width={150} height={150} src={pictureUrl} alt={pictureAlt} />
     <div class="title">{title}</div>
     <div class="subtitle">{subtitle}</div>
   </div>

@@ -45,7 +45,7 @@
 {:then _}
   <h2>Albums ({albums.length})</h2>
 
-  <Grid columns={6} lazyLoader={feedMore}>
+  <Grid columns={5} lazyLoader={feedMore}>
     {#each albums as album}
       <AlbumCard {album} />
     {/each}
