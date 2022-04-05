@@ -28,7 +28,7 @@
 
     onUnfocus: () => {
       focused = false
-      onFocus?.()
+      onUnfocus?.()
     },
 
     onPress,
