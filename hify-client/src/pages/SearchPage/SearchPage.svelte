@@ -23,7 +23,9 @@
       return
     }
 
-    logInfo('Performing search: ' + searchTerms)
+    logInfo(`Performing search "${searchTerms}"...`)
+    const start = Date.now()
+
     const res = await AsyncSearchPage({
       variables: {
         limit: MAX_RESULTS_PER_CATEGORY,
@@ -32,7 +34,8 @@
     })
 
     results = res.data.search
-    logInfo('Performed search: ' + searchTerms)
+
+    logInfo(`Received results for search "${searchTerms}" in ${Date.now() - start} ms.`)
   }
 
   if (searchTerms.length > 0) {
