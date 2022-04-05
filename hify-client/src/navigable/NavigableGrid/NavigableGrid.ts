@@ -84,7 +84,10 @@ export class NavigableGrid extends NavigableContainer {
           break
         }
 
-        return rows[rowIndex + 1][itemIndex % this.columns].navigateToFirstItemDown(NavigationComingFrom.Above)
+        const newRow = rows[rowIndex + 1]
+        const newItemIndex = Math.min(itemIndex % this.columns, newRow.length - 1)
+
+        return newRow[newItemIndex].navigateToFirstItemDown(NavigationComingFrom.Above)
       }
 
       case NavigationDirection.Left:
