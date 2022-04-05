@@ -2,7 +2,7 @@ import { derived, get, writable } from 'svelte/store'
 import { AlbumYearStrategy } from '../../graphql/types'
 import { getStreamUri } from '../../rest-api'
 import { AsyncAudioTrack, AudioTrackQuery } from './AudioTrack.generated'
-import { logInfo, logVerbose, logWarn } from './debugger'
+import { logInfo, logDebug, logWarn } from './debugger'
 
 type AudioPlayingState = {
   htmlEl: HTMLAudioElement
@@ -73,7 +73,7 @@ export function setPlayingAudioProgress(seconds: number) {
 
   playing.htmlEl.currentTime = seconds
 
-  logVerbose(`Set audio progress: ${humanReadableAudioProgress(seconds)}s`)
+  logDebug(`Set audio progress: ${humanReadableAudioProgress(seconds)}s`)
 }
 
 export function setPlayingAudioProgressRelative(relativeSeconds: number) {
@@ -86,7 +86,7 @@ export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 
   playing.htmlEl.currentTime += relativeSeconds
 
-  logVerbose(`Set relative audio progress: ${relativeSeconds}s`)
+  logDebug(`Set relative audio progress: ${relativeSeconds}s`)
 }
 
 export function toggleAudioPlayback() {

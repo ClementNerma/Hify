@@ -7,14 +7,14 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
-  import { logVerbose } from '../../stores/audio/debugger'
+  import { logDebug } from '../../stores/audio/debugger'
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio/store'
 
   const navigate = useNavigate()
   const location = useLocation()
 
   function onKeyDown(e: KeyboardEvent) {
-    logVerbose(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
+    logDebug(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
 
     if (e.ctrlKey || e.altKey || e.shiftKey) {
       return
