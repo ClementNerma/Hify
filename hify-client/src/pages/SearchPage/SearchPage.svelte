@@ -1,6 +1,5 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
-  import { writable } from 'svelte/store'
 
   import { SearchPageQuery } from '../../graphql/types'
 
@@ -9,7 +8,7 @@
   import CardRow from '../../organisms/CardRow/CardRow.svelte'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
-  import { logInfo, logWarn } from '../../stores/audio/debugger'
+  import { logInfo } from '../../stores/audio/debugger'
   import { playTrack } from '../../stores/audio/store'
   import { AsyncSearchPage } from './SearchPage.generated'
 
@@ -25,8 +24,18 @@
     }
 
     logInfo(`Performing search "${searchTerms}"...`)
+    const start = Date.now()
 
-    pendingRequest = { started: Date.now(), searchTerms }
+    const res = await AsyncSearchPage({
+      variables: {
+        limit: MAX_RESULTS_PER_CATEGORY,
+        input: searchTerms,
+      },
+    })
+
+    results = res.data.search
+
+    logInfo(`Received results for search "${searchTerms}" in ${Date.now() - start} ms.`)
   }
 
   if (searchTerms.length > 0) {
@@ -34,40 +43,8 @@
   }
 
   let results: SearchPageQuery['search'] | null = null
-  let pendingRequest: { started: number; searchTerms: string } | null = null
 
   let searchField: HTMLInputElement
-
-  const loadingMarker = writable<HTMLElement | null>()
-
-  loadingMarker.subscribe(async (val) => {
-    if (val === null) {
-      return
-    }
-
-    if (!pendingRequest) {
-      return logWarn('Loading marker was set but no request is pending')
-    }
-
-    const befReq = Date.now()
-
-    const res = await AsyncSearchPage({
-      variables: {
-        limit: MAX_RESULTS_PER_CATEGORY,
-        input: pendingRequest.searchTerms,
-      },
-    })
-
-    results = res.data.search
-
-    logInfo(
-      `Received results for search "${searchTerms}" in ${Date.now() - befReq} ms (+ ${
-        befReq - pendingRequest.started
-      }ms of lifecycle overhead).`,
-    )
-
-    pendingRequest = null
-  })
 </script>
 
 <div class="search-container">
@@ -83,19 +60,18 @@
   </SimpleNavigableItem>
 </div>
 
-{#if pendingRequest !== null}
-  <h2 bind:this={$loadingMarker}>Loading...</h2>
-{:else if results}
+{#if results}
   <h2>Tracks ({results.tracks.length})</h2>
 
   <CardRow
     items={results.tracks.map(({ id, metadata: { tags } }) => ({
+      _key: id,
       title: tags.title,
       subtitle: `${tags.album.name} - ${tags.artists.map((artist) => artist.name).join(' / ')}`,
       pictureUrl: getAlbumArtUri(tags.album.id),
       pictureAlt: tags.album.name,
-      onPress: () => playTrack(id),
-      onLongPress: () => alert('TODO: context menu for playing options'),
+      onPress: (id) => playTrack(id),
+      onLongPress: (id) => alert('TODO: context menu for playing options'),
     }))}
   />
 
@@ -103,12 +79,13 @@
 
   <CardRow
     items={results.albums.map((album) => ({
+      _key: album.id,
       title: album.name,
       subtitle: album.albumArtists.map((artist) => artist.name).join(' / '),
       pictureUrl: getAlbumArtUri(album.id),
       pictureAlt: 'Album art',
-      onPress: () => navigate(ROUTES.album(album.id)),
-      onLongPress: () => alert('TODO: context menu for playing options'),
+      onPress: (id) => navigate(ROUTES.album(id)),
+      onLongPress: (id) => alert('TODO: context menu for playing options'),
     }))}
   />
 
@@ -116,12 +93,13 @@
 
   <CardRow
     items={results.artists.map((artist) => ({
+      _key: artist.id,
       title: artist.name,
       subtitle: '',
       pictureUrl: 'TODO: get picture of first album? and if zero first participation in album?',
       pictureAlt: 'Album art',
-      onPress: () => navigate(ROUTES.artist(artist.id)),
-      onLongPress: () => alert('TODO: context menu for playing options'),
+      onPress: (id) => navigate(ROUTES.artist(id)),
+      onLongPress: (id) => alert('TODO: context menu for playing options'),
     }))}
   />
 {/if}
