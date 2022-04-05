@@ -1,4 +1,6 @@
 <script lang="ts">
+  import './Template.css'
+
   import { useLocation, useNavigate } from 'svelte-navigator'
   import { ROUTES } from '../../routes'
 
@@ -68,17 +70,3 @@
     </NavigableList>
   </NavigableWithHandlers>
 </NavigablePage>
-
-<style>
-  :global(navigable-item-wrapper :first-child) {
-    border: 3px solid transparent;
-    cursor: pointer;
-  }
-
-  :global(navigable-item-wrapper.focused :first-child, navigable-item-wrapper:hover :first-child) {
-    outline: none;
-    background-color: pink;
-    border: 3px solid pink;
-    border-radius: 5px;
-  }
-</style>

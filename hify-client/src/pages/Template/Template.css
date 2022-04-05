@@ -1,0 +1,16 @@
+body {
+    background-color: lightgray;
+    overflow: hidden;
+}
+
+navigable-item-wrapper :first-child {
+    border: 3px solid transparent;
+    cursor: pointer;
+}
+
+navigable-item-wrapper.focused :first-child, navigable-item-wrapper:hover :first-child {
+    outline: none;
+    background-color: pink;
+    border: 3px solid pink;
+    border-radius: 5px;
+}
