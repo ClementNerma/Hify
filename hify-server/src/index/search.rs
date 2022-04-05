@@ -68,21 +68,19 @@ impl SearchScoring for Track {
 
         let tags = &self.metadata.tags;
 
-        if let Some(title) = &tags.title {
-            if title.contains(word) {
-                score += word.len() * 10;
-            }
+        if tags.title.contains(word) {
+            score += word.len() * 10;
         }
 
-        if let Some(album_infos) = tags.get_album_infos() {
-            if album_infos.name.contains(word) {
-                score += word.len() * 3;
-            }
+        let album_infos = tags.get_album_infos();
 
-            for artist in album_infos.album_artists {
-                if artist.name.contains(word) {
-                    score += word.len();
-                }
+        if album_infos.name.contains(word) {
+            score += word.len() * 3;
+        }
+
+        for artist in album_infos.album_artists {
+            if artist.name.contains(word) {
+                score += word.len();
             }
         }
 

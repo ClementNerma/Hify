@@ -247,11 +247,6 @@ fn build_index_cache(
 ) -> IndexCache {
     let mut tracks_formats = HashMap::new();
 
-    let mut no_title_tracks = HashSet::new();
-    let mut no_album_tracks = HashSet::new();
-    let mut no_album_artist_tracks = HashSet::new();
-    let mut no_genre_tracks = HashSet::new();
-
     let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut artists_tracks = HashMap::<ArtistID, Vec<TrackID>>::new();
     let mut albums_artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
@@ -262,63 +257,50 @@ fn build_index_cache(
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
     let mut genres_tracks = HashMap::new();
+    let mut no_genre_tracks = HashSet::new();
 
     for track in tracks.values() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
 
         let tags = &track.metadata.tags;
 
-        if tags.title.is_none() {
-            no_title_tracks.insert(track.id.clone());
+        let album_infos = tags.get_album_infos();
+        let album_id = album_infos.get_id();
+
+        albums_infos.insert(album_id.clone(), album_infos.clone());
+
+        for album_artist_infos in tags.get_album_artists_infos() {
+            albums_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
+
+            albums_artists_albums
+                .entry(album_artist_infos.get_id())
+                .or_default()
+                .insert(album_infos.clone());
         }
 
-        if tags.album.is_none() {
-            no_album_tracks.insert(track.id.clone());
-        }
+        for artist_infos in tags
+            .get_album_artists_infos()
+            .chain(tags.get_artists_infos())
+        {
+            let artist_id = artist_infos.get_id();
 
-        if tags.album_artists.is_empty() {
-            no_album_artist_tracks.insert(track.id.clone());
-        }
+            artists_infos.insert(artist_id.clone(), artist_infos.clone());
 
-        if let Some(album_infos) = tags.get_album_infos() {
-            let album_id = album_infos.get_id();
+            artists_albums
+                .entry(artist_id.clone())
+                .or_default()
+                .insert(album_infos.clone());
 
-            albums_infos.insert(album_id.clone(), album_infos.clone());
-
-            for album_artist_infos in tags.get_album_artists_infos() {
-                albums_artists_infos
-                    .insert(album_artist_infos.get_id(), album_artist_infos.clone());
-
-                albums_artists_albums
-                    .entry(album_artist_infos.get_id())
-                    .or_default()
-                    .insert(album_infos.clone());
-            }
-
-            for artist_infos in tags
-                .get_album_artists_infos()
-                .chain(tags.get_artists_infos())
-            {
-                let artist_id = artist_infos.get_id();
-
-                artists_infos.insert(artist_id.clone(), artist_infos.clone());
-
-                artists_albums
-                    .entry(artist_id.clone())
-                    .or_default()
-                    .insert(album_infos.clone());
-
-                artists_tracks
-                    .entry(artist_id.clone())
-                    .or_default()
-                    .push(track.id.clone());
-            }
-
-            albums_tracks
-                .entry(album_id.clone())
+            artists_tracks
+                .entry(artist_id.clone())
                 .or_default()
                 .push(track.id.clone());
         }
+
+        albums_tracks
+            .entry(album_id.clone())
+            .or_default()
+            .push(track.id.clone());
 
         if track.metadata.tags.genres.is_empty() {
             no_genre_tracks.insert(track.id.clone());
@@ -368,11 +350,6 @@ fn build_index_cache(
     IndexCache {
         tracks_paths,
 
-        no_title_tracks,
-        no_album_tracks,
-        no_album_artist_tracks,
-        no_genre_tracks,
-
         artists_albums,
         artists_tracks,
 
@@ -384,5 +361,6 @@ fn build_index_cache(
         albums_infos: SortedMap::from_hashmap(albums_infos),
 
         genres_tracks,
+        no_genre_tracks,
     }
 }

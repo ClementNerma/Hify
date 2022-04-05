@@ -33,10 +33,6 @@
       <div class="container">
         <h2 class="no-track-infos">Playing track was not found in API :(</h2>
       </div>
-    {:else if !track.metadata.tags.album}
-      <div class="container">
-        <h2 class="no-album-track">Tracks without album are currently unsupported in the player :(</h2>
-      </div>
     {:else}
       <div class="container">
         <div class="album-art">
@@ -119,8 +115,7 @@
 
   .no-playing,
   .loading,
-  .no-track-infos,
-  .no-album-track {
+  .no-track-infos {
     margin-top: 25%;
     text-align: center;
     font-size: 3rem;

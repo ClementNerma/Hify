@@ -134,7 +134,7 @@ impl Track {
 
 #[ComplexObject]
 impl TrackTags {
-    async fn album(&self) -> Option<AlbumInfos> {
+    async fn album(&self) -> AlbumInfos {
         self.get_album_infos()
     }
 

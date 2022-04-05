@@ -117,7 +117,7 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
         .collect::<BTreeMap<_, _>>();
 
     Ok(TrackTags {
-        title: tags.remove("title"),
+        title: tags.remove("title").ok_or("Missing 'title' tag")?,
 
         artists: tags
             .remove("artist")
@@ -129,7 +129,7 @@ fn parse_ffprobe_tags(mut tags: FFProbeTags) -> Result<TrackTags, String> {
             .map(parse_array_tag)
             .unwrap_or_default(),
 
-        album: tags.remove("album"),
+        album: tags.remove("album").ok_or("Missing 'album' tag")?,
 
         album_artists: tags
             .remove("album_artist")

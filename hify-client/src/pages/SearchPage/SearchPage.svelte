@@ -50,12 +50,10 @@
 
   <CardRow
     items={results.tracks.map(({ id, metadata: { tags } }) => ({
-      title: tags.title ?? '<no title>',
-      subtitle: tags.album
-        ? `${tags.album.name} - ${tags.artists.map((artist) => artist.name).join(' / ')}`
-        : `<unknown album>`,
-      pictureUrl: tags.album ? getAlbumArtUri(tags.album.id) : 'TODO',
-      pictureAlt: 'Album art',
+      title: tags.title,
+      subtitle: `${tags.album.name} - ${tags.artists.map((artist) => artist.name).join(' / ')}`,
+      pictureUrl: getAlbumArtUri(tags.album.id),
+      pictureAlt: tags.album.name,
       onPress: () => playTrack(id),
       onLongPress: () => alert('TODO: context menu for playing options'),
     }))}

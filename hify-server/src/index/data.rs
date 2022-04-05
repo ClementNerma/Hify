@@ -24,11 +24,6 @@ pub struct Index {
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
-    pub no_title_tracks: HashSet<TrackID>,
-    pub no_album_tracks: HashSet<TrackID>,
-    pub no_album_artist_tracks: HashSet<TrackID>,
-    pub no_genre_tracks: HashSet<TrackID>,
-
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
@@ -41,6 +36,7 @@ pub struct IndexCache {
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
 
     pub genres_tracks: HashMap<String, TrackID>,
+    pub no_genre_tracks: HashSet<TrackID>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -156,7 +152,7 @@ pub struct TrackMetadata {
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct TrackTags {
-    pub title: Option<String>,
+    pub title: String,
 
     #[graphql(skip)]
     pub artists: Vec<String>,
@@ -164,7 +160,7 @@ pub struct TrackTags {
     pub composers: Vec<String>,
 
     #[graphql(skip)]
-    pub album: Option<String>,
+    pub album: String,
 
     #[graphql(skip)]
     pub album_artists: Vec<String>,
@@ -178,11 +174,8 @@ pub struct TrackTags {
 }
 
 impl TrackTags {
-    pub fn get_album_infos(&self) -> Option<AlbumInfos> {
-        Some(AlbumInfos::new(
-            self.album.as_ref()?.clone(),
-            self.get_album_artists_infos().collect(),
-        ))
+    pub fn get_album_infos(&self) -> AlbumInfos {
+        AlbumInfos::new(self.album.clone(), self.get_album_artists_infos().collect())
     }
 
     pub fn get_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
