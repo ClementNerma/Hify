@@ -15,6 +15,7 @@
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
 
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
+  import DevToolsPage from './pages/DevToolsPage/DevToolsPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -45,6 +46,10 @@
 
     <Route path={ROUTES.searchTerms(':terms')} let:params>
       <SearchPage searchTerms={params['terms']} />
+    </Route>
+
+    <Route path={ROUTES.devTools}>
+      <DevToolsPage />
     </Route>
 
     <Route>

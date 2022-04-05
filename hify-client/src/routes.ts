@@ -6,4 +6,5 @@ export const ROUTES = {
   nowPlaying: '/playing',
   search: '/search',
   searchTerms: (terms: string) => '/search/' + encodeURIComponent(terms),
+  devTools: '/dev',
 }

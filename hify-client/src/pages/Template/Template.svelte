@@ -7,11 +7,14 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
+  import { log } from '../../stores/audio/debugger'
 
   const navigate = useNavigate()
   const location = useLocation()
 
   function onKeyDown(e: KeyboardEvent) {
+    log(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
+
     if (e.ctrlKey || e.altKey || e.shiftKey) {
       return
     }
@@ -40,6 +43,7 @@
           { label: 'Albums', uri: ROUTES.albums },
           { label: 'Search', uri: ROUTES.search },
           { label: 'Now Playing', uri: ROUTES.nowPlaying },
+          { label: 'Dev Tools', uri: ROUTES.devTools },
         ]}
       />
 
