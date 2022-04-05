@@ -34,7 +34,7 @@
 {#await feedMore()}
   <h2>Loading...</h2>
 {:then _}
-  <Grid columns={6} lazy={feedMore}>
+  <Grid columns={6} lazyLoader={feedMore}>
     {#each albums as album}
       <AlbumCard {album} />
     {/each}
