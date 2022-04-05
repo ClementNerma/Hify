@@ -30,6 +30,8 @@ export function playTrack(trackId: string) {
       prevAudio.htmlEl.pause()
     }
 
+    logInfo('Started playing track ID: ' + trackId)
+
     const newAudio = new Audio(getStreamUri(trackId))
     newAudio
       .play()
