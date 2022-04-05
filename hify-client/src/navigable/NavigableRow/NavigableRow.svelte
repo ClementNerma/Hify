@@ -4,10 +4,10 @@
   import { getParentNavigable, NavigableAttachedData, setChildrenNavigable } from '../navigation'
   import { NavigableRow } from './NavigableRow'
 
-  export let data: NavigableAttachedData = null
+  export let attachedData: NavigableAttachedData = null
 
   const nav = getParentNavigable()
-  const row = new NavigableRow(nav, data)
+  const row = new NavigableRow(nav, attachedData)
 
   nav.append(row)
 

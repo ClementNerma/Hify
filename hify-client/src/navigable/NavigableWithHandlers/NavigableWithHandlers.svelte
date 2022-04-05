@@ -1,17 +1,17 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
 
-  import { getParentNavigable, NavigableAttachedData, setChildrenNavigable } from '../navigation'
+  import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
 
   export let onPress: NavigableWithHandlersProps['onPress'] = undefined
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
   export let onBack: NavigableWithHandlersProps['onBack'] = undefined
 
-  export let data: NavigableAttachedData = null
+  export let attachedData: NavigableWithHandlersProps['attachedData'] = null
 
   const nav = getParentNavigable()
-  const row = new NavigableWithHandlers(nav, { onPress, onLongPress, onBack, attachedData: data })
+  const row = new NavigableWithHandlers(nav, { onPress, onLongPress, onBack, attachedData })
 
   nav.append(row)
 

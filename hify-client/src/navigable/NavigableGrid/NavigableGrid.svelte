@@ -6,10 +6,10 @@
 
   export let columns: NavigableGridProps['columns']
   export let lazyLoader: NavigableGridProps['lazyLoader'] = undefined
-  export let data: NavigableAttachedData = null
+  export let attachedData: NavigableAttachedData = null
 
   const nav = getParentNavigable()
-  const row = new NavigableGrid(nav, { columns, lazyLoader, attachedData: data })
+  const row = new NavigableGrid(nav, { columns, lazyLoader, attachedData: attachedData })
 
   nav.append(row)
 

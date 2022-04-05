@@ -4,10 +4,10 @@
   import { getParentNavigable, NavigableAttachedData, setChildrenNavigable } from '../navigation'
   import { NavigableList } from './NavigableList'
 
-  export let data: NavigableAttachedData = null
+  export let attachedData: NavigableAttachedData = null
 
   const nav = getParentNavigable()
-  const list = new NavigableList(nav, data)
+  const list = new NavigableList(nav, attachedData)
 
   nav.append(list)
 
