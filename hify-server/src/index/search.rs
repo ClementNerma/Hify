@@ -7,6 +7,7 @@ pub fn search_index(index: &Index, input: &str, limit: usize) -> IndexSearchResu
     let words: Vec<_> = input
         .split_whitespace()
         .map(str::trim)
+        .map(str::to_lowercase)
         .filter(|str| !str.is_empty())
         .collect();
 
@@ -19,7 +20,7 @@ pub fn search_index(index: &Index, input: &str, limit: usize) -> IndexSearchResu
 
 fn search_and_score<'t, T: Clone + Send + Ord + SearchScoring + 't>(
     items: impl Iterator<Item = &'t T> + Send,
-    words: &[&str],
+    words: &[String],
     limit: usize,
 ) -> Vec<T>
 where
@@ -68,18 +69,18 @@ impl SearchScoring for Track {
 
         let tags = &self.metadata.tags;
 
-        if tags.title.contains(word) {
+        if tags.title.to_lowercase().contains(word) {
             score += word.len() * 10;
         }
 
         let album_infos = tags.get_album_infos();
 
-        if album_infos.name.contains(word) {
+        if album_infos.name.to_lowercase().contains(word) {
             score += word.len() * 3;
         }
 
         for artist in album_infos.album_artists {
-            if artist.name.contains(word) {
+            if artist.name.to_lowercase().contains(word) {
                 score += word.len();
             }
         }
@@ -92,12 +93,12 @@ impl SearchScoring for AlbumInfos {
     fn compute_word_scoring(&self, word: &str) -> usize {
         let mut score = 0;
 
-        if self.name.contains(word) {
+        if self.name.to_lowercase().contains(word) {
             score += word.len() * 10;
         }
 
         for artist in &self.album_artists {
-            if artist.name.contains(word) {
+            if artist.name.to_lowercase().contains(word) {
                 score += word.len();
             }
         }
@@ -108,7 +109,7 @@ impl SearchScoring for AlbumInfos {
 
 impl SearchScoring for ArtistInfos {
     fn compute_word_scoring(&self, word: &str) -> usize {
-        if self.name.contains(word) {
+        if self.name.to_lowercase().contains(word) {
             word.len() * 10
         } else {
             0
