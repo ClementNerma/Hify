@@ -106,9 +106,10 @@
 
   .search {
     border: none;
+    border-radius: 10px;
     outline: none;
     width: 33%;
-    padding: 20px;
-    font-size: 2rem;
+    padding: 12px;
+    font-size: 1.2rem;
   }
 </style>
