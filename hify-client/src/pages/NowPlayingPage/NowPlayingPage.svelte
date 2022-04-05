@@ -14,6 +14,7 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
+  import { ROUTES } from '../../routes'
 
   const navigate = useNavigate()
 </script>
@@ -51,7 +52,7 @@
           <div class="track-album-infos">
             <!-- TODO: find a fix for this check -->
             <SimpleNavigableItem
-              onPress={() => track.metadata.tags.album && navigate('/album/' + track.metadata.tags.album.id)}
+              onPress={() => track.metadata.tags.album && navigate(ROUTES.album(track.metadata.tags.album.id))}
             >
               <div class="track-album-name">
                 {track.metadata.tags.album.name ?? '<unknown album>'}

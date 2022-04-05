@@ -11,31 +11,32 @@
 
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
+  import { ROUTES } from './routes'
 </script>
 
 <Router primary={false}>
   <Template>
-    <Route path="/">
+    <Route path={ROUTES.home}>
       <Home />
     </Route>
 
-    <Route path="/albums">
+    <Route path={ROUTES.albums}>
       <AlbumsPage />
     </Route>
 
-    <Route path="/album/:id" let:params>
+    <Route path={ROUTES.album(':id')} let:params>
       <AlbumPage albumId={params['id']} />
     </Route>
 
-    <Route path="/playing">
+    <Route path={ROUTES.nowPlaying}>
       <NowPlaying />
     </Route>
 
-    <Route path="/search">
+    <Route path={ROUTES.search}>
       <SearchPage />
     </Route>
 
-    <Route path="/search/:terms" let:params>
+    <Route path={ROUTES.searchTerms(':terms')} let:params>
       <SearchPage searchTerms={params['terms']} />
     </Route>
 

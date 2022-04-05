@@ -1,5 +1,7 @@
 <script lang="ts">
   import { useLocation, useNavigate } from 'svelte-navigator'
+  import { ROUTES } from '../../routes'
+
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigablePage from '../../navigable/NavigablePage/NavigablePage.svelte'
 
@@ -14,10 +16,10 @@
     }
 
     if (e.key === 'Tab') {
-      if ($location.pathname === '/playing') {
+      if ($location.pathname === ROUTES.nowPlaying) {
         navigate(-1)
       } else {
-        navigate('/playing')
+        navigate(ROUTES.nowPlaying)
       }
 
       e.preventDefault()

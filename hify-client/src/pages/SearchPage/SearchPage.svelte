@@ -1,14 +1,13 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
 
-  import { HtmlTag, toggle_class } from 'svelte/internal'
   import { SearchPageQuery } from '../../graphql/types'
-  import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import CardRow from '../../organisms/CardRow/CardRow.svelte'
   import { getAlbumArtUri } from '../../rest-api'
+  import { ROUTES } from '../../routes'
   import { playTrack } from '../../stores/audio/store'
   import { AsyncSearchPage } from './SearchPage.generated'
 
@@ -70,7 +69,7 @@
       subtitle: album.albumArtists.map((artist) => artist.name).join(' / '),
       pictureUrl: getAlbumArtUri(album.id),
       pictureAlt: 'Album art',
-      onPress: () => navigate('/album/' + album.id),
+      onPress: () => navigate(ROUTES.album(album.id)),
       onLongPress: () => alert('TODO: context menu for playing options'),
     }))}
   />

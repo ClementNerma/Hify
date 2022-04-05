@@ -2,6 +2,7 @@
   import { useNavigate } from 'svelte-navigator'
   import { AlbumInfos, ArtistInfos } from '../../graphql/types'
   import { getAlbumArtUri } from '../../rest-api'
+import { ROUTES } from '../../routes';
   import Card from '../Card/Card.svelte'
 
   export let album: Pick<AlbumInfos, 'id' | 'name'> & {
@@ -14,7 +15,7 @@
 <Card
   title={album.name}
   subtitle={album.albumArtists.map((artist) => artist.name).join(', ')}
-  onPress={() => navigate('/album/' + album.id)}
+  onPress={() => navigate(ROUTES.album(album.id))}
   pictureUrl={getAlbumArtUri(album.id)}
   pictureAlt={album.name}
 />
