@@ -10,7 +10,7 @@ export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
     super(parent)
 
-    if (props.hasFocusPriority !== undefined && props.focuser === undefined) {
+    if (props.hasFocusPriority && !props.focuser) {
       throw new Error('Cannot provide a focus priority indicator without a focuser!')
     }
   }
@@ -90,7 +90,7 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 
   hasFocusPriority(): boolean | null {
-    return this.props.hasFocusPriority ?? null
+    return this.props.hasFocusPriority?.() ?? null
   }
 }
 
@@ -111,5 +111,5 @@ export type SimpleNavigableItemProps = {
   getUnderlyingElement: () => HTMLNavigableItemWrapperElement
 
   focuser?: NavigableContainer
-  hasFocusPriority?: boolean
+  hasFocusPriority?: () => boolean
 }
