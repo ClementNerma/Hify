@@ -82,7 +82,7 @@
       subtitle: '',
       pictureUrl: 'TODO: get picture of first album? and if zero first participation in album?',
       pictureAlt: 'Album art',
-      onPress: () => alert("TODO: navigate to artist's page"),
+      onPress: () => navigate(ROUTES.artist(artist.id)),
       onLongPress: () => alert('TODO: context menu for playing options'),
     }))}
   />

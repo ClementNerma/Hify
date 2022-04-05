@@ -65,7 +65,7 @@
           <div class="track-artists">
             <NavigableRow>
               {#each track.metadata.tags.album.albumArtists as albumArtist}
-                <SimpleNavigableItem onPress={() => alert("TODO: go to artist's page: " + albumArtist.name)}>
+                <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
                   <span class="album-artist">
                     {albumArtist.name}
                   </span>

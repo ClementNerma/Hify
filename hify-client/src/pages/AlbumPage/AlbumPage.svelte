@@ -8,6 +8,8 @@
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { navigate } from 'svelte-navigator'
+  import { ROUTES } from '../../routes'
 
   export let albumId: string
 
@@ -40,7 +42,7 @@
         <div class="album-artists">
           <NavigableRow>
             {#each album.albumArtists as albumArtist}
-              <SimpleNavigableItem onPress={() => alert("TODO: go to artist's page: " + albumArtist.name)}>
+              <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
                 <span class="album-artist">
                   {albumArtist.name}
                 </span>

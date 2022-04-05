@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Router, Route } from 'svelte-navigator'
+  import { ROUTES } from './routes'
 
   import Template from './pages/Template/Template.svelte'
   import NotFound from './pages/NotFoundPage/NotFoundPage.svelte'
@@ -7,11 +8,13 @@
   import Home from './pages/HomePage/HomePage.svelte'
 
   import AlbumsPage from './pages/AlbumsPage/AlbumsPage.svelte'
+
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
+  import ArtistPage from './pages/ArtistPage/ArtistPage.svelte'
 
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
+
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
-  import { ROUTES } from './routes'
 </script>
 
 <Router primary={false}>
@@ -26,6 +29,10 @@
 
     <Route path={ROUTES.album(':id')} let:params>
       <AlbumPage albumId={params['id']} />
+    </Route>
+
+    <Route path={ROUTES.artist(':id')} let:params>
+      <ArtistPage artistId={params['id']} />
     </Route>
 
     <Route path={ROUTES.nowPlaying}>

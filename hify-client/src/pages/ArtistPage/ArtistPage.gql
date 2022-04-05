@@ -1,0 +1,24 @@
+query ArtistPage($artistId: String!, $pagination: PaginationInput!, $strategy: AlbumYearStrategy!) {
+  artist(id: $artistId) {
+    name
+    albumParticipations(pagination: $pagination) {
+      edges {
+        node {
+          id
+          name
+          hasArtImage
+          genres
+          year(strategy: $strategy)
+          albumArtists {
+            id
+            name
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}
