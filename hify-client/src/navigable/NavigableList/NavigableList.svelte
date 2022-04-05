@@ -14,4 +14,4 @@
   onDestroy(() => nav.remove(list))
 </script>
 
-<slot />
+<slot nav={list} />

@@ -18,4 +18,4 @@
   onDestroy(() => nav.remove(row))
 </script>
 
-<slot />
+<slot nav={row} />

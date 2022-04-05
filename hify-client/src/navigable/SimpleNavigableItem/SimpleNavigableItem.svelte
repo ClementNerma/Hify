@@ -14,6 +14,9 @@
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
 
+  export let focuser: SimpleNavigableItemProps['focuser'] = undefined
+  export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = undefined
+
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
@@ -38,11 +41,18 @@
 
       return wrapper
     },
+
+    focuser,
+    hasFocusPriority,
   })
 
   nav.append(item)
+  focuser?.registerPriorityFocus(item)
 
-  onDestroy(() => nav.remove(item))
+  onDestroy(() => {
+    nav.remove(item)
+    focuser?.registerPriorityFocus(item)
+  })
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean
@@ -54,7 +64,7 @@
   bind:this={wrapper}
   class:focused
 >
-  <slot />
+  <slot {item} />
 </navigable-item-wrapper>
 
 <!-- Removed as "display: contents;" removes the ability to use .scrollIntoView() -->

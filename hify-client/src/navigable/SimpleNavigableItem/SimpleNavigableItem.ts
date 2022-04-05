@@ -9,6 +9,10 @@ import {
 export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
     super(parent)
+
+    if (props.hasFocusPriority !== undefined && props.focuser === undefined) {
+      throw new Error('Cannot provide a focus priority indicator without a focuser!')
+    }
   }
 
   underlyingElement(): HTMLNavigableItemWrapperElement {
@@ -84,6 +88,10 @@ export class SimpleNavigableItem extends NavigableItem {
   onUnfocus(): void {
     this.props.onFocusChange?.(false)
   }
+
+  hasFocusPriority(): boolean | null {
+    return this.props.hasFocusPriority ?? null
+  }
 }
 
 export type SimpleNavigableItemCallback = () => NavigableItem | null | void
@@ -101,4 +109,7 @@ export type SimpleNavigableItemProps = {
   onDown?: SimpleNavigableItemCallback
 
   getUnderlyingElement: () => HTMLNavigableItemWrapperElement
+
+  focuser?: NavigableContainer
+  hasFocusPriority?: boolean
 }

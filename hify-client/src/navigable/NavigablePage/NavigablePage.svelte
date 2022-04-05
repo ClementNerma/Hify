@@ -14,4 +14,4 @@
 
 <svelte:window on:keydown={handleWindowKeyEvent} />
 
-<slot />
+<slot pageNav={page} />

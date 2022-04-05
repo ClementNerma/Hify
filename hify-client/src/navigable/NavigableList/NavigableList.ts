@@ -69,9 +69,18 @@ export class NavigableList extends NavigableArrayContainer {
     let tries: Navigable[]
 
     switch (from) {
-      case NavigationComingFrom.Above:
       case NavigationComingFrom.Left:
       case NavigationComingFrom.Right:
+        const prio = this.getPriorityFocusItem()
+
+        if (prio) {
+          return prio
+        }
+
+        tries = this.rows
+        break
+
+      case NavigationComingFrom.Above:
         tries = this.rows
         break
 

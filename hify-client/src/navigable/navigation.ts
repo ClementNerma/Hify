@@ -38,10 +38,30 @@ export abstract class NavigableCommon {
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
+  readonly priorityFocusables: NavigableItem[] = []
+
   abstract append(navigable: Navigable): void
   abstract hasChild(child: Navigable): boolean
   abstract remove(child: Navigable): void
   abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
+
+  registerPriorityFocus(item: NavigableItem): void {
+    this.priorityFocusables.push(item)
+  }
+
+  unregisterPriorityFocus(item: NavigableItem): void {
+    const index = this.priorityFocusables.indexOf(item)
+
+    if (index === -1) {
+      throw new Error('Tried to remove a focusable item which is not registered in this navigable container')
+    }
+
+    this.priorityFocusables.splice(index, 1)
+  }
+
+  getPriorityFocusItem(): NavigableItem | null {
+    return this.priorityFocusables.find((item) => item.hasFocusPriority()) ?? null
+  }
 
   canHandleAction(_: NavigationAction): boolean {
     return false
@@ -81,6 +101,8 @@ export abstract class NavigableItem extends NavigableCommon {
   abstract onFocus(): void
   abstract onUnfocus(): void
 
+  abstract hasFocusPriority(): boolean | null
+
   navigateToFirstItemDown(_: NavigationComingFrom): NavigableItem {
     return this
   }
@@ -100,14 +122,25 @@ export abstract class NavigableItem extends NavigableCommon {
   }
 }
 
-class NavigablePage {
+interface _NavigableContainerLike extends NavigableContainer {
+  readonly identity: symbol
+
+  // Required to ensure compatibility
+  asContainer(): NavigableContainer
+}
+
+class NavigablePage implements _NavigableContainerLike {
   readonly identity = Symbol()
   readonly page: NavigablePage
+  readonly priorityFocusables: NavigableItem[] = []
 
   private onlyChild: Navigable | null = null
 
   constructor(private readonly onRequestFocus: (item: NavigableItem) => void) {
     this.page = this
+  }
+  getPriorityFocusItem(): NavigableItem | null {
+    throw new Error('Method not implemented.')
   }
 
   get parent(): NavigableContainer {
@@ -158,7 +191,14 @@ class NavigablePage {
     throw new Error('Tried to make the navigable page component handle an action')
   }
 
-  // Required to ensure compatibility with the parent class even without inheritance
+  registerPriorityFocus(_: NavigableItem): void {
+    throw new Error('Cannot register an item as focusable with priority from the page itself')
+  }
+
+  unregisterPriorityFocus(_: NavigableItem): void {
+    throw new Error('Cannot unregister a focusable with priority item from the page itself')
+  }
+
   asContainer(): NavigableContainer {
     return this
   }

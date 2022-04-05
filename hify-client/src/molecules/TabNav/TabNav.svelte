@@ -6,20 +6,25 @@
 </script>
 
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { useLocation, useNavigate } from 'svelte-navigator'
 
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   export let tabs: Tab[]
 </script>
 
 <div class="container">
-  <NavigableRow>
+  <NavigableRow let:nav={focuser}>
     {#each tabs as tab}
-      <SimpleNavigableItem onPress={() => navigate(tab.uri)}>
+      <SimpleNavigableItem
+        onPress={() => navigate(tab.uri)}
+        hasFocusPriority={$location.pathname === tab.uri}
+        {focuser}
+      >
         <div class="tab">{tab.label}</div>
       </SimpleNavigableItem>
     {/each}
