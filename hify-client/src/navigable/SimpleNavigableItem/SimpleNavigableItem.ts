@@ -82,11 +82,11 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 
   onFocus(): void {
-    this.props.onFocusChange?.(true)
+    this.props.onFocus?.()
   }
 
   onUnfocus(): void {
-    this.props.onFocusChange?.(false)
+    this.props.onUnfocus?.()
   }
 
   hasFocusPriority(): boolean | null {
@@ -97,7 +97,8 @@ export class SimpleNavigableItem extends NavigableItem {
 export type SimpleNavigableItemCallback = () => NavigableItem | null | void
 
 export type SimpleNavigableItemProps = {
-  onFocusChange?: (hasFocus: boolean) => void
+  onFocus?: () => void
+  onUnfocus?: () => void
 
   onPress?: SimpleNavigableItemCallback
   onLongPress?: SimpleNavigableItemCallback

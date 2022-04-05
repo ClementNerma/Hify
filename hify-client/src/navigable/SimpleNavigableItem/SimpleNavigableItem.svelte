@@ -3,7 +3,8 @@
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { onDestroy } from 'svelte'
 
-  export let onFocusChange: SimpleNavigableItemProps['onFocusChange'] = undefined
+  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
+  export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
 
   export let onPress: SimpleNavigableItemProps['onPress'] = undefined
   export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined
@@ -20,9 +21,14 @@
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
-    onFocusChange: (has) => {
-      focused = has
-      onFocusChange?.(has)
+    onFocus: () => {
+      focused = true
+      onFocus?.()
+    },
+
+    onUnfocus: () => {
+      focused = false
+      onFocus?.()
     },
 
     onPress,
