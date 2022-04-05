@@ -135,6 +135,7 @@ impl Ord for Track {
         a_tags
             .get_album_infos()
             .cmp(&b_tags.get_album_infos())
+            .then_with(|| a_tags.disc.cmp(&b_tags.disc))
             .then_with(|| a_tags.track_no.cmp(&b_tags.track_no))
             .then_with(|| self.path.cmp(&other.path))
     }
