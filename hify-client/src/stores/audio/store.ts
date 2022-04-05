@@ -75,7 +75,7 @@ export function setPlayingAudioProgress(seconds: number) {
 
   playing.htmlEl.currentTime = seconds
 
-  logDebug(`Set audio progress: ${humanReadableAudioProgress(seconds)}s`)
+  logDebug(`Set audio progress: ${humanReadableDuration(seconds)}s`)
 }
 
 export function setPlayingAudioProgressRelative(relativeSeconds: number) {
@@ -112,7 +112,7 @@ export function toggleAudioPlayback() {
   }
 }
 
-export function humanReadableAudioProgress(seconds: number): string {
+export function humanReadableDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
   seconds -= hours * 3600
 

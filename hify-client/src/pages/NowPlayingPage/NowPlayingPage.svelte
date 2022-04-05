@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAlbumArtUri } from '../../rest-api'
   import {
-    humanReadableAudioProgress,
+    humanReadableDuration,
     readableAudioPaused,
     readableAudioPlaying,
     readableAudioProgress,
@@ -92,10 +92,11 @@
             </div>
             <div class="current-time">
               {#if $readableAudioProgress}
-                {humanReadableAudioProgress($readableAudioProgress)}
+                {humanReadableDuration($readableAudioProgress)}
               {:else}
                 --:--:--
               {/if}
+              / {humanReadableDuration(track.metadata.duration)}
             </div>
           </div>
         </div>
