@@ -21,13 +21,11 @@ export enum NavigationComingFrom {
   Above,
 }
 
-export type NavigableAttachedData = string | symbol | null
-
 export abstract class NavigableCommon {
   readonly identity: symbol
   readonly page: NavigablePage
 
-  constructor(readonly parent: NavigableContainer, readonly attachedData: NavigableAttachedData) {
+  constructor(readonly parent: NavigableContainer) {
     this.identity = parent.identity
     this.page = parent.page
   }
@@ -105,7 +103,6 @@ export abstract class NavigableItem extends NavigableCommon {
 class NavigablePage {
   readonly identity = Symbol()
   readonly page: NavigablePage
-  readonly attachedData: NavigableAttachedData = null
 
   private onlyChild: Navigable | null = null
 

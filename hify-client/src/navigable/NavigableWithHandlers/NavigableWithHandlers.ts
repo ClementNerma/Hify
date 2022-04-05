@@ -1,6 +1,5 @@
 import {
   Navigable,
-  NavigableAttachedData,
   NavigableContainer,
   NavigableItem,
   NavigationAction,
@@ -12,15 +11,13 @@ export type NavigableWithHandlersProps = {
   onPress?: () => NavigableItem | null | void
   onLongPress?: () => NavigableItem | null | void
   onBack?: () => NavigableItem | null | void
-
-  attachedData: NavigableAttachedData
 }
 
 export class NavigableWithHandlers extends NavigableContainer {
   private onlyChild: Navigable | null = null
 
   constructor(parent: NavigableContainer, private readonly props: NavigableWithHandlersProps) {
-    super(parent, props.attachedData)
+    super(parent)
   }
 
   append(navigable: Navigable): void {

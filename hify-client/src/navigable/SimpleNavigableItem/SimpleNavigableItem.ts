@@ -2,14 +2,13 @@ import {
   HTMLNavigableItemWrapperElement,
   NavigableContainer,
   NavigableItem,
-  NavigableAttachedData,
   NavigationAction,
   NavigationDirection,
 } from '../navigation'
 
 export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
-    super(parent, props.attachedData)
+    super(parent)
   }
 
   underlyingElement(): HTMLNavigableItemWrapperElement {
@@ -102,6 +101,4 @@ export type SimpleNavigableItemProps = {
   onDown?: SimpleNavigableItemCallback
 
   getUnderlyingElement: () => HTMLNavigableItemWrapperElement
-
-  attachedData: NavigableAttachedData
 }

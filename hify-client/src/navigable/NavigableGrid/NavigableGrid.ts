@@ -5,7 +5,6 @@ import {
   NavigationComingFrom,
   NavigationDirection,
   NavigableArrayContainer,
-  NavigableAttachedData,
 } from '../navigation'
 
 export class NavigableGrid extends NavigableContainer {
@@ -13,7 +12,7 @@ export class NavigableGrid extends NavigableContainer {
   private itemsBeforeLastLazyLoading = 0
 
   constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
-    super(parent, props.attachedData)
+    super(parent)
   }
 
   private _rows() {
@@ -160,5 +159,4 @@ export class NavigableGrid extends NavigableContainer {
 export type NavigableGridProps = {
   columns: number
   lazyLoader?: () => void
-  attachedData: NavigableAttachedData
 }

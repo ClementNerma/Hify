@@ -8,10 +8,8 @@
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
   export let onBack: NavigableWithHandlersProps['onBack'] = undefined
 
-  export let attachedData: NavigableWithHandlersProps['attachedData'] = null
-
   const nav = getParentNavigable()
-  const row = new NavigableWithHandlers(nav, { onPress, onLongPress, onBack, attachedData })
+  const row = new NavigableWithHandlers(nav, { onPress, onLongPress, onBack })
 
   nav.append(row)
 

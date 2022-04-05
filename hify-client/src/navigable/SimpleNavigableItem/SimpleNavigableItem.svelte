@@ -14,8 +14,6 @@
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
 
-  export let attachedData: SimpleNavigableItemProps['attachedData'] = null
-
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
@@ -40,8 +38,6 @@
 
       return wrapper
     },
-
-    attachedData,
   })
 
   nav.append(item)
