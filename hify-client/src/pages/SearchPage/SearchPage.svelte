@@ -1,5 +1,6 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
+  import { writable } from 'svelte/store'
 
   import { SearchPageQuery } from '../../graphql/types'
 
@@ -8,7 +9,7 @@
   import CardRow from '../../organisms/CardRow/CardRow.svelte'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
-  import { logInfo } from '../../stores/audio/debugger'
+  import { logInfo, logWarn } from '../../stores/audio/debugger'
   import { playTrack } from '../../stores/audio/store'
   import { AsyncSearchPage } from './SearchPage.generated'
 
@@ -24,18 +25,8 @@
     }
 
     logInfo(`Performing search "${searchTerms}"...`)
-    const start = Date.now()
 
-    const res = await AsyncSearchPage({
-      variables: {
-        limit: MAX_RESULTS_PER_CATEGORY,
-        input: searchTerms,
-      },
-    })
-
-    results = res.data.search
-
-    logInfo(`Received results for search "${searchTerms}" in ${Date.now() - start} ms.`)
+    pendingRequest = { started: Date.now(), searchTerms }
   }
 
   if (searchTerms.length > 0) {
@@ -43,8 +34,40 @@
   }
 
   let results: SearchPageQuery['search'] | null = null
+  let pendingRequest: { started: number; searchTerms: string } | null = null
 
   let searchField: HTMLInputElement
+
+  const loadingMarker = writable<HTMLElement | null>()
+
+  loadingMarker.subscribe(async (val) => {
+    if (val === null) {
+      return
+    }
+
+    if (!pendingRequest) {
+      return logWarn('Loading marker was set but no request is pending')
+    }
+
+    const befReq = Date.now()
+
+    const res = await AsyncSearchPage({
+      variables: {
+        limit: MAX_RESULTS_PER_CATEGORY,
+        input: pendingRequest.searchTerms,
+      },
+    })
+
+    results = res.data.search
+
+    logInfo(
+      `Received results for search "${searchTerms}" in ${Date.now() - befReq} ms (+ ${
+        befReq - pendingRequest.started
+      }ms of lifecycle overhead).`,
+    )
+
+    pendingRequest = null
+  })
 </script>
 
 <div class="search-container">
@@ -60,7 +83,9 @@
   </SimpleNavigableItem>
 </div>
 
-{#if results}
+{#if pendingRequest !== null}
+  <h2 bind:this={$loadingMarker}>Loading...</h2>
+{:else if results}
   <h2>Tracks ({results.tracks.length})</h2>
 
   <CardRow
