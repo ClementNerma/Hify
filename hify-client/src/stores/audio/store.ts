@@ -25,7 +25,9 @@ export const readableAudioPaused = derived(audioPaused, (_) => _)
 
 export function playTrack(trackId: string) {
   audioPlaying.update((prevAudio): AudioPlayingState => {
-    prevAudio?.htmlEl.pause()
+    if (prevAudio && !prevAudio.htmlEl.paused) {
+      prevAudio.htmlEl.pause()
+    }
 
     const newAudio = new Audio(getStreamUri(trackId))
     newAudio
