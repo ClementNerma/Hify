@@ -6,6 +6,7 @@
   import NavigablePage from '../../navigable/NavigablePage/NavigablePage.svelte'
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import TavNav from '../../molecules/TabNav/TavNav.svelte'
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -33,6 +34,15 @@
 <NavigablePage {onKeyDown}>
   <NavigableWithHandlers onBack={() => navigate(-1)}>
     <NavigableList>
+      <TavNav
+        tabs={[
+          { label: 'Home', uri: ROUTES.home },
+          { label: 'Albums', uri: ROUTES.albums },
+          { label: 'Search', uri: ROUTES.search },
+          { label: 'Now Playing', uri: ROUTES.nowPlaying },
+        ]}
+      />
+
       <slot />
     </NavigableList>
   </NavigableWithHandlers>
