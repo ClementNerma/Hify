@@ -7,30 +7,35 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
-  import { log } from '../../stores/audio/debugger'
+  import { logVerbose } from '../../stores/audio/debugger'
+  import { toggleAudioPlayback } from '../../stores/audio/store'
 
   const navigate = useNavigate()
   const location = useLocation()
 
   function onKeyDown(e: KeyboardEvent) {
-    log(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
+    logVerbose(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
 
     if (e.ctrlKey || e.altKey || e.shiftKey) {
       return
     }
 
-    if (e.key === 'Tab') {
-      if ($location.pathname === ROUTES.nowPlaying) {
-        navigate(-1)
-      } else {
-        navigate(ROUTES.nowPlaying)
-      }
+    switch (e.key) {
+      case 'Tab':
+        if ($location.pathname === ROUTES.nowPlaying) {
+          navigate(-1)
+        } else {
+          navigate(ROUTES.nowPlaying)
+        }
 
-      e.preventDefault()
-      return false
+        break
+
+      default:
+        return
     }
 
-    return
+    e.preventDefault()
+    return false
   }
 </script>
 

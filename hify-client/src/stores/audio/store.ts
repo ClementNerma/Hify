@@ -2,6 +2,7 @@ import { derived, get, writable } from 'svelte/store'
 import { AlbumYearStrategy } from '../../graphql/types'
 import { getStreamUri } from '../../rest-api'
 import { AsyncAudioTrack, AudioTrackQuery } from './AudioTrack.generated'
+import { logWarn } from './debugger'
 
 type AudioPlayingState = {
   htmlEl: HTMLAudioElement
@@ -66,7 +67,7 @@ export function setPlayingAudioProgress(seconds: number) {
   const playing = get(audioPlaying)
 
   if (!playing) {
-    console.warn('Tried to set audio progress while no audio is playing')
+    logWarn('Tried to set audio progress while no audio is playing')
     return
   }
 
@@ -77,7 +78,7 @@ export function toggleAudioPlayback() {
   const playing = get(audioPlaying)
 
   if (!playing) {
-    console.warn('Tried to toggle audio playback while no audio is playing')
+    logWarn('Tried to toggle audio playback while no audio is playing')
     return
   }
 

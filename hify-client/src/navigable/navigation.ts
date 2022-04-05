@@ -1,5 +1,6 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
+import { logWarn } from '../stores/audio/debugger'
 
 export enum NavigationDirection {
   Up,
@@ -270,11 +271,11 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
 
   if (__current) {
     if (__current.identity !== state.page.identity) {
-      console.warn('Previously-focused element has a different identity than the current page, removing focus')
+      logWarn('Previously-focused element has a different identity than the current page, removing focus')
       __current.onUnfocus()
       __current = null
     } else if (wasNavigableDestroyed(__current)) {
-      console.warn('Previously-focused element was destroyed, removing focus')
+      logWarn('Previously-focused element was destroyed, removing focus')
       __current.onUnfocus()
       __current = null
     }
@@ -286,7 +287,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
     __current = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
 
     if (!__current) {
-      console.warn('No navigable item in this page')
+      logWarn('No navigable item in this page')
       return
     }
 
@@ -397,12 +398,12 @@ function _getParentsWithItem(item: NavigableItem): Navigable[] {
 
 function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
   if (item.identity !== page.identity) {
-    console.warn('Previously-focused element has a different identity than the current page, removing focus')
+    logWarn('Previously-focused element has a different identity than the current page, removing focus')
     item.onUnfocus()
     return false
   }
   if (wasNavigableDestroyed(item)) {
-    console.warn('Previously-focused element was destroyed, removing focus')
+    logWarn('Previously-focused element was destroyed, removing focus')
     item.onUnfocus()
     return false
   }

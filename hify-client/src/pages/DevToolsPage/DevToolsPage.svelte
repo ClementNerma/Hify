@@ -11,6 +11,24 @@
 
 <ul>
   {#each $appLogs as logEntry}
-    <li><strong>{logEntry.at.toLocaleDateString()}</strong>: {logEntry.message}</li>
+    <li class="log-entry {logEntry.level}">
+      <u>{logEntry.level.toLocaleUpperCase()}</u>
+      <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
+    </li>
   {/each}
 </ul>
+
+<style>
+  .log-entry.info {
+    background-color: lightblue;
+  }
+
+  .log-entry.warn {
+    background-color: yellow;
+  }
+
+  .log-entry.error {
+    background-color: red;
+    color: white;
+  }
+</style>
