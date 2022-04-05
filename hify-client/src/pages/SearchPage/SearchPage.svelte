@@ -8,6 +8,7 @@
   import CardRow from '../../organisms/CardRow/CardRow.svelte'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
+  import { logInfo } from '../../stores/audio/debugger'
   import { playTrack } from '../../stores/audio/store'
   import { AsyncSearchPage } from './SearchPage.generated'
 
@@ -22,6 +23,7 @@
       return
     }
 
+    logInfo('Performing search: ' + searchTerms)
     const res = await AsyncSearchPage({
       variables: {
         limit: MAX_RESULTS_PER_CATEGORY,
@@ -30,6 +32,7 @@
     })
 
     results = res.data.search
+    logInfo('Performed search: ' + searchTerms)
   }
 
   if (searchTerms.length > 0) {
@@ -37,11 +40,20 @@
   }
 
   let results: SearchPageQuery['search'] | null = null
+
+  let searchField: HTMLInputElement
 </script>
 
 <div class="search-container">
-  <SimpleNavigableItem>
-    <input class="search" type="text" bind:value={searchTerms} on:change={onChange} />
+  <SimpleNavigableItem onPress={() => searchField.focus()} onUnfocus={() => searchField.blur()}>
+    <input
+      class="search"
+      type="text"
+      bind:this={searchField}
+      bind:value={searchTerms}
+      on:input={onChange}
+      on:change={onChange}
+    />
   </SimpleNavigableItem>
 </div>
 
