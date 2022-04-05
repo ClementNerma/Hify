@@ -22,7 +22,7 @@
     {#each tabs as tab}
       <SimpleNavigableItem
         onPress={() => navigate(tab.uri)}
-        hasFocusPriority={$location.pathname === tab.uri}
+        hasFocusPriority={() => $location.pathname === tab.uri}
         {focuser}
       >
         <div class="tab">{tab.label}</div>
