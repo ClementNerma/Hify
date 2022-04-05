@@ -1,9 +1,18 @@
+use std::collections::HashMap;
+
 use async_graphql::SimpleObject;
 use rayon::iter::{ParallelBridge, ParallelIterator};
 
 use super::{AlbumInfos, ArtistInfos, Index, Track};
 
-pub fn search_index(index: &Index, input: &str, limit: usize) -> IndexSearchResults {
+static SEARCH_CACHE_CAPACITY: usize = 100;
+
+pub fn search_index(
+    index: &Index,
+    search_cache: &mut SearchCache,
+    input: &str,
+    limit: usize,
+) -> IndexSearchResults {
     let words: Vec<_> = input
         .split_whitespace()
         .map(str::trim)
@@ -11,11 +20,24 @@ pub fn search_index(index: &Index, input: &str, limit: usize) -> IndexSearchResu
         .filter(|str| !str.is_empty())
         .collect();
 
-    IndexSearchResults {
+    if let Some(cached) = search_cache.get(&words) {
+        return cached.clone();
+    }
+
+    let results = IndexSearchResults {
         tracks: search_and_score(index.tracks.values(), &words, limit),
         albums: search_and_score(index.cache.albums_infos.values(), &words, limit),
         artists: search_and_score(index.cache.artists_infos.values(), &words, limit),
+    };
+
+    if search_cache.len() == SEARCH_CACHE_CAPACITY {
+        let key = search_cache.keys().next().unwrap().clone();
+        search_cache.remove(&key);
     }
+
+    search_cache.insert(words, results.clone());
+
+    results
 }
 
 fn search_and_score<'t, T: Clone + Send + Ord + SearchScoring + 't>(
@@ -122,9 +144,11 @@ struct SearchResult<T> {
     score: usize,
 }
 
-#[derive(SimpleObject)]
+#[derive(SimpleObject, Clone)]
 pub struct IndexSearchResults {
     pub tracks: Vec<Track>,
     pub albums: Vec<AlbumInfos>,
     pub artists: Vec<ArtistInfos>,
 }
+
+pub type SearchCache = HashMap<Vec<String>, IndexSearchResults>;

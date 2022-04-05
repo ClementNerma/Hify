@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Enum, Object, Result, SimpleObject};
 
 use crate::{
-    graphql_index,
+    graphql_ctx_member, graphql_index,
     index::{
         search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexSearchResults, SortedMap,
         Track, TrackID, TrackTags,
@@ -112,7 +112,9 @@ impl QueryRoot {
             usize::try_from(limit).map_err(|_| "Invalid value provided for parameter 'limit'")?;
 
         let index = graphql_index!(ctx);
-        Ok(search_index(&index, &input, limit))
+        let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
+
+        Ok(search_index(&index, &mut search_cache, &input, limit))
     }
 }
 
