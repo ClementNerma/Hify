@@ -116,6 +116,7 @@
 
   .track-name {
     font-size: 2rem;
+    padding: 10px;
   }
 
   .track-album-name {
