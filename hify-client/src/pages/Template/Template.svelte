@@ -9,7 +9,7 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
-  import { logDebug } from '../../stores/audio/debugger'
+  import { logDebug } from '../../stores/debugger'
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio/store'
 
   const navigate = useNavigate()

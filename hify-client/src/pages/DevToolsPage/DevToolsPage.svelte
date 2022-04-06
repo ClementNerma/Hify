@@ -1,6 +1,6 @@
 <script lang="ts">
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { appLogs } from '../../stores/audio/debugger'
+  import { appLogs } from '../../stores/debugger'
 
   $: slicedAppLogs = $appLogs.slice(0, 100)
 </script>

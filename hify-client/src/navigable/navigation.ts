@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { logWarn } from '../stores/audio/debugger'
+import { logWarn } from '../stores/debugger'
 
 export enum NavigationDirection {
   Up,

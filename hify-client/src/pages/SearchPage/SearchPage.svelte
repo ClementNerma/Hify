@@ -8,7 +8,7 @@
   import CardRow from '../../organisms/CardRow/CardRow.svelte'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
-  import { logInfo } from '../../stores/audio/debugger'
+  import { logInfo } from '../../stores/debugger'
   import { playTrack } from '../../stores/audio/store'
   import { AsyncSearchPage } from './SearchPage.generated'
 

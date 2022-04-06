@@ -2,7 +2,7 @@ import { derived, get, writable } from 'svelte/store'
 import { AlbumYearStrategy } from '../../graphql/types'
 import { getStreamUri } from '../../rest-api'
 import { AsyncAudioTrack, AudioTrackQuery } from './AudioTrack.generated'
-import { logInfo, logDebug, logWarn } from './debugger'
+import { logInfo, logDebug, logWarn } from '../debugger'
 
 type AudioPlayingState = {
   htmlEl: HTMLAudioElement
