@@ -79,8 +79,4 @@ export class NavigableList extends NavigableArrayContainer {
 
     return null
   }
-
-  children(): Navigable[] {
-    return this.items
-  }
 }

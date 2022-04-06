@@ -31,14 +31,6 @@ export class NavigableGrid extends NavigableArrayContainer {
     }
   }
 
-  children(): Navigable[] {
-    return this.items
-  }
-
-  hasFocusPriority(): boolean {
-    return this.props.hasFocusPriority?.() ?? false
-  }
-
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
     const itemIndex = this.items.indexOf(focusedChild)
 
