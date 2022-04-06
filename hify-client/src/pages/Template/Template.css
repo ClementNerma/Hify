@@ -25,8 +25,24 @@ navigable-item-wrapper :first-child:not(input) {
 navigable-item-wrapper.focused :first-child:not(input),
 navigable-item-wrapper:hover :first-child:not(input) {
     outline: none;
-    border-radius: 5px;
     
     color: black;
     background-color: white;
+}
+
+navigable-item-wrapper.focused :first-child:not(input, tr, td),
+navigable-item-wrapper:hover :first-child:not(input, tr, td) {
+    border-radius: 5px;
+}
+
+navigable-item-wrapper.focused tr td:first-child,
+navigable-item-wrapper:hover tr td:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+navigable-item-wrapper.focused tr td:last-child,
+navigable-item-wrapper:hover tr td:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
