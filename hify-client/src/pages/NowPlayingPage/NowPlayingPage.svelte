@@ -37,9 +37,6 @@
         <div class="track-album-name">
           <span class="emoji">💿</span>
           {album.name}
-          {#if album.year}
-            <span class="track-album-year">({album.year})</span>
-          {/if}
         </div>
       </SimpleNavigableItem>
     </div>
@@ -55,6 +52,14 @@
         {/each}
       </NavigableRow>
     </div>
+    {#if tags.date}
+      <div class="track-date" item-like-style>
+        <span class="emoji">🕒</span>
+        {tags.date.year}{tags.date.month ? `-${tags.date.month}` : ''}{tags.date.day
+          ? `${tags.date.month ? '' : '??'}-${tags.date.day}`
+          : ''}
+      </div>
+    {/if}
   </div>
 
   <div class="player-bottom">
@@ -110,6 +115,7 @@
     top: calc(35% - 250px / 2);
     left: calc(5% + 250px);
     width: 100%;
+    font-size: 1.2rem;
   }
 
   .track-infos * {
@@ -129,17 +135,8 @@
     padding: 25px;
   }
 
-  .track-album-name {
-    font-size: 1.2rem;
-  }
-
-  .track-album-year {
-    vertical-align: middle;
-    font-size: 0.6rem;
-  }
-
-  .track-artists {
-    font-size: 1.2rem;
+  .track-date {
+    padding: 5px 10px;
   }
 
   .player-bottom {

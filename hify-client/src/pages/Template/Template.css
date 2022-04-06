@@ -17,7 +17,8 @@ body {
     background-attachment: fixed;
 }
 
-navigable-item-wrapper :first-child:not(input) {
+navigable-item-wrapper :first-child:not(input),
+[item-like-style] :first-child {
     padding: 5px 10px;
     cursor: pointer;
 }

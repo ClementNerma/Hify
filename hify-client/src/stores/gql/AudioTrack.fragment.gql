@@ -24,6 +24,11 @@ fragment AudioTrack on Track {
       disc
       trackNo
       genres
+      date {
+        year
+        month
+        day
+      }
     }
   }
 }
