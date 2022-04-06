@@ -26,7 +26,11 @@ export abstract class NavigableCommon {
   readonly identity: symbol
   readonly page: NavigablePage
 
-  constructor(readonly parent: NavigableContainer, readonly position: number | null) {
+  constructor(
+    readonly parent: NavigableContainer,
+    readonly position: number | null,
+    readonly hasFocusPriority: (() => boolean) | null,
+  ) {
     this.identity = parent.identity
     this.page = parent.page
   }
@@ -39,32 +43,12 @@ export abstract class NavigableCommon {
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
-  readonly priorityFocusables: NavigableItem[] = []
-
   abstract get ordered(): boolean
 
   abstract append(navigable: Navigable): void
   abstract hasChild(child: Navigable): boolean
   abstract remove(child: Navigable): void
   abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
-
-  registerPriorityFocus(item: NavigableItem): void {
-    this.priorityFocusables.push(item)
-  }
-
-  unregisterPriorityFocus(item: NavigableItem): void {
-    const index = this.priorityFocusables.indexOf(item)
-
-    if (index === -1) {
-      throw new Error('Tried to remove a focusable item which is not registered in this navigable container')
-    }
-
-    this.priorityFocusables.splice(index, 1)
-  }
-
-  getPriorityFocusItem(): NavigableItem | null {
-    return this.priorityFocusables.find((item) => item.hasFocusPriority()) ?? null
-  }
 
   canHandleAction(_: NavigationAction): boolean {
     return false
@@ -80,6 +64,10 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
 
   get ordered(): boolean {
     return this.items.length > 0 ? this.items[0].position !== null : false
+  }
+
+  protected getFocusPriority(): Navigable | null {
+    return this.items.find((item) => item.hasFocusPriority && item.hasFocusPriority()) ?? null
   }
 
   append(navigable: Navigable): void {
@@ -134,8 +122,6 @@ export abstract class NavigableItem extends NavigableCommon {
   abstract onFocus(): void
   abstract onUnfocus(): void
 
-  abstract hasFocusPriority(): boolean | null
-
   navigateToFirstItemDown(_: NavigationComingFrom): NavigableItem {
     return this
   }
@@ -173,9 +159,6 @@ class NavigablePage implements _NavigableContainerLike {
 
   constructor(private readonly onRequestFocus: (item: NavigableItem) => void) {
     this.page = this
-  }
-  getPriorityFocusItem(): NavigableItem | null {
-    throw new Error('Method not implemented.')
   }
 
   get parent(): NavigableContainer {
@@ -226,12 +209,8 @@ class NavigablePage implements _NavigableContainerLike {
     throw new Error('Tried to make the navigable page component handle an action')
   }
 
-  registerPriorityFocus(_: NavigableItem): void {
-    throw new Error('Cannot register an item as focusable with priority from the page itself')
-  }
-
-  unregisterPriorityFocus(_: NavigableItem): void {
-    throw new Error('Cannot unregister a focusable with priority item from the page itself')
+  hasFocusPriority(): boolean {
+    return false
   }
 
   asContainer(): NavigableContainer {

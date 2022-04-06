@@ -5,13 +5,14 @@
   import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
 
   export let position: NavigableWithHandlersProps['position'] = null
+  export let hasFocusPriority: (() => boolean) | null = null
 
   export let onPress: NavigableWithHandlersProps['onPress'] = undefined
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
   export let onBack: NavigableWithHandlersProps['onBack'] = undefined
 
   const nav = getParentNavigable()
-  const row = new NavigableWithHandlers(nav, { position, onPress, onLongPress, onBack })
+  const row = new NavigableWithHandlers(nav, { position, hasFocusPriority, onPress, onLongPress, onBack })
 
   nav.append(row)
 

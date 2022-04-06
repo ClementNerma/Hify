@@ -10,8 +10,8 @@ import {
 export class NavigableGrid extends NavigableArrayContainer {
   private itemsBeforeLastLazyLoading = 0
 
-  constructor(parent: NavigableContainer, position: number | null, private readonly props: NavigableGridProps) {
-    super(parent, position)
+  constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
+    super(parent, props.position, props.hasFocusPriority ?? null)
   }
 
   private _rows() {
@@ -33,6 +33,10 @@ export class NavigableGrid extends NavigableArrayContainer {
 
   children(): Navigable[] {
     return this.items
+  }
+
+  hasFocusPriority(): boolean {
+    return this.props.hasFocusPriority?.() ?? false
   }
 
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
@@ -142,6 +146,9 @@ export class NavigableGrid extends NavigableArrayContainer {
 }
 
 export type NavigableGridProps = {
+  position: number | null
+  hasFocusPriority?: () => boolean
+
   columns: number
   lazyLoader?: () => void
 }

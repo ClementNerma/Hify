@@ -51,10 +51,10 @@ export class NavigableRow extends NavigableArrayContainer {
     switch (from) {
       case NavigationComingFrom.Above:
       case NavigationComingFrom.Below:
-        const prio = this.getPriorityFocusItem()
+        const prio = this.getFocusPriority()
 
         if (prio) {
-          return prio
+          return prio.navigateToFirstItemDown(from)
         }
 
         tries = this.items

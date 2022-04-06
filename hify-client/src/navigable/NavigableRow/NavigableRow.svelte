@@ -5,9 +5,10 @@
   import { NavigableRow } from './NavigableRow'
 
   export let position: number | null = null
+  export let hasFocusPriority: (() => boolean) | null = null
 
   const nav = getParentNavigable()
-  const row = new NavigableRow(nav, position)
+  const row = new NavigableRow(nav, position, hasFocusPriority)
 
   nav.append(row)
 

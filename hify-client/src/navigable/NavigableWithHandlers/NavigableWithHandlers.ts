@@ -3,6 +3,7 @@ import { NavigableContainer, NavigableItem, NavigationAction } from '../navigati
 
 export type NavigableWithHandlersProps = {
   position: number | null
+  hasFocusPriority: (() => boolean) | null
 
   onPress?: () => NavigableItem | null | void
   onLongPress?: () => NavigableItem | null | void
@@ -11,7 +12,7 @@ export type NavigableWithHandlersProps = {
 
 export class NavigableWithHandlers extends NavigableOne {
   constructor(parent: NavigableContainer, private readonly props: NavigableWithHandlersProps) {
-    super(parent, props.position)
+    super(parent, props.position, props.hasFocusPriority)
   }
 
   override canHandleAction(action: NavigationAction): boolean {

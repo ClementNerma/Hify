@@ -4,6 +4,7 @@
   import { onDestroy } from 'svelte'
 
   export let position: SimpleNavigableItemProps['position'] = null
+  export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
 
   export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
   export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
@@ -17,13 +18,11 @@
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
 
-  export let focuser: SimpleNavigableItemProps['focuser'] = undefined
-  export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = undefined
-
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
     position,
+    hasFocusPriority,
 
     onFocus: () => {
       focused = true
@@ -51,17 +50,12 @@
 
       return wrapper
     },
-
-    focuser,
-    hasFocusPriority,
   })
 
   nav.append(item)
-  focuser?.registerPriorityFocus(item)
 
   onDestroy(() => {
     nav.remove(item)
-    focuser?.registerPriorityFocus(item)
   })
 
   let wrapper: HTMLNavigableItemWrapperElement
