@@ -24,22 +24,30 @@ export const readableAudioPlaying = derived(audioPlaying, (_) => _)
 export const readableAudioProgress = derived(audioProgress, (_) => _)
 export const readableAudioPaused = derived(audioPaused, (_) => _)
 
-export function playTrack(trackId: string) {
+export function playTrack(trackId: string, play = true) {
   audioPlaying.update((prevAudio): AudioPlayingState => {
     if (prevAudio && !prevAudio.htmlEl.paused) {
       prevAudio.htmlEl.pause()
+      audioPaused.set(true)
     }
 
     logInfo('Started playing track ID: ' + trackId)
 
     const newAudio = new Audio(getStreamUri(trackId))
-    newAudio
-      .play()
-      .then(() => {
-        audioPaused.set(false)
-        audioProgress.set(0)
-      })
-      .catch((e) => alert('Failed to play audio: ' + (e instanceof Error ? e.message : '<unknown error>')))
+
+    newAudio.addEventListener('error', (e) =>
+      alert('Failed to load audio track: ' + (e instanceof Error ? e.message : '<unknown error>')),
+    )
+
+    if (play !== false) {
+      newAudio
+        .play()
+        .then(() => {
+          audioPaused.set(false)
+          audioProgress.set(0)
+        })
+        .catch((e) => alert('Failed to play audio: ' + (e instanceof Error ? e.message : '<unknown error>')))
+    }
 
     let lastTimeUpdate = 0
 
