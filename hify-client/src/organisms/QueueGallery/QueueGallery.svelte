@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { readable } from 'svelte/store'
-
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
