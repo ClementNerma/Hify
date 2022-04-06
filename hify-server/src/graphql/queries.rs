@@ -98,6 +98,24 @@ impl QueryRoot {
         paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     }
 
+    async fn select_tracks(
+        &self,
+        ctx: &Context<'_>,
+        in_ids: Vec<String>,
+    ) -> Result<Vec<Track>, String> {
+        let index = graphql_index!(ctx);
+        in_ids
+            .into_iter()
+            .map(|track_id| {
+                index
+                    .tracks
+                    .get(&TrackID(track_id.clone()))
+                    .cloned()
+                    .ok_or_else(|| format!("Track not found for ID: {}", track_id))
+            })
+            .collect::<Result<Vec<_>, _>>()
+    }
+
     async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
         graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
     }
