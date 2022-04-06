@@ -29,12 +29,13 @@
     <img width={250} height={250} src={getAlbumArtUri(album.id)} alt={album.name} />
   </div>
   <div class="track-infos">
-    <div class="track-name">{tags.title ?? '<unknown title>'}</div>
+    <div class="track-name"><span class="emoji">🎵</span> {tags.title}</div>
     <div class="track-album-infos">
       <!-- TODO: find a fix for this check -->
       <SimpleNavigableItem onPress={() => void (album && navigate(ROUTES.album(album.id)))}>
         <div class="track-album-name">
-          {album.name ?? '<unknown album>'}
+          <span class="emoji">💿</span>
+          {album.name}
           {#if album.year}
             <span class="track-album-year">({album.year})</span>
           {/if}
@@ -46,6 +47,7 @@
         {#each album.albumArtists as albumArtist}
           <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
             <span class="album-artist">
+              <span class="emoji">🎤</span>
               {albumArtist.name}
             </span>
           </SimpleNavigableItem>
@@ -102,7 +104,6 @@
     position: fixed;
     top: calc(35% - 250px / 2);
     left: calc(5% + 250px);
-    padding: 10px;
     width: 100%;
   }
 
@@ -114,9 +115,13 @@
     margin: 5px;
   }
 
+  .track-infos .emoji {
+    font-size: 1.5rem;
+  }
+
   .track-name {
     font-size: 2rem;
-    padding: 10px;
+    padding: 25px;
   }
 
   .track-album-name {
