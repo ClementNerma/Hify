@@ -24,7 +24,6 @@
 <style>
   .card {
     text-align: center;
-    padding: 10px;
   }
 
   .title {

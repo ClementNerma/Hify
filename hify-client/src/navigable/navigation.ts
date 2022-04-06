@@ -137,7 +137,7 @@ export abstract class NavigableItem extends NavigableCommon {
       throw new Error("Item's underlying element is not an " + HTMLNavigableItemWrapperElement.name)
     }
 
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    el.children[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
   }
 }
 

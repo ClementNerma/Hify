@@ -1,16 +1,32 @@
-body {
-    background-color: lightgray;
-    overflow: hidden;
+html {
+    height: 100%;
 }
 
-navigable-item-wrapper :first-child {
-    border: 3px solid transparent;
+body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+
+    color: rgb(196, 196, 196);
+    
+    background: rgb(8,4,45);
+    background: linear-gradient(0deg, rgba(8,4,45,1) 20%, rgb(10, 38, 89) 100%);
+    background-attachment: fixed;
+}
+
+navigable-item-wrapper :first-child:not(input) {
+    padding: 5px 10px;
     cursor: pointer;
 }
 
-navigable-item-wrapper.focused :first-child, navigable-item-wrapper:hover :first-child {
+navigable-item-wrapper.focused :first-child:not(input),
+navigable-item-wrapper:hover :first-child:not(input) {
     outline: none;
-    background-color: pink;
-    border: 3px solid pink;
     border-radius: 5px;
+    
+    color: black;
+    background-color: white;
 }

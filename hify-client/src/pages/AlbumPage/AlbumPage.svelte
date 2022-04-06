@@ -72,7 +72,6 @@
         {#each album.tracks as track}
           <NavigableTrack tracksIds={album.tracks.map((track) => track.id)} trackId={track.id}>
             <tr>
-              <td class="play">🔊</td>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
             </tr>
@@ -121,27 +120,13 @@
     width: 90%;
     margin-left: 5%;
     border-collapse: collapse;
-    table-layout: fixed;
   }
 
   tr {
-    background-color: #e3e3e3;
+    width: 100%;
   }
-
-  /* tr.active {
-    background-color: #c9c9c9;
-  } */
 
   td {
     padding: 10px;
-  }
-
-  td.play {
-    width: 2%;
-    text-align: center;
-  }
-
-  td.trackno {
-    width: 5%;
   }
 </style>

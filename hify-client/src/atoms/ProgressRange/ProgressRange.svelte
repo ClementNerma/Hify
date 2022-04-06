@@ -32,9 +32,3 @@
     <input type="range" {max} {value} bind:this={input} on:change={() => onChange(getValue())} />
   </div>
 </SimpleNavigableItem>
-
-<style>
-  .container {
-    padding: 5px;
-  }
-</style>
