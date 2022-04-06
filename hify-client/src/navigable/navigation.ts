@@ -77,10 +77,8 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
   abstract children(): Navigable[]
 
   navigateToLastItem(): NavigableItem | null {
-    return NavigableArrayContainer.navigateToLastItem(this.children())
-  }
+    const children = this.children()
 
-  static navigateToLastItem(children: Navigable[]): NavigableItem | null {
     for (let c = children.length - 1; c >= 0; c--) {
       const target = children[c].navigateToLastItem()
 

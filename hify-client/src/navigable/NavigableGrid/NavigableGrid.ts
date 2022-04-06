@@ -7,7 +7,7 @@ import {
   NavigableArrayContainer,
 } from '../navigation'
 
-export class NavigableGrid extends NavigableContainer {
+export class NavigableGrid extends NavigableArrayContainer {
   private readonly items: Navigable[] = []
   private itemsBeforeLastLazyLoading = 0
 
@@ -30,6 +30,10 @@ export class NavigableGrid extends NavigableContainer {
       this.itemsBeforeLastLazyLoading = this.items.length
       this.props.lazyLoader()
     }
+  }
+
+  children(): Navigable[] {
+    return this.items
   }
 
   append(navigable: Navigable) {
@@ -150,9 +154,9 @@ export class NavigableGrid extends NavigableContainer {
     return null
   }
 
-  navigateToLastItem(): NavigableItem | null {
+  override navigateToLastItem(): NavigableItem | null {
     this._lazyLoading()
-    return NavigableArrayContainer.navigateToLastItem(this.items)
+    return super.navigateToLastItem()
   }
 }
 
