@@ -9,8 +9,6 @@
 {#await indexInfos}
   <h1>Loading...</h1>
 {:then indexInfos}
-  <h1>Index fingerprint: <strong><em>{indexInfos.fingerprint}</em></strong></h1>
-
   <h2>Albums ({indexInfos.albumsCount})</h2>
 
   <AlbumsPage />
