@@ -1,11 +1,5 @@
-import {
-  Navigable,
-  NavigableContainer,
-  NavigableItem,
-  NavigationAction,
-  NavigationComingFrom,
-  NavigationDirection,
-} from '../navigation'
+import { NavigableOne } from '../NavigableOne/NavigableOne'
+import { NavigableContainer, NavigableItem, NavigationAction } from '../navigation'
 
 export type NavigableWithHandlersProps = {
   onPress?: () => NavigableItem | null | void
@@ -13,47 +7,9 @@ export type NavigableWithHandlersProps = {
   onBack?: () => NavigableItem | null | void
 }
 
-export class NavigableWithHandlers extends NavigableContainer {
-  private onlyChild: Navigable | null = null
-
+export class NavigableWithHandlers extends NavigableOne {
   constructor(parent: NavigableContainer, private readonly props: NavigableWithHandlersProps) {
     super(parent)
-  }
-
-  append(navigable: Navigable): void {
-    if (this.onlyChild) {
-      throw new Error('Navigable with handlers can only contain a single navigable')
-    }
-
-    this.onlyChild = navigable
-  }
-
-  hasChild(child: Navigable): boolean {
-    return child === this.onlyChild
-  }
-
-  remove(child: Navigable): void {
-    if (!this.onlyChild) {
-      throw new Error('Cannot remove component from empty navigable with handlers')
-    }
-
-    if (this.onlyChild !== child) {
-      throw new Error("Tried to remove another navigable than the navigable's only one")
-    }
-
-    this.onlyChild = null
-  }
-
-  navigate(_: NavigableContainer, direction: NavigationDirection): NavigableItem | null {
-    return this.parent.navigate(this, direction)
-  }
-
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
-    return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
-  }
-
-  navigateToLastItem(): NavigableItem | null {
-    return this.onlyChild?.navigateToLastItem() ?? null
   }
 
   override canHandleAction(action: NavigationAction): boolean {
