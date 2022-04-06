@@ -352,11 +352,13 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
     case ' ':
     case 'Backspace':
     case 'Escape':
+    case 'F4': // F4 is a remap of the back button in the Android App
       const events: { [key in typeof e.key]: NavigationAction } = {
         Enter: NavigationAction.Press,
         ' ': NavigationAction.LongPress,
         Backspace: NavigationAction.Back,
         Escape: NavigationAction.Back,
+        F4: NavigationAction.Back,
       }
 
       const event = events[e.key]
