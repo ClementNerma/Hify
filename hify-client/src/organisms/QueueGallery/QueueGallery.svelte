@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { readable } from 'svelte/store'
+
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
@@ -8,7 +10,9 @@
   $: nearTracks =
     $queuePosition === null || $queuePosition < SIDE_TRACKS
       ? $readablePlayQueue.tracks.slice(0, SIDE_TRACKS * 2 + 1)
-      : $readablePlayQueue.tracks.slice(Math.max($queuePosition - SIDE_TRACKS, 0), $queuePosition + SIDE_TRACKS)
+      : $queuePosition >= $readablePlayQueue.tracks.length - SIDE_TRACKS
+      ? $readablePlayQueue.tracks.slice(-SIDE_TRACKS * 2 - 1)
+      : $readablePlayQueue.tracks.slice($queuePosition - SIDE_TRACKS, $queuePosition + SIDE_TRACKS + 1)
 </script>
 
 {#if $readablePlayQueue && $queuePosition !== null}
