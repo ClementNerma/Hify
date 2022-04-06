@@ -10,8 +10,8 @@ import {
 export class NavigableGrid extends NavigableArrayContainer {
   private itemsBeforeLastLazyLoading = 0
 
-  constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
-    super(parent)
+  constructor(parent: NavigableContainer, position: number | null, private readonly props: NavigableGridProps) {
+    super(parent, position)
   }
 
   private _rows() {

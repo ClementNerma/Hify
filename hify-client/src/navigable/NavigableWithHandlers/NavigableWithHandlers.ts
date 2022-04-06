@@ -2,6 +2,8 @@ import { NavigableOne } from '../NavigableOne/NavigableOne'
 import { NavigableContainer, NavigableItem, NavigationAction } from '../navigation'
 
 export type NavigableWithHandlersProps = {
+  position: number | null
+
   onPress?: () => NavigableItem | null | void
   onLongPress?: () => NavigableItem | null | void
   onBack?: () => NavigableItem | null | void
@@ -9,7 +11,7 @@ export type NavigableWithHandlersProps = {
 
 export class NavigableWithHandlers extends NavigableOne {
   constructor(parent: NavigableContainer, private readonly props: NavigableWithHandlersProps) {
-    super(parent)
+    super(parent, props.position)
   }
 
   override canHandleAction(action: NavigationAction): boolean {

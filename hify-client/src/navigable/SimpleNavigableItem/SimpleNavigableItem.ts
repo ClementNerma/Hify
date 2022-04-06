@@ -8,7 +8,7 @@ import {
 
 export class SimpleNavigableItem extends NavigableItem {
   constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
-    super(parent)
+    super(parent, props.position)
 
     if (props.hasFocusPriority && !props.focuser) {
       throw new Error('Cannot provide a focus priority indicator without a focuser!')
@@ -97,6 +97,8 @@ export class SimpleNavigableItem extends NavigableItem {
 export type SimpleNavigableItemCallback = () => NavigableItem | null | void
 
 export type SimpleNavigableItemProps = {
+  position: number | null
+
   onFocus?: () => void
   onUnfocus?: () => void
 

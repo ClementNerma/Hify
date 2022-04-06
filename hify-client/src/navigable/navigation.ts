@@ -26,7 +26,7 @@ export abstract class NavigableCommon {
   readonly identity: symbol
   readonly page: NavigablePage
 
-  constructor(readonly parent: NavigableContainer) {
+  constructor(readonly parent: NavigableContainer, readonly position: number | null) {
     this.identity = parent.identity
     this.page = parent.page
   }
@@ -40,6 +40,8 @@ export abstract class NavigableCommon {
 
 export abstract class NavigableContainer extends NavigableCommon {
   readonly priorityFocusables: NavigableItem[] = []
+
+  abstract get ordered(): boolean
 
   abstract append(navigable: Navigable): void
   abstract hasChild(child: Navigable): boolean
@@ -76,8 +78,24 @@ export abstract class NavigableContainer extends NavigableCommon {
 export abstract class NavigableArrayContainer extends NavigableContainer {
   protected items: Navigable[] = []
 
+  get ordered(): boolean {
+    return this.items.length > 0 ? this.items[0].position !== null : false
+  }
+
   append(navigable: Navigable): void {
+    if (this.items.length > 0) {
+      if (this.ordered && navigable.position === null) {
+        throw new Error('Cannot append a non-positioned item to an ordered container')
+      } else if (!this.ordered && navigable.position !== null) {
+        throw new Error('Cannot append a positioned item to an unordered container')
+      }
+    }
+
     this.items.push(navigable)
+
+    if (navigable.position !== null) {
+      this.items.sort((a, b) => a.position! - b.position!)
+    }
   }
 
   remove(child: Navigable): void {
@@ -148,6 +166,8 @@ class NavigablePage implements _NavigableContainerLike {
   readonly identity = Symbol()
   readonly page: NavigablePage
   readonly priorityFocusables: NavigableItem[] = []
+  readonly position = null
+  readonly ordered = false
 
   private onlyChild: Navigable | null = null
 

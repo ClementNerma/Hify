@@ -3,6 +3,8 @@
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { onDestroy } from 'svelte'
 
+  export let position: SimpleNavigableItemProps['position'] = null
+
   export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
   export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
 
@@ -21,6 +23,8 @@
   const nav = getParentNavigable()
 
   const item = new SimpleNavigableItem(nav, {
+    position,
+
     onFocus: () => {
       focused = true
       onFocus?.()

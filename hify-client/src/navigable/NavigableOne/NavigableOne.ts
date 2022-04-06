@@ -2,6 +2,7 @@ import { Navigable, NavigableContainer, NavigableItem, NavigationComingFrom, Nav
 
 export class NavigableOne extends NavigableContainer {
   private onlyChild: Navigable | null = null
+  readonly ordered = false
 
   append(navigable: Navigable): void {
     if (this.onlyChild) {
