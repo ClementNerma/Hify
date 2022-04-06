@@ -18,7 +18,7 @@
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
 
-  const nav = getParentNavigable()
+  const nav = getParentNavigable(true)
 
   const item = new SimpleNavigableItem(nav, {
     position,

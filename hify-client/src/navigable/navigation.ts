@@ -230,7 +230,15 @@ class NavigablePage implements _NavigableContainerLike {
   }
 }
 
-export function getParentNavigable(): NavigableContainer {
+export function getParentNavigable(item?: true): NavigableContainer {
+  if (item) {
+    if (Boolean(getContext(NAVIGABLE_ITEM_DETECTION_CTX))) {
+      throw new Error('Cannot use a navigable inside an item')
+    }
+
+    setContext(NAVIGABLE_ITEM_DETECTION_CTX, true)
+  }
+
   const nav = getContext(NAVIGATION_CTX)
 
   if (nav === null || nav === undefined) {
@@ -446,6 +454,7 @@ function _generateNavState(oldFocused: NavigableItem | null, newFocused: Navigab
 export type Navigable = NavigableContainer | NavigableItem
 
 const NAVIGATION_CTX = Symbol()
+const NAVIGABLE_ITEM_DETECTION_CTX = Symbol()
 
 type NavState = {
   page: NavigablePage
