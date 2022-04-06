@@ -13,10 +13,9 @@
 </script>
 
 <Card
-  _key={album.id}
   title={album.name}
   subtitle={album.albumArtists.map((artist) => artist.name).join(', ')}
-  onPress={(id) => navigate(ROUTES.album(id))}
+  onPress={() => navigate(ROUTES.album(album.id))}
   pictureUrl={getAlbumArtUri(album.id)}
   pictureAlt={album.name}
 />

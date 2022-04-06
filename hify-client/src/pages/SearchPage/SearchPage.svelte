@@ -70,8 +70,8 @@
       subtitle: `${tags.album.name} - ${tags.artists.map((artist) => artist.name).join(' / ')}`,
       pictureUrl: getAlbumArtUri(tags.album.id),
       pictureAlt: tags.album.name,
-      onPress: (id) => playTrack(id),
-      onLongPress: (id) => alert('TODO: context menu for playing options'),
+      onPress: () => playTrack(id),
+      onLongPress: () => alert('TODO: context menu for playing options'),
     }))}
   />
 
@@ -84,8 +84,8 @@
       subtitle: album.albumArtists.map((artist) => artist.name).join(' / '),
       pictureUrl: getAlbumArtUri(album.id),
       pictureAlt: 'Album art',
-      onPress: (id) => navigate(ROUTES.album(id)),
-      onLongPress: (id) => alert('TODO: context menu for playing options'),
+      onPress: () => navigate(ROUTES.album(album.id)),
+      onLongPress: () => alert('TODO: context menu for playing options'),
     }))}
   />
 
@@ -98,8 +98,8 @@
       subtitle: '',
       pictureUrl: 'TODO: get picture of first album? and if zero first participation in album?',
       pictureAlt: 'Album art',
-      onPress: (id) => navigate(ROUTES.artist(id)),
-      onLongPress: (id) => alert('TODO: context menu for playing options'),
+      onPress: () => navigate(ROUTES.artist(artist.id)),
+      onLongPress: () => alert('TODO: context menu for playing options'),
     }))}
   />
 {/if}
