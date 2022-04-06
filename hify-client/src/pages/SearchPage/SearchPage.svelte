@@ -8,8 +8,9 @@
 
   import { logInfo } from '../../stores/debugger'
 
-  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
+  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
 
   import Card from '../../molecules/Card/Card.svelte'
 
@@ -65,50 +66,56 @@
   <h2>Tracks ({results.tracks.length})</h2>
 
   <div class="row">
-    {#each results.tracks as track (track.id)}
-      <NavigableTrack tracksIds={results.tracks.map((track) => track.id)} trackId={track.id}>
-        <Card
-          title={track.metadata.tags.title}
-          subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
-            .map((artist) => artist.name)
-            .join(' / ')}`}
-          pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-          pictureAlt={track.metadata.tags.album.name}
-          onPress={() => {}}
-          onLongPress={() => alert('TODO: context menu for playing options')}
-        />
-      </NavigableTrack>
-    {/each}
+    <NavigableRow>
+      {#each results.tracks as track, i (track.id)}
+        <NavigableTrack position={i} tracksIds={results.tracks.map((track) => track.id)} trackId={track.id}>
+          <Card
+            title={track.metadata.tags.title}
+            subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
+              .map((artist) => artist.name)
+              .join(' / ')}`}
+            pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
+            pictureAlt={track.metadata.tags.album.name}
+            onPress={() => {}}
+            onLongPress={() => alert('TODO: context menu for playing options')}
+          />
+        </NavigableTrack>
+      {/each}
+    </NavigableRow>
   </div>
 
   <h2>Albums ({results.albums.length})</h2>
 
   <div class="row">
-    {#each results.albums as album}
-      <Card
-        title={album.name}
-        subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
-        pictureUrl={getAlbumArtUri(album.id)}
-        pictureAlt={album.name}
-        onPress={() => navigate(ROUTES.album(album.id))}
-        onLongPress={() => alert('TODO: context menu for playing options')}
-      />
-    {/each}
+    <NavigableRow>
+      {#each results.albums as album}
+        <Card
+          title={album.name}
+          subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
+          pictureUrl={getAlbumArtUri(album.id)}
+          pictureAlt={album.name}
+          onPress={() => navigate(ROUTES.album(album.id))}
+          onLongPress={() => alert('TODO: context menu for playing options')}
+        />
+      {/each}
+    </NavigableRow>
   </div>
 
   <h2>Artists ({results.artists.length})</h2>
 
   <div class="row">
-    {#each results.artists as artist}
-      <Card
-        title={artist.name}
-        subtitle=""
-        pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
-        pictureAlt={artist.name}
-        onPress={() => navigate(ROUTES.artist(artist.id))}
-        onLongPress={() => alert('TODO: context menu for playing options')}
-      />
-    {/each}
+    <NavigableRow>
+      {#each results.artists as artist}
+        <Card
+          title={artist.name}
+          subtitle=""
+          pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
+          pictureAlt={artist.name}
+          onPress={() => navigate(ROUTES.artist(artist.id))}
+          onLongPress={() => alert('TODO: context menu for playing options')}
+        />
+      {/each}
+    </NavigableRow>
   </div>
 {/if}
 
