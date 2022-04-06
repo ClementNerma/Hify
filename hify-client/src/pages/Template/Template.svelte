@@ -18,7 +18,7 @@
   const location = useLocation()
 
   function onKeyDown(e: KeyboardEvent) {
-    logDebug(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
+    // logDebug(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
 
     if (e.ctrlKey || e.altKey || e.shiftKey) {
       return
