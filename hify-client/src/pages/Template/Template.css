@@ -17,6 +17,8 @@ body {
     background-attachment: fixed;
 }
 
+/* This should be > :first-child but removing this would break everything :p */
+/* Same thing for all other rules below ^^" */
 navigable-item-wrapper :first-child:not(input),
 [item-like-style] :first-child {
     padding: 5px 10px;
