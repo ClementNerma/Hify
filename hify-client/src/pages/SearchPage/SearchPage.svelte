@@ -13,6 +13,7 @@
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
 
   import Card from '../../molecules/Card/Card.svelte'
+  import NonInteractiveCard from '../../molecules/Card/NonInteractiveCard.svelte'
 
   export let searchTerms: string = ''
 
@@ -69,15 +70,13 @@
     <NavigableRow>
       {#each results.tracks as track, i (track.id)}
         <NavigableTrack position={i} tracksIds={results.tracks.map((track) => track.id)} trackId={track.id}>
-          <Card
+          <NonInteractiveCard
             title={track.metadata.tags.title}
             subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
               .map((artist) => artist.name)
               .join(' / ')}`}
             pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
             pictureAlt={track.metadata.tags.album.name}
-            onPress={() => {}}
-            onLongPress={() => alert('TODO: context menu for playing options')}
           />
         </NavigableTrack>
       {/each}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NonInteractiveCard from './NonInteractiveCard.svelte'
 
   export let pictureUrl: string
   export let pictureAlt: string
@@ -14,19 +15,5 @@
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress} {position}>
-  <div class="card">
-    <img width={150} height={150} src={pictureUrl} alt={pictureAlt} />
-    <div class="title">{title}</div>
-    <div class="subtitle">{subtitle}</div>
-  </div>
+  <NonInteractiveCard {pictureUrl} {pictureAlt} {title} {subtitle} />
 </SimpleNavigableItem>
-
-<style>
-  .card {
-    text-align: center;
-  }
-
-  .title {
-    font-weight: bold;
-  }
-</style>
