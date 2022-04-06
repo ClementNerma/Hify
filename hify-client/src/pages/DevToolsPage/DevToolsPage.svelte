@@ -28,10 +28,12 @@
 <style>
   .log-entry.info {
     background-color: lightblue;
+    color: black;
   }
 
   .log-entry.warn {
     background-color: yellow;
+    color: black;
   }
 
   .log-entry.error {
