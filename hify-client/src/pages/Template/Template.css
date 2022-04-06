@@ -10,7 +10,7 @@ body {
     bottom: 0;
     overflow: hidden;
 
-    color: rgb(196, 196, 196);
+    color: rgb(230, 230, 230);
     
     background: rgb(8,4,45);
     background: linear-gradient(0deg, rgba(8,4,45,1) 20%, rgb(10, 38, 89) 100%);
