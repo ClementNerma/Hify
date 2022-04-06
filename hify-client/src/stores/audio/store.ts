@@ -2,7 +2,7 @@ import { derived, get, writable } from 'svelte/store'
 import { AlbumYearStrategy } from '../../graphql/types'
 import { getStreamUri } from '../../rest-api'
 import { AsyncAudioTrack, AudioTrackQuery } from './AudioTrack.generated'
-import { logInfo, logDebug, logWarn } from '../debugger'
+import { logInfo, logDebug, logWarn, logError } from '../debugger'
 
 type AudioPlayingState = {
   htmlEl: HTMLAudioElement
@@ -35,9 +35,7 @@ export function playTrack(trackId: string, play = true) {
 
     const newAudio = new Audio(getStreamUri(trackId))
 
-    newAudio.addEventListener('error', (e) =>
-      alert('Failed to load audio track: ' + (e instanceof Error ? e.message : '<unknown error>')),
-    )
+    newAudio.addEventListener('error', (e) => logError('Failed to load audio track', e))
 
     if (play !== false) {
       newAudio
@@ -46,7 +44,7 @@ export function playTrack(trackId: string, play = true) {
           audioPaused.set(false)
           audioProgress.set(0)
         })
-        .catch((e) => alert('Failed to play audio: ' + (e instanceof Error ? e.message : '<unknown error>')))
+        .catch((e: unknown) => logError('Failed to play audio', e))
     }
 
     let lastTimeUpdate = 0

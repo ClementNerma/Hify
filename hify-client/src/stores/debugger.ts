@@ -27,4 +27,8 @@ export function log(level: LogLevel, message: string): void {
 export const logDebug = (message: string) => log(LogLevel.Debug, message)
 export const logInfo = (message: string) => log(LogLevel.Info, message)
 export const logWarn = (message: string) => log(LogLevel.Warn, message)
-export const logError = (message: string) => log(LogLevel.Error, message)
+export const logError = (message: string, error?: unknown) =>
+  log(
+    LogLevel.Error,
+    Boolean(error) ? `${message} |> ${error instanceof Error ? error.message : '<unknown error>'}` : message,
+  )
