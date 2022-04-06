@@ -2,15 +2,23 @@
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
+
+  const SIDE_TRACKS = 3
+
+  $: nearTracks =
+    $queuePosition === null || $queuePosition < SIDE_TRACKS
+      ? $readablePlayQueue.tracks.slice(0, SIDE_TRACKS * 2 + 1)
+      : $readablePlayQueue.tracks.slice(Math.max($queuePosition - SIDE_TRACKS, 0), $queuePosition + SIDE_TRACKS)
 </script>
 
 {#if $readablePlayQueue && $queuePosition !== null}
   <NavigableRow>
     <div class="queue-gallery">
-      {#each $readablePlayQueue.tracks as track (track.id)}
+      {#each nearTracks as track (track.id)}
         <QueueGalleryTrack
           current={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
           position={$readablePlayQueue.tracks.indexOf(track)}
+          columns={SIDE_TRACKS * 2 + 1}
           {track}
         />
       {/each}
@@ -22,7 +30,5 @@
   .queue-gallery {
     display: flex;
     flex-direction: row;
-    overflow-x: visible;
-    overflow-y: visible;
   }
 </style>

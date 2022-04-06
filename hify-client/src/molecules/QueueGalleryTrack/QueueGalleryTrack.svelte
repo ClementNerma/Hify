@@ -7,10 +7,11 @@
   export let track: AudioTrackFragment
   export let position: number
   export let current: boolean
+  export let columns: number
 </script>
 
 <SimpleNavigableItem {position} onPress={() => playTrackFromCurrentQueue(position)} hasFocusPriority={() => current}>
-  <div class="track" class:current>
+  <div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
     <img
       class="album-art"
       width={80}
@@ -26,6 +27,7 @@
 <style>
   .track {
     text-align: center;
+    max-width: var(--column-size);
   }
 
   /* TODO: remove experimental stuff */
