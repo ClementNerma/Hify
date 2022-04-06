@@ -2,6 +2,10 @@
   import './Template.css'
 
   import { useLocation, useNavigate } from 'svelte-navigator'
+
+  import { logDebug } from '../../stores/debugger'
+  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
+
   import { ROUTES } from '../../routes'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
@@ -9,8 +13,6 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
-  import { logDebug } from '../../stores/debugger'
-  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio/store'
 
   const navigate = useNavigate()
   const location = useLocation()

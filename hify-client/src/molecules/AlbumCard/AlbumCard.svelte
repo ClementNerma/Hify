@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
-  import { AlbumInfos, ArtistInfos } from '../../graphql/types'
+  import { AlbumInfos, ArtistInfos } from '../../graphql/generated'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
   import Card from '../Card/Card.svelte'

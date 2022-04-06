@@ -1,16 +1,17 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
 
-  import { SearchPageQuery } from '../../graphql/types'
+  import { getAlbumArtUri } from '../../rest-api'
+  import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
 
+  import { ROUTES } from '../../routes'
+
+  import { logInfo } from '../../stores/debugger'
+
+  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  import CardRow from '../../organisms/CardRow/CardRow.svelte'
-  import { getAlbumArtUri } from '../../rest-api'
-  import { ROUTES } from '../../routes'
-  import { logInfo } from '../../stores/debugger'
-  import { playTrack } from '../../stores/audio/store'
-  import { AsyncSearchPage } from './SearchPage.generated'
+  import Card from '../../molecules/Card/Card.svelte'
 
   export let searchTerms: string = ''
 
@@ -63,45 +64,52 @@
 {#if results}
   <h2>Tracks ({results.tracks.length})</h2>
 
-  <CardRow
-    items={results.tracks.map(({ id, metadata: { tags } }) => ({
-      _key: id,
-      title: tags.title,
-      subtitle: `${tags.album.name} - ${tags.artists.map((artist) => artist.name).join(' / ')}`,
-      pictureUrl: getAlbumArtUri(tags.album.id),
-      pictureAlt: tags.album.name,
-      onPress: () => playTrack(id),
-      onLongPress: () => alert('TODO: context menu for playing options'),
-    }))}
-  />
+  <div class="row">
+    {#each results.tracks as track (track.id)}
+      <NavigableTrack tracksIds={results.tracks.map((track) => track.id)} trackId={track.id}>
+        <Card
+          title={track.metadata.tags.title}
+          subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
+            .map((artist) => artist.name)
+            .join(' / ')}`}
+          pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
+          pictureAlt={track.metadata.tags.album.name}
+          onPress={() => {}}
+          onLongPress={() => alert('TODO: context menu for playing options')}
+        />
+      </NavigableTrack>
+    {/each}
+  </div>
 
   <h2>Albums ({results.albums.length})</h2>
 
-  <CardRow
-    items={results.albums.map((album) => ({
-      _key: album.id,
-      title: album.name,
-      subtitle: album.albumArtists.map((artist) => artist.name).join(' / '),
-      pictureUrl: getAlbumArtUri(album.id),
-      pictureAlt: 'Album art',
-      onPress: () => navigate(ROUTES.album(album.id)),
-      onLongPress: () => alert('TODO: context menu for playing options'),
-    }))}
-  />
+  <div class="row">
+    {#each results.albums as album}
+      <Card
+        title={album.name}
+        subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
+        pictureUrl={getAlbumArtUri(album.id)}
+        pictureAlt={album.name}
+        onPress={() => navigate(ROUTES.album(album.id))}
+        onLongPress={() => alert('TODO: context menu for playing options')}
+      />
+    {/each}
+  </div>
 
   <h2>Artists ({results.artists.length})</h2>
 
-  <CardRow
-    items={results.artists.map((artist) => ({
-      _key: artist.id,
-      title: artist.name,
-      subtitle: '',
-      pictureUrl: 'TODO: get picture of first album? and if zero first participation in album?',
-      pictureAlt: 'Album art',
-      onPress: () => navigate(ROUTES.artist(artist.id)),
-      onLongPress: () => alert('TODO: context menu for playing options'),
-    }))}
-  />
+  <div class="row">
+    {#each results.artists as artist}
+      <Card
+        title={artist.name}
+        subtitle=""
+        pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
+        pictureAlt={artist.name}
+        onPress={() => navigate(ROUTES.artist(artist.id))}
+        onLongPress={() => alert('TODO: context menu for playing options')}
+      />
+    {/each}
+  </div>
 {/if}
 
 <style>
@@ -117,5 +125,10 @@
     width: 33%;
     padding: 12px;
     font-size: 1.2rem;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
   }
 </style>

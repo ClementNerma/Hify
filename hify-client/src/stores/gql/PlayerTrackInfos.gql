@@ -1,0 +1,5 @@
+query PlayerTrackInfos($trackId: String!, $albumYearStrategy: AlbumYearStrategy!) {
+  track(id: $trackId) {
+    ...AudioTrack
+  }
+}

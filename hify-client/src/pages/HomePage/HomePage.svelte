@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AsyncHomePage } from './HomePage.generated'
+  import { AsyncHomePage } from '../../graphql/generated'
 
   import AlbumsPage from '../AlbumsPage/AlbumsPage.svelte'
 

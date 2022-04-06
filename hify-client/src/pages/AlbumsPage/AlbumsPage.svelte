@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AsyncAlbumsPage } from './AlbumsPage.generated'
+  import { AsyncAlbumsPage } from '../../graphql/generated'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'

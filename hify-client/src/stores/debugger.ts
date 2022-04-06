@@ -32,3 +32,12 @@ export const logError = (message: string, error?: unknown) =>
     LogLevel.Error,
     Boolean(error) ? `${message} |> ${error instanceof Error ? error.message : '<unknown error>'}` : message,
   )
+export const logFatal = (message: string, error?: unknown): never => {
+  logError(message, error)
+
+  if (Boolean(error)) {
+    console.error(error)
+  }
+
+  throw new Error(message)
+}

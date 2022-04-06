@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { getAlbumArtUri } from '../../rest-api'
-  import { playTrack } from '../../stores/audio/store'
+  import { navigate } from 'svelte-navigator'
 
-  import { AlbumYearStrategy } from '../../graphql/types'
-  import { AsyncAlbumPage } from './AlbumPage.generated'
+  import { ROUTES } from '../../routes'
+  import { getAlbumArtUri } from '../../rest-api'
+  import { AlbumYearStrategy, AsyncAlbumPage } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { navigate } from 'svelte-navigator'
-  import { ROUTES } from '../../routes'
+
+  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
 
   export let albumId: string
 
@@ -70,13 +70,13 @@
     <table>
       <tbody>
         {#each album.tracks as track}
-          <SimpleNavigableItem onPress={() => playTrack(track.id)}>
+          <NavigableTrack tracksIds={album.tracks.map((track) => track.id)} trackId={track.id}>
             <tr>
               <td class="play">🔊</td>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
             </tr>
-          </SimpleNavigableItem>
+          </NavigableTrack>
         {/each}
       </tbody>
     </table>

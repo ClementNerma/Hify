@@ -3,11 +3,11 @@
   import {
     humanReadableDuration,
     readableAudioPaused,
-    readableAudioPlaying,
     readableAudioProgress,
     setPlayingAudioProgress,
     toggleAudioPlayback,
-  } from '../../stores/audio/store'
+  } from '../../stores/audio-player'
+  import { currentTrack } from '../../stores/play-queue'
 
   import { useNavigate } from 'svelte-navigator'
 
@@ -17,92 +17,76 @@
   import { ROUTES } from '../../routes'
 
   const navigate = useNavigate()
+
+  $: tags = $currentTrack && $currentTrack.metadata.tags
+  $: album = $currentTrack && $currentTrack.metadata.tags.album
 </script>
 
-{#if !$readableAudioPlaying}
+{#if !$currentTrack || !tags || !album}
   <div class="container">
-    <h2 class="no-playing">Nothing currently playing</h2>
+    <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
   </div>
 {:else}
-  {#await $readableAudioPlaying.trackInfos}
-    <div class="container">
-      <h2 class="loading">Loading track informations...</h2>
+  <div class="container">
+    <div class="album-art">
+      <img width={250} height={250} src={getAlbumArtUri(album.id)} alt={album.name} />
     </div>
-  {:then track}
-    {#if !track}
-      <div class="container">
-        <h2 class="no-track-infos">Playing track was not found in API :(</h2>
+    <div class="track-infos">
+      <div class="track-name">{tags.title ?? '<unknown title>'}</div>
+      <div class="track-album-infos">
+        <!-- TODO: find a fix for this check -->
+        <SimpleNavigableItem onPress={() => void (album && navigate(ROUTES.album(album.id)))}>
+          <div class="track-album-name">
+            {album.name ?? '<unknown album>'}
+            {#if album.year}
+              <span class="track-album-year">({album.year})</span>
+            {/if}
+          </div>
+        </SimpleNavigableItem>
       </div>
-    {:else}
-      <div class="container">
-        <div class="album-art">
-          <img
-            width={250}
-            height={250}
-            src={getAlbumArtUri(track.metadata.tags.album.id)}
-            alt={track.metadata.tags.album.name}
-          />
-        </div>
-        <div class="track-infos">
-          <div class="track-name">{track.metadata.tags.title ?? '<unknown title>'}</div>
-          <div class="track-album-infos">
-            <!-- TODO: find a fix for this check -->
-            <SimpleNavigableItem
-              onPress={() => track.metadata.tags.album && navigate(ROUTES.album(track.metadata.tags.album.id))}
-            >
-              <div class="track-album-name">
-                {track.metadata.tags.album.name ?? '<unknown album>'}
-                {#if track.metadata.tags.album.year}
-                  <span class="track-album-year">({track.metadata.tags.album.year})</span>
-                {/if}
-              </div>
+      <div class="track-artists">
+        <NavigableRow>
+          {#each album.albumArtists as albumArtist}
+            <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
+              <span class="album-artist">
+                {albumArtist.name}
+              </span>
             </SimpleNavigableItem>
-          </div>
-          <div class="track-artists">
-            <NavigableRow>
-              {#each track.metadata.tags.album.albumArtists as albumArtist}
-                <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
-                  <span class="album-artist">
-                    {albumArtist.name}
-                  </span>
-                </SimpleNavigableItem>
-              {/each}
-            </NavigableRow>
-          </div>
-        </div>
+          {/each}
+        </NavigableRow>
+      </div>
+    </div>
 
-        <div class="player-bottom">
-          <div class="progress-range">
-            <ProgressRange
-              max={track.metadata.duration}
-              value={$readableAudioProgress}
-              onChange={setPlayingAudioProgress}
-              onPress={toggleAudioPlayback}
-            />
-          </div>
-          <div class="progress-time">
-            <div class="playback-indicator">
-              {#if $readableAudioPaused === null}
-                -
-              {:else if $readableAudioPaused}
-                ⏸️
-              {:else}
-                ▶️
-              {/if}
-            </div>
-            <div class="current-time">
-              {#if $readableAudioProgress}
-                {humanReadableDuration($readableAudioProgress)}
-              {:else}
-                --:--:--
-              {/if}
-              / {humanReadableDuration(track.metadata.duration)}
-            </div>
-          </div>
+    <div class="player-bottom">
+      <div class="progress-range">
+        <ProgressRange
+          max={$currentTrack.metadata.duration}
+          value={$readableAudioProgress}
+          onChange={setPlayingAudioProgress}
+          onPress={toggleAudioPlayback}
+        />
+      </div>
+      <div class="progress-time">
+        <div class="playback-indicator">
+          {#if $readableAudioPaused === null}
+            -
+          {:else if $readableAudioPaused}
+            ⏸️
+          {:else}
+            ▶️
+          {/if}
+        </div>
+        <div class="current-time">
+          {#if $readableAudioProgress}
+            {humanReadableDuration($readableAudioProgress)}
+          {:else}
+            --:--:--
+          {/if}
+          / {humanReadableDuration($currentTrack.metadata.duration)}
         </div>
       </div>
-    {/if}
-  {/await}
+    </div>
+  </div>
 {/if}
 
 <style>
@@ -114,9 +98,7 @@
     bottom: 0;
   }
 
-  .no-playing,
-  .loading,
-  .no-track-infos {
+  .no-playing {
     margin-top: 25%;
     text-align: center;
     font-size: 2rem;

@@ -1,0 +1,29 @@
+fragment AudioTrack on Track {
+  id
+  path
+  metadata {
+    format
+    duration
+    bitrate
+    size
+    tags {
+      title
+      artists {
+        id
+        name
+      }
+      album {
+        id
+        name
+        year(strategy: $albumYearStrategy)
+        albumArtists {
+          id
+          name
+        }
+      }
+      disc
+      trackNo
+      genres
+    }
+  }
+}

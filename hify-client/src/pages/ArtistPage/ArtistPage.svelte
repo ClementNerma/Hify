@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { AsyncArtistPage } from './ArtistPage.generated'
+  import { AsyncArtistPage, AlbumYearStrategy } from '../../graphql/generated'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
-  import { AlbumYearStrategy } from '../../graphql/types'
 
   export let artistId: string
 
