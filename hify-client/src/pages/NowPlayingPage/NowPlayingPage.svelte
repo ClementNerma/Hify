@@ -121,25 +121,25 @@
   }
 
   .track-infos .emoji {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .track-name {
-    font-size: 2rem;
+    font-size: 1.7rem;
     padding: 25px;
   }
 
   .track-album-name {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .track-album-year {
     vertical-align: middle;
-    font-size: 1rem;
+    font-size: 0.6rem;
   }
 
   .track-artists {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .player-bottom {
