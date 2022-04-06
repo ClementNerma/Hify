@@ -15,6 +15,7 @@ const playQueue = writable<PlayQueue>({
 
 export const readablePlayQueue = derived(playQueue, (_) => _)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
+export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export async function playTrackFromFetchableQueue(tracksIds: string[], position: number): Promise<void> {
   if (!tracksIds[position]) {
@@ -32,10 +33,17 @@ export async function playTrackFromFetchableQueue(tracksIds: string[], position:
 
   logInfo(`Set new queue with ${tracks.data.selectTracks.length} tracks`)
 
-  return playTrackFromQueue(tracks.data.selectTracks, position)
+  return playTrackFromNewQueue(tracks.data.selectTracks, position)
 }
 
-export async function playTrackFromQueue(tracks: AudioTrackFragment[], position: number): Promise<void> {
+export async function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number): Promise<void> {
   playQueue.set({ tracks, position })
   startAudioPlayer(tracks[position])
+}
+
+export function playTrackFromCurrentQueue(position: number): void {
+  playQueue.update(({ tracks }) => {
+    startAudioPlayer(tracks[position])
+    return { tracks, position }
+  })
 }

@@ -71,7 +71,6 @@
   <slot {item} />
 </navigable-item-wrapper>
 
-<!-- Removed as "display: contents;" removes the ability to use .scrollIntoView() -->
 <style>
   navigable-item-wrapper {
     display: contents;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
 
@@ -11,14 +12,18 @@
   <button>Reload the application</button>
 </SimpleNavigableItem>
 
-<ul>
-  {#each slicedAppLogs as logEntry}
-    <li class="log-entry {logEntry.level}">
-      <u>{logEntry.level.toLocaleUpperCase()}</u>
-      <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
-    </li>
-  {/each}
-</ul>
+<NavigableList>
+  <ul>
+    {#each slicedAppLogs as logEntry}
+      <SimpleNavigableItem>
+        <li class="log-entry {logEntry.level}">
+          <u>{logEntry.level.toLocaleUpperCase()}</u>
+          <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
+        </li>
+      </SimpleNavigableItem>
+    {/each}
+  </ul>
+</NavigableList>
 
 <style>
   .log-entry.info {

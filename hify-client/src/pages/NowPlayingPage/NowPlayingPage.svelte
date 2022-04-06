@@ -15,6 +15,7 @@
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
+  import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
 
   const navigate = useNavigate()
 
@@ -80,6 +81,10 @@
         onPress={toggleAudioPlayback}
       />
     </div>
+  </div>
+
+  <div class="gallery">
+    <QueueGallery />
   </div>
 {/if}
 
@@ -157,5 +162,10 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 0px 10px;
+  }
+
+  .gallery {
+    position: fixed;
+    bottom: 20px;
   }
 </style>
