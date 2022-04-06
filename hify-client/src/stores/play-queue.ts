@@ -49,6 +49,8 @@ export function playTrackFromCurrentQueue(position: number): void {
 }
 
 export function playNextTrack(): void {
+  logInfo('Going to play next track...')
+
   playQueue.update(({ tracks, position }) => {
     let newPosition: number | null
 
@@ -63,6 +65,9 @@ export function playNextTrack(): void {
 
     if (newPosition !== null) {
       startAudioPlayer(tracks[newPosition], playNextTrack)
+      logInfo('Playing next track at position: ' + newPosition.toString())
+    } else {
+      logInfo('No more track to play')
     }
 
     return { tracks, position: newPosition }
