@@ -4,7 +4,7 @@
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableRow } from './NavigableRow'
 
-  export let position: number | null = null
+  export let position: (() => number) | null = null
   export let hasFocusPriority: (() => boolean) | null = null
 
   const nav = getParentNavigable()

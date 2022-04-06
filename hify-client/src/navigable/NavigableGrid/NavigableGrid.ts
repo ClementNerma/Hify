@@ -138,7 +138,7 @@ export class NavigableGrid extends NavigableArrayContainer {
 }
 
 export type NavigableGridProps = {
-  position: number | null
+  position: (() => number) | null
   hasFocusPriority?: () => boolean
 
   columns: number

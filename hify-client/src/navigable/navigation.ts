@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { logFatal, logWarn } from '../stores/debugger'
+import { logWarn } from '../stores/debugger'
 
 export enum NavigationDirection {
   Up,
@@ -28,7 +28,7 @@ export abstract class NavigableCommon {
 
   constructor(
     readonly parent: NavigableContainer,
-    readonly position: number | null,
+    readonly position: (() => number) | null,
     readonly hasFocusPriority: (() => boolean) | null,
   ) {
     this.identity = parent.identity
@@ -60,18 +60,22 @@ export abstract class NavigableContainer extends NavigableCommon {
 }
 
 export abstract class NavigableArrayContainer extends NavigableContainer {
-  protected items: Navigable[] = []
+  protected _unorderedItems: Navigable[] = []
 
   get ordered(): boolean {
-    return this.items.length > 0 ? this.items[0].position !== null : false
+    return this._unorderedItems.length > 0 ? this._unorderedItems[0].position !== null : false
+  }
+
+  protected get items(): Navigable[] {
+    return this.ordered ? [...this._unorderedItems].sort((a, b) => a.position!() - b.position!()) : this._unorderedItems
   }
 
   protected getFocusPriority(): Navigable | null {
-    return this.items.find((item) => item.hasFocusPriority && item.hasFocusPriority()) ?? null
+    return this._unorderedItems.find((item) => item.hasFocusPriority && item.hasFocusPriority()) ?? null
   }
 
   append(navigable: Navigable): void {
-    if (this.items.length > 0) {
+    if (this._unorderedItems.length > 0) {
       if (this.ordered && navigable.position === null) {
         throw new Error('Cannot append a non-positioned item to an ordered container')
       } else if (!this.ordered && navigable.position !== null) {
@@ -79,36 +83,26 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
       }
     }
 
-    this.items.push(navigable)
-
-    if (navigable.position !== null) {
-      this.items.sort((a, b) => {
-        if (a.position === null || b.position === null) {
-          return logFatal('Internal error: position not definied in ordered items array')
-        }
-
-        return a.position - b.position
-      })
-    }
+    this._unorderedItems.push(navigable)
   }
 
   remove(child: Navigable): void {
-    const indexOf = this.items.indexOf(child)
+    const indexOf = this._unorderedItems.indexOf(child)
 
     if (indexOf === -1) {
       throw new Error('Cannot remove unknown child')
     }
 
-    this.items.splice(indexOf, 1)
+    this._unorderedItems.splice(indexOf, 1)
   }
 
   hasChild(child: Navigable): boolean {
-    return this.items.indexOf(child) !== -1
+    return this._unorderedItems.indexOf(child) !== -1
   }
 
   navigateToLastItem(): NavigableItem | null {
-    for (let c = this.items.length - 1; c >= 0; c--) {
-      const target = this.items[c].navigateToLastItem()
+    for (let c = this._unorderedItems.length - 1; c >= 0; c--) {
+      const target = this._unorderedItems[c].navigateToLastItem()
 
       if (target) {
         return target

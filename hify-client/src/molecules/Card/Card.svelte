@@ -11,7 +11,7 @@
   export let onPress: () => void
   export let onLongPress: (() => void) | undefined = undefined
 
-  export let position: number | null = null
+  export let position: (() => number) | null = null
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress} {position}>

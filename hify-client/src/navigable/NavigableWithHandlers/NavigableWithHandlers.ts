@@ -2,7 +2,7 @@ import { NavigableOne } from '../NavigableOne/NavigableOne'
 import { NavigableContainer, NavigableItem, NavigationAction } from '../navigation'
 
 export type NavigableWithHandlersProps = {
-  position: number | null
+  position: (() => number) | null
   hasFocusPriority: (() => boolean) | null
 
   onPress?: () => NavigableItem | null | void

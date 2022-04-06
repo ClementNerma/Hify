@@ -5,7 +5,7 @@ import { logFatal, logInfo } from './debugger'
 
 type PlayQueue = {
   tracks: AudioTrackFragment[]
-  position: number | null
+  position: (() => number) | null
 }
 
 const playQueue = writable<PlayQueue>({
@@ -52,7 +52,7 @@ export function playNextTrack(): void {
   logInfo('Going to play next track...')
 
   playQueue.update(({ tracks, position }) => {
-    let newPosition: number | null
+    let newposition: (() => number) | null
 
     if (position === null) {
       newPosition = tracks.length > 0 ? 0 : null

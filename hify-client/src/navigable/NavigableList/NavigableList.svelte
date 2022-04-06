@@ -4,7 +4,7 @@
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableList } from './NavigableList'
 
-  export let position: number | null = null
+  export let position: (() => number) | null = null
 
   const nav = getParentNavigable()
   const list = new NavigableList(nav, position)

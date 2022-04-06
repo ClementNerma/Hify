@@ -54,9 +54,7 @@
 
   nav.append(item)
 
-  onDestroy(() => {
-    nav.remove(item)
-  })
+  onDestroy(() => nav.remove(item))
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean

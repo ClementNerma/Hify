@@ -4,7 +4,7 @@
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableGrid, NavigableGridProps } from './NavigableGrid'
 
-  export let position: number | null = null
+  export let position: (() => number) | null = null
   export let hasFocusPriority: NavigableGridProps['hasFocusPriority'] = undefined
 
   export let columns: NavigableGridProps['columns']
