@@ -10,7 +10,7 @@ const audioPaused = writable<boolean | null>(null)
 export const readableAudioProgress = derived(audioProgress, (_) => _)
 export const readableAudioPaused = derived(audioPaused, (_) => _)
 
-export function startAudioPlayer(track: AudioTrackFragment, play = true) {
+export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => void, play = true) {
   audioPlayer.update((prev): HTMLAudioElement => {
     if (prev && !prev.paused) {
       prev.pause()
@@ -25,6 +25,7 @@ export function startAudioPlayer(track: AudioTrackFragment, play = true) {
     newAudio.addEventListener('error', (e) => logError('Failed to load audio track', e))
     newAudio.addEventListener('play', () => audioPaused.set(false))
     newAudio.addEventListener('pause', () => audioPaused.set(true))
+    newAudio.addEventListener('ended', nextHandler)
     newAudio.addEventListener('timeupdate', () => {
       const currentTime = Math.round(newAudio.currentTime)
 
@@ -89,6 +90,23 @@ export function toggleAudioPlayback() {
   } else {
     player.pause()
   }
+}
+
+export function stopAudioPlayer() {
+  const player = get(audioPlayer)
+
+  if (!player) {
+    logWarn('Tried to stop audio playback while no audio is playing')
+    return
+  }
+
+  logInfo('Stopped audio playback')
+
+  if (!player.paused) {
+    player.pause()
+  }
+
+  player.currentTime = 0
 }
 
 export function humanReadableDuration(seconds: number): string {

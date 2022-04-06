@@ -1,6 +1,6 @@
 import { derived, writable } from 'svelte/store'
 import { AlbumYearStrategy, AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
-import { startAudioPlayer } from './audio-player'
+import { startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo } from './debugger'
 
 type PlayQueue = {
@@ -38,12 +38,33 @@ export async function playTrackFromFetchableQueue(tracksIds: string[], position:
 
 export async function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number): Promise<void> {
   playQueue.set({ tracks, position })
-  startAudioPlayer(tracks[position])
+  startAudioPlayer(tracks[position], playNextTrack)
 }
 
 export function playTrackFromCurrentQueue(position: number): void {
   playQueue.update(({ tracks }) => {
-    startAudioPlayer(tracks[position])
+    startAudioPlayer(tracks[position], playNextTrack)
     return { tracks, position }
+  })
+}
+
+export function playNextTrack(): void {
+  playQueue.update(({ tracks, position }) => {
+    let newPosition: number | null
+
+    if (position === null) {
+      newPosition = tracks.length > 0 ? 0 : null
+    } else if (position === tracks.length - 1) {
+      stopAudioPlayer()
+      newPosition = null
+    } else {
+      newPosition = position + 1
+    }
+
+    if (newPosition !== null) {
+      startAudioPlayer(tracks[newPosition], playNextTrack)
+    }
+
+    return { tracks, position: newPosition }
   })
 }
