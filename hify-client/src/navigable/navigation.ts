@@ -74,13 +74,29 @@ export abstract class NavigableContainer extends NavigableCommon {
 }
 
 export abstract class NavigableArrayContainer extends NavigableContainer {
-  abstract children(): Navigable[]
+  protected items: Navigable[] = []
+
+  append(navigable: Navigable): void {
+    this.items.push(navigable)
+  }
+
+  remove(child: Navigable): void {
+    const indexOf = this.items.indexOf(child)
+
+    if (indexOf === -1) {
+      throw new Error('Cannot remove unknown child')
+    }
+
+    this.items.splice(indexOf, 1)
+  }
+
+  hasChild(child: Navigable): boolean {
+    return this.items.indexOf(child) !== -1
+  }
 
   navigateToLastItem(): NavigableItem | null {
-    const children = this.children()
-
-    for (let c = children.length - 1; c >= 0; c--) {
-      const target = children[c].navigateToLastItem()
+    for (let c = this.items.length - 1; c >= 0; c--) {
+      const target = this.items[c].navigateToLastItem()
 
       if (target) {
         return target

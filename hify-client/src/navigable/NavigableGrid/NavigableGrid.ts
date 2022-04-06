@@ -8,7 +8,6 @@ import {
 } from '../navigation'
 
 export class NavigableGrid extends NavigableArrayContainer {
-  private readonly items: Navigable[] = []
   private itemsBeforeLastLazyLoading = 0
 
   constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
@@ -34,24 +33,6 @@ export class NavigableGrid extends NavigableArrayContainer {
 
   children(): Navigable[] {
     return this.items
-  }
-
-  append(navigable: Navigable) {
-    this.items.push(navigable)
-  }
-
-  hasChild(child: Navigable): boolean {
-    return this.items.indexOf(child) !== -1
-  }
-
-  remove(child: Navigable): void {
-    const index = this.items.indexOf(child)
-
-    if (index === -1) {
-      throw new Error('Tried to remove unknown child from navigable grid')
-    }
-
-    this.items.splice(index, 1)
   }
 
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {

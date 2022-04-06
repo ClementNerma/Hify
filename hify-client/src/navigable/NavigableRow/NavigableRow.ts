@@ -7,28 +7,8 @@ import {
 } from '../navigation'
 
 export class NavigableRow extends NavigableArrayContainer {
-  private readonly columns: Navigable[] = []
-
-  append(navigable: Navigable) {
-    this.columns.push(navigable)
-  }
-
-  hasChild(child: Navigable): boolean {
-    return this.columns.indexOf(child) !== -1
-  }
-
-  remove(child: Navigable): void {
-    const index = this.columns.indexOf(child)
-
-    if (index === -1) {
-      throw new Error('Tried to remove unknown child from navigable row')
-    }
-
-    this.columns.splice(index, 1)
-  }
-
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
-    const colIndex = this.columns.indexOf(focusedChild)
+    const colIndex = this.items.indexOf(focusedChild)
 
     if (colIndex === -1) {
       throw new Error('Focused element not found in navigable row')
@@ -39,7 +19,7 @@ export class NavigableRow extends NavigableArrayContainer {
         return this.parent.navigate(this, NavigationDirection.Up)
 
       case NavigationDirection.Left:
-        for (const colItem of [...this.columns.slice(0, colIndex)].reverse()) {
+        for (const colItem of [...this.items.slice(0, colIndex)].reverse()) {
           const item = colItem.navigateToFirstItemDown(NavigationComingFrom.Right)
 
           if (item) {
@@ -50,7 +30,7 @@ export class NavigableRow extends NavigableArrayContainer {
         return this.parent.navigate(this, NavigationDirection.Right)
 
       case NavigationDirection.Right:
-        for (const colItem of this.columns.slice(colIndex + 1)) {
+        for (const colItem of this.items.slice(colIndex + 1)) {
           const item = colItem.navigateToFirstItemDown(NavigationComingFrom.Left)
 
           if (item) {
@@ -77,15 +57,15 @@ export class NavigableRow extends NavigableArrayContainer {
           return prio
         }
 
-        tries = this.columns
+        tries = this.items
         break
 
       case NavigationComingFrom.Left:
-        tries = this.columns
+        tries = this.items
         break
 
       case NavigationComingFrom.Right:
-        tries = [...this.columns].reverse()
+        tries = [...this.items].reverse()
         break
     }
 
@@ -101,6 +81,6 @@ export class NavigableRow extends NavigableArrayContainer {
   }
 
   children(): Navigable[] {
-    return this.columns
+    return this.items
   }
 }
