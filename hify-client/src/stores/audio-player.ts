@@ -16,7 +16,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
       prev.pause()
     }
 
-    logInfo('Started playing track ID: ' + track.id)
+    logInfo(`Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
 
     let lastTimeUpdate = 0
 
