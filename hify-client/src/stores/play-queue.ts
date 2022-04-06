@@ -5,7 +5,7 @@ import { logFatal, logInfo } from './debugger'
 
 type PlayQueue = {
   tracks: AudioTrackFragment[]
-  position: (() => number) | null
+  position: number | null
 }
 
 const playQueue = writable<PlayQueue>({
