@@ -13,18 +13,13 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
+  import { handleInput } from '../../navigable/input-manager'
 
   const navigate = useNavigate()
   const location = useLocation()
 
-  function onKeyDown(e: KeyboardEvent) {
-    // logDebug(`Key down: "${e.key}" (ctrl: ${e.ctrlKey}, alt: ${e.altKey}, shift: ${e.altKey})`)
-
-    if (e.ctrlKey || e.altKey || e.shiftKey) {
-      return
-    }
-
-    switch (e.key) {
+  handleInput((key, pressType) => {
+    switch (key) {
       case 'Tab':
         if ($location.pathname === ROUTES.nowPlaying) {
           navigate(-1)
@@ -50,9 +45,8 @@
         return
     }
 
-    e.preventDefault()
     return false
-  }
+  })
 
   // window.addEventListener(
   //   'focus',
@@ -74,7 +68,7 @@
   // )
 </script>
 
-<NavigablePage {onKeyDown}>
+<NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)}>
     <NavigableList>
       <TabNav

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import './navigable/input-manager'
+
   import { Router, Route } from 'svelte-navigator'
   import { ROUTES } from './routes'
 

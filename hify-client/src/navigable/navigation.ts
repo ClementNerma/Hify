@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
+import { handleInput, KeyPressType } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -286,8 +287,8 @@ export function wasNavigableDestroyed(navigable: Navigable): boolean {
   return false
 }
 
-export function handleKeyboardEvent(e: KeyboardEvent): void | false {
-  if (e.ctrlKey || e.shiftKey || e.altKey) {
+export function handleKeyboardEvent(key: string, pressType: KeyPressType): void | false {
+  if (pressType !== KeyPressType.Simple) {
     return
   }
 
@@ -328,7 +329,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
 
   let next: NavigableItem | null
 
-  switch (e.key) {
+  switch (key) {
     case 'ArrowUp':
     case 'ArrowLeft':
     case 'ArrowRight':
@@ -338,14 +339,14 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
         break
       }
 
-      const directions: { [key in typeof e.key]: NavigationDirection } = {
+      const directions: { [key in typeof key]: NavigationDirection } = {
         ArrowUp: NavigationDirection.Up,
         ArrowLeft: NavigationDirection.Left,
         ArrowRight: NavigationDirection.Right,
         ArrowDown: NavigationDirection.Down,
       }
 
-      const direction = directions[e.key]
+      const direction = directions[key]
 
       next = current.canHandleDirection(direction)
         ? current.handleDirection(direction)
@@ -358,7 +359,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
     case 'Backspace':
     case 'Escape':
     case 'F4': // F4 is a remap of the back button in the Android App
-      const events: { [key in typeof e.key]: NavigationAction } = {
+      const events: { [key in typeof key]: NavigationAction } = {
         Enter: NavigationAction.Press,
         ' ': NavigationAction.LongPress,
         Backspace: NavigationAction.Back,
@@ -366,7 +367,7 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
         F4: NavigationAction.Back,
       }
 
-      const event = events[e.key]
+      const event = events[key]
 
       if (currentJustFocused && event !== NavigationAction.Back) {
         next = current
@@ -405,9 +406,6 @@ export function handleKeyboardEvent(e: KeyboardEvent): void | false {
   if (next) {
     navState.set(_generateNavState(current, next, state.page))
   }
-
-  e.preventDefault()
-  return false
 }
 
 function _getParents(item: NavigableItem): NavigableContainer[] {
@@ -479,3 +477,5 @@ if (!itemWrapperInPlace) {
 } else if (itemWrapperInPlace.name !== HTMLNavigableItemWrapperElement.name) {
   throw new Error('An invalid item wrapper element is already in place')
 }
+
+handleInput(handleKeyboardEvent)
