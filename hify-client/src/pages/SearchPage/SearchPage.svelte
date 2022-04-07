@@ -69,7 +69,12 @@
   <div class="row">
     <NavigableRow>
       {#each results.tracks as track, i (track.id)}
-        <NavigableTrack position={i} tracksIds={results.tracks.map((track) => track.id)} trackId={track.id}>
+        <NavigableTrack
+          position={i}
+          tracksIds={results.tracks.map((track) => track.id)}
+          trackId={track.id}
+          albumId={track.metadata.tags.album.id}
+        >
           <NonInteractiveCard
             title={track.metadata.tags.title}
             subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
