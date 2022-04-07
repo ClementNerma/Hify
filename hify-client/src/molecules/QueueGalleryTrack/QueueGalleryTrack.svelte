@@ -18,15 +18,8 @@
     style="display: block;"
   >
     <div>
-      <img
-        class="album-art"
-        width={80}
-        height={80}
-        src={getAlbumArtUri(track.metadata.tags.album.id)}
-        alt={track.metadata.tags.album.name}
-      />
-
-      <div class="title">{track.metadata.tags.title}</div>
+      <img class="album-art" width={80} height={80} src={getAlbumArtUri(track.metadata.tags.album.id)} alt="" />
+      <div class="title experimental-line-limiter">{track.metadata.tags.title}</div>
     </div>
   </SimpleNavigableItem>
 </div>
@@ -39,7 +32,6 @@
     max-width: var(--column-size);
   }
 
-  /* TODO: remove experimental stuff */
   .title {
     font-weight: bold;
     vertical-align: middle;
@@ -53,5 +45,14 @@
 
   .track:not(.current) {
     opacity: 0.2;
+  }
+
+  /* TODO: remove experimental stuff */
+  .experimental-line-limiter {
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 </style>
