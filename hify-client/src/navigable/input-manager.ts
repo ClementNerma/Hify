@@ -1,11 +1,11 @@
-import { logInfo } from '../stores/debugger'
+import { logDebug } from '../stores/debugger'
 
 export function handleInput(handler: InputHandler): void {
   inputHandlers.push(handler)
 }
 
 export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
-  logInfo('Pressed key: ' + key)
+  logDebug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
 
   for (const handler of inputHandlers) {
     if (handler(key, long) === false) {
@@ -18,13 +18,10 @@ export const LONG_PRESS_THRESOLD_MS = 500
 
 export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => boolean | void
 
-const inputHandlers: InputHandler[] = [
-  (key, long) => {
-    console.debug(`${key} (${long ? 'Long' : 'Short'})`)
-  },
-]
+const inputHandlers: InputHandler[] = []
 
 const pendingKeyCodes: Record<string, RegisteredKeyPress> = {}
+const triggeredKeyEvent = new Set<string>()
 
 type RegisteredKeyPress = {
   at: Date
@@ -52,8 +49,8 @@ document.body.addEventListener('keydown', (e) => {
   pendingKeyCodes[e.key] = {
     at: new Date(),
     timeout: window.setTimeout(() => {
+      triggeredKeyEvent.add(e.key)
       dispatchKeyPress(e.key, true)
-      delete pendingKeyCodes[e.key]
     }, LONG_PRESS_THRESOLD_MS),
   }
 
@@ -67,6 +64,12 @@ document.body.addEventListener('keyup', (e) => {
 
   // Happens when key has been pressed long enough for a long press
   if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
+    return
+  }
+
+  if (triggeredKeyEvent.has(e.key)) {
+    triggeredKeyEvent.delete(e.key)
+    delete pendingKeyCodes[e.key]
     return
   }
 
