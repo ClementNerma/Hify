@@ -51,7 +51,7 @@
 </script>
 
 <div class="search-container">
-  <SimpleNavigableItem onPress={() => searchField.focus()} onUnfocus={() => searchField?.blur()}>
+  <SimpleNavigableItem onPress={() => searchField.focus()} onUnfocus={() => searchField?.blur()} transparent={true}>
     <input
       class="search"
       type="text"
