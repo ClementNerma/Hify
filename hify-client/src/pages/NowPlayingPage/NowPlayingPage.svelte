@@ -30,34 +30,25 @@
     <img width={250} height={250} src={getAlbumArtUri(album.id)} alt={album.name} />
   </div>
   <div class="track-infos">
-    <div class="track-name"><span class="emoji">🎵</span> {tags.title}</div>
-    <div class="track-album-infos">
-      <!-- TODO: find a fix for this check -->
-      <SimpleNavigableItem onPress={() => void (album && navigate(ROUTES.album(album.id)))}>
-        <div class="track-album-name">
-          <span class="emoji">💿</span>
-          {album.name}
-        </div>
-      </SimpleNavigableItem>
-    </div>
-    <div class="track-artists">
-      <NavigableRow>
-        {#each album.albumArtists as albumArtist}
-          <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
-            <span class="album-artist">
-              <span class="emoji">🎤</span>
-              {albumArtist.name}
-            </span>
-          </SimpleNavigableItem>
-        {/each}
-      </NavigableRow>
-    </div>
+    <div item-like-style><div class="track-info">🎵 {tags.title}</div></div>
+    <!-- TODO: find a fix for this check -->
+    <SimpleNavigableItem onPress={() => void (album && navigate(ROUTES.album(album.id)))}>
+      <div class="track-info">💿 {album.name}</div>
+    </SimpleNavigableItem>
+    <NavigableRow>
+      {#each album.albumArtists as albumArtist}
+        <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
+          <span class="track-info">🎤 {albumArtist.name}</span>
+        </SimpleNavigableItem>
+      {/each}
+    </NavigableRow>
     {#if tags.date}
-      <div class="track-date" item-like-style>
-        <span class="emoji">🕒</span>
-        {tags.date.year}{tags.date.month ? `-${tags.date.month}` : ''}{tags.date.day
-          ? `${tags.date.month ? '' : '??'}-${tags.date.day}`
-          : ''}
+      <div item-like-style>
+        <div class="track-info">
+          🕒 {tags.date.year}{tags.date.month ? `-${tags.date.month}` : ''}{tags.date.day
+            ? `${tags.date.month ? '' : '??'}-${tags.date.day}`
+            : ''}
+        </div>
       </div>
     {/if}
   </div>
@@ -113,30 +104,13 @@
     flex-direction: column;
     position: fixed;
     top: calc(35% - 250px / 2);
-    left: calc(5% + 250px);
-    width: 100%;
+    left: calc(5% + 250px + 15px);
     font-size: 1.2rem;
   }
 
-  .track-infos * {
+  .track-info {
     display: inline-block;
-  }
-
-  .track-infos > * {
-    margin: 5px;
-  }
-
-  .track-infos .emoji {
-    font-size: 1.2rem;
-  }
-
-  .track-name {
-    font-size: 1.7rem;
-    padding: 25px;
-  }
-
-  .track-date {
-    padding: 5px 10px;
+    padding: 5px 25px;
   }
 
   .player-bottom {

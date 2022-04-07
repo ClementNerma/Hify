@@ -10,7 +10,12 @@
   export let columns: number
 </script>
 
-<SimpleNavigableItem {position} onPress={() => playTrackFromCurrentQueue(position)} hasFocusPriority={current}>
+<SimpleNavigableItem
+  {position}
+  onPress={() => playTrackFromCurrentQueue(position)}
+  hasFocusPriority={current}
+  transparent={true}
+>
   <div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
     <img
       class="album-art"

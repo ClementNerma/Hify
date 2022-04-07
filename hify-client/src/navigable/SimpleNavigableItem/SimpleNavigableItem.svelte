@@ -3,6 +3,8 @@
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { afterUpdate, onDestroy } from 'svelte'
 
+  export let transparent = false
+
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
 
@@ -63,19 +65,29 @@
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean
+  let mouseHover = false
 </script>
 
 <navigable-item-wrapper
+  bind:this={wrapper}
   on:click={() => onPress?.()}
   on:contextmenu|preventDefault={() => onLongPress?.()}
-  bind:this={wrapper}
+  on:mouseenter={() => {
+    mouseHover = true
+  }}
+  on:mouseleave={() => {
+    mouseHover = false
+  }}
+  class:focusedOrMouseHover={focused || mouseHover}
   class:focused
+  class:mouseHover
+  class:transparent
 >
   <slot {item} />
 </navigable-item-wrapper>
 
 <style>
-  navigable-item-wrapper {
+  navigable-item-wrapper.transparent {
     display: contents;
   }
 </style>

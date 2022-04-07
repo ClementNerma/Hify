@@ -36,7 +36,7 @@
   }
 
   .tab {
-    margin: 5px 25px;
+    padding: 0 25px;
     font-size: 1rem;
   }
 </style>

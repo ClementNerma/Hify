@@ -17,34 +17,38 @@ body {
     background-attachment: fixed;
 }
 
-/* This should be > :first-child but removing this would break everything :p */
-/* Same thing for all other rules below ^^" */
-navigable-item-wrapper :first-child:not(input),
-[item-like-style] :first-child {
+navigable-item-wrapper, [item-like-style] {
     padding: 5px 10px;
-    cursor: pointer;
 }
 
-navigable-item-wrapper.focused :first-child:not(input),
-navigable-item-wrapper:hover :first-child:not(input) {
+navigable-item-wrapper.focusedOrMouseHover, navigable-item-wrapper:hover {
     outline: none;
-    
     color: black;
     background-color: white;
 }
 
-navigable-item-wrapper.focused :first-child:not(input, tr, td),
-navigable-item-wrapper:hover :first-child:not(input, tr, td) {
+navigable-item-wrapper.transparent > :first-child, [item-like-style].transparent > :first-child {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+navigable-item-wrapper.focusedOrMouseHover.transparent > *, navigable-item-wrapper.transparent:hover > * {
+    outline: none;
+    background-color: white;
+}
+
+navigable-item-wrapper.focusedOrMouseHover:not(.transparent), navigable-item-wrapper:not(.transparent):hover {
+    cursor: pointer;
     border-radius: 5px;
 }
 
-navigable-item-wrapper.focused tr td:first-child,
-navigable-item-wrapper:hover tr td:first-child {
+navigable-item-wrapper.focusedOrMouseHover > tr > td:first-child,
+navigable-item-wrapper:hover > tr > td:first-child {
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
-navigable-item-wrapper.focused tr td:last-child,
+navigable-item-wrapper.focusedOrMouseHover tr td:last-child,
 navigable-item-wrapper:hover tr td:last-child {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;

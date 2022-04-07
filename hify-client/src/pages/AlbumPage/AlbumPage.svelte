@@ -70,7 +70,7 @@
     <table>
       <tbody>
         {#each album.tracks as track}
-          <NavigableTrack tracksIds={album.tracks.map((track) => track.id)} trackId={track.id}>
+          <NavigableTrack transparent={true} tracksIds={album.tracks.map((track) => track.id)} trackId={track.id}>
             <tr>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
