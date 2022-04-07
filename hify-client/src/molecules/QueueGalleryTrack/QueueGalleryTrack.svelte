@@ -15,7 +15,7 @@
     {position}
     onPress={() => playTrackFromCurrentQueue(position)}
     hasFocusPriority={current}
-    style="display: block;"
+    style="display: block; min-height: 100%;"
   >
     <div>
       <img class="album-art" width={80} height={80} src={getAlbumArtUri(track.metadata.tags.album.id)} alt="" />
