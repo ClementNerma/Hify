@@ -1,19 +1,24 @@
 <script lang="ts">
+  import { useNavigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { getAlbumArtUri } from '../../rest-api'
+  import { ROUTES } from '../../routes'
   import { playTrackFromCurrentQueue } from '../../stores/play-queue'
 
   export let track: AudioTrackFragment
   export let position: number
   export let current: boolean
   export let columns: number
+
+  const navigate = useNavigate()
 </script>
 
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
   <SimpleNavigableItem
     {position}
     onPress={() => playTrackFromCurrentQueue(position)}
+    onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
     hasFocusPriority={current}
     style="display: block; min-height: 100%;"
   >
