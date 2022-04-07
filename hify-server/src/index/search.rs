@@ -6,6 +6,7 @@ use rayon::iter::{ParallelBridge, ParallelIterator};
 use super::{AlbumInfos, ArtistInfos, Index, Track};
 
 static SEARCH_CACHE_CAPACITY: usize = 100;
+static SEARCH_CHARS_THRESOLD: usize = 3;
 
 pub fn search_index(
     index: &Index,
@@ -33,21 +34,23 @@ pub fn search_index(
         artists: search_and_score(index.cache.artists_infos.values(), &words, limit),
     };
 
-    if search_cache.len() == SEARCH_CACHE_CAPACITY {
-        let key = search_cache.keys().next().unwrap().clone();
-        search_cache.remove(&key);
+    if input.trim().len() >= SEARCH_CHARS_THRESOLD {
+        if search_cache.len() == SEARCH_CACHE_CAPACITY {
+            let key = search_cache.keys().next().unwrap().clone();
+            search_cache.remove(&key);
+        }
+
+        search_cache.insert(words, results.clone());
+
+        let fill_percent = search_cache.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
+
+        println!(
+            "|> Search cache now contains {} entries ({:.1}% of total capacity).",
+            search_cache.len(),
+            fill_percent
+        );
+        std::io::stdout().flush().unwrap();
     }
-
-    search_cache.insert(words, results.clone());
-
-    let fill_percent = search_cache.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
-
-    println!(
-        "|> Search cache now contains {} entries ({:.1}% of total capacity).",
-        search_cache.len(),
-        fill_percent
-    );
-    std::io::stdout().flush().unwrap();
 
     results
 }
