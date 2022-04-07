@@ -137,6 +137,8 @@
 
   .gallery {
     position: fixed;
+    left: 5%;
+    right: 5%;
     bottom: 20px;
   }
 </style>

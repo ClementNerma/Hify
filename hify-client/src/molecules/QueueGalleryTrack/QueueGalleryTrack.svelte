@@ -10,28 +10,32 @@
   export let columns: number
 </script>
 
-<SimpleNavigableItem
-  {position}
-  onPress={() => playTrackFromCurrentQueue(position)}
-  hasFocusPriority={current}
-  transparent={true}
->
-  <div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
-    <img
-      class="album-art"
-      width={80}
-      height={80}
-      src={getAlbumArtUri(track.metadata.tags.album.id)}
-      alt={track.metadata.tags.album.name}
-    />
+<div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
+  <SimpleNavigableItem
+    {position}
+    onPress={() => playTrackFromCurrentQueue(position)}
+    hasFocusPriority={current}
+    style="display: block;"
+  >
+    <div>
+      <img
+        class="album-art"
+        width={80}
+        height={80}
+        src={getAlbumArtUri(track.metadata.tags.album.id)}
+        alt={track.metadata.tags.album.name}
+      />
 
-    <div class="title">{track.metadata.tags.title}</div>
-  </div>
-</SimpleNavigableItem>
+      <div class="title">{track.metadata.tags.title}</div>
+    </div>
+  </SimpleNavigableItem>
+</div>
 
 <style>
   .track {
     text-align: center;
+    min-width: var(--column-size);
+    width: var(--column-size);
     max-width: var(--column-size);
   }
 
@@ -40,11 +44,6 @@
     font-weight: bold;
     vertical-align: middle;
     overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
   }
 
   .track.current {
