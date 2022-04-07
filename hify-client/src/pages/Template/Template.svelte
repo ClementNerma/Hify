@@ -3,7 +3,6 @@
 
   import { useLocation, useNavigate } from 'svelte-navigator'
 
-  import { logDebug } from '../../stores/debugger'
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
 
   import { ROUTES } from '../../routes'
@@ -51,25 +50,6 @@
 
     return false
   })
-
-  // window.addEventListener(
-  //   'focus',
-  //   (e) => {
-  //     if (!(e instanceof FocusEvent)) {
-  //       return
-  //     }
-
-  //     if (!(e instanceof FocusEvent) || !e.target || e.target instanceof HTMLInputElement) {
-  //       return
-  //     }
-
-  //     if (typeof e.target.blur === 'function') {
-  //       logDebug('Forcibly removed focus on element')
-  //       e.target.blur()
-  //     }
-  //   },
-  //   true,
-  // )
 </script>
 
 <NavigablePage>

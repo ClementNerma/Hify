@@ -1,8 +1,6 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
 
-  import { Track } from '../../graphql/generated'
-
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
   import { playTrackFromFetchableQueue } from '../../stores/play-queue'
