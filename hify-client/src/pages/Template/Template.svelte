@@ -54,24 +54,24 @@
     return false
   }
 
-  window.addEventListener(
-    'focus',
-    (e) => {
-      if (!(e instanceof FocusEvent)) {
-        return
-      }
+  // window.addEventListener(
+  //   'focus',
+  //   (e) => {
+  //     if (!(e instanceof FocusEvent)) {
+  //       return
+  //     }
 
-      if (!(e instanceof FocusEvent) || !e.target || e.target instanceof HTMLInputElement) {
-        return
-      }
+  //     if (!(e instanceof FocusEvent) || !e.target || e.target instanceof HTMLInputElement) {
+  //       return
+  //     }
 
-      if (typeof e.target.blur === 'function') {
-        logDebug('Forcibly removed focus on element')
-        e.target.blur()
-      }
-    },
-    true,
-  )
+  //     if (typeof e.target.blur === 'function') {
+  //       logDebug('Forcibly removed focus on element')
+  //       e.target.blur()
+  //     }
+  //   },
+  //   true,
+  // )
 </script>
 
 <NavigablePage {onKeyDown}>
