@@ -27,7 +27,7 @@
   }
 </script>
 
-<SimpleNavigableItem {onLeft} {onRight} {onPress} transparent={true}>
+<SimpleNavigableItem {onLeft} {onRight} {onPress}>
   <div class="container">
     <input type="range" {max} {value} bind:this={input} on:change={() => onChange(getValue())} />
   </div>
