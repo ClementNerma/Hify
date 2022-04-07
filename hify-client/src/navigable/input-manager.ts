@@ -1,8 +1,12 @@
+import { logInfo } from '../stores/debugger'
+
 export function handleInput(handler: InputHandler): void {
   inputHandlers.push(handler)
 }
 
 export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
+  logInfo('Pressed key: ' + key)
+
   for (const handler of inputHandlers) {
     if (handler(key, long) === false) {
       return
@@ -37,9 +41,12 @@ document.body.addEventListener('keydown', (e) => {
     return
   }
 
+  e.preventDefault()
+  e.stopImmediatePropagation()
+
   // Holding a key down will fire a repeated series of 'keydown' events, so we take care of ignoring them
   if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    return
+    return false
   }
 
   pendingKeyCodes[e.key] = {
@@ -50,7 +57,6 @@ document.body.addEventListener('keydown', (e) => {
     }, LONG_PRESS_THRESOLD_MS),
   }
 
-  e.preventDefault()
   return false
 })
 
@@ -68,7 +74,4 @@ document.body.addEventListener('keyup', (e) => {
 
   dispatchKeyPress(e.key, false)
   delete pendingKeyCodes[e.key]
-
-  e.preventDefault()
-  return false
 })
