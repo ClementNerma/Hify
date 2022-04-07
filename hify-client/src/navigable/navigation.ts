@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { logWarn } from '../stores/debugger'
+import { logFatal, logWarn } from '../stores/debugger'
 
 export enum NavigationDirection {
   Up,
@@ -67,7 +67,15 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
   }
 
   protected get items(): Navigable[] {
-    return this.ordered ? [...this._unorderedItems].sort((a, b) => a.position! - b.position!) : this._unorderedItems
+    return this.ordered
+      ? [...this._unorderedItems].sort((a, b) => {
+          if (a.position === null || b.position === null) {
+            return logFatal('Internal error: position not definied in ordered items array')
+          }
+
+          return a.position - b.position
+        })
+      : this._unorderedItems
   }
 
   protected getFocusPriority(): Navigable | null {
