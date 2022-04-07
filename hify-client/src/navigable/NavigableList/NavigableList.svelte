@@ -5,9 +5,10 @@
   import { NavigableList } from './NavigableList'
 
   export let position: (() => number) | null = null
+  export let hasFocusPriority: (() => boolean) | null = null
 
   const nav = getParentNavigable()
-  const list = new NavigableList(nav, position)
+  const list = new NavigableList(nav, position, hasFocusPriority)
 
   nav.append(list)
 
