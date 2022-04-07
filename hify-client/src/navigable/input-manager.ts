@@ -1,5 +1,3 @@
-import { logError } from '../stores/debugger'
-
 export function handleInput(handler: InputHandler): void {
   inputHandlers.push(handler)
 }
@@ -22,7 +20,12 @@ const inputHandlers: InputHandler[] = [
   },
 ]
 
-const pendingKeyCodes: Record<string, Date> = {}
+const pendingKeyCodes: Record<string, RegisteredKeyPress> = {}
+
+type RegisteredKeyPress = {
+  at: Date
+  timeout: number
+}
 
 export enum KeyPressType {
   Simple,
@@ -39,7 +42,13 @@ document.body.addEventListener('keydown', (e) => {
     return
   }
 
-  pendingKeyCodes[e.key] = new Date()
+  pendingKeyCodes[e.key] = {
+    at: new Date(),
+    timeout: window.setTimeout(() => {
+      dispatchKeyPress(e.key, true)
+      delete pendingKeyCodes[e.key]
+    }, LONG_PRESS_THRESOLD_MS),
+  }
 
   e.preventDefault()
   return false
@@ -50,11 +59,14 @@ document.body.addEventListener('keyup', (e) => {
     return
   }
 
+  // Happens when key has been pressed long enough for a long press
   if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    return logError('Got "keyup" event for a key without an associated "keydown" registration')
+    return
   }
 
-  dispatchKeyPress(e.key, Date.now() > pendingKeyCodes[e.key].getTime() + LONG_PRESS_THRESOLD_MS)
+  clearTimeout(pendingKeyCodes[e.key].timeout)
+
+  dispatchKeyPress(e.key, false)
   delete pendingKeyCodes[e.key]
 
   e.preventDefault()
