@@ -52,7 +52,7 @@ export function playNextTrack(): void {
   logInfo('Going to play next track...')
 
   playQueue.update(({ tracks, position }) => {
-    let newposition: (() => number) | null
+    let newPosition: number | null
 
     if (position === null) {
       newPosition = tracks.length > 0 ? 0 : null
