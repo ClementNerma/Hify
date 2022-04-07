@@ -5,7 +5,7 @@ use clap::Parser;
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
 pub struct Command {
-    #[clap(short, long)]
+    #[clap()]
     pub music_dir: PathBuf,
 
     #[clap(short, long)]
