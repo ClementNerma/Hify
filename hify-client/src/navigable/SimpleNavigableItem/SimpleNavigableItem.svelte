@@ -70,7 +70,6 @@
 </script>
 
 <navigable-item-wrapper
-  tabindex="-1"
   bind:this={wrapper}
   on:click={() => onPress?.()}
   on:contextmenu|preventDefault={() => onLongPress?.()}
