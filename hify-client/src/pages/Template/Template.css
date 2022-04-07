@@ -25,6 +25,8 @@ navigable-item-wrapper.focusedOrMouseHover, navigable-item-wrapper:hover {
     outline: none;
     color: black;
     background-color: white;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 navigable-item-wrapper.transparent > :first-child, [item-like-style].transparent > :first-child {
@@ -35,11 +37,6 @@ navigable-item-wrapper.transparent > :first-child, [item-like-style].transparent
 navigable-item-wrapper.focusedOrMouseHover.transparent > *, navigable-item-wrapper.transparent:hover > * {
     outline: none;
     background-color: white;
-}
-
-navigable-item-wrapper.focusedOrMouseHover:not(.transparent), navigable-item-wrapper:not(.transparent):hover {
-    cursor: pointer;
-    border-radius: 5px;
 }
 
 navigable-item-wrapper.focusedOrMouseHover > tr > td:first-child,
