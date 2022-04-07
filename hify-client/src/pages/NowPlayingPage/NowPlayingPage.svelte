@@ -104,7 +104,7 @@
     flex-direction: column;
     position: fixed;
     top: calc(35% - 250px / 2);
-    left: calc(5% + 250px + 15px);
+    left: calc(5% + 250px);
     font-size: 1.2rem;
   }
 
