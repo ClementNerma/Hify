@@ -35,7 +35,7 @@
   <NavigableList>
     <div class="album-header">
       <div class="album-art">
-        <img width={150} height={150} src={getAlbumArtUri(albumId)} alt={album.name} />
+        <img width={150} height={150} src={getAlbumArtUri(albumId)} alt="" />
       </div>
       <div class="album-infos">
         <div class="album-name">{album.name}</div>

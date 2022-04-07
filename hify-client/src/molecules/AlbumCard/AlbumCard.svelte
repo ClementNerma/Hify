@@ -17,5 +17,4 @@
   subtitle={album.albumArtists.map((artist) => artist.name).join(', ')}
   onPress={() => navigate(ROUTES.album(album.id))}
   pictureUrl={getAlbumArtUri(album.id)}
-  pictureAlt={album.name}
 />

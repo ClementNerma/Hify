@@ -3,7 +3,6 @@
   import NonInteractiveCard from './NonInteractiveCard.svelte'
 
   export let pictureUrl: string
-  export let pictureAlt: string
 
   export let title: string
   export let subtitle: string
@@ -15,5 +14,5 @@
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress} {position}>
-  <NonInteractiveCard {pictureUrl} {pictureAlt} {title} {subtitle} />
+  <NonInteractiveCard {pictureUrl} {title} {subtitle} />
 </SimpleNavigableItem>

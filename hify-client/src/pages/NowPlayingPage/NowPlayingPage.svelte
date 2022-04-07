@@ -27,7 +27,7 @@
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
 {:else}
   <div class="album-art">
-    <img width={250} height={250} src={getAlbumArtUri(album.id)} alt={album.name} />
+    <img width={250} height={250} src={getAlbumArtUri(album.id)} alt="" />
   </div>
   <div class="track-infos">
     <div item-like-style><div class="track-info">🎵 {tags.title}</div></div>

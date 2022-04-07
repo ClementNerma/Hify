@@ -76,7 +76,6 @@
               .map((artist) => artist.name)
               .join(' / ')}`}
             pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-            pictureAlt={track.metadata.tags.album.name}
           />
         </NavigableTrack>
       {/each}
@@ -92,7 +91,6 @@
           title={album.name}
           subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
           pictureUrl={getAlbumArtUri(album.id)}
-          pictureAlt={album.name}
           onPress={() => navigate(ROUTES.album(album.id))}
           onLongPress={() => alert('TODO: context menu for playing options')}
         />
@@ -109,7 +107,6 @@
           title={artist.name}
           subtitle=""
           pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
-          pictureAlt={artist.name}
           onPress={() => navigate(ROUTES.artist(artist.id))}
           onLongPress={() => alert('TODO: context menu for playing options')}
         />
