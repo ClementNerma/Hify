@@ -1,38 +1,32 @@
+import { logError } from '../stores/debugger'
+
 export function handleInput(handler: InputHandler): void {
   inputHandlers.push(handler)
 }
 
-export function dispatchKeyPress(key: KeyboardEvent['key'], pressType: KeyPressType) {
+export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
   for (const handler of inputHandlers) {
-    if (handler(key, pressType) === false) {
+    if (handler(key, long) === false) {
       return
     }
   }
 }
 
-export const DOUBLE_PRESS_THRESOLD_MS = 200
 export const LONG_PRESS_THRESOLD_MS = 500
 
-export type InputHandler = (key: KeyboardEvent['key'], pressType: KeyPressType) => boolean | void
+export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => boolean | void
 
 const inputHandlers: InputHandler[] = [
-  (key, type) => {
-    console.log(`${key} (${type === KeyPressType.Simple ? 'Simple' : type === KeyPressType.Long ? 'Long' : 'Double'})`)
+  (key, long) => {
+    console.debug(`${key} (${long ? 'Long' : 'Short'})`)
   },
 ]
 
-const pendingKeyCodes: Record<string, RegisteredKeyPress> = {}
+const pendingKeyCodes: Record<string, Date> = {}
 
 export enum KeyPressType {
   Simple,
-  Double,
   Long,
-}
-
-type RegisteredKeyPress = {
-  at: Date
-  wasReleasedOnce: boolean
-  timeout: number
 }
 
 document.body.addEventListener('keydown', (e) => {
@@ -40,23 +34,12 @@ document.body.addEventListener('keydown', (e) => {
     return
   }
 
+  // Holding a key down will fire a repeated series of 'keydown' events, so we take care of ignoring them
   if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    if (pendingKeyCodes[e.key].wasReleasedOnce) {
-      dispatchKeyPress(e.key, KeyPressType.Double)
-      delete pendingKeyCodes[e.key]
-    }
-  } else {
-    pendingKeyCodes[e.key] = {
-      at: new Date(),
-      wasReleasedOnce: false,
-      timeout: window.setTimeout(() => {
-        if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key) && pendingKeyCodes[e.key].wasReleasedOnce) {
-          delete pendingKeyCodes[e.key]
-          dispatchKeyPress(e.key, KeyPressType.Simple)
-        }
-      }, DOUBLE_PRESS_THRESOLD_MS),
-    }
+    return
   }
+
+  pendingKeyCodes[e.key] = new Date()
 
   e.preventDefault()
   return false
@@ -68,29 +51,12 @@ document.body.addEventListener('keyup', (e) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    return
+    return logError('Got "keyup" event for a key without an associated "keydown" registration')
   }
 
-  const pending = pendingKeyCodes[e.key]
+  dispatchKeyPress(e.key, Date.now() > pendingKeyCodes[e.key].getTime() + LONG_PRESS_THRESOLD_MS)
+  delete pendingKeyCodes[e.key]
 
-  const firstPressedAt = pending.at.getTime()
-  const now = Date.now()
-
-  let pressType: KeyPressType | null
-
-  if (now > firstPressedAt + LONG_PRESS_THRESOLD_MS) {
-    pressType = KeyPressType.Long
-  } else if (now > firstPressedAt + DOUBLE_PRESS_THRESOLD_MS) {
-    pressType = KeyPressType.Simple
-  } else {
-    pressType = null
-  }
-
-  if (pressType !== null) {
-    clearTimeout(pending.timeout)
-    dispatchKeyPress(e.key, pressType)
-    delete pendingKeyCodes[e.key]
-  } else {
-    pendingKeyCodes[e.key].wasReleasedOnce = true
-  }
+  e.preventDefault()
+  return false
 })

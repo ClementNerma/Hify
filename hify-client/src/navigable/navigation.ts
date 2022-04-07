@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput, KeyPressType } from './input-manager'
+import { handleInput } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -287,11 +287,7 @@ export function wasNavigableDestroyed(navigable: Navigable): boolean {
   return false
 }
 
-export function handleKeyboardEvent(key: string, pressType: KeyPressType): void | false {
-  if (pressType !== KeyPressType.Simple) {
-    return
-  }
-
+export function handleKeyboardEvent(key: string, long: boolean): void | false {
   const state = get(navState)
 
   if (!state) {
@@ -355,13 +351,11 @@ export function handleKeyboardEvent(key: string, pressType: KeyPressType): void 
       break
 
     case 'Enter':
-    case ' ':
     case 'Backspace':
     case 'Escape':
     case 'F4': // F4 is a remap of the back button in the Android App
       const events: { [key in typeof key]: NavigationAction } = {
-        Enter: NavigationAction.Press,
-        ' ': NavigationAction.LongPress,
+        Enter: long ? NavigationAction.LongPress : NavigationAction.Press,
         Backspace: NavigationAction.Back,
         Escape: NavigationAction.Back,
         F4: NavigationAction.Back,

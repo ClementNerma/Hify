@@ -18,7 +18,11 @@
   const navigate = useNavigate()
   const location = useLocation()
 
-  handleInput((key, pressType) => {
+  handleInput((key, long) => {
+    if (long) {
+      return
+    }
+
     switch (key) {
       case 'Tab':
         if ($location.pathname === ROUTES.nowPlaying) {
