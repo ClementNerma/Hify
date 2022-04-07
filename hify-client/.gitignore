@@ -2,6 +2,7 @@
 /tsconfig.build.tsbuildinfo
 /src/graphql
 /src/**/*.generated.ts
+/dist
 
 /.pnpm-debug.log
 
