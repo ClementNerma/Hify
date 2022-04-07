@@ -28,8 +28,8 @@ export abstract class NavigableCommon {
 
   constructor(
     readonly parent: NavigableContainer,
-    readonly position: (() => number) | null,
-    readonly hasFocusPriority: (() => boolean) | null,
+    public position: number | null,
+    public hasFocusPriority: boolean | null,
   ) {
     this.identity = parent.identity
     this.page = parent.page
@@ -67,11 +67,11 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
   }
 
   protected get items(): Navigable[] {
-    return this.ordered ? [...this._unorderedItems].sort((a, b) => a.position!() - b.position!()) : this._unorderedItems
+    return this.ordered ? [...this._unorderedItems].sort((a, b) => a.position! - b.position!) : this._unorderedItems
   }
 
   protected getFocusPriority(): Navigable | null {
-    return this._unorderedItems.find((item) => item.hasFocusPriority && item.hasFocusPriority()) ?? null
+    return this._unorderedItems.find((item) => item.hasFocusPriority === true) ?? null
   }
 
   append(navigable: Navigable): void {
@@ -157,6 +157,7 @@ class NavigablePage implements _NavigableContainerLike {
   readonly page: NavigablePage
   readonly priorityFocusables: NavigableItem[] = []
   readonly position = null
+  readonly hasFocusPriority = null
   readonly ordered = false
 
   private onlyChild: Navigable | null = null
@@ -211,10 +212,6 @@ class NavigablePage implements _NavigableContainerLike {
 
   handleAction(_: NavigationAction): NavigableItem | null {
     throw new Error('Tried to make the navigable page component handle an action')
-  }
-
-  hasFocusPriority(): boolean {
-    return false
   }
 
   asContainer(): NavigableContainer {

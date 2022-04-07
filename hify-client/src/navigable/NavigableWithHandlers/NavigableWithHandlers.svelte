@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte'
+  import { afterUpdate, onDestroy } from 'svelte'
 
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
 
   export let position: NavigableWithHandlersProps['position'] = null
-  export let hasFocusPriority: (() => boolean) | null = null
+  export let hasFocusPriority: NavigableWithHandlersProps['hasFocusPriority'] = null
 
   export let onPress: NavigableWithHandlersProps['onPress'] = undefined
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
@@ -17,6 +17,11 @@
   nav.append(row)
 
   setChildrenNavigable(row)
+
+  afterUpdate(() => {
+    row.position = position
+    row.hasFocusPriority = hasFocusPriority
+  })
 
   onDestroy(() => nav.remove(row))
 </script>

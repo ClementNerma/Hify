@@ -19,7 +19,7 @@
       {#each nearTracks as track (track.id)}
         <QueueGalleryTrack
           current={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
-          position={() => $readablePlayQueue.tracks.indexOf(track)}
+          position={$readablePlayQueue.tracks.indexOf(track)}
           columns={SIDE_TRACKS * 2 + 1}
           {track}
         />

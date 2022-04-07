@@ -11,7 +11,7 @@ export class NavigableGrid extends NavigableArrayContainer {
   private itemsBeforeLastLazyLoading = 0
 
   constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
-    super(parent, props.position, props.hasFocusPriority ?? null)
+    super(parent, props.position, props.hasFocusPriority)
   }
 
   private _rows() {
@@ -138,8 +138,8 @@ export class NavigableGrid extends NavigableArrayContainer {
 }
 
 export type NavigableGridProps = {
-  position: (() => number) | null
-  hasFocusPriority?: () => boolean
+  position: number | null
+  hasFocusPriority: boolean | null
 
   columns: number
   lazyLoader?: () => void

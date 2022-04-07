@@ -5,12 +5,12 @@
   import { playTrackFromCurrentQueue } from '../../stores/play-queue'
 
   export let track: AudioTrackFragment
-  export let position: () => number
+  export let position: number
   export let current: boolean
   export let columns: number
 </script>
 
-<SimpleNavigableItem {position} onPress={() => playTrackFromCurrentQueue(position())} hasFocusPriority={() => current}>
+<SimpleNavigableItem {position} onPress={() => playTrackFromCurrentQueue(position)} hasFocusPriority={current}>
   <div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
     <img
       class="album-art"

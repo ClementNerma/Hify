@@ -89,8 +89,8 @@ export class SimpleNavigableItem extends NavigableItem {
 export type SimpleNavigableItemCallback = () => NavigableItem | null | void
 
 export type SimpleNavigableItemProps = {
-  position: (() => number) | null
-  hasFocusPriority: (() => boolean) | null
+  position: number | null
+  hasFocusPriority: boolean | null
 
   onFocus?: () => void
   onUnfocus?: () => void

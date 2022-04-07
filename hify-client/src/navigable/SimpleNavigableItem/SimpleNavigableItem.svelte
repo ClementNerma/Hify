@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
-  import { onDestroy } from 'svelte'
+  import { afterUpdate, onDestroy } from 'svelte'
 
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
@@ -53,6 +53,11 @@
   })
 
   nav.append(item)
+
+  afterUpdate(() => {
+    item.position = position
+    item.hasFocusPriority = hasFocusPriority
+  })
 
   onDestroy(() => nav.remove(item))
 

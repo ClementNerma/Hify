@@ -4,7 +4,7 @@
 
   export let tracksIds: string[]
   export let trackId: string
-  export let position: (() => number) | null = null
+  export let position: number | null = null
 
   function play() {
     playTrackFromFetchableQueue(tracksIds, tracksIds.indexOf(trackId))
