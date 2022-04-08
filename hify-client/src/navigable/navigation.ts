@@ -396,7 +396,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
   }
 
   if (next) {
-    navState.set(_generateNavState(current, next, state.page))
+    navState.set(_generateUpdatedNavState(current, next, state.page))
   }
 }
 
@@ -435,11 +435,15 @@ function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
 
 function _requestFocus(item: NavigableItem) {
   navState.update((state) =>
-    state && _checkItemValidity(item, state.page) ? _generateNavState(state.focused, item, state.page) : state,
+    state && _checkItemValidity(item, state.page) ? _generateUpdatedNavState(state.focused, item, state.page) : state,
   )
 }
 
-function _generateNavState(oldFocused: NavigableItem | null, newFocused: NavigableItem, page: NavigablePage): NavState {
+function _generateUpdatedNavState(
+  oldFocused: NavigableItem | null,
+  newFocused: NavigableItem,
+  page: NavigablePage,
+): NavState {
   oldFocused?.onUnfocus()
   newFocused.onFocus()
 
