@@ -46,7 +46,7 @@
       <SearchPage />
     </Route>
 
-    <Route path={ROUTES.searchTerms(':terms')} let:params>
+    <Route path={ROUTES.search + '/:terms'} let:params>
       <SearchPage searchTerms={params['terms']} />
     </Route>
 
