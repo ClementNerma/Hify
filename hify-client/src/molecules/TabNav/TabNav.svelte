@@ -20,7 +20,13 @@
 <div class="container">
   <NavigableRow>
     {#each tabs as tab}
-      <SimpleNavigableItem onPress={() => navigate(tab.uri)} hasFocusPriority={$location.pathname === tab.uri}>
+      <SimpleNavigableItem
+        onPress={() => navigate(tab.uri)}
+        hasFocusPriority={$location.pathname === tab.uri}
+        onFocus={() => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+        }}
+      >
         <div class="tab">{tab.label}</div>
       </SimpleNavigableItem>
     {/each}
