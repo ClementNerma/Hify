@@ -31,7 +31,9 @@
     <img width={250} height={250} src={getAlbumArtUri(album.id)} alt="" />
   </div>
   <div class="track-infos">
-    <div item-like-style><div class="track-info">🎵 {tags.title}</div></div>
+    <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+      <div class="track-info">🎵 {tags.title}</div>
+    </SimpleNavigableItem>
     <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
       <div class="track-info">💿 {album.name}</div>
     </SimpleNavigableItem>
