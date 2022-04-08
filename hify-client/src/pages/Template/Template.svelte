@@ -23,15 +23,6 @@
     }
 
     switch (key) {
-      case 'Tab':
-        if ($location.pathname === ROUTES.nowPlaying) {
-          navigate(-1)
-        } else {
-          navigate(ROUTES.nowPlaying)
-        }
-
-        break
-
       case 'MediaPlayPause':
         toggleAudioPlayback()
         break
