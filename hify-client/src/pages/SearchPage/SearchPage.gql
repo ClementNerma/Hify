@@ -1,21 +1,7 @@
-query SearchPage($input: String!, $limit: Int!) {
+query SearchPage($input: String!, $limit: Int!, $albumYearStrategy: AlbumYearStrategy!) {
   search(input: $input, limit: $limit) {
     tracks {
-      id
-      metadata {
-        # duration
-        tags {
-          title
-          album {
-            id
-            name
-          }
-          artists {
-            id
-            name
-          }
-        }
-      }
+      ...AudioTrack
     }
     albums {
       id

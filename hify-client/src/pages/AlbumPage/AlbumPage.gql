@@ -1,24 +1,14 @@
-query AlbumPage($albumId: String!, $strategy: AlbumYearStrategy!) {
+query AlbumPage($albumId: String!, $albumYearStrategy: AlbumYearStrategy!) {
   album(id: $albumId) {
     name
-    year(strategy: $strategy)
+    year(strategy: $albumYearStrategy)
     genres
     albumArtists {
       id
       name
     }
     tracks {
-      id
-      metadata {
-        tags {
-          trackNo
-          title
-          artists {
-            id
-            name
-          }
-        }
-      }
+      ...AudioTrack
     }
   }
 }

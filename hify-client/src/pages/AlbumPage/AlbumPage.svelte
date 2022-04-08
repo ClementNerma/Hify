@@ -16,7 +16,7 @@
   const album = AsyncAlbumPage({
     variables: {
       albumId,
-      strategy: AlbumYearStrategy.IdenticalOnly,
+      albumYearStrategy: AlbumYearStrategy.IdenticalOnly,
     },
   }).then((res) => {
     const album = res.data.album
@@ -70,12 +70,7 @@
     <table>
       <tbody>
         {#each album.tracks as track}
-          <NavigableTrack
-            transparent={true}
-            tracksIds={album.tracks.map((track) => track.id)}
-            trackId={track.id}
-            {albumId}
-          >
+          <NavigableTrack transparent={true} tracks={album.tracks} {track}>
             <tr>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>

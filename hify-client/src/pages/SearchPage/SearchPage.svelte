@@ -2,7 +2,7 @@
   import { useNavigate } from 'svelte-navigator'
 
   import { getAlbumArtUri } from '../../rest-api'
-  import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
+  import { AlbumYearStrategy, AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
 
   import { ROUTES } from '../../routes'
 
@@ -34,6 +34,7 @@
       variables: {
         limit: MAX_RESULTS_PER_CATEGORY,
         input: searchTerms,
+        albumYearStrategy: AlbumYearStrategy.IdenticalOrFirstTrack,
       },
     })
 
@@ -74,12 +75,7 @@
   <div class="row">
     <NavigableRow>
       {#each results.tracks as track, i (track.id)}
-        <NavigableTrack
-          position={i}
-          tracksIds={results.tracks.map((track) => track.id)}
-          trackId={track.id}
-          albumId={track.metadata.tags.album.id}
-        >
+        <NavigableTrack position={i} tracks={results.tracks} {track}>
           <NonInteractiveCard
             title={track.metadata.tags.title}
             subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists

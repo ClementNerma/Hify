@@ -1,18 +1,18 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
+  import { AudioTrackFragment, Track } from '../../graphql/generated'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
-  import { playTrackFromFetchableQueue } from '../../stores/play-queue'
+  import { playTrackFromNewQueue } from '../../stores/play-queue'
 
-  export let tracksIds: string[]
-  export let trackId: string
-  export let albumId: string
+  export let tracks: AudioTrackFragment[]
+  export let track: AudioTrackFragment
   export let position: number | null = null
   export let transparent = false
 
   function play() {
-    playTrackFromFetchableQueue(tracksIds, tracksIds.indexOf(trackId))
+    playTrackFromNewQueue(tracks, tracks.indexOf(track))
     navigate(ROUTES.nowPlaying)
   }
 
@@ -22,7 +22,7 @@
 <SimpleNavigableItem
   let:item
   onPress={play}
-  onLongPress={() => navigate(ROUTES.album(albumId))}
+  onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
   {position}
   {transparent}
 >
