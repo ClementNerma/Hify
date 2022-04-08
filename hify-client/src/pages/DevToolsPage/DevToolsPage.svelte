@@ -4,13 +4,13 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
 
-  $: slicedAppLogs = $appLogs.slice(0, 100)
-
   let hideDebugLogs = true
 
   function toggleDebugLogsDisplay() {
     hideDebugLogs = !hideDebugLogs
   }
+
+  $: slicedAppLogs = $appLogs.slice(0, 100).filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
 </script>
 
 <h2>Developer Tools</h2>
@@ -27,14 +27,12 @@
 <NavigableList>
   <ul>
     {#each slicedAppLogs as logEntry}
-      {#if logEntry.level !== 'debug' || !hideDebugLogs}
-        <SimpleNavigableItem displayBlock={true}>
-          <li class="log-entry {logEntry.level}">
-            <u>{logEntry.level.toLocaleUpperCase()}</u>
-            <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
-          </li>
-        </SimpleNavigableItem>
-      {/if}
+      <SimpleNavigableItem displayBlock={true}>
+        <li class="log-entry {logEntry.level}">
+          <u>{logEntry.level.toLocaleUpperCase()}</u>
+          <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
+        </li>
+      </SimpleNavigableItem>
     {/each}
   </ul>
 </NavigableList>
