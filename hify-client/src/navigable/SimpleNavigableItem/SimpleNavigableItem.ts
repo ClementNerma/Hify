@@ -84,6 +84,11 @@ export class SimpleNavigableItem extends NavigableItem {
   onUnfocus(): void {
     this.props.onUnfocus?.()
   }
+
+  // Additional methods
+  requestFocus(): void {
+    return this.parent.page.requestFocus(this)
+  }
 }
 
 export type SimpleNavigableItemCallback = () => NavigableItem | null | void

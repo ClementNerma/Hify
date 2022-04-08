@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { afterUpdate } from 'svelte'
+
   import { useNavigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
@@ -8,18 +10,30 @@
 
   export let track: AudioTrackFragment
   export let position: number
-  export let current: boolean
+  export let isCurrent: boolean
   export let columns: number
 
+  let wasCurrent = isCurrent
+
+  afterUpdate(() => {
+    if (!wasCurrent && isCurrent) {
+      wrapper.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+    }
+
+    wasCurrent = isCurrent
+  })
+
   const navigate = useNavigate()
+
+  let wrapper: HTMLDivElement
 </script>
 
-<div class="track" style="--column-size: {`${100 / columns}%`}" class:current>
+<div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
   <SimpleNavigableItem
     {position}
     onPress={() => playTrackFromCurrentQueue(position)}
     onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
-    hasFocusPriority={current}
+    hasFocusPriority={isCurrent}
     style="display: block; min-height: 100%;"
   >
     <div>
@@ -43,12 +57,11 @@
     overflow: hidden;
   }
 
-  .track.current {
-    font-weight: bold;
+  .track.isCurrent {
     border-radius: 5px;
   }
 
-  .track:not(.current) {
+  .track:not(.track.isCurrent) {
     opacity: 0.2;
   }
 

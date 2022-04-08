@@ -85,7 +85,7 @@
   class:transparent
   {style}
 >
-  <slot {item} />
+  <slot {item} requestFocus={() => item.requestFocus()} />
 </navigable-item-wrapper>
 
 <style>
