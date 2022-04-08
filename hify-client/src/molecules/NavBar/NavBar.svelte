@@ -15,17 +15,32 @@
   const location = useLocation()
 
   export let tabs: Tab[]
+  export let tabsFocusRequest = new Array<() => void>(tabs.length)
+
+  export const requestFocus = (): void => {
+    for (let i = 0; i < tabs.length; i++) {
+      if ($location.pathname === tabs[i].uri) {
+        tabsFocusRequest[i]()
+        return
+      }
+    }
+
+    if (tabsFocusRequest.length) {
+      tabsFocusRequest[0]()
+    }
+  }
 </script>
 
 <div class="container">
   <NavigableRow>
-    {#each tabs as tab}
+    {#each tabs as tab, i}
       <SimpleNavigableItem
         onPress={() => navigate(tab.uri)}
         hasFocusPriority={$location.pathname === tab.uri}
         onFocus={() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
         }}
+        bind:requestFocus={tabsFocusRequest[i]}
       >
         <div class="tab">{tab.label}</div>
       </SimpleNavigableItem>

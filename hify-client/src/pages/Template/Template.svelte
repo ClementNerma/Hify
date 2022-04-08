@@ -14,6 +14,7 @@
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
   import { handleInput } from '../../navigable/input-manager'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
+  import { onMount } from 'svelte'
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -53,6 +54,10 @@
 
     return false
   })
+
+  let requestFocus: () => void
+
+  onMount(() => location.subscribe(requestFocus))
 </script>
 
 <NavigablePage>
@@ -66,6 +71,7 @@
           { label: 'Now Playing', uri: ROUTES.nowPlaying },
           { label: 'Dev Tools', uri: ROUTES.devTools },
         ]}
+        bind:requestFocus
       />
 
       <slot />
