@@ -28,12 +28,12 @@ export class NavigableOne extends NavigableContainer {
     this.onlyChild = null
   }
 
-  navigate(focusedChild: NavigableContainer, direction: NavigationDirection): NavigableItem | null {
+  navigate(focusedChild: NavigableContainer, direction: NavigationDirection, long: boolean): NavigableItem | null {
     if (focusedChild !== this.onlyChild) {
       throw new Error('Focused child does not belong to the current single container')
     }
 
-    return this.parent.navigate(this, direction)
+    return this.parent.navigate(this, direction, long)
   }
 
   navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {

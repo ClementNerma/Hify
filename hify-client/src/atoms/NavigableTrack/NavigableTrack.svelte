@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useNavigate } from 'svelte-navigator'
-  import { AudioTrackFragment, Track } from '../../graphql/generated'
+  import { AudioTrackFragment } from '../../graphql/generated'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'

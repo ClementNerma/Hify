@@ -7,7 +7,7 @@ import {
 } from '../navigation'
 
 export class NavigableList extends NavigableArrayContainer {
-  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
+  navigate(focusedChild: Navigable, direction: NavigationDirection, long: boolean): NavigableItem | null {
     const rowIndex = this.items.indexOf(focusedChild)
 
     if (rowIndex === -1) {
@@ -15,8 +15,10 @@ export class NavigableList extends NavigableArrayContainer {
     }
 
     switch (direction) {
-      case NavigationDirection.Up:
-        for (const rowItem of [...this.items.slice(0, rowIndex)].reverse()) {
+      case NavigationDirection.Up: {
+        const sliced = this.items.slice(0, rowIndex)
+
+        for (const rowItem of long ? sliced : sliced.reverse()) {
           const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Below)
 
           if (item) {
@@ -24,16 +26,19 @@ export class NavigableList extends NavigableArrayContainer {
           }
         }
 
-        return this.parent.navigate(this, NavigationDirection.Up)
+        return this.parent.navigate(this, NavigationDirection.Up, long)
+      }
 
       case NavigationDirection.Left:
-        return this.parent.navigate(this, NavigationDirection.Left)
+        return this.parent.navigate(this, NavigationDirection.Left, long)
 
       case NavigationDirection.Right:
-        return this.parent.navigate(this, NavigationDirection.Right)
+        return this.parent.navigate(this, NavigationDirection.Right, long)
 
-      case NavigationDirection.Down:
-        for (const rowItem of this.items.slice(rowIndex + 1)) {
+      case NavigationDirection.Down: {
+        const sliced = this.items.slice(rowIndex + 1)
+
+        for (const rowItem of long ? sliced.reverse() : sliced) {
           const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Above)
 
           if (item) {
@@ -41,7 +46,8 @@ export class NavigableList extends NavigableArrayContainer {
           }
         }
 
-        return this.parent.navigate(this, NavigationDirection.Down)
+        return this.parent.navigate(this, NavigationDirection.Down, long)
+      }
     }
   }
 
