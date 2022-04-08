@@ -103,8 +103,8 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: calc(35% - 250px / 2);
-    left: calc(5% + 250px);
+    top: calc(35% - 250px / 2 + 33px);
+    left: calc(5% + 250px + 10px);
     font-size: 1.2rem;
   }
 
