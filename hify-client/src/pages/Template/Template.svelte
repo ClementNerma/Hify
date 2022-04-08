@@ -11,7 +11,7 @@
   import NavigablePage from '../../navigable/NavigablePage/NavigablePage.svelte'
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import TabNav from '../../molecules/TabNav/TabNav.svelte'
+  import NavBar from '../../molecules/NavBar/NavBar.svelte'
   import { handleInput } from '../../navigable/input-manager'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
 
@@ -58,7 +58,7 @@
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)}>
     <NavigableList>
-      <TabNav
+      <NavBar
         tabs={[
           { label: 'Home', uri: ROUTES.home },
           { label: 'Albums', uri: ROUTES.albums },
