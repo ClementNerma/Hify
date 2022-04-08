@@ -7,8 +7,8 @@
 
 <div class="card">
   <img width={150} height={150} src={pictureUrl} alt="" />
-  <div class="title">{title}</div>
-  <div class="subtitle">{subtitle}</div>
+  <div class="title experimental-line-limiter">{title}</div>
+  <div class="subtitle experimental-line-limiter">{subtitle}</div>
 </div>
 
 <style>
@@ -18,5 +18,15 @@
 
   .title {
     font-weight: bold;
+  }
+
+  /* TODO: remove experimental stuff */
+  .experimental-line-limiter {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 </style>
