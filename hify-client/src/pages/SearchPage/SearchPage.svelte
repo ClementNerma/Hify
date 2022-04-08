@@ -15,6 +15,7 @@
   import Card from '../../molecules/Card/Card.svelte'
   import NonInteractiveCard from '../../molecules/Card/NonInteractiveCard.svelte'
   import { onMount } from 'svelte'
+  import { CONFIG } from '../../config'
 
   export let searchTerms: string = ''
 
@@ -34,7 +35,7 @@
       variables: {
         limit: MAX_RESULTS_PER_CATEGORY,
         input: searchTerms,
-        albumYearStrategy: AlbumYearStrategy.IdenticalOrFirstTrack,
+        albumYearStrategy: CONFIG.albumYearStrategy,
       },
     })
 

@@ -10,13 +10,14 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
+  import { CONFIG } from '../../config'
 
   export let albumId: string
 
   const album = AsyncAlbumPage({
     variables: {
       albumId,
-      albumYearStrategy: AlbumYearStrategy.IdenticalOnly,
+      albumYearStrategy: CONFIG.albumYearStrategy,
     },
   }).then((res) => {
     const album = res.data.album

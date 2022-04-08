@@ -1,4 +1,5 @@
 import { derived, get, writable } from 'svelte/store'
+import { CONFIG } from '../config'
 import { AlbumYearStrategy, AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo } from './debugger'
@@ -29,7 +30,7 @@ export async function playTrackFromFetchableQueue(tracksIds: string[], position:
   const tracks = await AsyncPlayQueue({
     variables: {
       tracksIds,
-      albumYearStrategy: AlbumYearStrategy.IdenticalOrFirstTrack,
+      albumYearStrategy: CONFIG.albumYearStrategy,
     },
   })
 

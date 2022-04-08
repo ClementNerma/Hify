@@ -3,6 +3,7 @@
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
+  import { CONFIG } from '../../config'
 
   export let artistId: string
 
@@ -22,7 +23,7 @@
           after: currentPageInfo?.endCursor,
           first: ALBUMS_PER_PAGE,
         },
-        strategy: AlbumYearStrategy.IdenticalOrFirstTrack,
+        strategy: CONFIG.albumYearStrategy,
       },
     })
 
