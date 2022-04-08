@@ -13,6 +13,7 @@
 
   function play() {
     playTrackFromFetchableQueue(tracksIds, tracksIds.indexOf(trackId))
+    navigate(ROUTES.nowPlaying)
   }
 
   const navigate = useNavigate()
