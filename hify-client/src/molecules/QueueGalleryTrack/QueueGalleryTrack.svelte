@@ -7,6 +7,7 @@
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
   import { playTrackFromCurrentQueue } from '../../stores/play-queue'
+  import { bind } from '../../utils'
 
   export let track: AudioTrackFragment
   export let position: number
@@ -31,8 +32,8 @@
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
   <SimpleNavigableItem
     {position}
-    onPress={() => playTrackFromCurrentQueue(position)}
-    onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
+    onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
+    onLongPress={bind(track.metadata.tags.album, (album) => navigate(ROUTES.album(album.id)))}
     hasFocusPriority={isCurrent}
     displayBlock={true}
     style="min-height: 100%;"

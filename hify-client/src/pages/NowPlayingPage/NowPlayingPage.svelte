@@ -37,7 +37,7 @@
     </SimpleNavigableItem>
     <NavigableRow>
       {#each album.albumArtists as albumArtist}
-        <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
+        <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
           <span class="track-info">🎤 {albumArtist.name}</span>
         </SimpleNavigableItem>
       {/each}

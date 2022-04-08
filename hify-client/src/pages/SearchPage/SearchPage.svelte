@@ -16,6 +16,7 @@
   import NonInteractiveCard from '../../molecules/Card/NonInteractiveCard.svelte'
   import { onMount } from 'svelte'
   import { CONFIG } from '../../config'
+  import { bind } from '../../utils'
 
   export let searchTerms: string = ''
 
@@ -98,7 +99,7 @@
           title={album.name}
           subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
           pictureUrl={getAlbumArtUri(album.id)}
-          onPress={() => navigate(ROUTES.album(album.id))}
+          onPress={bind(album, (album) => navigate(ROUTES.album(album.id)))}
           onLongPress={() => alert('TODO: context menu for playing options')}
         />
       {/each}
@@ -114,7 +115,7 @@
           title={artist.name}
           subtitle=""
           pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
-          onPress={() => navigate(ROUTES.artist(artist.id))}
+          onPress={bind(artist.id, (id) => navigate(ROUTES.artist(artist.id)))}
           onLongPress={() => alert('TODO: context menu for playing options')}
         />
       {/each}

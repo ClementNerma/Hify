@@ -5,6 +5,7 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue } from '../../stores/play-queue'
+import { bind } from '../../utils'
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
@@ -22,7 +23,7 @@
 <SimpleNavigableItem
   let:item
   onPress={play}
-  onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
+  onLongPress={bind(track.metadata.tags.album, (album) => navigate(ROUTES.album(album.id)))}
   {position}
   {transparent}
 >

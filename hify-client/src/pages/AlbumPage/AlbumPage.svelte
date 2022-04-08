@@ -11,6 +11,7 @@
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
   import { CONFIG } from '../../config'
+  import { bind } from '../../utils'
 
   export let albumId: string
 
@@ -43,7 +44,7 @@
         <div class="album-artists">
           <NavigableRow>
             {#each album.albumArtists as albumArtist}
-              <SimpleNavigableItem onPress={() => navigate(ROUTES.artist(albumArtist.id))}>
+              <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
                 <span class="album-artist">
                   {albumArtist.name}
                 </span>
