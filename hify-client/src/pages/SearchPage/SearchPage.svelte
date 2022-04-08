@@ -120,7 +120,7 @@
           title={artist.name}
           subtitle=""
           pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
-          onPress={bind(artist.id, (id) => navigate(ROUTES.artist(artist.id)))}
+          onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}
           onLongPress={() => alert('TODO: context menu for playing options')}
         />
       {/each}
