@@ -14,6 +14,7 @@
 
   import Card from '../../molecules/Card/Card.svelte'
   import NonInteractiveCard from '../../molecules/Card/NonInteractiveCard.svelte'
+  import { onMount } from 'svelte'
 
   export let searchTerms: string = ''
 
@@ -48,6 +49,10 @@
   let results: SearchPageQuery['search'] | null = null
 
   let searchField: HTMLInputElement
+
+  onMount(() => {
+    searchField.focus()
+  })
 </script>
 
 <div class="search-container">
