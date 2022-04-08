@@ -34,7 +34,8 @@
     onPress={() => playTrackFromCurrentQueue(position)}
     onLongPress={() => navigate(ROUTES.album(track.metadata.tags.album.id))}
     hasFocusPriority={isCurrent}
-    style="display: block; min-height: 100%;"
+    displayBlock={true}
+    style="min-height: 100%;"
   >
     <div>
       <img class="album-art" width={80} height={80} src={getAlbumArtUri(track.metadata.tags.album.id)} alt="" />

@@ -2,8 +2,10 @@
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { afterUpdate, onDestroy } from 'svelte'
+  import { logError } from '../../stores/debugger'
 
   export let transparent = false
+  export let displayBlock = false
   export let style: string | undefined = undefined
 
   export let position: SimpleNavigableItemProps['position'] = null
@@ -20,6 +22,11 @@
   export let onLeft: SimpleNavigableItemProps['onLeft'] = undefined
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
+
+  if (transparent && displayBlock) {
+    logError('Cannot provide both "displayBlock" and "fillHeight" at the same time!')
+    transparent = false
+  }
 
   const nav = getParentNavigable(true)
 
@@ -83,13 +90,18 @@
   class:focused
   class:mouseHover
   class:transparent
+  class:displayBlock
   {style}
 >
   <slot {item} requestFocus={() => item.requestFocus()} />
 </navigable-item-wrapper>
 
 <style>
-  navigable-item-wrapper.transparent {
+  .transparent {
     display: contents;
+  }
+
+  .displayBlock {
+    display: block;
   }
 </style>
