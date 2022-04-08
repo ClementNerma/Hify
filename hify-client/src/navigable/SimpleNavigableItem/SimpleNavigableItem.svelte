@@ -3,6 +3,7 @@
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { afterUpdate, onDestroy } from 'svelte'
   import { logError } from '../../stores/debugger'
+  import { readable } from 'svelte/store'
 
   export let transparent = false
   export let displayBlock = false
@@ -73,6 +74,8 @@
   })
 
   onDestroy(() => nav.remove(item))
+
+  export const requestFocus = () => item.requestFocus()
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean

@@ -17,6 +17,7 @@
   import { onMount } from 'svelte'
   import { CONFIG } from '../../config'
   import { bind } from '../../utils'
+  import { Readable } from 'svelte/store'
 
   export let searchTerms: string = ''
 
@@ -53,13 +54,18 @@
 
   let searchField: HTMLInputElement
 
-  onMount(() => {
-    searchField.focus()
-  })
+  let requestFocus: () => void
+
+  onMount(() => requestFocus())
 </script>
 
 <div class="search-container">
-  <SimpleNavigableItem onPress={() => searchField.focus()} onUnfocus={() => searchField?.blur()} transparent={true}>
+  <SimpleNavigableItem
+    onFocus={() => searchField.focus()}
+    onUnfocus={() => searchField?.blur()}
+    transparent={true}
+    bind:requestFocus
+  >
     <input
       class="search"
       type="text"
