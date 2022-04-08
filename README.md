@@ -18,7 +18,7 @@ This project is under development.
 * Support for keyboard navigation (mouse partially supported)
 * Designed with performance and memory usage in mind, should work properly on low-end devices
 
-Missing features (coming soon!):
+Remaining features (todo list):
 
 * Queue ordering
 * Playing a track after the current one
