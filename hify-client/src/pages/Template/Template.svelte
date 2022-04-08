@@ -13,26 +13,39 @@
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
   import { handleInput } from '../../navigable/input-manager'
+  import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
+  import { logInfo } from '../../stores/debugger'
 
   const navigate = useNavigate()
   const location = useLocation()
 
   handleInput((key, long) => {
-    if (long) {
-      return
-    }
-
     switch (key) {
       case 'MediaPlayPause':
-        toggleAudioPlayback()
+        if (!long) {
+          toggleAudioPlayback()
+        } else {
+          navigate($location.pathname === ROUTES.nowPlaying ? ROUTES.search : ROUTES.nowPlaying)
+        }
+
         break
 
       case 'MediaRewind':
-        setPlayingAudioProgressRelative(-10)
+        if (!long) {
+          setPlayingAudioProgressRelative(-10)
+        } else {
+          playPreviousTrackOrRewind()
+        }
+
         break
 
       case 'MediaFastForward':
-        setPlayingAudioProgressRelative(+10)
+        if (!long) {
+          setPlayingAudioProgressRelative(+10)
+        } else {
+          playNextTrack()
+        }
+
         break
 
       default:

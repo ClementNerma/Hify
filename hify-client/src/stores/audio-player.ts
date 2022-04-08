@@ -92,6 +92,10 @@ export function toggleAudioPlayback() {
   }
 }
 
+export function replayTrack() {
+  setPlayingAudioProgress(0)
+}
+
 export function stopAudioPlayer(justPause = false) {
   const player = get(audioPlayer)
 

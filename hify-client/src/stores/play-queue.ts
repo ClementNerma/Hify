@@ -1,6 +1,6 @@
-import { derived, writable } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import { AlbumYearStrategy, AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
-import { startAudioPlayer, stopAudioPlayer } from './audio-player'
+import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo } from './debugger'
 
 type PlayQueue = {
@@ -16,6 +16,8 @@ const playQueue = writable<PlayQueue>({
 export const readablePlayQueue = derived(playQueue, (_) => _)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
 export const queuePosition = derived(playQueue, ({ position }) => position)
+
+export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_MS = 5000
 
 export async function playTrackFromFetchableQueue(tracksIds: string[], position: number): Promise<void> {
   if (!tracksIds[position]) {
@@ -46,6 +48,38 @@ export function playTrackFromCurrentQueue(position: number): void {
     startAudioPlayer(tracks[position], playNextTrack)
     return { tracks, position }
   })
+}
+
+export function playPreviousTrackOrRewind(): void {
+  logInfo('Going to play previous track or rewind...')
+
+  const progress = get(readableAudioProgress)
+
+  if (progress !== null && progress > PREVIOUS_TRACK_OR_REWIND_THRESOLD_MS) {
+    replayTrack()
+  } else {
+    playQueue.update(({ tracks, position }) => {
+      let newPosition: number | null
+
+      if (position === null) {
+        newPosition = null
+      } else if (position === 0) {
+        replayTrack()
+        newPosition = null
+      } else {
+        newPosition = position - 1
+      }
+
+      if (newPosition !== null) {
+        startAudioPlayer(tracks[newPosition], playNextTrack)
+        logInfo('Playing previous track at position: ' + newPosition.toString())
+      } else {
+        logInfo('No previous track to play')
+      }
+
+      return { tracks, position: newPosition }
+    })
+  }
 }
 
 export function playNextTrack(): void {
