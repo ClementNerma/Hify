@@ -2,7 +2,7 @@
   import { useNavigate } from 'svelte-navigator'
 
   import { getAlbumArtUri } from '../../rest-api'
-  import { AlbumYearStrategy, AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
+  import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
 
   import { ROUTES } from '../../routes'
 
@@ -17,7 +17,6 @@
   import { onMount } from 'svelte'
   import { CONFIG } from '../../config'
   import { bind } from '../../utils'
-  import { Readable } from 'svelte/store'
 
   export let searchTerms: string = ''
 

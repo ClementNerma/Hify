@@ -1,6 +1,5 @@
 <script lang="ts">
   import { afterUpdate, onDestroy } from 'svelte'
-  import { NavigableGridProps } from '../NavigableGrid/NavigableGrid'
 
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
