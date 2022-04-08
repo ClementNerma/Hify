@@ -11,7 +11,7 @@ export type NavigableWithHandlersProps = {
 }
 
 export class NavigableWithHandlers extends NavigableOne {
-  constructor(parent: NavigableContainer, private readonly props: NavigableWithHandlersProps) {
+  constructor(parent: NavigableContainer, public props: NavigableWithHandlersProps) {
     super(parent, props.position, props.hasFocusPriority)
   }
 

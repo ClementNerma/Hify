@@ -7,7 +7,7 @@ import {
 } from '../navigation'
 
 export class SimpleNavigableItem extends NavigableItem {
-  constructor(parent: NavigableContainer, private readonly props: SimpleNavigableItemProps) {
+  constructor(parent: NavigableContainer, public props: SimpleNavigableItemProps) {
     super(parent, props.position, props.hasFocusPriority)
   }
 

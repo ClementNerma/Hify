@@ -28,9 +28,7 @@
     transparent = false
   }
 
-  const nav = getParentNavigable(true)
-
-  const item = new SimpleNavigableItem(nav, {
+  const itemProps = (): SimpleNavigableItemProps => ({
     position,
     hasFocusPriority,
 
@@ -62,11 +60,16 @@
     },
   })
 
+  const nav = getParentNavigable(true)
+
+  const item = new SimpleNavigableItem(nav, itemProps())
+
   nav.append(item)
 
   afterUpdate(() => {
     item.position = position
     item.hasFocusPriority = hasFocusPriority
+    item.props = itemProps()
   })
 
   onDestroy(() => nav.remove(item))

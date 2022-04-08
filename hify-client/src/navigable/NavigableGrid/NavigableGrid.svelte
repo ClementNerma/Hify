@@ -10,19 +10,27 @@
   export let columns: NavigableGridProps['columns']
   export let lazyLoader: NavigableGridProps['lazyLoader'] = undefined
 
-  const nav = getParentNavigable()
-  const row = new NavigableGrid(nav, { position, hasFocusPriority, columns, lazyLoader })
-
-  nav.append(row)
-
-  setChildrenNavigable(row)
-
-  afterUpdate(() => {
-    row.position = position
-    row.hasFocusPriority = hasFocusPriority
+  const gridProps = (): NavigableGridProps => ({
+    position,
+    hasFocusPriority,
+    columns,
+    lazyLoader,
   })
 
-  onDestroy(() => nav.remove(row))
+  const nav = getParentNavigable()
+  const grid = new NavigableGrid(nav, gridProps())
+
+  nav.append(grid)
+
+  setChildrenNavigable(grid)
+
+  afterUpdate(() => {
+    grid.position = position
+    grid.hasFocusPriority = hasFocusPriority
+    grid.props = gridProps()
+  })
+
+  onDestroy(() => nav.remove(grid))
 </script>
 
-<slot nav={row} />
+<slot nav={grid} />

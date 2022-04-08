@@ -10,7 +10,7 @@ import {
 export class NavigableGrid extends NavigableArrayContainer {
   private itemsBeforeLastLazyLoading = 0
 
-  constructor(parent: NavigableContainer, private readonly props: NavigableGridProps) {
+  constructor(parent: NavigableContainer, public props: NavigableGridProps) {
     super(parent, props.position, props.hasFocusPriority)
   }
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onDestroy } from 'svelte'
+  import { NavigableGridProps } from '../NavigableGrid/NavigableGrid'
 
   import { getParentNavigable, setChildrenNavigable } from '../navigation'
   import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
@@ -11,8 +12,16 @@
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
   export let onBack: NavigableWithHandlersProps['onBack'] = undefined
 
+  const containerProps = (): NavigableWithHandlersProps => ({
+    position,
+    hasFocusPriority,
+    onPress,
+    onLongPress,
+    onBack,
+  })
+
   const nav = getParentNavigable()
-  const row = new NavigableWithHandlers(nav, { position, hasFocusPriority, onPress, onLongPress, onBack })
+  const row = new NavigableWithHandlers(nav, containerProps())
 
   nav.append(row)
 
@@ -21,6 +30,7 @@
   afterUpdate(() => {
     row.position = position
     row.hasFocusPriority = hasFocusPriority
+    row.props = containerProps()
   })
 
   onDestroy(() => nav.remove(row))
