@@ -124,7 +124,7 @@
 
   .progress-range,
   .progress-range :global(input) {
-    width: 100%;
+    width: calc(100% - 5px);
     color: red;
   }
 
