@@ -110,7 +110,7 @@
 
   .track-info {
     display: inline-block;
-    padding: 5px 25px;
+    padding: 5px;
   }
 
   .player-bottom {
