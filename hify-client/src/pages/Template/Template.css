@@ -30,7 +30,6 @@ navigable-item-wrapper.focusedOrMouseHover, navigable-item-wrapper:hover {
 }
 
 navigable-item-wrapper.transparent > :first-child, [item-like-style].transparent > :first-child {
-    padding: 5px;
     cursor: pointer;
 }
 
