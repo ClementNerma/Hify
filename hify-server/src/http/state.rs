@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 use rocket::tokio::sync::RwLock;
 
@@ -14,7 +14,7 @@ impl AppState {
     pub fn new(index: Index) -> Self {
         Self {
             index: Arc::new(RwLock::new(index)),
-            search_cache: Arc::new(RwLock::new(HashMap::new())),
+            search_cache: Arc::new(RwLock::new(SearchCache::new())),
         }
     }
 }
