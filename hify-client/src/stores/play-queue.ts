@@ -17,7 +17,7 @@ export const readablePlayQueue = derived(playQueue, (_) => _)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
 export const queuePosition = derived(playQueue, ({ position }) => position)
 
-export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_MS = 5000
+export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
 
 export async function playTrackFromFetchableQueue(tracksIds: string[], position: number): Promise<void> {
   if (!tracksIds[position]) {
@@ -55,7 +55,7 @@ export function playPreviousTrackOrRewind(): void {
 
   const progress = get(readableAudioProgress)
 
-  if (progress !== null && progress > PREVIOUS_TRACK_OR_REWIND_THRESOLD_MS) {
+  if (progress !== null && progress > PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS) {
     replayTrack()
   } else {
     playQueue.update(({ tracks, position }) => {
