@@ -59,7 +59,7 @@ export class NavigableGrid extends NavigableArrayContainer {
         // Required to trigger lazy loader when either:
         // * We navigate to the last row from the above one
         // * We navigate to the last row from below
-        if (rowIndex >= rows.length - 2) {
+        if (rowIndex >= rows.length - 2 || long) {
           this._lazyLoading()
         }
 
