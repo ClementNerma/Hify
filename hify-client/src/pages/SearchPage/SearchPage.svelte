@@ -139,5 +139,6 @@
   .row {
     display: flex;
     flex-direction: row;
+    overflow-x: auto;
   }
 </style>
