@@ -14,7 +14,6 @@
   import TabNav from '../../molecules/TabNav/TabNav.svelte'
   import { handleInput } from '../../navigable/input-manager'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
-  import { logInfo } from '../../stores/debugger'
 
   const navigate = useNavigate()
   const location = useLocation()

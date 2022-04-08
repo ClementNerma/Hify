@@ -14,7 +14,7 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
   }
 }
 
-export const LONG_PRESS_THRESOLD_MS = 500
+export const LONG_PRESS_THRESOLD_MS = 250
 
 export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => boolean | void
 
