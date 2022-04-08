@@ -35,13 +35,15 @@
     <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
       <div class="track-info">💿 {album.name}</div>
     </SimpleNavigableItem>
-    <NavigableRow>
-      {#each album.albumArtists as albumArtist}
-        <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
-          <span class="track-info">🎤 {albumArtist.name}</span>
-        </SimpleNavigableItem>
-      {/each}
-    </NavigableRow>
+    <div class="artists">
+      <NavigableRow>
+        {#each album.albumArtists as albumArtist}
+          <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
+            <span class="track-info">🎤 {albumArtist.name}</span>
+          </SimpleNavigableItem>
+        {/each}
+      </NavigableRow>
+    </div>
     {#if tags.date}
       <div item-like-style>
         <div class="track-info">
@@ -111,6 +113,11 @@
   .track-info {
     display: inline-block;
     padding: 5px;
+  }
+
+  .artists {
+    display: flex;
+    flex-direction: row;
   }
 
   .player-bottom {
