@@ -445,9 +445,9 @@ function _generateUpdatedNavState(
   page: NavigablePage,
 ): NavState {
   oldFocused?.onUnfocus()
-  newFocused.onFocus()
 
   newFocused.scrollTo()
+  newFocused.onFocus()
 
   return { page, focused: newFocused }
 }
