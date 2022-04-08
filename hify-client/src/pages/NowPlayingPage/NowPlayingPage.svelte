@@ -10,6 +10,7 @@
   import { currentTrack } from '../../stores/play-queue'
 
   import { useNavigate } from 'svelte-navigator'
+  import { bind } from '../../utils'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
@@ -31,8 +32,7 @@
   </div>
   <div class="track-infos">
     <div item-like-style><div class="track-info">🎵 {tags.title}</div></div>
-    <!-- TODO: find a fix for this check -->
-    <SimpleNavigableItem onPress={() => void (album && navigate(ROUTES.album(album.id)))}>
+    <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
       <div class="track-info">💿 {album.name}</div>
     </SimpleNavigableItem>
     <NavigableRow>
