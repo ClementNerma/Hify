@@ -4,6 +4,7 @@
   export let max: number
   export let value: number | null
   export let onChange: (newValue: number) => void
+  export let directionalAmount: number
   export let onPress: SimpleNavigableItem['$$prop_def']['onPress'] = undefined
 
   let input: HTMLInputElement
@@ -19,11 +20,11 @@
   }
 
   function onLeft() {
-    onChange(Math.max(getValue() - 5, 0))
+    onChange(Math.max(getValue() - directionalAmount, 0))
   }
 
   function onRight() {
-    onChange(Math.min(getValue() + 5, max))
+    onChange(Math.min(getValue() + directionalAmount, max))
   }
 </script>
 

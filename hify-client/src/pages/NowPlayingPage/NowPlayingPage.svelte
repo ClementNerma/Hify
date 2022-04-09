@@ -5,6 +5,7 @@
     readableAudioPaused,
     readableAudioProgress,
     setPlayingAudioProgress,
+    setPlayingAudioProgressRelative,
     toggleAudioPlayback,
   } from '../../stores/audio-player'
   import { currentTrack } from '../../stores/play-queue'
@@ -75,6 +76,7 @@
         value={$readableAudioProgress}
         onChange={setPlayingAudioProgress}
         onPress={toggleAudioPlayback}
+        directionalAmount={30}
       />
     </div>
   </div>
