@@ -10,7 +10,7 @@
   import { currentTrack } from '../../stores/play-queue'
 
   import { useNavigate } from 'svelte-navigator'
-  import { bind } from '../../utils'
+  import { bind, formatDate } from '../../utils'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
@@ -48,11 +48,7 @@
     </div>
     {#if tags.date}
       <div item-like-style>
-        <div class="track-info">
-          🕒 {tags.date.year}{tags.date.month ? `-${tags.date.month}` : ''}{tags.date.day
-            ? `${tags.date.month ? '' : '??'}-${tags.date.day}`
-            : ''}
-        </div>
+        <div class="track-info">🕒 {formatDate(tags.date)}</div>
       </div>
     {/if}
   </div>
