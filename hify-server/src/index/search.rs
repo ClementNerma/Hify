@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io::Write, time::Instant};
+use std::{collections::HashMap, io::Write};
 
 use async_graphql::SimpleObject;
 use rayon::iter::{ParallelBridge, ParallelIterator};
@@ -7,7 +7,6 @@ use super::{AlbumInfos, ArtistInfos, Index, Track};
 
 static SEARCH_CACHE_CAPACITY: usize = 100;
 static SEARCH_CHARS_THRESOLD: usize = 3;
-static CACHE_UPDATE_DELAY_SECONDS: u64 = 3;
 
 pub fn search_index(
     index: &Index,
@@ -15,10 +14,6 @@ pub fn search_index(
     input: &str,
     limit: usize,
 ) -> IndexSearchResults {
-    let now = Instant::now();
-    let previous_cache_trigger = search_cache.last_trigger;
-    search_cache.last_trigger = now;
-
     let words: Vec<_> = input
         .split_whitespace()
         .map(str::trim)
@@ -40,7 +35,7 @@ pub fn search_index(
         artists: search_and_score(index.cache.artists_infos.values(), &words, limit),
     };
 
-    if input.trim().len() >= SEARCH_CHARS_THRESOLD && now.duration_since(previous_cache_trigger).as_secs() > CACHE_UPDATE_DELAY_SECONDS {
+    if input.trim().len() >= SEARCH_CHARS_THRESOLD {
         if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
             let key = search_cache.content.keys().next().unwrap().clone();
             search_cache.content.remove(&key);
@@ -173,12 +168,11 @@ pub struct IndexSearchResults {
 }
 
 pub struct SearchCache {
-    last_trigger: Instant,
     content: HashMap<Vec<String>, IndexSearchResults>
 }
 
 impl SearchCache {
     pub fn new() -> Self {
-        Self { last_trigger: Instant::now(), content: HashMap::new() }
+        Self { content: HashMap::new() }
     }
 }
