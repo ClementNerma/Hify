@@ -31,7 +31,7 @@ export class NavigableGrid extends NavigableArrayContainer {
     }
   }
 
-  navigate(focusedChild: Navigable, direction: NavigationDirection, long: boolean): NavigableItem | null {
+  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
     const itemIndex = this.items.indexOf(focusedChild)
 
     if (itemIndex === -1) {
@@ -48,9 +48,7 @@ export class NavigableGrid extends NavigableArrayContainer {
           break
         }
 
-        return rows[long ? 0 : rowIndex - 1][itemIndex % this.props.columns].navigateToFirstItemDown(
-          NavigationComingFrom.Below,
-        )
+        return rows[rowIndex - 1][itemIndex % this.props.columns].navigateToFirstItemDown(NavigationComingFrom.Below)
       }
 
       case NavigationDirection.Down: {
@@ -59,7 +57,7 @@ export class NavigableGrid extends NavigableArrayContainer {
         // Required to trigger lazy loader when either:
         // * We navigate to the last row from the above one
         // * We navigate to the last row from below
-        if (rowIndex >= rows.length - 2 || long) {
+        if (rowIndex >= rows.length - 2) {
           this._lazyLoading()
         }
 
@@ -67,7 +65,7 @@ export class NavigableGrid extends NavigableArrayContainer {
           break
         }
 
-        const newRow = rows[long ? rows.length - 1 : rowIndex + 1]
+        const newRow = rows[rowIndex + 1]
         const newItemIndex = Math.min(itemIndex % this.props.columns, newRow.length - 1)
 
         return newRow[newItemIndex].navigateToFirstItemDown(NavigationComingFrom.Above)
@@ -87,7 +85,7 @@ export class NavigableGrid extends NavigableArrayContainer {
           ? row.slice(0, itemIndex % this.props.columns).reverse()
           : row.slice((itemIndex % this.props.columns) + 1)
 
-        for (const colItem of long ? sliced.reverse() : sliced) {
+        for (const colItem of sliced) {
           const item = colItem.navigateToFirstItemDown(isLeft ? NavigationComingFrom.Right : NavigationComingFrom.Left)
 
           if (item) {
@@ -99,7 +97,7 @@ export class NavigableGrid extends NavigableArrayContainer {
       }
     }
 
-    return this.parent.navigate(this, direction, long)
+    return this.parent.navigate(this, direction)
   }
 
   navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {

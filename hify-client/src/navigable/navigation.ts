@@ -49,7 +49,7 @@ export abstract class NavigableContainer extends NavigableCommon {
   abstract append(navigable: Navigable): void
   abstract hasChild(child: Navigable): boolean
   abstract remove(child: Navigable): void
-  abstract navigate(focusedChild: Navigable, direction: NavigationDirection, long: boolean): NavigableItem | null
+  abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
 
   canHandleAction(_: NavigationAction): boolean {
     return false
@@ -123,8 +123,8 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
 }
 
 export abstract class NavigableItem extends NavigableCommon {
-  abstract canHandleDirection(direction: NavigationDirection, long: boolean): boolean
-  abstract handleDirection(direction: NavigationDirection, long: boolean): NavigableItem | null
+  abstract canHandleDirection(direction: NavigationDirection): boolean
+  abstract handleDirection(direction: NavigationDirection): NavigableItem | null
 
   abstract underlyingElement(): HTMLNavigableItemWrapperElement
 
@@ -344,9 +344,9 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
       const direction = directions[key]
 
-      next = current.canHandleDirection(direction, long)
-        ? current.handleDirection(direction, long)
-        : current.parent.navigate(current, direction, long)
+      next = current.canHandleDirection(direction)
+        ? current.handleDirection(direction)
+        : current.parent.navigate(current, direction)
 
       break
 
