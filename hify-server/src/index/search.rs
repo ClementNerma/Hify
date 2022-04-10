@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Instant};
 
 use async_graphql::SimpleObject;
 use rayon::iter::{ParallelBridge, ParallelIterator};
@@ -21,12 +21,13 @@ pub fn search_index(
         .filter(|str| !str.is_empty())
         .collect();
 
-    if let Some(cached) = search_cache.content.get(&words) {
+    if let Some(cached) = search_cache.content.get_mut(&words) {
+        cached.last_usage = Instant::now();
+
         println!("|> Served cached search results.");
-        return cached.clone();
+        return cached.results.clone();
     }
 
-    
     let results = IndexSearchResults {
         tracks: search_and_score(index.tracks.values(), &words, limit),
         albums: search_and_score(index.cache.albums_infos.values(), &words, limit),
@@ -35,11 +36,17 @@ pub fn search_index(
 
     if input.trim().len() >= SEARCH_CHARS_THRESOLD {
         if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
-            let key = search_cache.content.keys().next().unwrap().clone();
-            search_cache.content.remove(&key);
+            let min = search_cache.least_recently_used().unwrap().clone();
+            search_cache.content.remove(&min);
         }
 
-        search_cache.content.insert(words, results.clone());
+        search_cache.content.insert(
+            words,
+            SearchCacheEntry {
+                last_usage: Instant::now(),
+                results: results.clone(),
+            },
+        );
 
         let fill_percent = search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
 
@@ -165,11 +172,33 @@ pub struct IndexSearchResults {
 }
 
 pub struct SearchCache {
-    content: HashMap<Vec<String>, IndexSearchResults>
+    content: HashMap<Vec<String>, SearchCacheEntry>,
 }
 
 impl SearchCache {
     pub fn new() -> Self {
-        Self { content: HashMap::new() }
+        Self {
+            content: HashMap::new(),
+        }
     }
+
+    pub fn least_recently_used(&self) -> Option<&Vec<String>> {
+        self.content
+            .iter()
+            .fold(None, |min, (key, entry)| match min {
+                None => Some((key, entry)),
+                Some((_, min_entry)) if entry.last_usage < min_entry.last_usage => {
+                    Some((key, entry))
+                }
+                Some(_) => min,
+            })
+            .map(|(min_key, _)| min_key)
+    }
+}
+
+pub struct SearchCacheEntry {
+    // search_terms: Vec<String>,
+    // generated_at: Instant,
+    last_usage: Instant,
+    results: IndexSearchResults,
 }
