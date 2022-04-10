@@ -12,12 +12,14 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
-  import { handleInput } from '../../navigable/input-manager'
+  import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
   import { onMount } from 'svelte'
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward')
 
   handleInput((key, long) => {
     switch (key) {

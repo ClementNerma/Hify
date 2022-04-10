@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput, registerLongPressableKey } from './input-manager'
+import { handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -475,6 +475,6 @@ if (!itemWrapperInPlace) {
 }
 
 // Support long-press for "Enter" key
-registerLongPressableKey('Enter')
+registerLongPressableKeys('Enter')
 
 handleInput(handleKeyboardEvent)

@@ -14,8 +14,10 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
   }
 }
 
-export function registerLongPressableKey(key: string): void {
-  watchLongPressForKeys.add(key)
+export function registerLongPressableKeys(...keys: string[]): void {
+  for (const key of keys) {
+    watchLongPressForKeys.add(key)
+  }
 }
 
 export const LONG_PRESS_THRESOLD_MS = 250
