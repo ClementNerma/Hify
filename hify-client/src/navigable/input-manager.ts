@@ -14,11 +14,17 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
   }
 }
 
+export function registerLongPressableKey(key: string): void {
+  watchLongPressForKeys.add(key)
+}
+
 export const LONG_PRESS_THRESOLD_MS = 250
 
 export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => boolean | void
 
 const inputHandlers: InputHandler[] = []
+
+const watchLongPressForKeys = new Set<string>()
 
 const pendingKeyCodes: Record<string, RegisteredKeyPress> = {}
 const triggeredKeyEvent = new Set<string>()
@@ -40,6 +46,11 @@ document.body.addEventListener('keydown', (e) => {
 
   e.preventDefault()
   e.stopImmediatePropagation()
+
+  if (!watchLongPressForKeys.has(e.key)) {
+    dispatchKeyPress(e.key, false)
+    return false
+  }
 
   // Holding a key down will fire a repeated series of 'keydown' events, so we take care of ignoring them
   if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
@@ -64,6 +75,10 @@ document.body.addEventListener('keyup', (e) => {
 
   // Happens when key has been pressed long enough for a long press
   if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
+    return
+  }
+
+  if (!watchLongPressForKeys.has(e.key)) {
     return
   }
 

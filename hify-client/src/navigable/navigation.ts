@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput } from './input-manager'
+import { handleInput, registerLongPressableKey } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -473,5 +473,8 @@ if (!itemWrapperInPlace) {
 } else if (itemWrapperInPlace.name !== HTMLNavigableItemWrapperElement.name) {
   throw new Error('An invalid item wrapper element is already in place')
 }
+
+// Support long-press for "Enter" key
+registerLongPressableKey('Enter')
 
 handleInput(handleKeyboardEvent)
