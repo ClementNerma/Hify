@@ -20,7 +20,7 @@
   import { afterUpdate } from 'svelte'
   import { Writable, writable } from 'svelte/store'
 
-  import { getParentNavigable, RequestFocus } from '../../navigable/navigation'
+  import { getParentNavigable, NavigableItem, RequestFocus } from '../../navigable/navigation'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
@@ -33,6 +33,7 @@
 
   let ctxTop = -1
   let ctxLeft = -1
+  let prevItem: NavigableItem | null = null
 
   afterUpdate(() => {
     if (!$store || !$store.options.length) {
@@ -54,6 +55,7 @@
     ctxTop = (rect.top + rect.bottom) / 2
     ctxLeft = (rect.left + rect.right) / 2
 
+    prevItem = focusedItem
     requestFocus()
     return
   })
@@ -62,21 +64,27 @@
     store.set(null)
   }
 
+  function onOptionSelected(callback: () => void): void {
+    hideContextMenu()
+    prevItem?.requestFocus()
+
+    callback()
+  }
+
+  function onBack(): void {
+    hideContextMenu()
+    prevItem?.requestFocus()
+  }
+
   let requestFocus: RequestFocus | undefined
 </script>
 
 {#if $store && $store.options.length > 0}
-  <NavigableWithHandlers onBack={hideContextMenu}>
+  <NavigableWithHandlers {onBack}>
     <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
       <NavigableList bind:requestFocus>
         {#each $store.options as { label, onPress }}
-          <SimpleNavigableItem
-            onPress={() => {
-              hideContextMenu()
-              onPress()
-            }}
-            transparent={true}
-          >
+          <SimpleNavigableItem onPress={() => onOptionSelected(onPress)} transparent={true}>
             <div class="option">{label}</div>
           </SimpleNavigableItem>
         {/each}
