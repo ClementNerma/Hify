@@ -108,3 +108,20 @@ export function playNextTrack(): void {
     return { tracks, position: newPosition }
   })
 }
+
+export function queueAsNext(track: AudioTrackFragment): void {
+  logInfo('Queuing track as next: ' + track.metadata.tags.title)
+
+  playQueue.update(({ position, tracks }) => {
+    return {
+      position,
+      tracks:
+        position === null
+          ? [track]
+          : tracks
+              .slice(0, position + 1)
+              .concat([track])
+              .concat(tracks.slice(position + 1)),
+    }
+  })
+}

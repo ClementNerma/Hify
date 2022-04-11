@@ -17,6 +17,7 @@
   import { onMount } from 'svelte'
   import { CONFIG } from '../../config'
   import { bind } from '../../utils'
+  import { RequestFocus } from '../../navigable/navigation'
 
   export let searchTerms: string = ''
 
@@ -53,7 +54,7 @@
 
   let searchField: HTMLInputElement
 
-  let requestFocus: () => void
+  let requestFocus: RequestFocus
 
   onMount(() => requestFocus())
 </script>

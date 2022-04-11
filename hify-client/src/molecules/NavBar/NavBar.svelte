@@ -9,13 +9,14 @@
   import { useLocation, useNavigate } from 'svelte-navigator'
 
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
+  import { RequestFocus } from '../../navigable/navigation'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   const navigate = useNavigate()
   const location = useLocation()
 
   export let tabs: Tab[]
-  export let tabsFocusRequest = new Array<() => void>(tabs.length)
+  export let tabsFocusRequest = new Array<RequestFocus>(tabs.length)
 
   export const requestFocus = (): void => {
     for (let i = 0; i < tabs.length; i++) {
