@@ -150,7 +150,11 @@ export abstract class NavigableItem extends NavigableCommon {
       return logWarn('Failed to scroll to element has it does not have a valid child element')
     }
 
-    el.children[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    if (el.children.length > 0) {
+      el.children[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    } else {
+      logWarn('Navigable item has no children ; cannot scroll into view')
+    }
   }
 }
 
