@@ -97,6 +97,7 @@
     background-color: lightgray;
     color: black;
     border: 1px solid black;
+    z-index: 10;
   }
 
   .option {
