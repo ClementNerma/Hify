@@ -4,10 +4,12 @@
   import { useNavigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
-  import { playTrackFromCurrentQueue } from '../../stores/play-queue'
+  import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../utils'
+  import { ContextMenuOption, showContextMenu } from '../ContextMenu/ContextMenu.svelte'
 
   export let track: AudioTrackFragment
   export let position: number
@@ -26,6 +28,16 @@
 
   const navigate = useNavigate()
 
+  function buildContextMenuOptions(): ContextMenuOption[] {
+    const options = [{ label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) }]
+
+    if (!isCurrent) {
+      options.push({ label: 'Remove from queue', onPress: () => removeFromQueue(position) })
+    }
+
+    return options
+  }
+
   let wrapper: HTMLDivElement
 </script>
 
@@ -33,7 +45,7 @@
   <SimpleNavigableItem
     {position}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
-    onLongPress={bind(track.metadata.tags.album, (album) => navigate(ROUTES.album(album.id)))}
+    onLongPress={() => showContextMenu(contextMenuStore, buildContextMenuOptions())}
     hasFocusPriority={isCurrent}
     displayBlock={true}
     style="min-height: 100%;"

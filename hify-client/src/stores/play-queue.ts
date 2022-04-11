@@ -2,7 +2,7 @@ import { derived, get, writable } from 'svelte/store'
 import { CONFIG } from '../config'
 import { AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
-import { logFatal, logInfo } from './debugger'
+import { logFatal, logInfo, logWarn } from './debugger'
 
 type PlayQueue = {
   tracks: AudioTrackFragment[]
@@ -122,6 +122,27 @@ export function queueAsNext(track: AudioTrackFragment): void {
               .slice(0, position + 1)
               .concat([track])
               .concat(tracks.slice(position + 1)),
+    }
+  })
+}
+
+export function removeFromQueue(index: number): void {
+  logInfo(`Removing track n°${index + 1} from queue`)
+
+  playQueue.update(({ position, tracks }) => {
+    if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
+      logWarn('Cannot remove track from queue as the provided position does not exist')
+      return { position, tracks }
+    }
+
+    if (index === position) {
+      logWarn('Cannot remove track from queue as it is the currently-playing track')
+      return { position, tracks }
+    }
+
+    return {
+      position: position === null ? null : index < position ? position - 1 : position,
+      tracks: tracks.slice(0, index).concat(tracks.slice(index + 1)),
     }
   })
 }
