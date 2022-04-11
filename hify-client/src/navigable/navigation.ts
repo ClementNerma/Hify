@@ -408,8 +408,9 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
         if (newFocused) {
           next = newFocused
-          break
         }
+
+        break
       }
 
       break
