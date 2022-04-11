@@ -20,17 +20,18 @@
   import { afterUpdate } from 'svelte'
   import { Writable, writable } from 'svelte/store'
 
+  import { getParentNavigable, RequestFocus } from '../../navigable/navigation'
+
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import { getParentNavigable, RequestFocus } from '../../navigable/navigation'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   const nav = getParentNavigable()
 
   export let store: ContextMenuStore
 
-  let ctxTop = 100
-  let ctxLeft = 100
+  let ctxTop = -1
+  let ctxLeft = -1
 
   afterUpdate(() => {
     if (!$store || !$store.options.length) {
