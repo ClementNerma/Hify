@@ -62,17 +62,6 @@
 
   export function hideContextMenu(): void {
     store.set(null)
-  }
-
-  function onOptionSelected(callback: () => void): void {
-    hideContextMenu()
-    prevItem?.requestFocus()
-
-    callback()
-  }
-
-  function onBack(): void {
-    hideContextMenu()
     prevItem?.requestFocus()
   }
 
@@ -80,11 +69,17 @@
 </script>
 
 {#if $store && $store.options.length > 0}
-  <NavigableWithHandlers {onBack}>
+  <NavigableWithHandlers onBack={hideContextMenu}>
     <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
       <NavigableList bind:requestFocus>
         {#each $store.options as { label, onPress }}
-          <SimpleNavigableItem onPress={() => onOptionSelected(onPress)} transparent={true}>
+          <SimpleNavigableItem
+            onPress={() => {
+              hideContextMenu()
+              onPress()
+            }}
+            transparent={true}
+          >
             <div class="option">{label}</div>
           </SimpleNavigableItem>
         {/each}
