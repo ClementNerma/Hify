@@ -25,6 +25,7 @@
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { logFatal } from '../../stores/debugger'
 
   const nav = getParentNavigable()
 
@@ -44,12 +45,17 @@
       return
     }
 
+    if (!requestFocus) {
+      return logFatal('Focus request binding is not defined in ContextMenu component')
+    }
+
     const rect = focusedItem.underlyingElement().getBoundingClientRect()
 
     ctxTop = (rect.top + rect.bottom) / 2
     ctxLeft = (rect.left + rect.right) / 2
 
-    requestFocus?.()
+    requestFocus()
+    return
   })
 
   export function hideContextMenu(): void {
