@@ -28,6 +28,7 @@
     showContextMenu(contextMenuStore, [
       { label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) },
       { label: 'Play next', onPress: () => queueAsNext(track) },
+      { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0) },
     ])}
   {position}
   {transparent}
