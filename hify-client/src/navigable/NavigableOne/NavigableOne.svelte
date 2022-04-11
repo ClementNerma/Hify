@@ -8,18 +8,20 @@
   export let hasFocusPriority: boolean | null = null
 
   const nav = getParentNavigable()
-  const row = new NavigableOne(nav, position, hasFocusPriority)
+  const one = new NavigableOne(nav, position, hasFocusPriority)
 
-  nav.append(row)
+  nav.append(one)
 
-  setChildrenNavigable(row)
+  setChildrenNavigable(one)
 
   afterUpdate(() => {
-    row.position = position
-    row.hasFocusPriority = hasFocusPriority
+    one.position = position
+    one.hasFocusPriority = hasFocusPriority
   })
 
-  onDestroy(() => nav.remove(row))
+  onDestroy(() => nav.remove(one))
+
+  export const requestFocus = () => one.requestFocus()
 </script>
 
-<slot nav={row} />
+<slot nav={one} />

@@ -86,8 +86,9 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 
   // Additional methods
-  requestFocus(): void {
-    return this.parent.page.requestFocus(this)
+  requestFocus(): boolean {
+    this.parent.page.requestPageFocus(this)
+    return true
   }
 }
 

@@ -43,4 +43,8 @@ export class NavigableOne extends NavigableContainer {
   navigateToLastItem(): NavigableItem | null {
     return this.onlyChild?.navigateToLastItem() ?? null
   }
+
+  requestFocus(): boolean {
+    return this.onlyChild?.requestFocus() ?? false
+  }
 }

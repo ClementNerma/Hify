@@ -31,6 +31,8 @@
   })
 
   onDestroy(() => nav.remove(grid))
+
+  export const requestFocus = () => grid.requestFocus()
 </script>
 
 <slot nav={grid} />

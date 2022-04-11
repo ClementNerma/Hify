@@ -20,6 +20,8 @@
   })
 
   onDestroy(() => nav.remove(list))
+
+  export const requestFocus = () => list.requestFocus()
 </script>
 
 <slot nav={list} />

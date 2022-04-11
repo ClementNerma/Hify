@@ -41,6 +41,8 @@ export abstract class NavigableCommon {
 
   abstract canHandleAction(key: NavigationAction): boolean
   abstract handleAction(key: NavigationAction): NavigableItem | null
+
+  abstract requestFocus(): boolean
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
@@ -81,6 +83,10 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
 
   protected getFocusPriority(): Navigable | null {
     return this._unorderedItems.find((item) => item.hasFocusPriority === true) ?? null
+  }
+
+  requestFocus(): boolean {
+    return this.items[0]?.requestFocus() ?? false
   }
 
   append(navigable: Navigable): void {
@@ -227,11 +233,15 @@ class NavigablePage implements _NavigableContainerLike {
     throw new Error('Tried to make the navigable page component handle an action')
   }
 
+  requestFocus(): boolean {
+    return this.onlyChild?.requestFocus() ?? false
+  }
+
   asContainer(): NavigableContainer {
     return this
   }
 
-  requestFocus(item: NavigableItem): void {
+  requestPageFocus(item: NavigableItem): void {
     if (item.parent.page !== this) {
       throw new Error("Cannot request focus for an element that isn't part of the same page")
     }
@@ -455,6 +465,8 @@ function _generateUpdatedNavState(
 
   return { page, focused: newFocused }
 }
+
+export type RequestFocus = () => boolean
 
 export type Navigable = NavigableContainer | NavigableItem
 

@@ -33,6 +33,8 @@
   })
 
   onDestroy(() => nav.remove(row))
+
+  export const requestFocus = () => row.requestFocus()
 </script>
 
 <slot nav={row} />
