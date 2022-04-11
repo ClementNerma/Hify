@@ -15,6 +15,7 @@
   import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
   import { onMount } from 'svelte'
+  import TplContextMenu from './TplContextMenu.svelte'
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -65,6 +66,8 @@
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)}>
     <NavigableList>
+      <TplContextMenu />
+
       <NavBar
         tabs={[
           { label: 'Home', uri: ROUTES.home },
