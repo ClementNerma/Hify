@@ -181,7 +181,10 @@ class NavigablePage implements _NavigableContainerLike {
 
   private onlyChild: Navigable | null = null
 
-  constructor(private readonly onRequestFocus: (item: NavigableItem) => void) {
+  constructor(
+    private readonly onRequestFocus: (item: NavigableItem) => void,
+    private readonly getFocusedItem: () => NavigableItem | null,
+  ) {
     this.page = this
   }
 
@@ -248,6 +251,20 @@ class NavigablePage implements _NavigableContainerLike {
 
     this.onRequestFocus(item)
   }
+
+  focusedItem(): NavigableItem | null {
+    const item = this.getFocusedItem()
+
+    if (!item) {
+      return null
+    }
+
+    if (item.parent.page !== this) {
+      throw new Error("Cannot return item focused when it isn't part of the same page")
+    }
+
+    return item
+  }
 }
 
 export function getParentNavigable(item?: true): NavigableContainer {
@@ -277,7 +294,7 @@ export function setChildrenNavigable(nav: NavigableContainer) {
 }
 
 export function usePageNavigator(): NavigableContainer {
-  const page = new NavigablePage(_requestFocus)
+  const page = new NavigablePage(_requestFocus, () => get(navState)?.focused ?? null)
 
   navState.update((state) => {
     state?.focused?.onUnfocus()
