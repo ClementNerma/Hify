@@ -4,7 +4,8 @@
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
 
-  const ALBUMS_PER_PAGE = 24
+  const ALBUMS_PER_LINE = 5
+  const LINES_PER_PAGE = 5
 
   let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
@@ -17,7 +18,7 @@
       variables: {
         pagination: {
           after: currentPageInfo?.endCursor,
-          first: ALBUMS_PER_PAGE,
+          first: ALBUMS_PER_LINE * LINES_PER_PAGE,
         },
       },
     })
@@ -34,7 +35,7 @@
 {#await feedMore()}
   <h2>Loading...</h2>
 {:then _}
-  <Grid columns={5} lazyLoader={feedMore}>
+  <Grid columns={ALBUMS_PER_LINE} lazyLoader={feedMore}>
     {#each albums as album}
       <AlbumCard {album} />
     {/each}
