@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
 
   import { getAlbumArtUri } from '../../rest-api'
   import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
@@ -22,8 +22,6 @@
   export let searchTerms: string = ''
 
   const MAX_RESULTS_PER_CATEGORY = 50
-
-  const navigate = useNavigate()
 
   async function onChange() {
     if (searchTerms.trim().length === 0) {

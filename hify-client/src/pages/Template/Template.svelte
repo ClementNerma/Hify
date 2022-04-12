@@ -1,7 +1,7 @@
 <script lang="ts">
   import './Template.css'
 
-  import { useLocation, useNavigate } from 'svelte-navigator'
+  import { useLocation, navigate } from 'svelte-navigator'
 
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
 
@@ -17,7 +17,6 @@
   import { onMount } from 'svelte'
   import TplContextMenu from './TplContextMenu.svelte'
 
-  const navigate = useNavigate()
   const location = useLocation()
 
   registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward')

@@ -10,7 +10,7 @@
   } from '../../stores/audio-player'
   import { currentTrack } from '../../stores/play-queue'
 
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
   import { bind, formatDate } from '../../utils'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
@@ -18,8 +18,6 @@
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-
-  const navigate = useNavigate()
 
   $: tags = $currentTrack && $currentTrack.metadata.tags
   $: album = $currentTrack && $currentTrack.metadata.tags.album

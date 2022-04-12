@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
 
@@ -17,8 +17,6 @@
     playTrackFromNewQueue(tracks, tracks.indexOf(track))
     navigate(ROUTES.nowPlaying)
   }
-
-  const navigate = useNavigate()
 </script>
 
 <SimpleNavigableItem

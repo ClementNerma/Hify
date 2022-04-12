@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
   import { AlbumInfos, ArtistInfos } from '../../graphql/generated'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
@@ -9,8 +9,6 @@
   export let album: Pick<AlbumInfos, 'id' | 'name'> & {
     albumArtists: Array<Pick<ArtistInfos, 'name'>>
   }
-
-  const navigate = useNavigate()
 </script>
 
 <Card

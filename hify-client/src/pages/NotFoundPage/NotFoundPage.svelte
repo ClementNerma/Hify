@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
 
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-
-  const navigate = useNavigate()
 </script>
 
 <SimpleNavigableItem onPress={() => navigate(-1)}>

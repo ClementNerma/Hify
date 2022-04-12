@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterUpdate } from 'svelte'
 
-  import { useNavigate } from 'svelte-navigator'
+  import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
@@ -25,8 +25,6 @@
 
     wasCurrent = isCurrent
   })
-
-  const navigate = useNavigate()
 
   function buildContextMenuOptions(): ContextMenuOption[] {
     const options = [{ label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) }]
