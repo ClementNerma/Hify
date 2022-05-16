@@ -3,10 +3,12 @@
 
   export let title: string
   export let subtitle: string
+
+  export let boxSize = 150
 </script>
 
-<div class="card">
-  <img width={150} height={150} src={pictureUrl} alt="" />
+<div class="card" style="--width: {boxSize}px">
+  <img width={boxSize} height={boxSize} src={pictureUrl} alt="" />
   <div class="title experimental-line-limiter">{title}</div>
   <div class="subtitle experimental-line-limiter">{subtitle}</div>
 </div>
@@ -14,6 +16,7 @@
 <style>
   .card {
     text-align: center;
+    max-width: var(--width);
   }
 
   .title {
