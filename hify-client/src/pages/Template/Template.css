@@ -35,7 +35,8 @@ body.distraction-free {
     --linear-start: #000;
     --linear-end: #000;
     
-    transition: --linear-start 3s, --linear-end 3s;
+    transition: --linear-start 3s, --linear-end 3s, opacity 3s;
+    opacity: 0.5;
 }
 
 navigable-item-wrapper, [item-like-style] {
