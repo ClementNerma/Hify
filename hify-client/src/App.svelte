@@ -18,6 +18,7 @@
 
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
   import DevToolsPage from './pages/DevToolsPage/DevToolsPage.svelte'
+  import ArtistsPage from './pages/ArtistsPage/ArtistsPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -28,6 +29,10 @@
 
     <Route path={ROUTES.albums}>
       <AlbumsPage />
+    </Route>
+
+    <Route path={ROUTES.artists}>
+      <ArtistsPage />
     </Route>
 
     <Route path={ROUTES.album(':id')} let:params>

@@ -1,0 +1,14 @@
+query ArtistsPage($pagination: PaginationInput!) {
+    albumsArtists(pagination: $pagination) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+}
