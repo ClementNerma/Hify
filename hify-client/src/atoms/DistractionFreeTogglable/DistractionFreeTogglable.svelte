@@ -7,11 +7,12 @@
 </div>
 
 <style>
-  div {
-    transition: all 3s;
+  div:not(.hidden) {
+    transition: all 0.5s;
   }
 
   .hidden {
+    transition: all 3s;
     opacity: 0;
   }
 </style>

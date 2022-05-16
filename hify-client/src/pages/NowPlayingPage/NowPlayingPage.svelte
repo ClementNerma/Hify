@@ -24,7 +24,7 @@
   $: album = $currentTrack && $currentTrack.metadata.tags.album
 
   setupDistractionFreeListener(
-    10_000,
+    1000,
     ['MediaPlayPause', 'MediaRewind', 'MediaFastForward'],
     () => $readableAudioPaused === false,
   )

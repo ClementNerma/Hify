@@ -28,7 +28,7 @@ body {
     background-attachment: fixed;
 
     /* transition: none; */
-    transition: --linear-start 3s, --linear-end 3s;
+    transition: --linear-start 0.5s, --linear-end 0.5s;
 }
 
 body.distraction-free {
