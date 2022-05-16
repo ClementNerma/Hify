@@ -2,6 +2,18 @@ html {
     height: 100%;
 }
 
+@property --linear-start {
+  syntax: '<color>';
+  initial-value: rgba(8, 4, 45, 1);
+  inherits: false;
+}
+
+@property --linear-end {
+  syntax: '<color>';
+  initial-value: rgb(10, 38, 89);
+  inherits: false;
+}
+
 body {
     position: absolute;
     top: 0;
@@ -12,9 +24,18 @@ body {
 
     color: rgb(230, 230, 230);
     
-    background: rgb(8,4,45);
-    background: linear-gradient(0deg, rgba(8,4,45,1) 20%, rgb(10, 38, 89) 100%);
+    background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
     background-attachment: fixed;
+
+    /* transition: none; */
+    transition: --linear-start 3s, --linear-end 3s;
+}
+
+body.distraction-free {
+    --linear-start: #000;
+    --linear-end: #000;
+    
+    transition: --linear-start 3s, --linear-end 3s;
 }
 
 navigable-item-wrapper, [item-like-style] {

@@ -5,7 +5,6 @@
     readableAudioPaused,
     readableAudioProgress,
     setPlayingAudioProgress,
-    setPlayingAudioProgressRelative,
     toggleAudioPlayback,
   } from '../../stores/audio-player'
   import { currentTrack } from '../../stores/play-queue'
@@ -18,9 +17,17 @@
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
+  import { distractionFreeMode, setupDistractionFreeListener } from '../../stores/distraction-free'
+  import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
 
   $: tags = $currentTrack && $currentTrack.metadata.tags
   $: album = $currentTrack && $currentTrack.metadata.tags.album
+
+  setupDistractionFreeListener(
+    10_000,
+    ['MediaPlayPause', 'MediaRewind', 'MediaFastForward'],
+    () => $readableAudioPaused === false,
+  )
 </script>
 
 {#if !$currentTrack || !tags || !album}
@@ -79,9 +86,11 @@
     </div>
   </div>
 
-  <div class="gallery">
-    <QueueGallery />
-  </div>
+  <DistractionFreeTogglable>
+    <div class="play-queue-gallery">
+      <QueueGallery />
+    </div>
+  </DistractionFreeTogglable>
 {/if}
 
 <style>
@@ -140,7 +149,7 @@
     padding: 0px 10px;
   }
 
-  .gallery {
+  .play-queue-gallery {
     position: fixed;
     left: 5%;
     right: 5%;

@@ -1,9 +1,12 @@
 <script lang="ts">
   import './Template.css'
 
+  import { onMount } from 'svelte'
   import { useLocation, navigate } from 'svelte-navigator'
 
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
+  import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
+  import { distractionFreeMode } from '../../stores/distraction-free'
 
   import { ROUTES } from '../../routes'
 
@@ -13,9 +16,8 @@
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
   import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
-  import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
-  import { onMount } from 'svelte'
   import TplContextMenu from './TplContextMenu.svelte'
+  import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
 
   const location = useLocation()
 
@@ -67,17 +69,19 @@
     <NavigableList>
       <TplContextMenu />
 
-      <NavBar
-        tabs={[
-          { label: 'Home', uri: ROUTES.home },
-          { label: 'Albums', uri: ROUTES.albums },
-          { label: 'Artists', uri: ROUTES.artists },
-          { label: 'Search', uri: ROUTES.search },
-          { label: 'Now Playing', uri: ROUTES.nowPlaying },
-          { label: 'Dev Tools', uri: ROUTES.devTools },
-        ]}
-        bind:requestFocus
-      />
+      <DistractionFreeTogglable>
+        <NavBar
+          tabs={[
+            { label: 'Home', uri: ROUTES.home },
+            { label: 'Albums', uri: ROUTES.albums },
+            { label: 'Artists', uri: ROUTES.artists },
+            { label: 'Search', uri: ROUTES.search },
+            { label: 'Now Playing', uri: ROUTES.nowPlaying },
+            { label: 'Dev Tools', uri: ROUTES.devTools },
+          ]}
+          bind:requestFocus
+        />
+      </DistractionFreeTogglable>
 
       <slot />
     </NavigableList>
