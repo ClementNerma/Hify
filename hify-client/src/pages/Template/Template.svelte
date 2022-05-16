@@ -18,6 +18,7 @@
   import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
   import TplContextMenu from './TplContextMenu.svelte'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+  import DevToolsPage from '../DevToolsPage/DevToolsPage.svelte'
 
   const location = useLocation()
 
@@ -70,17 +71,18 @@
       <TplContextMenu />
 
       <DistractionFreeTogglable>
-        <NavBar
-          tabs={[
-            { label: 'Home', uri: ROUTES.home },
-            { label: 'Albums', uri: ROUTES.albums },
-            { label: 'Artists', uri: ROUTES.artists },
-            { label: 'Search', uri: ROUTES.search },
-            { label: 'Now Playing', uri: ROUTES.nowPlaying },
-            { label: 'Dev Tools', uri: ROUTES.devTools },
-          ]}
-          bind:requestFocus
-        />
+        <NavigableWithHandlers onLongPress={() => navigate(ROUTES.devTools)}>
+          <NavBar
+            tabs={[
+              { label: 'Home', uri: ROUTES.home },
+              { label: 'Albums', uri: ROUTES.albums },
+              { label: 'Artists', uri: ROUTES.artists },
+              { label: 'Search', uri: ROUTES.search },
+              { label: 'Now Playing', uri: ROUTES.nowPlaying },
+            ]}
+            bind:requestFocus
+          />
+        </NavigableWithHandlers>
       </DistractionFreeTogglable>
 
       <slot />
