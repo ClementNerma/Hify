@@ -101,6 +101,18 @@ where
         .collect()
 }
 
+fn contains_with_multiplier(input: &str, word: &str) -> Option<usize> {
+    let lower = input.to_lowercase();
+
+    if !lower.contains(word) {
+        None
+    } else if lower.starts_with(word) {
+        Some(2)
+    } else {
+        Some(1)
+    }
+}
+
 trait SearchScoring {
     fn compute_word_scoring(&self, word: &str) -> usize;
 }
@@ -111,8 +123,8 @@ impl SearchScoring for Track {
 
         let tags = &self.metadata.tags;
 
-        if tags.title.to_lowercase().contains(word) {
-            score += word.len() * 10;
+        if let Some(mul) = contains_with_multiplier(&tags.title, word) {
+            score += word.len() * 10 * mul;
         }
 
         let album_infos = tags.get_album_infos();
@@ -135,13 +147,13 @@ impl SearchScoring for AlbumInfos {
     fn compute_word_scoring(&self, word: &str) -> usize {
         let mut score = 0;
 
-        if self.name.to_lowercase().contains(word) {
-            score += word.len() * 10;
+        if let Some(mul) = contains_with_multiplier(&self.name, word) {
+            score += word.len() * 10 * mul;
         }
 
         for artist in &self.album_artists {
-            if artist.name.to_lowercase().contains(word) {
-                score += word.len();
+            if let Some(mul) = contains_with_multiplier(&artist.name, word) {
+                score += word.len() * mul;
             }
         }
 
@@ -151,8 +163,8 @@ impl SearchScoring for AlbumInfos {
 
 impl SearchScoring for ArtistInfos {
     fn compute_word_scoring(&self, word: &str) -> usize {
-        if self.name.to_lowercase().contains(word) {
-            word.len() * 10
+        if let Some(mul) = contains_with_multiplier(&self.name, word) {
+            word.len() * 10 * mul
         } else {
             0
         }
