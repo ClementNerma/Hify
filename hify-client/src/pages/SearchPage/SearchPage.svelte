@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import { navigate } from 'svelte-navigator'
 
   import { getAlbumArtUri } from '../../rest-api'
@@ -12,9 +13,9 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
 
+  import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
   import Card from '../../molecules/Card/Card.svelte'
-  import NonInteractiveCard from '../../molecules/Card/NonInteractiveCard.svelte'
-  import { onMount } from 'svelte'
+
   import { CONFIG } from '../../config'
   import { bind } from '../../utils'
   import { RequestFocus } from '../../navigable/navigation'
@@ -82,7 +83,7 @@
     <NavigableRow>
       {#each results.tracks as track, i (track.id)}
         <NavigableTrack position={i} tracks={results.tracks} {track}>
-          <NonInteractiveCard
+          <Card
             title={track.metadata.tags.title}
             subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
               .map((artist) => artist.name)
@@ -99,7 +100,7 @@
   <div class="row">
     <NavigableRow>
       {#each results.albums as album}
-        <Card
+        <InteractiveCard
           title={album.name}
           subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
           pictureUrl={getAlbumArtUri(album.id)}
@@ -115,7 +116,7 @@
   <div class="row">
     <NavigableRow>
       {#each results.artists as artist}
-        <Card
+        <InteractiveCard
           title={artist.name}
           subtitle=""
           pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}

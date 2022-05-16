@@ -4,14 +4,14 @@
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
   import { bind } from '../../utils'
-  import Card from '../Card/Card.svelte'
+  import InteractiveCard from '../Card/InteractiveCard.svelte'
 
   export let album: Pick<AlbumInfos, 'id' | 'name'> & {
     albumArtists: Array<Pick<ArtistInfos, 'name'>>
   }
 </script>
 
-<Card
+<InteractiveCard
   title={album.name}
   subtitle={album.albumArtists.map((artist) => artist.name).join(', ')}
   onPress={bind(album, (album) => navigate(ROUTES.album(album.id)))}
