@@ -11,8 +11,10 @@
   export let onLongPress: (() => void) | undefined = undefined
 
   export let position: number | null = null
+
+  export let enforceMaxWidth: boolean | undefined = undefined
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress} {position}>
-  <Card {pictureUrl} {title} {subtitle} />
+  <Card {pictureUrl} {title} {subtitle} {enforceMaxWidth} />
 </SimpleNavigableItem>
