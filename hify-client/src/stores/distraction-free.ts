@@ -1,10 +1,28 @@
 import { onDestroy } from 'svelte'
-import { writable } from 'svelte/store'
+import { derived, get, writable } from 'svelte/store'
 import { handleInput } from '../navigable/input-manager'
 
 export const DISTRACTION_FREE_CLASSNAME = 'distraction-free'
 
-export const distractionFreeMode = writable(false)
+export const enableDistractionFreeModeFeature = writable(true)
+
+enableDistractionFreeModeFeature.subscribe((set) => {
+  if (!set) {
+    distractionFreeMode.set(false)
+  }
+})
+
+const distractionFreeMode = writable(false)
+
+export const readableDistractionFreeMode = derived(distractionFreeMode, (_) => _)
+
+export function setDistractionFreeMode(set: boolean) {
+  if (!get(enableDistractionFreeModeFeature)) {
+    return
+  }
+
+  distractionFreeMode.set(set)
+}
 
 distractionFreeMode.subscribe((set) => {
   if (set) {
@@ -18,7 +36,7 @@ export function setupDistractionFreeListener(delay: number, ignoreKeys?: string[
   function startDistractionFreeTimeout(): number | null {
     return window.setTimeout(() => {
       if (interceptTurningOn?.() !== false) {
-        distractionFreeMode.set(true)
+        setDistractionFreeMode(true)
       }
     }, delay)
   }

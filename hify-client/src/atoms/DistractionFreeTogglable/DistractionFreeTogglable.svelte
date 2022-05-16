@@ -1,8 +1,8 @@
 <script>
-  import { distractionFreeMode } from '../../stores/distraction-free'
+  import { readableDistractionFreeMode } from '../../stores/distraction-free'
 </script>
 
-<div class={$distractionFreeMode ? 'hidden' : ''}>
+<div class={$readableDistractionFreeMode ? 'hidden' : ''}>
   <slot />
 </div>
 

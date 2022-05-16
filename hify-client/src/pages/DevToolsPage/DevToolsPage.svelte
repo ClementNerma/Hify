@@ -3,11 +3,16 @@
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
+  import { enableDistractionFreeModeFeature } from '../../stores/distraction-free'
 
   let hideDebugLogs = true
 
   function toggleDebugLogsDisplay() {
     hideDebugLogs = !hideDebugLogs
+  }
+
+  function toggleDistractionFreeEnabling() {
+    enableDistractionFreeModeFeature.update((set) => !set)
   }
 
   $: slicedAppLogs = $appLogs.slice(0, 100).filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
@@ -21,6 +26,9 @@
   </SimpleNavigableItem>
   <SimpleNavigableItem onPress={toggleDebugLogsDisplay}>
     <input type="checkbox" checked={hideDebugLogs} /> Hide debug logs
+  </SimpleNavigableItem>
+  <SimpleNavigableItem onPress={toggleDistractionFreeEnabling}>
+    <input type="checkbox" checked={$enableDistractionFreeModeFeature} /> Enable distraction-free mode
   </SimpleNavigableItem>
 </NavigableRow>
 

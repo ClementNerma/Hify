@@ -6,7 +6,6 @@
 
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
   import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
-  import { distractionFreeMode } from '../../stores/distraction-free'
 
   import { ROUTES } from '../../routes'
 
@@ -18,7 +17,6 @@
   import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
   import TplContextMenu from './TplContextMenu.svelte'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import DevToolsPage from '../DevToolsPage/DevToolsPage.svelte'
 
   const location = useLocation()
 
