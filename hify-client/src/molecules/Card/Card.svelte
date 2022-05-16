@@ -6,10 +6,11 @@
 
   export let boxSize = 150
   export let enforceMaxWidth = false
+  export let rounded = false
 </script>
 
 <div class="card {enforceMaxWidth ? 'enforce-max-width' : ''}" style="--width: {boxSize}px">
-  <img width={boxSize} height={boxSize} src={pictureUrl} alt="" />
+  <img class="cover {rounded ? 'rounded' : ''}" width={boxSize} height={boxSize} src={pictureUrl} alt="" />
   <div class="title experimental-line-limiter">{title}</div>
   <div class="subtitle experimental-line-limiter">{subtitle}</div>
 </div>
@@ -21,6 +22,10 @@
 
   .card.enforce-max-width {
     max-width: var(--width);
+  }
+
+  .cover.rounded {
+    border-radius: 50%;
   }
 
   .title {

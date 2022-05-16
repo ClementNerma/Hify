@@ -13,8 +13,9 @@
   export let position: number | null = null
 
   export let enforceMaxWidth: boolean | undefined = undefined
+  export let rounded: boolean | undefined = undefined
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress} {position}>
-  <Card {pictureUrl} {title} {subtitle} {enforceMaxWidth} />
+  <Card {pictureUrl} {title} {subtitle} {enforceMaxWidth} {rounded} />
 </SimpleNavigableItem>

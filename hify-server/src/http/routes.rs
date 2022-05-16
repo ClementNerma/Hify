@@ -8,15 +8,15 @@ use rocket::{
 };
 use rocket_seek_stream::SeekStream;
 
-use crate::index::{AlbumID, AudioFormat, TrackID};
+use crate::index::{AlbumID, AudioFormat, TrackID, ArtistID};
 
 use super::{
     server::{rest_server_error, FaillibleResponse},
     AppState,
 };
 
-#[rocket::get("/art/<id>")]
-pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+#[rocket::get("/art/album/<id>")]
+pub async fn album_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
     let index = ctx.index.read().await;
     let album_art_path = index
         .albums_arts
@@ -32,6 +32,52 @@ pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<
             rest_server_error(
                 Status::NotFound,
                 "Provided album does not have an art image".to_string(),
+            )
+        })?;
+
+    // Cannot fail given we only look for art files with specific file extensions
+    let ext = album_art_path.extension().unwrap().to_str().unwrap();
+
+    let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
+        rest_server_error(
+            Status::InternalServerError,
+            "Internal error: Rocket did not return a valid MIME-TYPE for an art file extension"
+                .to_string(),
+        )
+    })?;
+
+    let file = File::open(Path::new(&album_art_path))
+        .await
+        .map_err(|err| {
+            rest_server_error(
+                Status::InternalServerError,
+                format!("Failed to open art file: {err}"),
+            )
+        })?;
+
+    Ok(Custom(mime_type, file))
+}
+
+#[rocket::get("/art/artist/<id>")]
+pub async fn artist_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+    let index = ctx.index.read().await;
+
+    let artist_first_album_id = index.cache.artists_albums.get(&ArtistID(id))
+        .ok_or_else(|| {
+        rest_server_error(Status::NotFound, "Provided artist ID was not found".to_string())
+    })?.keys().next().ok_or_else(|| {
+        rest_server_error(Status::NotFound, "Provided artist does not have any album to generate an art image from".to_string())
+    })?;
+
+    let album_art_path = index
+        .albums_arts
+        .get(artist_first_album_id)
+        .cloned()
+        .expect("Internal error: album not found from provided artist's first album ID")
+        .ok_or_else(|| {
+            rest_server_error(
+                Status::NotFound,
+                "Artist's first album does not have an art image".to_string(),
             )
         })?;
 

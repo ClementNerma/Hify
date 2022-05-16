@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { navigate } from 'svelte-navigator'
 
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri, getArtistArtUri } from '../../rest-api'
   import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
 
   import { ROUTES } from '../../routes'
@@ -121,10 +121,11 @@
         <InteractiveCard
           title={artist.name}
           subtitle=""
-          pictureUrl={'TODO: get picture of first album? and if zero first participation in album?'}
+          pictureUrl={getArtistArtUri(artist.id)}
           onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}
           onLongPress={() => alert('TODO: context menu for playing options')}
           enforceMaxWidth={true}
+          rounded={true}
         />
       {/each}
     </NavigableRow>
