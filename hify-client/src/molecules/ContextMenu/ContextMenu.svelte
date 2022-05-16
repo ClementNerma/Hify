@@ -35,6 +35,30 @@
   let ctxLeft = -1
   let prevItem: NavigableItem | null = null
 
+  function getBoundingClientRect(el: HTMLElement): DOMRect | null {
+    let rect = el.getBoundingClientRect()
+    const children = [...el.children]
+
+    while (
+      rect.top === 0 &&
+      rect.left === 0 &&
+      rect.right === 0 &&
+      rect.bottom === 0 &&
+      rect.height === 0 &&
+      rect.width === 0
+    ) {
+      const child = children.shift()
+
+      if (!child) {
+        return null
+      }
+
+      rect = child.getBoundingClientRect()
+    }
+
+    return rect
+  }
+
   afterUpdate(() => {
     if (!$store || !$store.options.length) {
       return
@@ -50,10 +74,10 @@
       return logFatal('Focus request binding is not defined in ContextMenu component')
     }
 
-    const rect = focusedItem.underlyingElement().getBoundingClientRect()
+    const rect = getBoundingClientRect(focusedItem.underlyingElement())
 
-    ctxTop = (rect.top + rect.bottom) / 2
-    ctxLeft = (rect.left + rect.right) / 2
+    ctxTop = rect ? (rect.top + rect.bottom) / 2 : 0
+    ctxLeft = rect ? (rect.left + rect.right) / 2 : 0
 
     prevItem = focusedItem
     requestFocus()
