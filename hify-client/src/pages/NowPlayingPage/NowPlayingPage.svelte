@@ -75,15 +75,17 @@
         {humanReadableDuration($currentTrack.metadata.duration)}
       </div>
     </div>
-    <div class="progress-range">
-      <ProgressRange
-        max={$currentTrack.metadata.duration}
-        value={$readableAudioProgress}
-        onChange={setPlayingAudioProgress}
-        onPress={toggleAudioPlayback}
-        directionalAmount={30}
-      />
-    </div>
+    <DistractionFreeTogglable>
+      <div class="progress-range">
+        <ProgressRange
+          max={$currentTrack.metadata.duration}
+          value={$readableAudioProgress}
+          onChange={setPlayingAudioProgress}
+          onPress={toggleAudioPlayback}
+          directionalAmount={30}
+        />
+      </div>
+    </DistractionFreeTogglable>
   </div>
 
   <DistractionFreeTogglable>
