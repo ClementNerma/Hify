@@ -72,7 +72,7 @@
     <table>
       <tbody>
         {#each album.tracks as track}
-          <NavigableTrack transparent={true} tracks={album.tracks} {track}>
+          <NavigableTrack transparent={true} tracks={album.tracks} goToAlbumOption={false} {track}>
             <tr>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
