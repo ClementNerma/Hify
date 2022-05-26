@@ -52,7 +52,7 @@
     </Route>
 
     <Route path={ROUTES.search + '/:terms'} let:params>
-      <SearchPage searchTerms={params['terms']} />
+      <SearchPage searchTerms={decodeURIComponent(params['terms'])} />
     </Route>
 
     <Route path={ROUTES.devTools}>
