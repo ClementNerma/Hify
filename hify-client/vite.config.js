@@ -8,9 +8,9 @@ export default ({mode}) => {
   return defineConfig({
     plugins: [svelte()],
 
-    server: {
+    /*server: {
       port: process.env['VITE_PORT'] ?? 8892,
       host: !!process.env['VITE_HOST']
-    }
+    }*/
   })
 }
