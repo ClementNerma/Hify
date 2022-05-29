@@ -1,13 +1,9 @@
-use std::{
-    error::Error,
-    fs,
-    path::Path,
-};
+use std::{error::Error, fs, path::Path};
 
 use crate::index::Index;
 
 pub fn save_index(to: &Path, index: &Index) -> Result<(), Box<dyn Error>> {
-    let json = serde_json::to_string(index)?;
+    let json = serde_json::to_string_pretty(index)?;
     fs::write(to, json)?;
     Ok(())
 }
