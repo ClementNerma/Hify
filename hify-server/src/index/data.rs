@@ -35,7 +35,7 @@ pub struct IndexCache {
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
 
-    pub genres_tracks: HashMap<String, TrackID>,
+    pub genres_tracks: HashMap<String, Vec<TrackID>>,
     pub no_genre_tracks: HashSet<TrackID>,
 }
 

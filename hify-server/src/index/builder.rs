@@ -256,7 +256,7 @@ fn build_index_cache(
     let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
-    let mut genres_tracks = HashMap::new();
+    let mut genres_tracks = HashMap::<String, Vec<TrackID>>::new();
     let mut no_genre_tracks = HashSet::new();
 
     for track in tracks.values() {
@@ -306,7 +306,10 @@ fn build_index_cache(
             no_genre_tracks.insert(track.id.clone());
         } else {
             for genre in &track.metadata.tags.genres {
-                genres_tracks.insert(genre.clone(), track.id.clone());
+                genres_tracks
+                    .entry(genre.clone())
+                    .or_default()
+                    .push(track.id.clone());
             }
         }
     }
@@ -344,6 +347,14 @@ fn build_index_cache(
         .map(|(album_id, mut album_tracks)| {
             album_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
             (album_id, album_tracks)
+        })
+        .collect();
+
+    let genres_tracks = genres_tracks
+        .into_iter()
+        .map(|(genre_id, mut genre_tracks)| {
+            genre_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
+            (genre_id, genre_tracks)
         })
         .collect();
 
