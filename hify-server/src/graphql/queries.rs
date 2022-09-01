@@ -199,7 +199,7 @@ impl AlbumInfos {
             .map(|date| date.year)
             .collect();
 
-        let first_track_year = *years.get(0)?;
+        let first_track_year = *years.first()?;
 
         if years.iter().all(|year| *year == first_track_year) {
             return Some(first_track_year);
