@@ -8,7 +8,7 @@ use rocket::{
 };
 use rocket_seek_stream::SeekStream;
 
-use crate::index::{AlbumID, AudioFormat, TrackID, ArtistID};
+use crate::index::{AlbumID, ArtistID, AudioFormat, TrackID};
 
 use super::{
     server::{rest_server_error, FaillibleResponse},
@@ -62,12 +62,24 @@ pub async fn album_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<C
 pub async fn artist_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
     let index = ctx.index.read().await;
 
-    let artist_first_album_id = index.cache.artists_albums.get(&ArtistID(id))
+    let artist_first_album_id = index
+        .cache
+        .artists_albums
+        .get(&ArtistID(id))
         .ok_or_else(|| {
-        rest_server_error(Status::NotFound, "Provided artist ID was not found".to_string())
-    })?.keys().next().ok_or_else(|| {
-        rest_server_error(Status::NotFound, "Provided artist does not have any album to generate an art image from".to_string())
-    })?;
+            rest_server_error(
+                Status::NotFound,
+                "Provided artist ID was not found".to_string(),
+            )
+        })?
+        .keys()
+        .next()
+        .ok_or_else(|| {
+            rest_server_error(
+                Status::NotFound,
+                "Provided artist does not have any album to generate an art image from".to_string(),
+            )
+        })?;
 
     let album_art_path = index
         .albums_arts
@@ -140,4 +152,9 @@ pub async fn stream<'a>(
     };
 
     Ok(Custom(mime_type, stream))
+}
+
+#[rocket::get("/exit")]
+pub fn exit() {
+    std::process::exit(0)
 }

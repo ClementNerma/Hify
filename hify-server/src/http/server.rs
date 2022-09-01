@@ -7,7 +7,7 @@ use rocket::response::status;
 use super::{
     cache::CachingStrategy,
     cors::CORS,
-    routes::{album_art, artist_art, stream},
+    routes::{album_art, artist_art, exit, stream},
     AppState,
 };
 use crate::graphql::{get_graphql_routes, get_graphql_schema};
@@ -24,7 +24,7 @@ pub async fn launch(index: Index) -> Result<(), rocket::Error> {
         .manage(get_graphql_schema(app_state.clone()))
         .manage(app_state)
         .mount(GRAPHQL_MOUNTPOINT, get_graphql_routes())
-        .mount("/", rocket::routes![album_art, artist_art, stream])
+        .mount("/", rocket::routes![album_art, artist_art, stream, exit])
         .launch()
         .await
 }
