@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Enum, Object, Result, SimpleObject};
 
 use crate::{
-    graphql_ctx_member, graphql_index,
+    graphql_ctx_member, graphql_index, graphql_user_data,
     index::{
         search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexSearchResults, SortedMap,
         Track, TrackID, TrackTags,
@@ -32,6 +32,18 @@ impl QueryRoot {
             artists_count: index.cache.artists_infos.len() as i32,
             tracks_count: index.tracks.len() as i32,
         }
+    }
+
+    async fn history(&self, ctx: &Context<'_>) -> Vec<Track> {
+        let index = graphql_index!(ctx);
+        let user_data = graphql_user_data!(ctx);
+
+        user_data
+            .history()
+            .iter()
+            .filter_map(|id| index.tracks.get(id))
+            .cloned()
+            .collect()
     }
 
     async fn albums(

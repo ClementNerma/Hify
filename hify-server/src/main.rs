@@ -45,8 +45,13 @@ async fn main() {
     let user_data = if user_data_file.is_file() {
         utils::save::load_user_data(&user_data_file).unwrap()
     } else {
-        userdata::UserData::new()
+        userdata::UserData::new(200)
     };
+
+    let user_data = userdata::UserDataWrapper::new(
+        user_data,
+        Box::new(move |user_data| utils::save::save_user_data(&user_data_file, user_data).unwrap()),
+    );
 
     println!("> Launching server...");
 
