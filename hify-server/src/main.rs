@@ -12,34 +12,38 @@ mod utils;
 
 #[::rocket::main]
 async fn main() {
-    let args = cmd::Command::parse();
+    let cmd::Command {
+        music_dir,
+        index_file,
+        user_data_file,
+    } = cmd::Command::parse();
 
-    if !args.music_dir.is_dir() {
+    if !music_dir.is_dir() {
         panic!("Music path is not a directory");
     }
 
-    if args.index_file.is_dir() {
+    if index_file.is_dir() {
         panic!("Index file must not be a directory");
     }
 
-    let index = if args.index_file.is_file() {
+    let index = if index_file.is_file() {
         println!("> Loading index from disk...");
-        let index = utils::save::load_index(&args.index_file).unwrap();
+        let index = utils::save::load_index(&index_file).unwrap();
 
         println!("> Done.");
 
         index
     } else {
         println!("> Generating index...");
-        let index = index::build_index(args.music_dir);
-        utils::save::save_index(&args.index_file, &index).unwrap();
+        let index = index::build_index(music_dir);
+        utils::save::save_index(&index_file, &index).unwrap();
         println!("> Index saved on disk.");
 
         index
     };
 
-    let user_data = if args.user_data_file.is_file() {
-        utils::save::load_user_data(&args.user_data_file).unwrap()
+    let user_data = if user_data_file.is_file() {
+        utils::save::load_user_data(&user_data_file).unwrap()
     } else {
         userdata::UserData::new()
     };
