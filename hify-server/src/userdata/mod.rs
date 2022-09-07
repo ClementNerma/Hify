@@ -32,8 +32,16 @@ impl UserDataWrapper {
     }
 
     pub fn history_push(&mut self, track_id: TrackID) {
-        if self.inner.history.len() == self.inner.history_size {
-            self.inner.history.remove(0);
+        match self.inner.history.iter().position(|t| *t == track_id) {
+            Some(index) => {
+                self.inner.history.remove(index);
+            }
+
+            None => {
+                if self.inner.history.len() == self.inner.history_size {
+                    self.inner.history.remove(0);
+                }
+            }
         }
 
         self.inner.history.insert(0, track_id);
