@@ -1,5 +1,5 @@
 html {
-    height: 100%;
+  height: 100%;
 }
 
 @property --linear-start {
@@ -15,59 +15,63 @@ html {
 }
 
 body {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: auto; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
 
-    color: rgb(230, 230, 230);
-    
-    background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
-    background-attachment: fixed;
+  color: rgb(230, 230, 230);
 
-    /* transition: none; */
-    transition: --linear-start 0.5s, --linear-end 0.5s;
+  background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
+  background-attachment: fixed;
+
+  /* transition: none; */
+  transition: --linear-start 0.5s, --linear-end 0.5s;
 }
 
 body.distraction-free {
-    --linear-start: #000;
-    --linear-end: #000;
-    
-    transition: --linear-start 3s, --linear-end 3s, opacity 3s;
-    opacity: 0.5;
+  --linear-start: #000;
+  --linear-end: #000;
+
+  transition: --linear-start 3s, --linear-end 3s, opacity 3s;
+  opacity: 0.5;
 }
 
-navigable-item-wrapper, [item-like-style] {
-    padding: 5px;
+navigable-item-wrapper,
+[item-like-style] {
+  padding: 5px;
 }
 
-navigable-item-wrapper.focusedOrMouseHover, navigable-item-wrapper:hover {
-    outline: none;
-    color: black;
-    background-color: white;
-    border-radius: 5px;
-    cursor: pointer;
+navigable-item-wrapper.focusedOrMouseHover,
+navigable-item-wrapper:hover {
+  outline: none;
+  color: black;
+  background-color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-navigable-item-wrapper.transparent > :first-child, [item-like-style].transparent > :first-child {
-    cursor: pointer;
+navigable-item-wrapper.transparent > :first-child,
+[item-like-style].transparent > :first-child {
+  cursor: pointer;
 }
 
-navigable-item-wrapper.focusedOrMouseHover.transparent > *, navigable-item-wrapper.transparent:hover > * {
-    outline: none;
-    background-color: white;
+navigable-item-wrapper.focusedOrMouseHover.transparent > *,
+navigable-item-wrapper.transparent:hover > * {
+  outline: none;
+  background-color: white;
 }
 
 navigable-item-wrapper.focusedOrMouseHover > tr > td:first-child,
 navigable-item-wrapper:hover > tr > td:first-child {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 navigable-item-wrapper.focusedOrMouseHover tr td:last-child,
 navigable-item-wrapper:hover tr td:last-child {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
