@@ -75,6 +75,7 @@
               { label: 'Home', uri: ROUTES.home },
               { label: 'Albums', uri: ROUTES.albums },
               { label: 'Artists', uri: ROUTES.artists },
+              { label: 'History', uri: ROUTES.history },
               { label: 'Search', uri: ROUTES.search },
               { label: 'Now Playing', uri: ROUTES.nowPlaying },
             ]}

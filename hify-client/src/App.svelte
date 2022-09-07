@@ -13,12 +13,11 @@
 
   import AlbumPage from './pages/AlbumPage/AlbumPage.svelte'
   import ArtistPage from './pages/ArtistPage/ArtistPage.svelte'
-
+  import ArtistsPage from './pages/ArtistsPage/ArtistsPage.svelte'
+  import HistoryPage from './pages/HistoryPage/HistoryPage.svelte'
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
-
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
   import DevToolsPage from './pages/DevToolsPage/DevToolsPage.svelte'
-  import ArtistsPage from './pages/ArtistsPage/ArtistsPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -41,6 +40,10 @@
 
     <Route path={ROUTES.artist(':id')} let:params>
       <ArtistPage artistId={params['id']} />
+    </Route>
+
+    <Route path={ROUTES.history}>
+      <HistoryPage />
     </Route>
 
     <Route path={ROUTES.nowPlaying}>

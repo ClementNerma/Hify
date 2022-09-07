@@ -1,0 +1,5 @@
+query History($albumYearStrategy: AlbumYearStrategy!) {
+  history {
+    ...AudioTrack
+  }
+}

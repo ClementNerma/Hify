@@ -1,0 +1,3 @@
+mutation HistoryPush($trackId: String!) {
+  historyPush(trackId: $trackId)
+}
