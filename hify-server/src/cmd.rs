@@ -9,10 +9,7 @@ pub struct Command {
     pub music_dir: PathBuf,
 
     #[clap(short, long)]
-    pub index_file: Option<PathBuf>,
-
-    #[clap(long)]
-    pub no_index_file: bool,
+    pub index_file: PathBuf,
 
     #[clap(short, long)]
     pub user_data_file: PathBuf,
