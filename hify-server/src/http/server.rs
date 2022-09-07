@@ -10,13 +10,16 @@ use super::{
     routes::{album_art, artist_art, exit, stream},
     AppState,
 };
-use crate::graphql::{get_graphql_routes, get_graphql_schema};
 use crate::index::Index;
+use crate::{
+    graphql::{get_graphql_routes, get_graphql_schema},
+    userdata::UserData,
+};
 
 pub static GRAPHQL_MOUNTPOINT: &str = "/graphql";
 
-pub async fn launch(index: Index) -> Result<(), rocket::Error> {
-    let app_state = AppState::new(index);
+pub async fn launch(index: Index, user_data: UserData) -> Result<(), rocket::Error> {
+    let app_state = AppState::new(index, user_data);
 
     Rocket::build()
         .attach(CORS)

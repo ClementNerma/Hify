@@ -7,6 +7,7 @@ mod cmd;
 mod graphql;
 mod http;
 mod index;
+mod userdata;
 mod utils;
 
 #[::rocket::main]
@@ -50,7 +51,13 @@ async fn main() {
         index
     };
 
+    let user_data = if args.user_data_file.is_file() {
+        utils::save::load_user_data(&args.user_data_file).unwrap()
+    } else {
+        userdata::UserData::new()
+    };
+
     println!("> Launching server...");
 
-    http::launch(index).await.unwrap();
+    http::launch(index, user_data).await.unwrap();
 }
