@@ -36,7 +36,7 @@ body.distraction-free {
   --linear-end: #000;
 
   transition: --linear-start 3s, --linear-end 3s, opacity 3s;
-  opacity: 0.5;
+  /* opacity: 0.5; */
 }
 
 navigable-item-wrapper,
