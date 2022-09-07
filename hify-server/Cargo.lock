@@ -1433,7 +1433,8 @@ dependencies = [
 [[package]]
 name = "rocket_seek_stream"
 version = "0.2.5"
-source = "git+https://github.com/rydz/rocket_seek_stream.git#519601b2250b6164b9617601b38826c73915f842"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd566a2e067c1ded3126d91ab39f1417bf2bb1cd8fde31aab8f50ed5e7402db2"
 dependencies = [
  "futures",
  "rand",
