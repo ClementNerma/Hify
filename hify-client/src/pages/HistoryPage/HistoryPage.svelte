@@ -12,6 +12,7 @@
     variables: {
       albumYearStrategy: CONFIG.albumYearStrategy,
     },
+    fetchPolicy: 'no-cache',
   })
 </script>
 
