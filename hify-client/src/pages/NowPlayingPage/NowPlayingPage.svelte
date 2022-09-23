@@ -154,6 +154,7 @@
     flex-direction: column;
     position: fixed;
     top: calc(35% - 250px / 2 + 33px);
+    width: calc(50% - 250px / 2 - 10px);
     left: 5%;
     font-size: 1.2rem;
   }
