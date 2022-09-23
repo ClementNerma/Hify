@@ -40,7 +40,7 @@ body.distraction-free {
 }
 
 navigable-item-wrapper,
-[item-like-style] {
+[data-item-like-style] {
   padding: 5px;
 }
 
@@ -54,7 +54,7 @@ navigable-item-wrapper:hover {
 }
 
 navigable-item-wrapper.transparent > :first-child,
-[item-like-style].transparent > :first-child {
+[data-item-like-style].transparent > :first-child {
   cursor: pointer;
 }
 

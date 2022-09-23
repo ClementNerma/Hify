@@ -17,7 +17,7 @@
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import { distractionFreeMode, setupDistractionFreeListener } from '../../stores/distraction-free'
+  import { setupDistractionFreeListener } from '../../stores/distraction-free'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
 
   $: tags = $currentTrack && $currentTrack.metadata.tags
@@ -53,7 +53,7 @@
       </NavigableRow>
     </div>
     {#if tags.date}
-      <div item-like-style>
+      <div data-item-like-style>
         <div class="track-info">🕒 {formatDate(tags.date)}</div>
       </div>
     {/if}
