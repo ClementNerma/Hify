@@ -35,7 +35,7 @@ body.distraction-free {
   --linear-start: #000;
   --linear-end: #000;
 
-  transition: --linear-start 3s, --linear-end 3s, opacity 3s;
+  transition: --linear-start 1s, --linear-end 1s, opacity 1s;
   /* opacity: 0.5; */
 }
 

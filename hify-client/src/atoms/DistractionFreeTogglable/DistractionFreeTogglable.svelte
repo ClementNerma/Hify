@@ -12,7 +12,7 @@
   }
 
   .hidden {
-    transition: all 3s;
+    transition: all 1s;
     opacity: 0;
   }
 </style>
