@@ -1,0 +1,117 @@
+<script lang="ts">
+  import { navigate } from 'svelte-navigator'
+  import { bind, formatDate } from '../../utils'
+
+  import {
+    humanReadableDuration,
+    readableAudioPaused,
+    readableAudioProgress,
+    setPlayingAudioProgress,
+    toggleAudioPlayback,
+  } from '../../stores/audio-player'
+
+  import { AudioTrackFragment } from '../../graphql/generated'
+
+  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
+  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
+  import { ROUTES } from '../../routes'
+  import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
+
+  export let currentTrack: AudioTrackFragment
+
+  $: tags = currentTrack.metadata.tags
+  $: album = tags.album
+</script>
+
+<div class="player-bottom">
+  <div class="track-infos">
+    <NavigableRow>
+      <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+        <div class="track-info">🎵 {tags.title}</div>
+      </SimpleNavigableItem>
+      <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
+        <div class="track-info">💿 {album.name}</div>
+      </SimpleNavigableItem>
+      {#if tags.date}
+        <div data-item-like-style>
+          <div class="track-info">🕒 {formatDate(tags.date)}</div>
+        </div>
+      {/if}
+
+      {#each album.albumArtists as albumArtist}
+        <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
+          <div class="track-info">🎤 {albumArtist.name}</div>
+        </SimpleNavigableItem>
+      {/each}
+    </NavigableRow>
+  </div>
+
+  <div class="player-time">
+    <div class="track-progress">
+      {#if $readableAudioProgress !== null}
+        {humanReadableDuration($readableAudioProgress)}
+      {:else}
+        --:--
+      {/if}
+      {#if $readableAudioPaused}
+        ⏸️
+      {/if}
+    </div>
+    <div class="track-duration">
+      {humanReadableDuration(currentTrack.metadata.duration)}
+    </div>
+  </div>
+  <div class="progress-range">
+    <ProgressRange
+      max={currentTrack.metadata.duration}
+      value={$readableAudioProgress}
+      onChange={setPlayingAudioProgress}
+      onPress={toggleAudioPlayback}
+      directionalAmount={30}
+    />
+  </div>
+
+  <div class="play-queue-gallery">
+    <QueueGallery />
+  </div>
+</div>
+
+<style>
+  .player-bottom {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 1%;
+
+    background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0), rgba(30, 30, 30, 1));
+  }
+
+  .track-infos {
+    display: flex;
+    flex-direction: row;
+    font-size: 1.2rem;
+  }
+
+  .track-info {
+    padding: 5px;
+  }
+
+  .progress-range,
+  .progress-range :global(input) {
+    width: calc(100% - 5px);
+    color: red;
+  }
+
+  .player-time {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 10px;
+  }
+</style>
