@@ -29,9 +29,11 @@
       tabsFocusRequest[0]()
     }
   }
+
+  let isFocused: boolean
 </script>
 
-<div class="container">
+<div class="container {isFocused ? 'focused' : ''}">
   <NavigableRow>
     {#each tabs as tab, i}
       <SimpleNavigableItem
@@ -39,6 +41,10 @@
         hasFocusPriority={$location.pathname === tab.uri}
         onFocus={() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+          isFocused = true
+        }}
+        onUnfocus={() => {
+          isFocused = false
         }}
         bind:requestFocus={tabsFocusRequest[i]}
       >
@@ -55,6 +61,12 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
+  }
+
+  .container:not(.focused) {
+    opacity: 0;
+    transition: opacity linear 0.5s;
+    transition-delay: 1s;
   }
 
   .tab {
