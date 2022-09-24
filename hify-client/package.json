@@ -51,6 +51,6 @@
     "svelte-navigator": "^3.2.2"
   },
   "volta": {
-    "node": "17.6.0"
+    "node": "18.9.1"
   }
 }
