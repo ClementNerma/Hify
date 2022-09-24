@@ -154,9 +154,15 @@
   .player-bottom {
     position: fixed;
 
-    left: 5%;
-    right: 5%;
-    bottom: 5%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 1%;
+
+    background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0), rgba(30, 30, 30, 1));
   }
 
   .progress-range,
