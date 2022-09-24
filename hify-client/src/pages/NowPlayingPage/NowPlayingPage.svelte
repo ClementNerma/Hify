@@ -19,10 +19,10 @@
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
   import { setupDistractionFreeListener } from '../../stores/distraction-free'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import { readableDistractionFreeMode } from '../../stores/distraction-free'
   import { onMount, onDestroy } from 'svelte'
   import { blackBackground } from '../../stores/black-background'
+  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
 
   $: tags = $currentTrack && $currentTrack.metadata.tags
   $: album = $currentTrack && $currentTrack.metadata.tags.album
@@ -49,37 +49,35 @@
   />
 
   <DistractionFreeTogglable>
-    <NavigableRow>
-      <NavigableList>
-        <div class="track-infos">
-          <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
-            <div class="track-info">🎵 {tags.title}</div>
-          </SimpleNavigableItem>
-          <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
-            <div class="track-info">💿 {album.name}</div>
-          </SimpleNavigableItem>
-          {#if tags.date}
-            <div data-item-like-style>
-              <div class="track-info">🕒 {formatDate(tags.date)}</div>
-            </div>
-          {/if}
-        </div>
-      </NavigableList>
+    <div class="player-bottom">
+      <div class="track-infos">
+        <NavigableRow>
+          <div class="track-infos-row">
+            <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+              <div class="track-info">🎵 {tags.title}</div>
+            </SimpleNavigableItem>
+            <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
+              <div class="track-info">💿 {album.name}</div>
+            </SimpleNavigableItem>
+            {#if tags.date}
+              <div data-item-like-style>
+                <div class="track-info">🕒 {formatDate(tags.date)}</div>
+              </div>
+            {/if}
+          </div>
+        </NavigableRow>
 
-      <NavigableList>
-        <div class="track-artists">
-          <NavigableRow>
+        <NavigableRow>
+          <div class="track-infos-row">
             {#each album.albumArtists as albumArtist}
               <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
-                <span class="track-info">{albumArtist.name} 🎤</span>
+                <span class="track-info">🎤 {albumArtist.name}</span>
               </SimpleNavigableItem>
             {/each}
-          </NavigableRow>
-        </div>
-      </NavigableList>
-    </NavigableRow>
+          </div>
+        </NavigableRow>
+      </div>
 
-    <div class="player-bottom">
       <div class="player-time">
         <div class="track-progress">
           {#if $readableAudioProgress !== null}
@@ -104,10 +102,10 @@
           directionalAmount={30}
         />
       </div>
-    </div>
 
-    <div class="play-queue-gallery">
-      <QueueGallery />
+      <div class="play-queue-gallery">
+        <QueueGallery />
+      </div>
     </div>
   </DistractionFreeTogglable>
 {/if}
@@ -122,55 +120,30 @@
   }
 
   .album-art {
-    z-index: 2;
     position: fixed;
-  }
 
-  .album-art:not(.centered) {
-    top: calc(35% - 250px / 2);
-    left: calc(50% - 250px / 2);
+    top: 10%;
+    left: 10%;
 
-    transition: all 0.5s linear;
-
-    /* Just so the image doesn't get wider in the beginning of the transition
-       when coming from .centered */
-    -o-object-fit: contain;
-    object-fit: contain;
-  }
-
-  .album-art.centered {
-    top: 5%;
-    left: 5%;
-
-    width: 90%;
-    height: 90%;
+    width: 80%;
+    height: 80%;
 
     margin: auto;
     overflow: auto;
 
     -o-object-fit: contain;
     object-fit: contain;
-
-    transition: all 1s linear;
   }
 
   .track-infos {
     display: flex;
     flex-direction: column;
-    position: fixed;
-    top: calc(35% - 250px / 2 + 33px);
-    width: calc(50% - 250px / 2 - 10px);
-    left: 5%;
     font-size: 1.2rem;
   }
 
-  .track-artists {
+  .track-infos-row {
     display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: calc(35% - 250px / 2 + 33px);
-    right: 5%;
-    font-size: 1.2rem;
+    flex-direction: row;
   }
 
   .track-info {
@@ -180,11 +153,10 @@
 
   .player-bottom {
     position: fixed;
-    bottom: 5%;
 
-    top: calc(35% + 250px / 2 + 15px);
-    left: 10%;
-    right: 10%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;
   }
 
   .progress-range,
@@ -198,12 +170,5 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 0px 10px;
-  }
-
-  .play-queue-gallery {
-    position: fixed;
-    left: 5%;
-    right: 5%;
-    bottom: 20px;
   }
 </style>
