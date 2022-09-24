@@ -21,6 +21,8 @@
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import { readableDistractionFreeMode } from '../../stores/distraction-free'
+  import { onMount, onDestroy } from 'svelte'
+  import { blackBackground } from '../../stores/black-background'
 
   $: tags = $currentTrack && $currentTrack.metadata.tags
   $: album = $currentTrack && $currentTrack.metadata.tags.album
@@ -30,6 +32,9 @@
     ['MediaPlayPause', 'MediaRewind', 'MediaFastForward'],
     () => $readableAudioPaused === false,
   )
+
+  onMount(() => blackBackground.set(true))
+  onDestroy(() => blackBackground.set(false))
 </script>
 
 {#if !$currentTrack || !tags || !album}

@@ -2,8 +2,6 @@ import { onDestroy } from 'svelte'
 import { derived, get, writable } from 'svelte/store'
 import { handleInput } from '../navigable/input-manager'
 
-export const DISTRACTION_FREE_CLASSNAME = 'distraction-free'
-
 export const enableDistractionFreeModeFeature = writable(true)
 
 enableDistractionFreeModeFeature.subscribe((set) => {
@@ -24,13 +22,13 @@ export function setDistractionFreeMode(set: boolean) {
   distractionFreeMode.set(set)
 }
 
-distractionFreeMode.subscribe((set) => {
-  if (set) {
-    document.body.classList.add(DISTRACTION_FREE_CLASSNAME)
-  } else {
-    document.body.classList.remove(DISTRACTION_FREE_CLASSNAME)
-  }
-})
+// distractionFreeMode.subscribe((set) => {
+//   if (set) {
+//     document.body.classList.add(DISTRACTION_FREE_CLASSNAME)
+//   } else {
+//     document.body.classList.remove(DISTRACTION_FREE_CLASSNAME)
+//   }
+// })
 
 export function setupDistractionFreeListener(delay: number, ignoreKeys?: string[], interceptTurningOn?: () => boolean) {
   function startDistractionFreeTimeout(): number | null {
