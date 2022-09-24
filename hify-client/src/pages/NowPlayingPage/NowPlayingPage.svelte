@@ -52,29 +52,23 @@
     <div class="player-bottom">
       <div class="track-infos">
         <NavigableRow>
-          <div class="track-infos-row">
-            <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
-              <div class="track-info">🎵 {tags.title}</div>
-            </SimpleNavigableItem>
-            <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
-              <div class="track-info">💿 {album.name}</div>
-            </SimpleNavigableItem>
-            {#if tags.date}
-              <div data-item-like-style>
-                <div class="track-info">🕒 {formatDate(tags.date)}</div>
-              </div>
-            {/if}
-          </div>
-        </NavigableRow>
+          <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+            <div class="track-info">🎵 {tags.title}</div>
+          </SimpleNavigableItem>
+          <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
+            <div class="track-info">💿 {album.name}</div>
+          </SimpleNavigableItem>
+          {#if tags.date}
+            <div data-item-like-style>
+              <div class="track-info">🕒 {formatDate(tags.date)}</div>
+            </div>
+          {/if}
 
-        <NavigableRow>
-          <div class="track-infos-row">
-            {#each album.albumArtists as albumArtist}
-              <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
-                <span class="track-info">🎤 {albumArtist.name}</span>
-              </SimpleNavigableItem>
-            {/each}
-          </div>
+          {#each album.albumArtists as albumArtist}
+            <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
+              <div class="track-info">🎤 {albumArtist.name}</div>
+            </SimpleNavigableItem>
+          {/each}
         </NavigableRow>
       </div>
 
@@ -137,17 +131,11 @@
 
   .track-infos {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-size: 1.2rem;
   }
 
-  .track-infos-row {
-    display: flex;
-    flex-direction: row;
-  }
-
   .track-info {
-    display: inline-block;
     padding: 5px;
   }
 
