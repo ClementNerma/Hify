@@ -15,7 +15,7 @@ use super::{
     sorted_map::SortedMap,
 };
 
-fn log(time: SystemTime, message: &str) {
+pub fn log(time: SystemTime, message: &str) {
     let elapsed = match time.elapsed() {
         Ok(time) => time.as_secs().to_string(),
         Err(_) => "?".to_string(),
@@ -27,7 +27,7 @@ fn log(time: SystemTime, message: &str) {
 pub fn build_index(from: PathBuf) -> Result<Index> {
     let started = SystemTime::now();
 
-    log(started, "Starting index building...");
+    log(started, "Looking for audio files...");
 
     let mut files = vec![];
     let mut observations = vec![];

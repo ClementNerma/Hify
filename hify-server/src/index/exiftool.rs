@@ -1,10 +1,16 @@
-use std::{path::Path, process::Command};
+use std::{
+    io::{stdout, BufRead, BufReader, Write},
+    path::Path,
+    process::{Command, Stdio},
+    sync::{Arc, Mutex},
+    time::Instant,
+};
 
 use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
-use serde::Deserialize;
+use serde::{de::Error, Deserialize, Deserializer};
 use serde_json::Value;
 
 use crate::index::{AudioFormat, TrackDate, TrackMetadata, TrackTags};
@@ -35,30 +41,126 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
                 return None;
             }
 
-            Some(Ok(file.as_ref()))
+            Some(Ok(file.as_ref().to_path_buf()))
         })
         .collect::<Result<Vec<_>>>()?;
 
-    let exiftool_out = Command::new("exiftool")
-        .args(&["-n", "-json"])
-        .args(&files)
-        .output()
-        .context("Failed to launch ExifTool: {e}")?;
+    let started = Instant::now();
+    let mut previous = 0;
 
-    if !exiftool_out.status.success() {
-        let stderr = std::str::from_utf8(&exiftool_out.stderr).unwrap_or("<invalid UTF-8 output>");
+    let display_progress = |elapsed: u64, current: u64, total: u64| {
+        print!(
+            "\r[     ] Progress: {} / {} ({}%) in {}s...",
+            current,
+            total,
+            current * 100 / total,
+            elapsed
+        );
 
-        bail!("ExifTool failed: {stderr}");
+        stdout().flush().unwrap();
+    };
+
+    print!("Starting analysis...");
+
+    let files_count = u64::try_from(files.len()).unwrap();
+
+    const FILES_PER_CHUNK: usize = 100;
+
+    let mut analyzed = vec![];
+
+    for (chunk_num, files) in files.chunks(FILES_PER_CHUNK).enumerate() {
+        let chunk_start = u64::try_from(FILES_PER_CHUNK * chunk_num).unwrap();
+
+        let mut handle = Command::new("exiftool")
+            .args(&["-n", "-json", "-progress"])
+            .args(files)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .context("Failed to launch ExifTool")?;
+
+        let stdout_reader = BufReader::new(
+            handle
+                .stdout
+                .take()
+                .context("Failed to get command's STDOUT")?,
+        );
+
+        let stderr_reader = BufReader::new(
+            handle
+                .stderr
+                .take()
+                .context("Failed to get the command's SDTERR")?,
+        );
+
+        let stdout_lines = Arc::new(Mutex::new(vec![]));
+        let stderr_lines = Arc::new(Mutex::new(vec![]));
+
+        let stdout_lines_for_reader = Arc::clone(&stdout_lines);
+        let stderr_lines_for_reader = Arc::clone(&stderr_lines);
+
+        std::thread::spawn(move || {
+            for line in stdout_reader.lines() {
+                match line {
+                    Ok(line) => stdout_lines_for_reader.lock().unwrap().push(line),
+                    Err(err) => {
+                        eprintln!("{err:?}");
+                        // TODO
+                    }
+                }
+            }
+        });
+
+        std::thread::spawn(move || {
+            for line in stderr_reader.lines() {
+                match line {
+                    Ok(line) => match PARSE_PROGRESS_LINE.captures(&line) {
+                        Some(m) => {
+                            let current =
+                                m.name("current").unwrap().as_str().parse::<u64>().unwrap();
+
+                            let elapsed = started.elapsed().as_secs();
+
+                            if elapsed != previous || current == files_count {
+                                previous = elapsed;
+                                display_progress(elapsed, chunk_start + current, files_count);
+                            }
+                        }
+                        None => {
+                            stderr_lines_for_reader.lock().unwrap().push(line);
+                        }
+                    },
+                    Err(err) => {
+                        eprintln!("{err:?}");
+                        // TODO
+                    }
+                }
+            }
+        });
+
+        let status = handle.wait().with_context(|| {
+            format!(
+                "ExifTool failed: {}",
+                stderr_lines.lock().unwrap().join("\n")
+            )
+        })?;
+
+        if !status.success() {
+            bail!(
+                "ExifTool failed: {}",
+                stderr_lines.lock().unwrap().join("\n")
+            );
+        }
+
+        let stdout_lines = stdout_lines.lock().unwrap().join("\n");
+
+        let parsed_output = serde_json::from_str::<ExifToolOutput>(&stdout_lines)
+            .with_context(|| format!("Failed to parse ExifTool output:\n\n{}", stdout_lines))?;
+
+        analyzed.extend(parsed_output.0);
     }
 
-    let json_str = std::str::from_utf8(&exiftool_out.stdout)
-        .context("ExifTool returned an invalid UTF-8 response")?;
-
-    let parsed_output = serde_json::from_str::<ExifToolOutput>(json_str)
-        .context("Failed to parse ExifTool output")?;
-
     let files_count = files.len();
-    let analyzed = parsed_output.0;
 
     if analyzed.len() != files_count {
         bail!(
@@ -112,7 +214,7 @@ fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
             )
         })?,
         duration: analyzed.Duration as i32,
-        bitrate: analyzed.AudioBitrate as i32,
+        bitrate: analyzed.AudioBitrate.map(|br| br as i32),
         tags: parse_exiftool_tags(analyzed.tags)?,
     })
 }
@@ -126,32 +228,21 @@ fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
         album_artists: tags.Band.map(parse_array_tag).unwrap_or_default(),
 
         disc: tags
-            .PartOfSet
-            .map(|date| int_or_string(date).and_then(|date| parse_set_number(&date, "disc number")))
+            .Discnumber
+            .or(tags.PartOfSet)
+            .map(|value| parse_set_number(&value, "disc number"))
             .transpose()?,
 
         track_no: tags
             .Track
-            .map(|date| {
-                int_or_string(date).and_then(|date| parse_set_number(&date, "track number"))
-            })
+            .or(tags.TrackNumber)
+            .map(|value| parse_set_number(&value, "track number"))
             .transpose()?,
 
-        date: tags
-            .Year
-            .map(|date| int_or_string(date).and_then(|date| parse_date(&date)))
-            .transpose()?,
+        date: tags.Year.map(|date| parse_date(&date)).transpose()?,
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
     })
-}
-
-fn int_or_string(value: Value) -> Result<String> {
-    match value {
-        Value::Number(num) => Ok(num.to_string()),
-        Value::String(str) => Ok(str),
-        _ => bail!("Failed to parse value: {:?}", value),
-    }
 }
 
 fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32> {
@@ -219,7 +310,9 @@ struct ExifToolFile {
     FileType: String,
     Duration: f32,
     FileSize: u64,
-    AudioBitrate: f64,
+
+    #[serde(default)]
+    AudioBitrate: Option<f64>,
 
     #[serde(flatten)]
     tags: ExifToolFileTags,
@@ -228,34 +321,60 @@ struct ExifToolFile {
 #[derive(Deserialize)]
 #[allow(non_snake_case)]
 struct ExifToolFileTags {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Album: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Artist: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Band: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Composer: Option<String>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
+    Discnumber: Option<String>,
 
     #[serde(default)]
     Genre: Option<String>,
 
-    #[serde(default)]
-    PartOfSet: Option<Value>,
+    #[serde(default, deserialize_with = "ensure_string")]
+    PartOfSet: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Title: Option<String>,
 
-    #[serde(default)]
-    Track: Option<Value>,
+    #[serde(default, deserialize_with = "ensure_string")]
+    Track: Option<String>,
 
-    #[serde(default)]
-    Year: Option<Value>,
+    #[serde(default, deserialize_with = "ensure_string")]
+    TrackNumber: Option<String>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
+    Year: Option<String>,
     // #[serde(default)]
     // Popularimeter: Option<String>,
+}
+
+fn ensure_string<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<String>, D::Error> {
+    let matched: Option<Value> = Deserialize::deserialize(deserializer)?;
+
+    matched
+        .map(|num| match num {
+            Value::Number(num) => {
+                if num.is_u64() {
+                    Ok(num.to_string())
+                } else {
+                    Err(D::Error::custom("Invalid number type (expected u64)"))
+                }
+            }
+            Value::String(str) => Ok(str),
+            _ => Err(D::Error::custom(
+                "Invalid value type (expected string or integer)",
+            )),
+        })
+        .transpose()
 }
 
 static PARSE_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
@@ -302,6 +421,15 @@ static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
         Start
             :year([digit]{4})
             (';' | End)
+    ))
+    .unwrap()
+});
+
+static PARSE_PROGRESS_LINE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start
+            "======== " Codepoint+ " [" :current([digit]+) "/" [digit]+ "]"
+        End
     ))
     .unwrap()
 });
