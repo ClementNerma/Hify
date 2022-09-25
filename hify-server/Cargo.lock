@@ -797,6 +797,8 @@ dependencies = [
  "async-graphql-rocket",
  "clap",
  "once_cell",
+ "pomsky",
+ "pomsky-macro",
  "rayon",
  "regex",
  "rocket",
@@ -1285,6 +1287,34 @@ dependencies = [
  "cpufeatures",
  "opaque-debug 0.3.0",
  "universal-hash",
+]
+
+[[package]]
+name = "pomsky"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac612e14535d899b91c654d041a7b3fdc780966829d417376b5dcc01d0dac212"
+dependencies = [
+ "pomsky-syntax",
+ "thiserror",
+]
+
+[[package]]
+name = "pomsky-macro"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "002e82a9789a1bce0cf8dbf9db93cad442230adb117fd10acebbc12803461215"
+dependencies = [
+ "pomsky",
+]
+
+[[package]]
+name = "pomsky-syntax"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9073be4362b70ab2ad437ef941c915dc0a706d3de4456d39002d11dbb1cee158"
+dependencies = [
+ "thiserror",
 ]
 
 [[package]]

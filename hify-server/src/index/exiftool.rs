@@ -1,6 +1,7 @@
 use std::{path::Path, process::Command};
 
 use once_cell::sync::Lazy;
+use pomsky_macro::pomsky;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
@@ -125,7 +126,7 @@ fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32, 
         .captures(input)
         .ok_or_else(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
-            c.get(1)
+            c.name("number")
                 .unwrap()
                 .as_str()
                 .parse::<u16>()
@@ -231,19 +232,50 @@ struct ExifToolFileTags {
     // Popularimeter: Option<String>,
 }
 
-static PARSE_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(\d+)(/\d+)?$").unwrap());
+static PARSE_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start
+            :number([digit]+)
+            ("/" [digit]+)?
+        End
+    ))
+    .unwrap()
+});
 
 static PARSE_TRACK_YEAR_OR_DATE_1: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(
-    r"^(?P<year>\d\d\d\d)[-/\.\s](?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})(?:T\d\d:\d\d:\d\dZ)?$",
-).unwrap()
+    Regex::new(pomsky!(
+        Start
+            :year([digit]{4})
+            ['-' '\\' '.' ' ']
+            :month([digit]{2})
+            ['-' '\\' '.' ' ']
+            :day([digit]{2})
+            ('T' [digit]{2} ':' [digit]{2} ':' [digit]{2} 'Z')?
+        End
+
+    ))
+    .unwrap()
 });
 
 static PARSE_TRACK_YEAR_OR_DATE_2: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(
-    r"^(?P<month>\d{1,2})[-/\.\s](?P<day>\d{1,2})[-/\.\s](?P<year>\d\d\d\d)(?:T\d\d:\d\d:\d\dZ)?$",
-).unwrap()
+    Regex::new(pomsky!(
+        Start
+            :month([digit]{2})
+            ['-' '\\' '.' ' ']
+            :day([digit]{2})
+            ['-' '\\' '.' ' ']
+            :year([digit]{4})
+            ('T' [digit]{2} ':' [digit]{2} ':' [digit]{2} 'Z')?
+        End
+    ))
+    .unwrap()
 });
 
-static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(?P<year>\d\d\d\d)(?:;.*)?$").unwrap());
+static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start
+            :year([digit]{4})
+            (';' | End)
+    ))
+    .unwrap()
+});
