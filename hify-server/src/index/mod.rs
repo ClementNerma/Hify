@@ -1,6 +1,6 @@
 pub(self) mod builder;
 pub(self) mod data;
-pub(self) mod ffprobe;
+pub(self) mod exiftool;
 pub(self) mod search;
 pub(self) mod sorted_map;
 

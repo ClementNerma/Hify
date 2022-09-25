@@ -12,7 +12,7 @@ use walkdir::WalkDir;
 
 use super::{
     data::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, Index, IndexCache, Track, TrackID},
-    ffprobe,
+    exiftool,
     sorted_map::SortedMap,
 };
 
@@ -44,7 +44,7 @@ pub fn build_index(from: PathBuf) -> Index {
 
     log(
         started,
-        &format!("Found {} files, analyzing with FFProbe...", files.len()),
+        &format!("Found {} files, analyzing with ExifTool...", files.len()),
     );
 
     let counter = AtomicUsize::new(0);
@@ -52,7 +52,7 @@ pub fn build_index(from: PathBuf) -> Index {
     let analyzed = files
         .par_iter()
         .enumerate()
-        .map(|(_, file)| ffprobe::run_on(&file.path))
+        .map(|(_, file)| exiftool::run_on(&file.path))
         .inspect(|_| {
             let counter = counter.fetch_add(1, Ordering::SeqCst) + 1;
             if counter % 1000 == 0 || counter == files.len() {
