@@ -23,9 +23,12 @@ export enum NavigationComingFrom {
   Above,
 }
 
+export type OnFocusChangeCallback = (isFocused: boolean) => void
+
 export abstract class NavigableCommon {
   readonly identity: symbol
   readonly page: NavigablePage
+  public onFocusChangeCallback: OnFocusChangeCallback | null = null
 
   constructor(
     readonly parent: NavigableContainer,
@@ -178,6 +181,8 @@ class NavigablePage implements _NavigableContainerLike {
   readonly position = null
   readonly hasFocusPriority = null
   readonly ordered = false
+
+  public onFocusChangeCallback: ((isFocused: boolean) => void) | null = null
 
   private onlyChild: Navigable | null = null
 
@@ -456,6 +461,7 @@ function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
     item.onUnfocus()
     return false
   }
+
   if (wasNavigableDestroyed(item)) {
     logWarn('Previously-focused element was destroyed, removing focus')
     item.onUnfocus()
@@ -476,12 +482,25 @@ function _generateUpdatedNavState(
   newFocused: NavigableItem,
   page: NavigablePage,
 ): NavState {
-  oldFocused?.onUnfocus()
+  if (oldFocused) {
+    oldFocused.onUnfocus()
+    _propagateFocusChangeEvent(oldFocused, false)
+  }
 
   newFocused.scrollTo()
   newFocused.onFocus()
+  _propagateFocusChangeEvent(newFocused, true)
 
   return { page, focused: newFocused }
+}
+
+function _propagateFocusChangeEvent(item: NavigableItem, focused: boolean): void {
+  let curr: NavigableCommon = item
+
+  do {
+    curr.onFocusChangeCallback?.(focused)
+    curr = curr.parent
+  } while (!(curr instanceof NavigablePage))
 }
 
 export type RequestFocus = () => boolean
