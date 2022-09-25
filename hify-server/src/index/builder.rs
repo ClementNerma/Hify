@@ -1,7 +1,5 @@
 use anyhow::{anyhow, Context, Result};
-use rayon::iter::{
-    IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
-};
+
 use std::{
     collections::{hash_map::DefaultHasher, BTreeSet, HashMap, HashSet},
     hash::{Hash, Hasher},
@@ -26,7 +24,7 @@ fn log(time: SystemTime, message: &str) {
     println!("[{: >4}s] {message}", elapsed);
 }
 
-pub fn build_index(from: PathBuf) -> Index {
+pub fn build_index(from: PathBuf) -> Result<Index> {
     let started = SystemTime::now();
 
     log(started, "Starting index building...");
@@ -48,46 +46,19 @@ pub fn build_index(from: PathBuf) -> Index {
         &format!("Found {} files, analyzing with ExifTool...", files.len()),
     );
 
-    let counter = AtomicUsize::new(0);
-
-    let analyzed = files
-        .par_iter()
-        .enumerate()
-        .map(|(_, file)| exiftool::run_on(&file.path))
-        .inspect(|_| {
-            let counter = counter.fetch_add(1, Ordering::SeqCst) + 1;
-            if counter % 1000 == 0 || counter == files.len() {
-                let progress_percent = counter as f64 * 100.0 / files.len() as f64;
-                log(
-                    started,
-                    &format!(
-                        "Index building progress: {:.1}% ({counter}/{} files)",
-                        progress_percent,
-                        files.len(),
-                    ),
-                );
-            }
-        })
-        .collect::<Vec<_>>();
-
-    log(started, "Collecting tracks...");
+    let analyzed = exiftool::run_on(
+        files
+            .iter()
+            .map(|file| &file.path)
+            .collect::<Vec<_>>()
+            .as_slice(),
+    )?;
 
     let mut tracks = vec![];
     let mut tracks_paths = HashMap::new();
 
     for (i, track_metadata) in analyzed.into_iter().enumerate() {
         let FoundFile { path, path_str } = &files.get(i).unwrap();
-
-        let track_metadata = match track_metadata {
-            Ok(None) => continue,
-            Ok(Some(mt)) => mt,
-            Err(err) => {
-                let err = format!("Error while analyzing file '{path_str}': {err:?}");
-                eprintln!("{err}");
-                observations.push(err);
-                continue;
-            }
-        };
 
         let mut hasher = DefaultHasher::new();
         path_str.hash(&mut hasher);
@@ -122,7 +93,7 @@ pub fn build_index(from: PathBuf) -> Index {
 
     let album_ids: Vec<_> = cache.albums_infos.keys().collect();
     let albums_arts: HashMap<_, _> = album_ids
-        .par_iter()
+        .iter()
         .map(|id| ((*id).clone(), find_album_art(id, &cache)))
         .inspect(|(album_id, art_path)| {
             if art_path.is_some() {
@@ -160,21 +131,20 @@ pub fn build_index(from: PathBuf) -> Index {
         .as_secs()
         .to_string();
 
-    Index {
+    Ok(Index {
         fingerprint,
         from,
         tracks,
         albums_arts,
         cache,
         observations,
-    }
+    })
 }
 
 fn build_files_list(from: &Path) -> Vec<Result<FoundFile>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
-        .par_bridge()
         .filter_map(|item| {
             let item = match item {
                 Ok(item) => item,

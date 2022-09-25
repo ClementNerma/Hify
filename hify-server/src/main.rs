@@ -36,7 +36,7 @@ async fn main() {
         index
     } else {
         println!("> Generating index...");
-        let index = index::build_index(music_dir);
+        let index = index::build_index(music_dir).unwrap();
         utils::save::save_index(&index_file, &index).unwrap();
         println!("> Index saved on disk.");
 

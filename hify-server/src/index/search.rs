@@ -1,7 +1,6 @@
 use std::{collections::HashMap, time::Instant};
 
 use async_graphql::SimpleObject;
-use rayon::iter::{ParallelBridge, ParallelIterator};
 
 use super::{AlbumInfos, ArtistInfos, Index, Track};
 
@@ -69,7 +68,6 @@ where
     &'t T: Send,
 {
     let mut items: Vec<_> = items
-        .par_bridge()
         .filter_map(|item| {
             let mut score = 0;
 

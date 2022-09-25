@@ -1,6 +1,6 @@
 use std::{path::Path, process::Command};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
@@ -9,33 +9,39 @@ use serde_json::Value;
 
 use crate::index::{AudioFormat, TrackDate, TrackMetadata, TrackTags};
 
-pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>> {
-    let audio_ext = match file.extension().and_then(|ext| ext.to_str()) {
-        Some(ext) => ext.to_ascii_lowercase(),
-        None => return Ok(None),
-    };
+pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
+    let files = files
+        .iter()
+        .filter_map(|file| {
+            let audio_ext = file
+                .as_ref()
+                .extension()
+                .and_then(|ext| ext.to_str())?
+                .to_ascii_lowercase();
 
-    if matches!(
-        audio_ext.as_str(),
-        "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
-    ) {
-        bail!("File format unsupported by web players: {audio_ext}");
-    }
+            if matches!(
+                audio_ext.as_str(),
+                "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
+            ) {
+                return Some(Err(anyhow!(
+                    "File format unsupported by web players: {audio_ext}"
+                )));
+            }
 
-    if !matches!(
-        audio_ext.as_str(),
-        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
-    ) {
-        return Ok(None);
-    }
+            if !matches!(
+                audio_ext.as_str(),
+                "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
+            ) {
+                return None;
+            }
+
+            Some(Ok(file.as_ref()))
+        })
+        .collect::<Result<Vec<_>>>()?;
 
     let exiftool_out = Command::new("exiftool")
-        .args(&[
-            "-n",
-            "-json",
-            file.to_str()
-                .context("File doesn't have a valid UTF-8 filename")?,
-        ])
+        .args(&["-n", "-json"])
+        .args(&files)
         .output()
         .context("Failed to launch ExifTool: {e}")?;
 
@@ -51,15 +57,43 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>> {
     let parsed_output = serde_json::from_str::<ExifToolOutput>(json_str)
         .context("Failed to parse ExifTool output")?;
 
-    let mut files = parsed_output.0;
+    let files_count = files.len();
+    let analyzed = parsed_output.0;
 
-    let file = match files.len() {
-        0 => bail!("File does nto contain any audio stream"),
-        1 => files.remove(0),
-        _ => bail!("File contains multiple audio streams"),
-    };
+    if analyzed.len() != files_count {
+        bail!(
+            "Found invalid number of results returned by ExifTool: expected {}, found {}",
+            files_count,
+            analyzed.len()
+        );
+    }
 
-    let format = match file.FileType.as_str() {
+    let mut successes = vec![];
+    let mut errors = vec![];
+
+    for (i, analyzed) in analyzed.into_iter().enumerate() {
+        match process_analyzed_file(analyzed) {
+            Ok(data) => successes.push(data),
+            Err(err) => errors.push((files.get(i).unwrap(), err)),
+        }
+    }
+
+    if !errors.is_empty() {
+        bail!(
+            "Failed with the following errors:\n\n{}",
+            errors
+                .iter()
+                .map(|(success, err)| format!("* {}: {err:?}", success.to_string_lossy()))
+                .collect::<Vec<_>>()
+                .join("\n")
+        )
+    }
+
+    Ok(successes)
+}
+
+fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
+    let format = match analyzed.FileType.as_str() {
         "FLAC" => AudioFormat::FLAC,
         "MP3" => AudioFormat::MP3,
         "WAV" => AudioFormat::WAV,
@@ -69,18 +103,18 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>> {
         codec_name => bail!("Unknown codec name: {codec_name}"),
     };
 
-    Ok(Some(TrackMetadata {
+    Ok(TrackMetadata {
         format,
-        size: i32::try_from(file.FileSize).with_context(|| {
+        size: i32::try_from(analyzed.FileSize).with_context(|| {
             format!(
                 "Size is too big to be returned to GraphQL: {}",
-                file.FileSize
+                analyzed.FileSize
             )
         })?,
-        duration: file.Duration as i32,
-        bitrate: file.AudioBitrate as i32,
-        tags: parse_exiftool_tags(file.tags)?,
-    }))
+        duration: analyzed.Duration as i32,
+        bitrate: analyzed.AudioBitrate as i32,
+        tags: parse_exiftool_tags(analyzed.tags)?,
+    })
 }
 
 fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
