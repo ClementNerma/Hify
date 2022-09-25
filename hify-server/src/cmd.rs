@@ -13,4 +13,7 @@ pub struct Command {
 
     #[clap(short, long)]
     pub user_data_file: PathBuf,
+
+    #[clap(short, long)]
+    pub no_server: bool,
 }

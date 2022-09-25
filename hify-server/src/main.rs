@@ -16,6 +16,7 @@ async fn main() {
         music_dir,
         index_file,
         user_data_file,
+        no_server,
     } = cmd::Command::parse();
 
     if !music_dir.is_dir() {
@@ -52,6 +53,10 @@ async fn main() {
         user_data,
         Box::new(move |user_data| utils::save::save_user_data(&user_data_file, user_data).unwrap()),
     );
+
+    if no_server {
+        return;
+    }
 
     println!("> Launching server...");
 
