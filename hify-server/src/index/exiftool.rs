@@ -1,5 +1,6 @@
 use std::{path::Path, process::Command};
 
+use anyhow::{bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
@@ -8,7 +9,7 @@ use serde_json::Value;
 
 use crate::index::{AudioFormat, TrackDate, TrackMetadata, TrackTags};
 
-pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
+pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>> {
     let audio_ext = match file.extension().and_then(|ext| ext.to_str()) {
         Some(ext) => ext.to_ascii_lowercase(),
         None => return Ok(None),
@@ -18,9 +19,7 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         audio_ext.as_str(),
         "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
     ) {
-        return Err(format!(
-            "File format unsupported by web players: {audio_ext}"
-        ));
+        bail!("File format unsupported by web players: {audio_ext}");
     }
 
     if !matches!(
@@ -35,29 +34,29 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
             "-n",
             "-json",
             file.to_str()
-                .ok_or("File doesn't have a valid UTF-8 filename")?,
+                .context("File doesn't have a valid UTF-8 filename")?,
         ])
         .output()
-        .map_err(|e| format!("Failed to launch ExifTool: {e}"))?;
+        .context("Failed to launch ExifTool: {e}")?;
 
     if !exiftool_out.status.success() {
         let stderr = std::str::from_utf8(&exiftool_out.stderr).unwrap_or("<invalid UTF-8 output>");
 
-        return Err(format!("ExifTool failed: {stderr}"));
+        bail!("ExifTool failed: {stderr}");
     }
 
     let json_str = std::str::from_utf8(&exiftool_out.stdout)
-        .map_err(|e| format!("ExifTool returned an invalid UTF-8 response: {e}"))?;
+        .context("ExifTool returned an invalid UTF-8 response")?;
 
     let parsed_output = serde_json::from_str::<ExifToolOutput>(json_str)
-        .map_err(|e| format!("Failed to parse ExifTool output: {e}"))?;
+        .context("Failed to parse ExifTool output")?;
 
     let mut files = parsed_output.0;
 
     let file = match files.len() {
-        0 => return Err("File does nto contain any audio stream".into()),
+        0 => bail!("File does nto contain any audio stream"),
         1 => files.remove(0),
-        _ => return Err("File contains multiple audio streams".into()),
+        _ => bail!("File contains multiple audio streams"),
     };
 
     let format = match file.FileType.as_str() {
@@ -67,12 +66,12 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
         "AAC" => AudioFormat::AAC,
         "OGG" => AudioFormat::OGG,
         "M4A" => AudioFormat::M4A,
-        codec_name => return Err(format!("Unknown codec name: {codec_name}")),
+        codec_name => bail!("Unknown codec name: {codec_name}"),
     };
 
     Ok(Some(TrackMetadata {
         format,
-        size: i32::try_from(file.FileSize).map_err(|_| {
+        size: i32::try_from(file.FileSize).with_context(|| {
             format!(
                 "Size is too big to be returned to GraphQL: {}",
                 file.FileSize
@@ -84,12 +83,12 @@ pub fn run_on(file: &Path) -> Result<Option<TrackMetadata>, String> {
     }))
 }
 
-fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags, String> {
+fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
     Ok(TrackTags {
-        title: tags.Title.ok_or("Missing 'title' tag")?,
+        title: tags.Title.context("Missing 'title' tag")?,
         artists: tags.Artist.map(parse_array_tag).unwrap_or_default(),
         composers: tags.Composer.map(parse_array_tag).unwrap_or_default(),
-        album: tags.Album.ok_or("Missing 'album' tag")?,
+        album: tags.Album.context("Missing 'album' tag")?,
         album_artists: tags.Band.map(parse_array_tag).unwrap_or_default(),
 
         disc: tags
@@ -113,36 +112,36 @@ fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags, String> {
     })
 }
 
-fn int_or_string(value: Value) -> Result<String, String> {
+fn int_or_string(value: Value) -> Result<String> {
     match value {
         Value::Number(num) => Ok(num.to_string()),
         Value::String(str) => Ok(str),
-        _ => Err(format!("Failed to parse value: {:?}", value)),
+        _ => bail!("Failed to parse value: {:?}", value),
     }
 }
 
-fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32, String> {
+fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32> {
     PARSE_DISC_NUMBER
         .captures(input)
-        .ok_or_else(|| format!("Invalid {category} value: {input}"))
+        .with_context(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
             c.name("number")
                 .unwrap()
                 .as_str()
                 .parse::<u16>()
                 .map(i32::from)
-                .map_err(|_| {
+                .with_context(|| {
                     format!("Internal error: failed to parse validated {category} number: {input}")
                 })
         })
 }
 
-fn parse_date(input: &str) -> Result<TrackDate, String> {
+fn parse_date(input: &str) -> Result<TrackDate> {
     let captured = PARSE_TRACK_YEAR_OR_DATE_1
         .captures(input)
         .or_else(|| PARSE_TRACK_YEAR_OR_DATE_2.captures(input))
         .or_else(|| PARSE_TRACK_YEAR_OR_DATE_3.captures(input))
-        .ok_or_else(|| format!("Invalid date value: {input}"))?;
+        .with_context(|| format!("Invalid date value: {input}"))?;
 
     Ok(TrackDate {
         year: captured
@@ -151,24 +150,17 @@ fn parse_date(input: &str) -> Result<TrackDate, String> {
             .as_str()
             .parse::<u16>()
             .map(i32::from)
-            .map_err(|e| format!("Invalid year number: {e}"))?,
+            .context("Invalid year number")?,
+
         month: captured
             .name("month")
-            .map(|month| {
-                month
-                    .as_str()
-                    .parse::<u8>()
-                    .map_err(|e| format!("Invalid month number: {e}"))
-            })
+            .map(|month| month.as_str().parse::<u8>().context("Invalid month number"))
             .transpose()?
             .map(i32::from),
+
         day: captured
             .name("day")
-            .map(|day| {
-                day.as_str()
-                    .parse::<u8>()
-                    .map_err(|e| format!("Invalid day number: {e}"))
-            })
+            .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
             .transpose()?
             .map(i32::from),
     })

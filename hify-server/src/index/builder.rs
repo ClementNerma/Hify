@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Context, Result};
 use rayon::iter::{
     IndexedParallelIterator, IntoParallelRefIterator, ParallelBridge, ParallelIterator,
 };
@@ -36,7 +37,7 @@ pub fn build_index(from: PathBuf) -> Index {
     for file in build_files_list(&from) {
         match file {
             Ok(file) => files.push(file),
-            Err(err) => observations.push(err),
+            Err(err) => observations.push(format!("{err:?}")),
         }
     }
 
@@ -81,7 +82,7 @@ pub fn build_index(from: PathBuf) -> Index {
             Ok(None) => continue,
             Ok(Some(mt)) => mt,
             Err(err) => {
-                let err = format!("Error while analyzing file '{path_str}': {err}");
+                let err = format!("Error while analyzing file '{path_str}': {err:?}");
                 eprintln!("{err}");
                 observations.push(err);
                 continue;
@@ -169,7 +170,7 @@ pub fn build_index(from: PathBuf) -> Index {
     }
 }
 
-fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
+fn build_files_list(from: &Path) -> Vec<Result<FoundFile>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
@@ -177,7 +178,7 @@ fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
         .filter_map(|item| {
             let item = match item {
                 Ok(item) => item,
-                Err(err) => return Some(Err(format!("Failed to read directory entry: {err}"))),
+                Err(err) => return Some(Err(anyhow!("Failed to read directory entry: {err}"))),
             };
 
             if !item.path().is_file() {
@@ -191,7 +192,7 @@ fn build_files_list(from: &Path) -> Vec<Result<FoundFile, String>> {
                     path: item.path().to_path_buf(),
                     path_str: path.to_string(),
                 })
-                .ok_or_else(|| {
+                .with_context(|| {
                     format!(
                         "Item does not have a valid UTF-8 path: {}",
                         item.path().to_string_lossy()

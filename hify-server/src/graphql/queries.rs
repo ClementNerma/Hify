@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
-use async_graphql::{ComplexObject, Context, Enum, Object, Result, SimpleObject};
+use anyhow::{Context as _, Result};
+use async_graphql::{ComplexObject, Context, Enum, Object, SimpleObject};
 
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
@@ -110,11 +111,7 @@ impl QueryRoot {
         paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     }
 
-    async fn select_tracks(
-        &self,
-        ctx: &Context<'_>,
-        in_ids: Vec<String>,
-    ) -> Result<Vec<Track>, String> {
+    async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<String>) -> Result<Vec<Track>> {
         let index = graphql_index!(ctx);
         in_ids
             .into_iter()
@@ -123,9 +120,9 @@ impl QueryRoot {
                     .tracks
                     .get(&TrackID(track_id.clone()))
                     .cloned()
-                    .ok_or_else(|| format!("Track not found for ID: {}", track_id))
+                    .with_context(|| format!("Track not found for ID: {}", track_id))
             })
-            .collect::<Result<Vec<_>, _>>()
+            .collect::<Result<Vec<_>>>()
     }
 
     async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
@@ -137,9 +134,9 @@ impl QueryRoot {
         ctx: &Context<'_>,
         input: String,
         limit: i32,
-    ) -> Result<IndexSearchResults, String> {
+    ) -> Result<IndexSearchResults> {
         let limit =
-            usize::try_from(limit).map_err(|_| "Invalid value provided for parameter 'limit'")?;
+            usize::try_from(limit).context("Invalid value provided for parameter 'limit'")?;
 
         let index = graphql_index!(ctx);
         let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
