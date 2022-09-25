@@ -154,8 +154,20 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
 
         let stdout_lines = stdout_lines.lock().unwrap().join("\n");
 
-        let parsed_output = serde_json::from_str::<ExifToolOutput>(&stdout_lines)
-            .with_context(|| format!("Failed to parse ExifTool output:\n\n{}", stdout_lines))?;
+        let parsed_output = serde_json::from_str::<ExifToolOutput>(&stdout_lines).map_err(|e| {
+            anyhow!(
+                "Failed to parse ExifTool output: {}\n\n{}",
+                e,
+                stdout_lines
+                    .lines()
+                    .enumerate()
+                    .skip(if e.line() < 15 { 0 } else { e.line() - 15 })
+                    .take(15)
+                    .map(|(i, line)| format!("[{: >5}s] *| {line}", i + 1))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            )
+        })?;
 
         analyzed.extend(parsed_output.0);
     }
