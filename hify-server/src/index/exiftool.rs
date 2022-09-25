@@ -361,20 +361,41 @@ fn ensure_string<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<St
     let matched: Option<Value> = Deserialize::deserialize(deserializer)?;
 
     matched
-        .map(|num| match num {
-            Value::Number(num) => {
-                if num.is_u64() {
-                    Ok(num.to_string())
-                } else {
-                    Err(D::Error::custom("Invalid number type (expected u64)"))
-                }
-            }
-            Value::String(str) => Ok(str),
-            _ => Err(D::Error::custom(
-                "Invalid value type (expected string or integer)",
-            )),
-        })
+        .map(decode_value_as_string)
         .transpose()
+        .map_err(D::Error::custom)
+}
+
+fn decode_value_as_string(value: Value) -> Result<String, String> {
+    match value {
+        // NOTE: Approx. but no way to do otherwise :(
+        Value::Bool(bool) => Ok(if bool { "True" } else { "False" }.to_string()),
+
+        Value::Number(num) => {
+            if num.is_u64() {
+                Ok(num.to_string())
+            } else {
+                Err(format!("Invalid number type (expected u64): {num}"))
+            }
+        }
+
+        Value::String(str) => Ok(str),
+
+        Value::Array(values) => {
+            let decoded = values
+                .into_iter()
+                .map(decode_value_as_string)
+                .collect::<Result<Vec<_>, String>>()?;
+
+            // NOTE: joined as ',' as this is the default separator used by ExifTool
+            Ok(decoded.join(","))
+        }
+
+        invalid => Err(format!(
+            "Invalid value type (expected string or integer): {}",
+            invalid
+        )),
+    }
 }
 
 static PARSE_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
