@@ -796,7 +796,7 @@ dependencies = [
  "async-graphql",
  "async-graphql-rocket",
  "clap",
- "lazy_static",
+ "once_cell",
  "rayon",
  "regex",
  "rocket",
