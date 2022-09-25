@@ -98,10 +98,14 @@
     padding-bottom: 1%;
 
     background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0), rgba(30, 30, 30, 1));
+
+    transition: bottom 0.3s;
   }
 
   .player-bottom.queue-focused {
     bottom: 0px;
+
+    transition: bottom 0.3s;
   }
 
   .track-infos {
