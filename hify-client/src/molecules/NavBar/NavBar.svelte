@@ -64,9 +64,9 @@
   }
 
   .container:not(.focused) {
-    opacity: 0;
-    transition: opacity linear 0.5s;
-    transition-delay: 1s;
+    opacity: 0.2;
+    transition: opacity linear 0.8s;
+    transition-delay: 0.2s;
   }
 
   .tab {
