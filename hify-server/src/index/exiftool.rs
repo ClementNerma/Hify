@@ -336,7 +336,7 @@ struct ExifToolFileTags {
     #[serde(default, deserialize_with = "ensure_string")]
     Discnumber: Option<String>,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ensure_string")]
     Genre: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
