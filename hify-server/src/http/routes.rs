@@ -2,7 +2,6 @@ use std::path::Path;
 
 use rocket::{
     http::{ContentType, Status},
-    response::content::Custom,
     tokio::fs::File,
     State,
 };
@@ -16,7 +15,10 @@ use super::{
 };
 
 #[rocket::get("/art/album/<id>")]
-pub async fn album_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+pub async fn album_art(
+    ctx: &State<AppState>,
+    id: String,
+) -> FaillibleResponse<(ContentType, File)> {
     let index = ctx.index.read().await;
     let album_art_path = index
         .albums_arts
@@ -55,11 +57,14 @@ pub async fn album_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<C
             )
         })?;
 
-    Ok(Custom(mime_type, file))
+    Ok((mime_type, file))
 }
 
 #[rocket::get("/art/artist/<id>")]
-pub async fn artist_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<Custom<File>> {
+pub async fn artist_art(
+    ctx: &State<AppState>,
+    id: String,
+) -> FaillibleResponse<(ContentType, File)> {
     let index = ctx.index.read().await;
 
     let artist_first_album_id = index
@@ -113,14 +118,14 @@ pub async fn artist_art(ctx: &State<AppState>, id: String) -> FaillibleResponse<
             )
         })?;
 
-    Ok(Custom(mime_type, file))
+    Ok((mime_type, file))
 }
 
 #[rocket::get("/stream/<id>")]
 pub async fn stream<'a>(
     ctx: &State<AppState>,
     id: String,
-) -> FaillibleResponse<Custom<SeekStream<'a>>> {
+) -> FaillibleResponse<(ContentType, SeekStream<'a>)> {
     let index = ctx.index.read().await;
     let track_path = index
         .cache
@@ -151,7 +156,7 @@ pub async fn stream<'a>(
         AudioFormat::M4A => ContentType::MP4,
     };
 
-    Ok(Custom(mime_type, stream))
+    Ok((mime_type, stream))
 }
 
 #[rocket::get("/exit")]

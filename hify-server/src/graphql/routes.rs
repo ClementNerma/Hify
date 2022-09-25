@@ -5,8 +5,8 @@ use rocket::{http::Status, response::content, Route, State};
 use super::entrypoint::AppSchema;
 
 #[rocket::get("/")]
-pub fn graphql_playground() -> content::Html<String> {
-    content::Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+pub fn graphql_playground() -> content::RawHtml<String> {
+    content::RawHtml(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
 #[rocket::options("/")]

@@ -2,7 +2,7 @@ use std::hash::Hash;
 
 use async_graphql::{
     connection::{Connection, CursorType, Edge},
-    InputObject, Result,
+    InputObject, OutputType, Result,
 };
 
 use crate::index::SortedMap;
@@ -26,7 +26,7 @@ pub type Paginated<C, T> = Result<Connection<C, T>>;
 
 /// Compute a paginated result from a list of items and a [`PaginationInput`]
 /// Requires an index cache to quickly avoid performing a full slice lookup
-pub fn paginate<C: CursorType + Eq + Hash, T: Clone + Ord>(
+pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + OutputType>(
     pagination: PaginationInput,
     items: &SortedMap<C, T>,
     item_cursor: impl Fn(&T) -> C,
@@ -106,8 +106,8 @@ pub fn paginate<C: CursorType + Eq + Hash, T: Clone + Ord>(
 
     // Produce the paginated results
     match direction {
-        Direction::After => connection.append(edges),
-        Direction::Before => connection.append(edges.rev()),
+        Direction::After => connection.edges.extend(edges),
+        Direction::Before => connection.edges.extend(edges.rev()),
     }
 
     // Success!

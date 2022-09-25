@@ -1,5 +1,5 @@
-use rocket::http::Status;
 use rocket::Rocket;
+use rocket::{http::Status, Ignite};
 use serde::Serialize;
 
 use rocket::response::status;
@@ -15,7 +15,10 @@ use crate::{index::Index, userdata::UserDataWrapper};
 
 pub static GRAPHQL_MOUNTPOINT: &str = "/graphql";
 
-pub async fn launch(index: Index, user_data: UserDataWrapper) -> Result<(), rocket::Error> {
+pub async fn launch(
+    index: Index,
+    user_data: UserDataWrapper,
+) -> Result<Rocket<Ignite>, rocket::Error> {
     let app_state = AppState::new(index, user_data);
 
     Rocket::build()

@@ -55,5 +55,6 @@ async fn main() {
 
     println!("> Launching server...");
 
-    http::launch(index, user_data).await.unwrap();
+    let server = http::launch(index, user_data).await.unwrap();
+    server.shutdown().await;
 }
