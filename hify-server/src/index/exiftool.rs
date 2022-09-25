@@ -66,7 +66,8 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
 
     const FILES_PER_CHUNK: usize = 100;
 
-    let mut analyzed = vec![];
+    let mut successes = vec![];
+    let mut errors = vec![];
 
     for (chunk_num, files) in files.chunks(FILES_PER_CHUNK).enumerate() {
         let chunk_start = u64::try_from(FILES_PER_CHUNK * chunk_num).unwrap();
@@ -169,27 +170,27 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
             )
         })?;
 
-        analyzed.extend(parsed_output.0);
+        for (i, analyzed) in parsed_output.0.into_iter().enumerate() {
+            match process_analyzed_file(analyzed) {
+                Ok(data) => successes.push(data),
+                Err(err) => {
+                    let file = files.get(i).unwrap();
+                    eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
+                    errors.push((file, err));
+                }
+            }
+        }
     }
 
     let files_count = files.len();
+    let results_count = successes.len() + errors.len();
 
-    if analyzed.len() != files_count {
+    if results_count != files_count {
         bail!(
             "Found invalid number of results returned by ExifTool: expected {}, found {}",
             files_count,
-            analyzed.len()
+            results_count
         );
-    }
-
-    let mut successes = vec![];
-    let mut errors = vec![];
-
-    for (i, analyzed) in analyzed.into_iter().enumerate() {
-        match process_analyzed_file(analyzed) {
-            Ok(data) => successes.push(data),
-            Err(err) => errors.push((files.get(i).unwrap(), err)),
-        }
     }
 
     if !errors.is_empty() {
