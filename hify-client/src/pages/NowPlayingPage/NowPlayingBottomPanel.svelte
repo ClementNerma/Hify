@@ -17,14 +17,16 @@
   import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
+  import NavigableOne from '../../navigable/NavigableOne/NavigableOne.svelte'
 
   export let currentTrack: AudioTrackFragment
+  let isQueueFocused = false
 
   $: tags = currentTrack.metadata.tags
   $: album = tags.album
 </script>
 
-<div class="player-bottom">
+<div class="player-bottom {isQueueFocused ? 'queue-focused' : ''}">
   <div class="track-infos">
     <NavigableRow>
       <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
@@ -73,7 +75,13 @@
   </div>
 
   <div class="play-queue-gallery">
-    <QueueGallery />
+    <NavigableOne
+      whenFocusChanges={(focused) => {
+        isQueueFocused = focused
+      }}
+    >
+      <QueueGallery />
+    </NavigableOne>
   </div>
 </div>
 
@@ -83,13 +91,17 @@
 
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: -100px;
 
     padding-left: 5%;
     padding-right: 5%;
     padding-bottom: 1%;
 
     background-image: linear-gradient(to bottom, rgba(255, 0, 0, 0), rgba(30, 30, 30, 1));
+  }
+
+  .player-bottom.queue-focused {
+    bottom: 0px;
   }
 
   .track-infos {
@@ -113,5 +125,6 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 0px 10px;
+    transition: all 1s;
   }
 </style>
