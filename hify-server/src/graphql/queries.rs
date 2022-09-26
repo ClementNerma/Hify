@@ -9,7 +9,10 @@ use crate::{
         search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos,
         IndexSearchResults, SortedMap, Track, TrackID, TrackTags,
     },
-    library::mixer::{self, MixerParams},
+    library::{
+        feed::{self, Feed},
+        mixer::{self, MixerParams},
+    },
     transparent_cursor_type,
 };
 
@@ -160,6 +163,10 @@ impl QueryRoot {
         let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
 
         Ok(search_index(&index, &mut search_cache, &input, limit))
+    }
+
+    async fn generate_feed(&self, ctx: &Context<'_>) -> Feed {
+        feed::generate_feed(&*graphql_index!(ctx), &*graphql_user_data!(ctx))
     }
 
     async fn generate_mix(&self, ctx: &Context<'_>, input: MixerParams) -> Vec<Track> {

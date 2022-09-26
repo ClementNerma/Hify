@@ -119,7 +119,7 @@ pub fn build_index_cache(
             artist_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
             (artist_id, artist_tracks)
         })
-        .collect();
+        .collect::<HashMap<_, _>>();
 
     let albums_tracks = albums_tracks
         .into_iter()
@@ -127,7 +127,7 @@ pub fn build_index_cache(
             album_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
             (album_id, album_tracks)
         })
-        .collect();
+        .collect::<HashMap<_, _>>();
 
     let genres_tracks = genres_tracks
         .into_iter()
@@ -147,14 +147,53 @@ pub fn build_index_cache(
         })
         .collect();
 
+    let albums_mean_score = albums_tracks
+        .iter()
+        .filter_map(|(album_id, album_tracks)| {
+            let noted_tracks: Vec<_> = album_tracks
+                .iter()
+                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.note)
+                .map(|note| note as f64)
+                .collect();
+
+            if noted_tracks.is_empty() {
+                return None;
+            }
+
+            let mean = noted_tracks.iter().sum::<f64>() / (noted_tracks.len() as f64);
+            Some((album_id.clone(), mean))
+        })
+        .collect();
+
+    let artists_mean_score = artists_tracks
+        .iter()
+        .filter_map(|(artist_id, artist_tracks)| {
+            let noted_tracks: Vec<_> = artist_tracks
+                .iter()
+                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.note)
+                .map(|note| note as f64)
+                .collect();
+
+            if noted_tracks.is_empty() {
+                return None;
+            }
+
+            let mean = noted_tracks.iter().sum::<f64>() / (noted_tracks.len() as f64);
+            Some((artist_id.clone(), mean))
+        })
+        .collect();
+
     IndexCache {
         tracks_paths,
 
         artists_albums,
         artists_tracks,
 
-        albums_artists_albums,
         albums_tracks,
+        albums_artists_albums,
+
+        albums_mean_score,
+        artists_mean_score,
 
         artists_infos: SortedMap::from_hashmap(artists_infos),
         albums_artists_infos: SortedMap::from_hashmap(albums_artists_infos),

@@ -35,6 +35,10 @@ impl UserDataWrapper {
         &self.inner.history
     }
 
+    pub fn listenings(&self) -> &HashMap<TrackID, u32> {
+        &self.inner.listenings
+    }
+
     pub fn history_push(&mut self, track_id: TrackID) {
         match self.inner.history.iter().position(|t| *t == track_id) {
             Some(index) => {

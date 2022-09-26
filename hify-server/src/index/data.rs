@@ -26,9 +26,11 @@ pub struct IndexCache {
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
+    pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
     pub albums_artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 
-    pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
+    pub albums_mean_score: HashMap<AlbumID, f64>,
+    pub artists_mean_score: HashMap<ArtistID, f64>,
 
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,

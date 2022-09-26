@@ -29,14 +29,21 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         albums_arts: HashMap::new(),
         cache: IndexCache {
             tracks_paths: HashMap::new(),
+
             artists_albums: HashMap::new(),
             artists_tracks: HashMap::new(),
+
             albums_artists_albums: HashMap::new(),
+            artists_mean_score: HashMap::new(),
+
             albums_tracks: HashMap::new(),
+            albums_mean_score: HashMap::new(),
+
             artists_infos: SortedMap::empty(),
             albums_artists_infos: SortedMap::empty(),
             albums_infos: SortedMap::empty(),
             genre_infos: SortedMap::empty(),
+
             genres_albums: HashMap::new(),
             genres_tracks: HashMap::new(),
             no_genre_tracks: HashSet::new(),
