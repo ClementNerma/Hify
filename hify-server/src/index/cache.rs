@@ -75,7 +75,7 @@ pub fn build_index_cache(
         if track.metadata.tags.genres.is_empty() {
             no_genre_tracks.insert(track.id.clone());
         } else {
-            for genre in tags.get_genres() {
+            for genre in tags.get_genres_infos() {
                 let genre_id = genre.get_id();
 
                 genres_infos.insert(genre_id.clone(), genre.clone());

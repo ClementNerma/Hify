@@ -200,6 +200,10 @@ impl TrackTags {
     async fn album_artists(&self) -> Vec<ArtistInfos> {
         self.get_album_artists_infos().collect()
     }
+
+    async fn genres(&self) -> Vec<GenreInfos> {
+        self.get_genres_infos().collect()
+    }
 }
 
 #[Object]
@@ -259,7 +263,7 @@ impl AlbumInfos {
                     .unwrap()
                     .metadata
                     .tags
-                    .get_genres()
+                    .get_genres_infos()
             })
             .collect()
     }

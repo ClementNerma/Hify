@@ -164,6 +164,8 @@ pub struct TrackTags {
     pub track_no: Option<i32>,
 
     pub date: Option<TrackDate>,
+
+    #[graphql(skip)]
     pub genres: Vec<String>,
 
     pub note: Option<u8>,
@@ -187,7 +189,7 @@ impl TrackTags {
         artists.iter().cloned().map(ArtistInfos::new)
     }
 
-    pub fn get_genres(&self) -> impl Iterator<Item = GenreInfos> + '_ {
+    pub fn get_genres_infos(&self) -> impl Iterator<Item = GenreInfos> + '_ {
         self.genres.iter().cloned().map(GenreInfos::new)
     }
 }
