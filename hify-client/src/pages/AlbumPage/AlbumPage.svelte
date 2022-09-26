@@ -11,6 +11,7 @@
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
   import { bind } from '../../utils'
+  import TrackNote from '../../atoms/TrackNote/TrackNote.svelte'
 
   export let albumId: string
 
@@ -74,6 +75,11 @@
             <tr>
               <td class="trackno">{track.metadata.tags.trackNo}</td>
               <td class="title">{track.metadata.tags.title}</td>
+              <td class="note">
+                {#if track.metadata.tags.note}
+                  <TrackNote note={track.metadata.tags.note} />
+                {/if}
+              </td>
             </tr>
           </NavigableTrack>
         {/each}

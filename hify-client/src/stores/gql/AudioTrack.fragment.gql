@@ -17,6 +17,7 @@ fragment AudioTrack on Track {
       }
       disc
       trackNo
+      note
       genres {
         id
         name
