@@ -1,9 +1,11 @@
 <script lang="ts">
+  import Row from '../../atoms/Row/Row.svelte'
   import { AsyncHomePage } from '../../graphql/generated'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
   import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
   import IndexUpdater from './IndexUpdater.svelte'
+  import MixGenerator from './MixGenerator.svelte'
 
   const indexInfos = AsyncHomePage({ variables: {}, fetchPolicy: 'no-cache' }).then((res) => res.data.generateFeed)
 </script>
@@ -37,7 +39,10 @@
 
   <h2>Tools</h2>
 
-  <IndexUpdater />
+  <Row>
+    <IndexUpdater />
+    <MixGenerator />
+  </Row>
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
 {/await}

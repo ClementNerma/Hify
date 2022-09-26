@@ -33,6 +33,11 @@ export async function playTrackFromFetchableQueue(tracksIds: string[], position:
   return playTrackFromNewQueue(tracks.data.selectTracks, position)
 }
 
+export async function playNewQueueFromBeginning(tracks: AudioTrackFragment[]): Promise<void> {
+  playQueue.set({ tracks, position: 0 })
+  startAudioPlayer(tracks[0], playNextTrack)
+}
+
 export async function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number): Promise<void> {
   playQueue.set({ tracks, position })
   startAudioPlayer(tracks[position], playNextTrack)

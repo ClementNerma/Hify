@@ -15,7 +15,7 @@
   .button {
     display: inline-block;
     padding: 5px;
-    margin: 0;
+    margin: 5px;
     border: 1px solid white;
   }
 
