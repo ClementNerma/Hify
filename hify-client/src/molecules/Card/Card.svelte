@@ -4,9 +4,12 @@
   export let title: string
   export let subtitle: string
 
-  export let boxSize = 150
-  export let enforceMaxWidth = false
+  export let boxSize = 120
   export let rounded = false
+
+  // 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
+  // It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
+  export let enforceMaxWidth = false
 </script>
 
 <div class="card {enforceMaxWidth ? 'enforce-max-width' : ''}" style="--width: {boxSize}px">
@@ -30,6 +33,10 @@
 
   .title {
     font-weight: bold;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
   }
 
   /* TODO: remove experimental stuff */

@@ -8,6 +8,6 @@
 
 <Row>
   {#each albums as album}
-    <AlbumCard {album} enforceMaxWidth={true} />
+    <AlbumCard {album} />
   {/each}
 </Row>

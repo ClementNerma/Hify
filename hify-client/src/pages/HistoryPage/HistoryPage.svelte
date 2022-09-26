@@ -22,7 +22,7 @@
 {:then history}
   <h2>History: {history.data.history.length} tracks</h2>
 
-  <Grid columns={6}>
+  <Grid columns={7}>
     {#each history.data.history as track, i}
       {@const tags = track.metadata.tags}
 

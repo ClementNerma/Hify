@@ -17,7 +17,6 @@
           .map((artist) => artist.name)
           .join(' / ')}`}
         pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-        enforceMaxWidth={true}
       />
     </NavigableTrack>
   {/each}

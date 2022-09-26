@@ -4,7 +4,7 @@
   import Grid from '../../organisms/Grid/Grid.svelte'
   import ArtistCard from '../../molecules/ArtistCard/ArtistCard.svelte'
 
-  const ARTISTS_PER_LINE = 5
+  const ARTISTS_PER_LINE = 6
   const LINES_PER_PAGE = 5
 
   let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
