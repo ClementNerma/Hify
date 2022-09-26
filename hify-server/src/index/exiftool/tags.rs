@@ -95,7 +95,7 @@ fn parse_date(input: &str) -> Result<TrackDate> {
 }
 
 fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
-    let captured = PARSE_MUSICBEE_POPM
+    let captured = PARSE_MUSICBEE_WMP_POPM
         .captures(popm.as_ref())
         .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm.as_ref()))?;
 
@@ -107,7 +107,7 @@ fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
         "196" => Ok(Some(80)),
         "255" => Ok(Some(100)),
         score => bail!(
-            "Failed to parse MusicBee score in 'Popularimeter' tag: invalid value {}",
+            "Failed to parse score in 'Popularimeter' tag: invalid value {}",
             score
         ),
     }
@@ -267,9 +267,9 @@ static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-static PARSE_MUSICBEE_POPM: Lazy<Regex> = Lazy::new(|| {
+static PARSE_MUSICBEE_WMP_POPM: Lazy<Regex> = Lazy::new(|| {
     Regex::new(pomsky!(
-        Start "MusicBee " :score([digit]+) " 0" End
+        Start ("MusicBee" | "Windows Media Player 9 Series") " " :score([digit]+) " 0" End
     ))
     .unwrap()
 });
