@@ -18,5 +18,6 @@
   .container {
     display: grid;
     grid-template-columns: var(--columns-size);
+    text-align: center;
   }
 </style>
