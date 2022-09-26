@@ -42,102 +42,101 @@
 {:then album}
   {@const filteredTracks = filterTracks(album.tracks, onlyShowGreatSongs)}
 
-  <NavigableList>
-    <div class="album-header">
-      <div class="album-art">
-        <img width={150} height={150} src={getAlbumArtUri(albumId)} alt="" />
-      </div>
-      <div class="album-infos">
-        <div class="album-name">{album.name}</div>
-        <div class="album-artists">
-          <NavigableRow>
-            {#each album.albumArtists as albumArtist}
-              <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
-                <span class="album-artist">
-                  {albumArtist.name}
-                </span>
-              </SimpleNavigableItem>
-            {/each}
-          </NavigableRow>
+  <div class="container">
+    <NavigableList>
+      <div class="header">
+        <img class="art" width={256} height={256} src={getAlbumArtUri(albumId)} alt="" />
+
+        <div class="infos">
+          <div class="name">
+            {album.name}
+          </div>
+
+          <div class="year">
+            <span class="year" data-item-like-style>🕒 {album.year ?? '?'}</span>
+          </div>
+
+          <div class="artists">
+            <NavigableRow>
+              {#each album.albumArtists as albumArtist}
+                <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
+                  <span class="artist">
+                    🎤 {albumArtist.name}
+                  </span>
+                </SimpleNavigableItem>
+              {/each}
+            </NavigableRow>
+          </div>
+
+          <div class="genres">
+            <NavigableRow>
+              {#each album.genres as genre}
+                <SimpleNavigableItem onPress={bind(genre.id, (id) => navigate(ROUTES.genre(id)))}>
+                  <span class="genre">
+                    🎵 {genre.name}
+                  </span>
+                </SimpleNavigableItem>
+              {/each}
+            </NavigableRow>
+          </div>
+
+          <Checkbox bind:checked={onlyShowGreatSongs}>Only show great songs</Checkbox>
         </div>
-        <div class="album-year">{album.year ?? '<unknown year>'}</div>
-        <div class="album-genres">
-          <NavigableRow>
-            {#each album.genres as genre}
-              <SimpleNavigableItem onPress={bind(genre.id, (id) => navigate(ROUTES.genre(id)))}>
-                <span class="album-genre">
-                  {genre.name}
-                </span>
-              </SimpleNavigableItem>
-            {/each}
-          </NavigableRow>
-        </div>
-
-        <Checkbox bind:checked={onlyShowGreatSongs}>Only show great songs</Checkbox>
       </div>
-    </div>
-  </NavigableList>
+    </NavigableList>
 
-  <NavigableList>
-    <table>
-      <tbody>
-        {#each filteredTracks as track (track.id)}
-          {@const tags = track.metadata.tags}
+    <NavigableList>
+      <table>
+        <tbody>
+          {#each filteredTracks as track, i (track.id)}
+            {@const tags = track.metadata.tags}
 
-          <NavigableTrack position={tags.trackNo} transparent={true} tracks={filteredTracks} goToAlbumOption={false} {track}>
-            <tr>
-              <td class="trackno">{tags.trackNo}</td>
-              <td class="title">{tags.title}</td>
-              <td class="rating">
-                {#if tags.rating}
-                  <TrackRating rating={tags.rating} />
-                {/if}
-              </td>
-            </tr>
-          </NavigableTrack>
-        {/each}
-      </tbody>
-    </table>
-  </NavigableList>
+            <NavigableTrack position={tags.trackNo} transparent tracks={filteredTracks} goToAlbumOption={false} {track}>
+              <tr class={i === 0 ? '' : 'not-first'}>
+                <td class="trackno">{tags.trackNo}</td>
+                <td class="title">{tags.title}</td>
+                <td class="rating">
+                  {#if tags.rating}
+                    <TrackRating rating={tags.rating} />
+                  {/if}
+                </td>
+              </tr>
+            </NavigableTrack>
+          {/each}
+        </tbody>
+      </table>
+    </NavigableList>
+  </div>
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}
 
 <style>
-  .album-header {
+  .container {
+    margin-left: 10%;
+    width: 80%;
+  }
+
+  .header {
     display: flex;
     flex-direction: row;
-    width: 90%;
-    margin-left: 5%;
   }
 
-  .album-infos {
-    padding: 10px;
-    min-height: 100%;
+  .infos {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-left: 10px;
+    gap: 10px;
   }
 
-  .album-name {
+  .infos .name {
+    font-size: 2rem;
     font-weight: bold;
-    font-size: 2em;
-  }
-
-  .album-artist {
-    font-size: 1.5rem;
-  }
-
-  .album-genre {
-    font-size: 0.75rem;
-    padding: 7px;
-  }
-
-  .album-year {
-    font-size: 1rem;
-    padding: 7px;
   }
 
   table {
-    width: 90%;
-    margin-left: 5%;
+    width: 100%;
     border-collapse: collapse;
   }
 
@@ -145,7 +144,15 @@
     width: 100%;
   }
 
+  tr.not-first {
+    border-top: 1px solid rgb(50, 50, 50);
+  }
+
   td {
     padding: 10px;
+  }
+
+  td.title {
+    width: 100%;
   }
 </style>
