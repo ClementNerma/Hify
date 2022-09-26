@@ -14,5 +14,6 @@
   subtitle=""
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
   pictureUrl={getArtistArtUri(artist.id)}
+  onLongPress={() => alert('TODO: context menu for playing options')}
   rounded={true}
 />

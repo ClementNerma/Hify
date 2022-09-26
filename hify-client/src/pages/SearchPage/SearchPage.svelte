@@ -1,23 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { navigate } from 'svelte-navigator'
 
-  import { getAlbumArtUri, getArtistArtUri } from '../../rest-api'
   import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
-
-  import { ROUTES } from '../../routes'
 
   import { logInfo } from '../../stores/debugger'
 
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
 
-  import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
-  import Card from '../../molecules/Card/Card.svelte'
-
-  import { bind } from '../../utils'
   import { RequestFocus } from '../../navigable/navigation'
+  import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
+  import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
+  import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
 
   export let searchTerms: string = ''
 
@@ -77,57 +70,15 @@
 {#if results}
   <h2>Tracks ({results.tracks.length})</h2>
 
-  <div class="row">
-    <NavigableRow>
-      {#each results.tracks as track, i (track.id)}
-        <NavigableTrack position={i} tracks={results.tracks} {track}>
-          <Card
-            title={track.metadata.tags.title}
-            subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
-              .map((artist) => artist.name)
-              .join(' / ')}`}
-            pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-            enforceMaxWidth={true}
-          />
-        </NavigableTrack>
-      {/each}
-    </NavigableRow>
-  </div>
+  <TracksRow tracks={results.tracks} />
 
   <h2>Albums ({results.albums.length})</h2>
 
-  <div class="row">
-    <NavigableRow>
-      {#each results.albums as album}
-        <InteractiveCard
-          title={album.name}
-          subtitle={album.albumArtists.map((artist) => artist.name).join(' / ')}
-          pictureUrl={getAlbumArtUri(album.id)}
-          onPress={bind(album, (album) => navigate(ROUTES.album(album.id)))}
-          onLongPress={() => alert('TODO: context menu for playing options')}
-          enforceMaxWidth={true}
-        />
-      {/each}
-    </NavigableRow>
-  </div>
+  <AlbumsRow tracks={results.albums} />
 
   <h2>Artists ({results.artists.length})</h2>
 
-  <div class="row">
-    <NavigableRow>
-      {#each results.artists as artist}
-        <InteractiveCard
-          title={artist.name}
-          subtitle=""
-          pictureUrl={getArtistArtUri(artist.id)}
-          onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}
-          onLongPress={() => alert('TODO: context menu for playing options')}
-          enforceMaxWidth={true}
-          rounded={true}
-        />
-      {/each}
-    </NavigableRow>
-  </div>
+  <ArtistsRow artists={results.artists} />
 {/if}
 
 <style>
@@ -143,11 +94,5 @@
     width: 33%;
     padding: 12px;
     font-size: 1.2rem;
-  }
-
-  .row {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
   }
 </style>
