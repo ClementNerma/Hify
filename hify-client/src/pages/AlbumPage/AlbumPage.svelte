@@ -10,8 +10,9 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind } from '../../utils'
+  import { bind, hasMinimumNote } from '../../utils'
   import TrackNote from '../../atoms/TrackNote/TrackNote.svelte'
+  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
 
   export let albumId: string
 
@@ -28,6 +29,8 @@
 
     return album
   })
+
+  let onlyShowGreatSongs = false
 </script>
 
 {#await album}
@@ -63,6 +66,8 @@
             {/each}
           </NavigableRow>
         </div>
+
+        <Checkbox bind:checked={onlyShowGreatSongs}>Only show great songs</Checkbox>
       </div>
     </div>
   </NavigableList>
@@ -70,14 +75,16 @@
   <NavigableList>
     <table>
       <tbody>
-        {#each album.tracks as track}
+        {#each album.tracks.filter((track) => (!onlyShowGreatSongs ? track : hasMinimumNote(track, 80))) as track}
+          {@const tags = track.metadata.tags}
+
           <NavigableTrack transparent={true} tracks={album.tracks} goToAlbumOption={false} {track}>
             <tr>
-              <td class="trackno">{track.metadata.tags.trackNo}</td>
-              <td class="title">{track.metadata.tags.title}</td>
+              <td class="trackno">{tags.trackNo}</td>
+              <td class="title">{tags.title}</td>
               <td class="note">
-                {#if track.metadata.tags.note}
-                  <TrackNote note={track.metadata.tags.note} />
+                {#if tags.note}
+                  <TrackNote note={tags.note} />
                 {/if}
               </td>
             </tr>

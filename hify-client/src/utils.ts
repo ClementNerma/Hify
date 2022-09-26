@@ -16,3 +16,8 @@ export function formatDate({ day, month, year }: NonNullable<AudioTrackFragment[
     ? `${twoDigits(month)}/${year}`
     : year.toString()
 }
+
+export function hasMinimumNote(track: AudioTrackFragment, min: number): boolean {
+  const note = track.metadata.tags.note
+  return note !== null && note !== undefined && note >= min
+}
