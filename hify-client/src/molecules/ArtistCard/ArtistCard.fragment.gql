@@ -1,0 +1,4 @@
+fragment ArtistCard on ArtistInfos {
+  id
+  name
+}

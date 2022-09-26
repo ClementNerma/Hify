@@ -1,8 +1,7 @@
 query ArtistsPage($pagination: PaginationInput!) {
   albumsArtists(pagination: $pagination) {
     nodes {
-      id
-      name
+      ...ArtistCard
     }
 
     pageInfo {

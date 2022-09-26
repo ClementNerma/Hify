@@ -12,8 +12,7 @@ query SearchPage($input: String!, $limit: Int!, $albumYearStrategy: AlbumYearStr
       }
     }
     artists {
-      id
-      name
+      ...ArtistCard
     }
   }
 }
