@@ -7,7 +7,7 @@
 </script>
 
 <Row>
-  {#each albums as album (album.id)}
+  {#each albums as album}
     <AlbumCard {album} enforceMaxWidth={true} />
   {/each}
 </Row>

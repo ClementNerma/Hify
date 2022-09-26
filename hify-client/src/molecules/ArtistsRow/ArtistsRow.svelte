@@ -7,7 +7,7 @@
 </script>
 
 <Row>
-  {#each artists as artist (artist.id)}
+  {#each artists as artist}
     <ArtistCard {artist} />
   {/each}
 </Row>
