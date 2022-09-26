@@ -40,6 +40,8 @@
 {#await album}
   <h2>Loading...</h2>
 {:then album}
+  {@const filteredTracks = filterTracks(album.tracks, onlyShowGreatSongs)}
+
   <NavigableList>
     <div class="album-header">
       <div class="album-art">
@@ -79,10 +81,10 @@
   <NavigableList>
     <table>
       <tbody>
-        {#each filterTracks(album.tracks, onlyShowGreatSongs) as track (track.id)}
+        {#each filteredTracks as track (track.id)}
           {@const tags = track.metadata.tags}
 
-          <NavigableTrack transparent={true} tracks={album.tracks} goToAlbumOption={false} {track}>
+          <NavigableTrack transparent={true} tracks={filteredTracks} goToAlbumOption={false} {track}>
             <tr>
               <td class="trackno">{tags.trackNo}</td>
               <td class="title">{tags.title}</td>
