@@ -51,7 +51,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
         let seconds = elapsed % 60;
 
         print!(
-            "\r        Progress: {} / {} ({}%) in {}{}s...",
+            "\r        Progress: {} / {} ({}%) in {}{}s... ",
             current,
             total,
             current * 100 / total,
