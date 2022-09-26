@@ -12,13 +12,8 @@ fragment AudioTrack on Track {
         name
       }
       album {
-        id
-        name
+        ...Album
         year(strategy: $albumYearStrategy)
-        albumArtists {
-          id
-          name
-        }
       }
       disc
       trackNo

@@ -1,18 +1,13 @@
 query AlbumsPage($pagination: PaginationInput!) {
-    albums(pagination: $pagination) {
-      edges {
-        node {
-          id
-          name
-          albumArtists {
-            id
-            name
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
+  albums(pagination: $pagination) {
+    edges {
+      node {
+        ...Album
       }
     }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
 }
