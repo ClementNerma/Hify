@@ -436,7 +436,7 @@ static PARSE_TRACK_YEAR_OR_DATE_1: Lazy<Regex> = Lazy::new(|| {
             :month([digit]{2})
             ['-' '\\' '.' ' ']
             :day([digit]{2})
-            ('T' [digit]{2} ':' [digit]{2} ':' [digit]{2} 'Z')?
+            ('T' ['0'-'9' ':' 'Z']+)?
         End
 
     ))
@@ -451,7 +451,7 @@ static PARSE_TRACK_YEAR_OR_DATE_2: Lazy<Regex> = Lazy::new(|| {
             :day([digit]{2})
             ['-' '\\' '.' ' ']
             :year([digit]{4})
-            ('T' [digit]{2} ':' [digit]{2} ':' [digit]{2} 'Z')?
+            ('T' ['0'-'9' ':' 'Z']+)?
         End
     ))
     .unwrap()
