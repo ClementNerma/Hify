@@ -6,7 +6,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SortedMap<K: Eq + Hash, V: Ord> {
     values: Vec<V>,
     indexes: HashMap<K, usize>,

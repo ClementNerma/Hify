@@ -1,19 +1,19 @@
 use async_graphql::{Context, Object};
 
 use super::GraphQLContext;
-use crate::index::{build_index, TrackID};
+use crate::index::{build_index, Index, TrackID};
 
 pub struct MutationRoot;
 
 #[Object]
 
 impl MutationRoot {
-    async fn generate_index(&self, ctx: &Context<'_>) -> Result<bool, String> {
+    async fn update_index(&self, ctx: &Context<'_>) -> Result<bool, String> {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
 
-        // TODO
-        build_index(ctx.app_state.index.read().await.from.clone(), None)
-            .map_err(|err| format!("{err:?}"))?;
+        let current = Index::clone(&*ctx.app_state.index.read().await);
+
+        build_index(current.from.clone(), Some(current)).map_err(|err| format!("{err:?}"))?;
 
         Ok(true)
     }

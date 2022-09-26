@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use super::sorted_map::SortedMap;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
@@ -19,7 +19,7 @@ pub struct Index {
     pub cache: IndexCache,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
