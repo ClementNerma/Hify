@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context, Result};
+use anyhow::{bail, Context, Result};
 
 use std::{
     collections::{hash_map::DefaultHasher, HashMap},
@@ -31,16 +31,7 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
 
     log(started, "Looking for audio files...");
 
-    let mut files = vec![];
-    let mut observations = vec![];
-
-    for file in build_files_list(&from) {
-        match file {
-            Ok(file) => files.push(file),
-            Err(err) => observations.push(format!("{err:?}")),
-        }
-    }
-
+    let mut files = build_files_list(&from).context("Failed to build files list")?;
     files.sort();
 
     log(
@@ -48,37 +39,27 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
         &format!("Found {} files, analyzing with ExifTool...", files.len()),
     );
 
-    let analyzed = exiftool::run_on(
-        files
-            .iter()
-            .map(|file| &file.path)
-            .collect::<Vec<_>>()
-            .as_slice(),
-    )?;
+    let analyzed = exiftool::run_on(files.as_slice())?;
 
     let mut tracks = vec![];
     let mut tracks_paths = HashMap::new();
 
     for (i, track_metadata) in analyzed.into_iter().enumerate() {
-        let FoundFile { path, path_str } = &files.get(i).unwrap();
+        let path = files.get(i).unwrap();
+        let path_str = path.to_str().unwrap();
 
         let mut hasher = DefaultHasher::new();
-        path_str.hash(&mut hasher);
         let id = TrackID(format!("{:x}", hasher.finish()));
+        path_str.hash(&mut hasher);
 
         tracks_paths.insert(id.clone(), path.clone());
 
         tracks.push(Track {
             id,
-            path: path_str.clone(),
+            path: path_str.to_string(),
             metadata: track_metadata,
         });
     }
-
-    log(
-        started,
-        &format!("Emitted {} observations.", observations.len()),
-    );
 
     log(
         started,
@@ -121,45 +102,32 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
         tracks,
         albums_arts,
         cache,
-        observations,
     })
 }
 
-fn build_files_list(from: &Path) -> Vec<Result<FoundFile>> {
+fn build_files_list(from: &Path) -> Result<Vec<PathBuf>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
-        .filter_map(|item| {
-            let item = match item {
-                Ok(item) => item,
-                Err(err) => return Some(Err(anyhow!("Failed to read directory entry: {err}"))),
-            };
+        .map(|item| {
+            let item = item.context("Failed to read directory entry")?;
 
             if !item.path().is_file() {
-                return None;
+                return Ok(None);
             }
 
-            let result = item
-                .path()
-                .to_str()
-                .map(|path| FoundFile {
-                    path: item.path().to_path_buf(),
-                    path_str: path.to_string(),
-                })
-                .with_context(|| {
-                    format!(
-                        "Item does not have a valid UTF-8 path: {}",
-                        item.path().to_string_lossy()
-                    )
-                });
-
-            Some(result)
+            match item.path().to_str() {
+                None => bail!(
+                    "Item does not have a valid UTF-8 path: {}",
+                    item.path().to_string_lossy()
+                ),
+                Some(_) => Ok(Some(item.path().to_path_buf())),
+            }
         })
-        .collect()
-}
-
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
-struct FoundFile {
-    path: PathBuf,
-    path_str: String,
+        .filter_map(|entry| match entry {
+            Ok(Some(decoded)) => Some(Ok(decoded)),
+            Ok(None) => None,
+            Err(err) => Some(Err(err)),
+        })
+        .collect::<Result<Vec<_>>>()
 }
