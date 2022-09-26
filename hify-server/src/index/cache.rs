@@ -24,6 +24,8 @@ pub fn build_index_cache(
     let mut genres_tracks = HashMap::<String, Vec<TrackID>>::new();
     let mut no_genre_tracks = HashSet::new();
 
+    let mut genres_albums = HashMap::<String, BTreeSet<AlbumInfos>>::new();
+
     for track in tracks.values() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
 
@@ -75,6 +77,11 @@ pub fn build_index_cache(
                     .entry(genre.clone())
                     .or_default()
                     .push(track.id.clone());
+
+                genres_albums
+                    .entry(genre.clone())
+                    .or_default()
+                    .insert(album_infos.clone());
             }
         }
     }
@@ -123,6 +130,16 @@ pub fn build_index_cache(
         })
         .collect();
 
+    let genres_albums = genres_albums
+        .into_iter()
+        .map(|(k, v)| {
+            (
+                k,
+                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+            )
+        })
+        .collect();
+
     IndexCache {
         tracks_paths,
 
@@ -138,5 +155,7 @@ pub fn build_index_cache(
 
         genres_tracks,
         no_genre_tracks,
+
+        genres_albums,
     }
 }

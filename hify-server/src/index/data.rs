@@ -36,6 +36,8 @@ pub struct IndexCache {
 
     pub genres_tracks: HashMap<String, Vec<TrackID>>,
     pub no_genre_tracks: HashSet<TrackID>,
+
+    pub genres_albums: HashMap<String, SortedMap<AlbumID, AlbumInfos>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
