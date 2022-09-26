@@ -10,13 +10,13 @@
 {#await indexInfos}
   <h1>Loading...</h1>
 {:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
-  <h2>Last songs you listened to:</h2>
-
-  <TracksRow tracks={lastListenedTo} />
-
   <h2>Tracks you like to listen to:</h2>
 
   <TracksRow tracks={popularTracks} />
+
+  <h2>Last songs you listened to:</h2>
+
+  <TracksRow tracks={lastListenedTo} />
 
   <h2>Albums you like to listen to:</h2>
 
