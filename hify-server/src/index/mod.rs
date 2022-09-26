@@ -1,4 +1,6 @@
+pub(self) mod arts;
 pub(self) mod builder;
+pub(self) mod cache;
 pub(self) mod data;
 pub(self) mod exiftool;
 pub(self) mod search;
