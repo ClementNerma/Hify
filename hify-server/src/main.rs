@@ -17,6 +17,7 @@ async fn main() {
         index_file,
         user_data_file,
         rebuild_index,
+        update_index,
         no_server,
     } = cmd::Command::parse();
 
@@ -28,11 +29,11 @@ async fn main() {
         panic!("Index file must not be a directory");
     }
 
-    let index = if index_file.is_file() {
+    let index = if index_file.is_file() && !rebuild_index {
         println!("> Loading index from disk...");
         let mut index = utils::save::load_index(&index_file).unwrap();
 
-        if rebuild_index {
+        if update_index {
             println!("> Rebuilding index as requested...");
             index = index::build_index(music_dir, Some(index)).unwrap();
         }

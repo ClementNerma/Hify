@@ -18,5 +18,8 @@ pub struct Command {
     pub rebuild_index: bool,
 
     #[clap(short, long)]
+    pub update_index: bool,
+
+    #[clap(short, long)]
     pub no_server: bool,
 }
