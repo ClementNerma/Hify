@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from '../../atoms/Button/Button.svelte'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
@@ -21,15 +22,13 @@
 <h2>Developer Tools</h2>
 
 <NavigableRow>
-  <SimpleNavigableItem onPress={() => location.reload()}>
-    <button>Reload the application</button>
-  </SimpleNavigableItem>
-  <SimpleNavigableItem onPress={toggleDebugLogsDisplay}>
+  <Button onPress={() => location.reload()}>Reload the application</Button>
+  <Button onPress={toggleDebugLogsDisplay}>
     <input type="checkbox" checked={hideDebugLogs} /> Hide debug logs
-  </SimpleNavigableItem>
-  <SimpleNavigableItem onPress={toggleDistractionFreeEnabling}>
+  </Button>
+  <Button onPress={toggleDistractionFreeEnabling}>
     <input type="checkbox" checked={$enableDistractionFreeModeFeature} /> Enable distraction-free mode
-  </SimpleNavigableItem>
+  </Button>
 </NavigableRow>
 
 <NavigableList>
