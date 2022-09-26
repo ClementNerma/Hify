@@ -4,7 +4,8 @@ use std::{
 };
 
 use super::{
-    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, IndexCache, SortedMap, Track, TrackID,
+    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, SortedMap, Track,
+    TrackID,
 };
 
 // TODO: lots of optimization to perform here
@@ -23,10 +24,10 @@ pub fn build_index_cache(
     let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
+    let mut genres_infos = HashMap::<GenreID, GenreInfos>::new();
+    let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
     let mut genres_tracks = HashMap::<GenreID, Vec<TrackID>>::new();
     let mut no_genre_tracks = HashSet::new();
-
-    let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
 
     for track in tracks.values() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
@@ -74,14 +75,18 @@ pub fn build_index_cache(
         if track.metadata.tags.genres.is_empty() {
             no_genre_tracks.insert(track.id.clone());
         } else {
-            for genre in &track.metadata.tags.genres {
+            for genre in tags.get_genres() {
+                let genre_id = genre.get_id();
+
+                genres_infos.insert(genre_id.clone(), genre.clone());
+
                 genres_tracks
-                    .entry(GenreID(genre.clone()))
+                    .entry(genre_id.clone())
                     .or_default()
                     .push(track.id.clone());
 
                 genres_albums
-                    .entry(GenreID(genre.clone()))
+                    .entry(genre_id)
                     .or_default()
                     .insert(album_infos.clone());
             }
@@ -154,10 +159,10 @@ pub fn build_index_cache(
         artists_infos: SortedMap::from_hashmap(artists_infos),
         albums_artists_infos: SortedMap::from_hashmap(albums_artists_infos),
         albums_infos: SortedMap::from_hashmap(albums_infos),
-
-        genres_tracks,
-        no_genre_tracks,
+        genre_infos: SortedMap::from_hashmap(genres_infos),
 
         genres_albums,
+        genres_tracks,
+        no_genre_tracks,
     }
 }

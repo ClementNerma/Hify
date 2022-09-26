@@ -33,14 +33,14 @@ pub struct IndexCache {
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
-
-    pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
-    pub no_genre_tracks: HashSet<TrackID>,
+    pub genre_infos: SortedMap<GenreID, GenreInfos>,
 
     pub genres_albums: HashMap<GenreID, SortedMap<AlbumID, AlbumInfos>>,
+    pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
+    pub no_genre_tracks: HashSet<TrackID>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AlbumInfos {
     pub name: String,
     pub album_artists: Vec<ArtistInfos>,
@@ -61,21 +61,7 @@ impl AlbumInfos {
     }
 }
 
-impl PartialOrd for AlbumInfos {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for AlbumInfos {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.name
-            .cmp(&other.name)
-            .then_with(|| self.album_artists.cmp(&other.album_artists))
-    }
-}
-
-#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArtistInfos {
     pub name: String,
 }
@@ -92,15 +78,20 @@ impl ArtistInfos {
     }
 }
 
-impl PartialOrd for ArtistInfos {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
+#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct GenreInfos {
+    pub name: String,
 }
 
-impl Ord for ArtistInfos {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.name.cmp(&other.name)
+impl GenreInfos {
+    fn new(name: String) -> Self {
+        Self { name }
+    }
+
+    pub fn get_id(&self) -> GenreID {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        GenreID(format!("{:x}", hasher.finish()))
     }
 }
 
@@ -194,6 +185,10 @@ impl TrackTags {
             &self.artists
         };
         artists.iter().cloned().map(ArtistInfos::new)
+    }
+
+    pub fn get_genres(&self) -> impl Iterator<Item = GenreInfos> + '_ {
+        self.genres.iter().cloned().map(GenreInfos::new)
     }
 }
 

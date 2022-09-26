@@ -6,8 +6,8 @@ use async_graphql::{ComplexObject, Context, Enum, Object, SimpleObject};
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
     index::{
-        search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexSearchResults, SortedMap,
-        Track, TrackID, TrackTags,
+        search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos,
+        IndexSearchResults, SortedMap, Track, TrackID, TrackTags,
     },
     transparent_cursor_type,
 };
@@ -17,7 +17,7 @@ use super::{
     GraphQLContext,
 };
 
-transparent_cursor_type!(TrackID, AlbumID, ArtistID);
+transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);
 
 pub struct QueryRoot;
 
@@ -99,6 +99,27 @@ impl QueryRoot {
             .cache
             .artists_infos
             .get(&ArtistID(id))
+            .cloned()
+    }
+
+    async fn genres(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<GenreID, GenreInfos> {
+        let index = graphql_index!(ctx);
+        paginate(
+            pagination,
+            &index.cache.genre_infos,
+            |genre: &GenreInfos| genre.get_id(),
+        )
+    }
+
+    async fn genre(&self, ctx: &Context<'_>, id: String) -> Option<GenreInfos> {
+        graphql_index!(ctx)
+            .cache
+            .genre_infos
+            .get(&GenreID(id))
             .cloned()
     }
 
@@ -221,7 +242,7 @@ impl AlbumInfos {
         }
     }
 
-    async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<String> {
+    async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<GenreInfos> {
         let index = graphql_index!(ctx);
         let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
         album_tracks
@@ -233,8 +254,7 @@ impl AlbumInfos {
                     .unwrap()
                     .metadata
                     .tags
-                    .genres
-                    .clone()
+                    .get_genres()
             })
             .collect()
     }
@@ -297,6 +317,34 @@ impl ArtistInfos {
                 .get(&self.get_id())
                 .unwrap_or(&SortedMap::empty()),
             |album| album.get_id(),
+        )
+    }
+}
+
+#[Object]
+impl GenreInfos {
+    async fn id(&self) -> String {
+        self.get_id().0
+    }
+
+    async fn name(&self) -> &str {
+        &self.name
+    }
+
+    async fn albums(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<AlbumID, AlbumInfos> {
+        let index = graphql_index!(ctx);
+        paginate(
+            pagination,
+            index
+                .cache
+                .genres_albums
+                .get(&self.get_id())
+                .unwrap_or(&SortedMap::empty()),
+            |genre| genre.get_id(),
         )
     }
 }

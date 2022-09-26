@@ -41,9 +41,10 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             artists_infos: SortedMap::empty(),
             albums_artists_infos: SortedMap::empty(),
             albums_infos: SortedMap::empty(),
+            genre_infos: SortedMap::empty(),
+            genres_albums: HashMap::new(),
             genres_tracks: HashMap::new(),
             no_genre_tracks: HashSet::new(),
-            genres_albums: HashMap::new(),
         },
     });
 
