@@ -4,7 +4,7 @@
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
 
-  const ALBUMS_PER_LINE = 5
+  const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5
 
   export let genreId: string
