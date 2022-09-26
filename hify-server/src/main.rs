@@ -7,6 +7,7 @@ mod cmd;
 mod graphql;
 mod http;
 mod index;
+mod library;
 mod userdata;
 mod utils;
 
