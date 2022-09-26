@@ -363,6 +363,15 @@ impl GenreInfos {
             |genre| genre.get_id(),
         )
     }
+
+    async fn albums_count(&self, ctx: &Context<'_>) -> usize {
+        graphql_index!(ctx)
+            .cache
+            .genres_albums
+            .get(&self.get_id())
+            .unwrap()
+            .len()
+    }
 }
 
 #[derive(SimpleObject)]
