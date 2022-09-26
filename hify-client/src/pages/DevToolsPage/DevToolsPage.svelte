@@ -32,16 +32,14 @@
 </NavigableRow>
 
 <NavigableList>
-  <ul>
-    {#each slicedAppLogs as logEntry}
-      <SimpleNavigableItem displayBlock={true}>
-        <li class="log-entry {logEntry.level}">
-          <u>{logEntry.level.toLocaleUpperCase()}</u>
-          <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
-        </li>
-      </SimpleNavigableItem>
-    {/each}
-  </ul>
+  {#each slicedAppLogs as logEntry}
+    <SimpleNavigableItem displayBlock={true}>
+      <div class="log-entry {logEntry.level}">
+        <u>{logEntry.level.toLocaleUpperCase()}</u>
+        <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}
+      </div>
+    </SimpleNavigableItem>
+  {/each}
 </NavigableList>
 
 <style>
