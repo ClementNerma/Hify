@@ -1,14 +1,12 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { AlbumInfos, ArtistInfos } from '../../graphql/generated'
+  import { AlbumCardFragment } from '../../graphql/generated'
   import { getAlbumArtUri } from '../../rest-api'
   import { ROUTES } from '../../routes'
   import { bind } from '../../utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
 
-  export let album: Pick<AlbumInfos, 'id' | 'name'> & {
-    albumArtists: Array<Pick<ArtistInfos, 'name'>>
-  }
+  export let album: AlbumCardFragment
 </script>
 
 <InteractiveCard
