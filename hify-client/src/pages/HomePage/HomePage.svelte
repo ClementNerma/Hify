@@ -4,7 +4,7 @@
   import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
 
-  const indexInfos = AsyncHomePage({ variables: {} }).then((res) => res.data.generateFeed)
+  const indexInfos = AsyncHomePage({ variables: {}, fetchPolicy: 'no-cache' }).then((res) => res.data.generateFeed)
 </script>
 
 {#await indexInfos}
