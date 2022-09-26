@@ -175,7 +175,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
                     .enumerate()
                     .skip(if e.line() < 15 { 0 } else { e.line() - 15 })
                     .take(15)
-                    .map(|(i, line)| format!("[{: >5}s] *| {line}", i + 1))
+                    .map(|(i, line)| format!("Line {: >5} *| {line}", i + 1))
                     .collect::<Vec<_>>()
                     .join("\n")
             )
