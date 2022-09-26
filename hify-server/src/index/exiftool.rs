@@ -252,7 +252,11 @@ fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
             .map(|value| parse_set_number(&value, "track number"))
             .transpose()?,
 
-        date: tags.Year.map(|date| parse_date(&date)).transpose()?,
+        date: tags
+            .Year
+            .or(tags.ReleaseTime)
+            .map(|date| parse_date(&date))
+            .transpose()?,
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
     })
@@ -354,6 +358,9 @@ struct ExifToolFileTags {
 
     #[serde(default, deserialize_with = "ensure_string")]
     PartOfSet: Option<String>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
+    ReleaseTime: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
     Title: Option<String>,
