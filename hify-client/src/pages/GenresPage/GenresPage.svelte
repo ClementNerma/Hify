@@ -11,12 +11,12 @@
 {#await genres}
   <h2>Loading...</h2>
 {:then genres}
-  <h2>List of all genres ({genres.length}):</h2>
+  <h2>List of all genres ({genres.length}) and number of albums:</h2>
 
   <Grid columns={6}>
     {#each genres as genre}
       <SimpleNavigableItem onPress={() => navigate(ROUTES.genre(genre.id))} transparent={true}>
-        <p class="genre">{genre.name}</p>
+        <p class="genre">{genre.name} ({genre.albumsCount})</p>
       </SimpleNavigableItem>
     {/each}
   </Grid>

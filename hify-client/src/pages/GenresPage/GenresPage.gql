@@ -2,5 +2,6 @@ query GenresPage {
   genres {
     id
     name
+    albumsCount
   }
 }
