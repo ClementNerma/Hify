@@ -84,7 +84,7 @@
         {#each filteredTracks as track (track.id)}
           {@const tags = track.metadata.tags}
 
-          <NavigableTrack transparent={true} tracks={filteredTracks} goToAlbumOption={false} {track}>
+          <NavigableTrack position={tags.trackNo} transparent={true} tracks={filteredTracks} goToAlbumOption={false} {track}>
             <tr>
               <td class="trackno">{tags.trackNo}</td>
               <td class="title">{tags.title}</td>
