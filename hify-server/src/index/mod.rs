@@ -1,10 +1,10 @@
-pub(self) mod arts;
-pub(self) mod builder;
-pub(self) mod cache;
-pub(self) mod data;
-pub(self) mod exiftool;
-pub(self) mod search;
-pub(self) mod sorted_map;
+mod arts;
+mod builder;
+mod cache;
+mod data;
+mod exiftool;
+mod search;
+mod sorted_map;
 
 pub use builder::build_index;
 pub use data::*;
