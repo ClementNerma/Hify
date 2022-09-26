@@ -16,43 +16,33 @@ use crate::index::TrackMetadata;
 
 use super::file::{process_analyzed_file, ExifToolFile};
 
-pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
-    let original_count = files.len();
+pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
+    let path = path.as_ref();
 
-    let files = files
-        .iter()
-        .filter_map(|file| {
-            let audio_ext = file
-                .as_ref()
-                .extension()
-                .and_then(|ext| ext.to_str())?
-                .to_ascii_lowercase();
+    let audio_ext = match path.extension().and_then(|ext| ext.to_str()) {
+        Some(ext) => ext.to_ascii_lowercase(),
+        None => return false,
+    };
 
-            if matches!(
-                audio_ext.as_str(),
-                "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
-            ) {
-                return Some(Err(anyhow!(
-                    "File format unsupported by web players: {audio_ext}"
-                )));
-            }
+    if matches!(
+        audio_ext.as_str(),
+        "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
+    ) {
+        eprintln!(
+            "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
+            path.to_string_lossy()
+        );
 
-            if !matches!(
-                audio_ext.as_str(),
-                "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
-            ) {
-                return None;
-            }
+        return false;
+    }
 
-            Some(Ok(file.as_ref().to_path_buf()))
-        })
-        .collect::<Result<Vec<_>>>()?;
+    matches!(
+        audio_ext.as_str(),
+        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
+    )
+}
 
-    println!(
-        "        Ignoring {} non-audio files",
-        original_count - files.len()
-    );
-
+pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     let started = Instant::now();
     let mut previous = 0;
 

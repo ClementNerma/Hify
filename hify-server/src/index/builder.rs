@@ -59,13 +59,16 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         .cloned()
         .collect::<HashSet<_>>();
 
-    let mut files = files.difference(existing).cloned().collect::<Vec<_>>();
+    let mut files = files
+        .difference(existing)
+        .filter(|path| exiftool::is_audio_file(path))
+        .cloned()
+        .collect::<Vec<_>>();
+
     files.sort();
 
-    log(
-        started,
-        &format!("Found {} files, analyzing with ExifTool...", files.len()),
-    );
+    log(started, &format!("Found {} files.", files.len(),));
+    log(started, "Extracting audio metadata...");
 
     let analyzed = exiftool::run_on(files.as_slice())?;
 
