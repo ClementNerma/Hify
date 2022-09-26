@@ -25,7 +25,6 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
             )
         })?,
         duration: analyzed.Duration as i32,
-        bitrate: analyzed.AudioBitrate.map(|br| br as i32),
         tags: parse_exiftool_tags(analyzed.tags)?,
     })
 }
@@ -36,9 +35,6 @@ pub struct ExifToolFile {
     FileType: String,
     Duration: f32,
     FileSize: u64,
-
-    #[serde(default)]
-    AudioBitrate: Option<f64>,
 
     #[serde(flatten)]
     tags: ExifToolFileTags,

@@ -145,7 +145,6 @@ pub struct TrackMetadata {
     pub format: AudioFormat,
     pub size: i32,
     pub duration: i32,
-    pub bitrate: Option<i32>,
     pub tags: TrackTags,
 }
 
