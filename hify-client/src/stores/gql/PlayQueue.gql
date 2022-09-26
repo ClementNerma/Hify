@@ -1,4 +1,4 @@
-query PlayQueue($tracksIds: [String!]!, $albumYearStrategy: AlbumYearStrategy!) {
+query PlayQueue($tracksIds: [String!]!) {
   selectTracks(inIds: $tracksIds) {
     ...AudioTrack
   }

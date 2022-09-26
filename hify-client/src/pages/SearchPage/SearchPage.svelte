@@ -16,7 +16,6 @@
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
   import Card from '../../molecules/Card/Card.svelte'
 
-  import { CONFIG } from '../../config'
   import { bind } from '../../utils'
   import { RequestFocus } from '../../navigable/navigation'
 
@@ -36,7 +35,6 @@
       variables: {
         limit: MAX_RESULTS_PER_CATEGORY,
         input: searchTerms,
-        albumYearStrategy: CONFIG.albumYearStrategy,
       },
     })
 

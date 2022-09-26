@@ -1,4 +1,4 @@
-query ArtistPage($artistId: String!, $pagination: PaginationInput!, $strategy: AlbumYearStrategy!) {
+query ArtistPage($artistId: String!, $pagination: PaginationInput!) {
   artist(id: $artistId) {
     name
     albumParticipations(pagination: $pagination) {
@@ -10,7 +10,7 @@ query ArtistPage($artistId: String!, $pagination: PaginationInput!, $strategy: A
           id
           name
         }
-        year(strategy: $strategy)
+        year
         albumArtists {
           id
           name

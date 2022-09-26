@@ -1,8 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
 
-  import { CONFIG } from '../../config'
-
   import { AsyncHistory } from '../../graphql/generated'
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
   import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
@@ -14,9 +12,7 @@
   import { contextMenuStore } from '../Template/TplContextMenu.svelte'
 
   const history = AsyncHistory({
-    variables: {
-      albumYearStrategy: CONFIG.albumYearStrategy,
-    },
+    variables: {},
     fetchPolicy: 'no-cache',
   })
 </script>

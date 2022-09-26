@@ -1,4 +1,4 @@
-query SearchPage($input: String!, $limit: Int!, $albumYearStrategy: AlbumYearStrategy!) {
+query SearchPage($input: String!, $limit: Int!) {
   search(input: $input, limit: $limit) {
     tracks {
       ...AudioTrack

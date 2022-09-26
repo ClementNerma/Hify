@@ -1,7 +1,7 @@
-query AlbumPage($albumId: String!, $albumYearStrategy: AlbumYearStrategy!) {
+query AlbumPage($albumId: String!) {
   album(id: $albumId) {
     ...AlbumCard
-    year(strategy: $albumYearStrategy)
+    year
     genres {
       id
       name

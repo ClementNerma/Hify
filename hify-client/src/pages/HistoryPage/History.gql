@@ -1,4 +1,4 @@
-query History($albumYearStrategy: AlbumYearStrategy!) {
+query History {
   history {
     ...AudioTrack
   }
