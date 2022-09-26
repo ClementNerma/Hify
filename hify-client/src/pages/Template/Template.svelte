@@ -28,7 +28,7 @@
         if (!long) {
           toggleAudioPlayback()
         } else {
-          navigate($location.pathname === ROUTES.nowPlaying ? ROUTES.search : ROUTES.nowPlaying)
+          navigate($location.pathname === ROUTES.search ? ROUTES.nowPlaying : ROUTES.search)
         }
 
         break
@@ -73,11 +73,11 @@
           <NavBar
             tabs={[
               { label: 'Home', uri: ROUTES.home },
+              { label: 'History', uri: ROUTES.history },
+              { label: 'Now Playing', uri: ROUTES.nowPlaying },
               { label: 'Albums', uri: ROUTES.albums },
               { label: 'Artists', uri: ROUTES.artists },
-              { label: 'History', uri: ROUTES.history },
               { label: 'Search', uri: ROUTES.search },
-              { label: 'Now Playing', uri: ROUTES.nowPlaying },
             ]}
             bind:requestFocus
           />
