@@ -49,12 +49,20 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
     let mut previous = 0;
 
     let display_progress = |elapsed: u64, current: u64, total: u64| {
+        let minutes = elapsed / 60;
+        let seconds = elapsed % 60;
+
         print!(
-            "\r        Progress: {} / {} ({}%) in {}s...",
+            "\r        Progress: {} / {} ({}%) in {}{}s...",
             current,
             total,
             current * 100 / total,
-            elapsed
+            if minutes > 0 {
+                format!("{minutes}m ")
+            } else {
+                String::new()
+            },
+            seconds
         );
 
         stdout().flush().unwrap();
