@@ -50,7 +50,7 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
 
     let display_progress = |elapsed: u64, current: u64, total: u64| {
         print!(
-            "\r[     ] Progress: {} / {} ({}%) in {}s...",
+            "\r        Progress: {} / {} ({}%) in {}s...",
             current,
             total,
             current * 100 / total,
