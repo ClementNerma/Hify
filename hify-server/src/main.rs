@@ -76,9 +76,13 @@ async fn inner_main() -> Result<()> {
     if !no_server {
         println!("> Launching server...");
 
-        let server = http::launch(index, user_data)
-            .await
-            .context("Failed to launch HTTP server")?;
+        let server = http::launch(
+            index,
+            user_data,
+            Box::new(move |index| utils::save::save_index(&index_file, index)),
+        )
+        .await
+        .context("Failed to launch HTTP server")?;
 
         server.shutdown().await;
     }
