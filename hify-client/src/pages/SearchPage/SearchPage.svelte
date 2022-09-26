@@ -74,7 +74,7 @@
 
   <h2>Albums ({results.albums.length})</h2>
 
-  <AlbumsRow tracks={results.albums} />
+  <AlbumsRow albums={results.albums} />
 
   <h2>Artists ({results.artists.length})</h2>
 
