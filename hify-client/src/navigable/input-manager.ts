@@ -1,5 +1,9 @@
 import { logDebug } from '../stores/debugger'
 
+export const REMAPPED_KEYS = {
+  Escape: 'F4',
+}
+
 export function handleInput(handler: InputHandler): void {
   inputHandlers.push(handler)
 }
@@ -17,6 +21,12 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
 export function registerLongPressableKeys(...keys: string[]): void {
   for (const key of keys) {
     watchLongPressForKeys.add(key)
+  }
+
+  for (const [key, remapped] of Object.entries(REMAPPED_KEYS)) {
+    if (keys.includes(key)) {
+      watchLongPressForKeys.add(remapped)
+    }
   }
 }
 

@@ -20,7 +20,7 @@
 
   const location = useLocation()
 
-  registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward')
+  registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape')
 
   handleInput((key, long) => {
     switch (key) {
@@ -64,7 +64,7 @@
 </script>
 
 <NavigablePage>
-  <NavigableWithHandlers onBack={() => navigate(-1)}>
+  <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>
     <NavigableList>
       <TplContextMenu />
 

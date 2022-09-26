@@ -25,6 +25,9 @@ export class SimpleNavigableItem extends NavigableItem {
 
       case NavigationAction.Back:
         return !!this.props.onBack
+
+      case NavigationAction.LongBack:
+        return false
     }
   }
 
@@ -33,6 +36,7 @@ export class SimpleNavigableItem extends NavigableItem {
       [NavigationAction.Press]: this.props.onPress,
       [NavigationAction.LongPress]: this.props.onLongPress,
       [NavigationAction.Back]: this.props.onBack,
+      [NavigationAction.LongBack]: () => null,
     }
 
     const fn = callbacks[action]

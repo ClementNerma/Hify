@@ -8,6 +8,7 @@ export type NavigableWithHandlersProps = {
   onPress?: () => NavigableItem | null | void
   onLongPress?: () => NavigableItem | null | void
   onBack?: () => NavigableItem | null | void
+  onLongBack?: () => NavigableItem | null | void
 }
 
 export class NavigableWithHandlers extends NavigableOne {
@@ -25,6 +26,9 @@ export class NavigableWithHandlers extends NavigableOne {
 
       case NavigationAction.Back:
         return !!this.props.onBack
+
+      case NavigationAction.LongBack:
+        return !!this.props.onLongBack
     }
   }
 
@@ -38,6 +42,9 @@ export class NavigableWithHandlers extends NavigableOne {
 
       case NavigationAction.Back:
         return this.props.onBack?.() ?? null
+
+      case NavigationAction.LongBack:
+        return this.props.onLongBack?.() ?? null
     }
   }
 }

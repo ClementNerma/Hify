@@ -10,6 +10,7 @@
   export let onPress: NavigableWithHandlersProps['onPress'] = undefined
   export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
   export let onBack: NavigableWithHandlersProps['onBack'] = undefined
+  export let onLongBack: NavigableWithHandlersProps['onLongBack'] = undefined
 
   const containerProps = (): NavigableWithHandlersProps => ({
     position,
@@ -17,6 +18,7 @@
     onPress,
     onLongPress,
     onBack,
+    onLongBack,
   })
 
   const nav = getParentNavigable()

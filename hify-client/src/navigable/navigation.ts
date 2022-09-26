@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput, registerLongPressableKeys } from './input-manager'
+import { handleInput, registerLongPressableKeys, REMAPPED_KEYS } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -14,6 +14,7 @@ export enum NavigationAction {
   Press,
   LongPress,
   Back,
+  LongBack,
 }
 
 export enum NavigationComingFrom {
@@ -388,11 +389,11 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
     case 'Enter':
     case 'Escape':
-    case 'F4': // F4 is a remap of the back button in the Android App
+    case REMAPPED_KEYS.Escape:
       const events: { [key in typeof key]: NavigationAction } = {
         Enter: long ? NavigationAction.LongPress : NavigationAction.Press,
-        Escape: NavigationAction.Back,
-        F4: NavigationAction.Back,
+        Escape: long ? NavigationAction.LongBack : NavigationAction.Back,
+        [REMAPPED_KEYS.Escape]: long ? NavigationAction.LongBack : NavigationAction.Back,
       }
 
       const event = events[key]
