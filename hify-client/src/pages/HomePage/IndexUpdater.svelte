@@ -1,7 +1,6 @@
 <script lang="ts">
   import Button from '../../atoms/Button/Button.svelte'
   import { IndexUpdater } from '../../graphql/generated'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   function updateIndex() {
     isUpdating = true
