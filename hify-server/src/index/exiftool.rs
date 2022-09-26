@@ -380,35 +380,41 @@ struct ExifToolFileTags {
 fn ensure_string<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<String>, D::Error> {
     let matched: Option<Value> = Deserialize::deserialize(deserializer)?;
 
-    matched
+    Ok(matched
         .map(decode_value_as_string)
         .transpose()
-        .map_err(D::Error::custom)
+        .map_err(D::Error::custom)?
+        .flatten())
 }
 
-fn decode_value_as_string(value: Value) -> Result<String, String> {
+fn decode_value_as_string(value: Value) -> Result<Option<String>, String> {
     match value {
         // NOTE: Approx. but no way to do otherwise :(
-        Value::Bool(bool) => Ok(if bool { "True" } else { "False" }.to_string()),
+        Value::Bool(bool) => Ok(Some(if bool { "True" } else { "False" }.to_string())),
 
         Value::Number(num) => {
             if num.is_u64() {
-                Ok(num.to_string())
+                Ok(Some(num.to_string()))
             } else {
                 Err(format!("Invalid number type (expected u64): {num}"))
             }
         }
 
-        Value::String(str) => Ok(str),
+        Value::String(str) => Ok(if !str.is_empty() { Some(str) } else { None }),
 
         Value::Array(values) => {
             let decoded = values
                 .into_iter()
                 .map(decode_value_as_string)
+                .filter_map(|decoded| match decoded {
+                    Ok(Some(decoded)) => Some(Ok(decoded)),
+                    Ok(None) => None,
+                    Err(err) => Some(Err(err)),
+                })
                 .collect::<Result<Vec<_>, String>>()?;
 
             // NOTE: joined as ',' as this is the default separator used by ExifTool
-            Ok(decoded.join(","))
+            Ok(Some(decoded.join(",")))
         }
 
         invalid => Err(format!(
