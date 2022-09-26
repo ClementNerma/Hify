@@ -1,3 +1,5 @@
+use std::collections::{hash_map::Entry, HashMap};
+
 use serde::{Deserialize, Serialize};
 
 use crate::index::TrackID;
@@ -6,6 +8,7 @@ use crate::index::TrackID;
 pub struct UserData {
     history: Vec<TrackID>,
     history_size: usize,
+    listenings: HashMap<TrackID, u32>,
 }
 
 impl UserData {
@@ -13,6 +16,7 @@ impl UserData {
         Self {
             history: vec![],
             history_size,
+            listenings: HashMap::new(),
         }
     }
 }
@@ -44,7 +48,14 @@ impl UserDataWrapper {
             }
         }
 
-        self.inner.history.insert(0, track_id);
+        self.inner.history.insert(0, track_id.clone());
+
+        match self.inner.listenings.entry(track_id) {
+            Entry::Occupied(mut occ) => *occ.get_mut() += 1,
+            Entry::Vacant(vac) => {
+                vac.insert(1);
+            }
+        };
 
         (self.on_change)(&self.inner);
     }
