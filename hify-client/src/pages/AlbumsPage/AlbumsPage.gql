@@ -1,10 +1,9 @@
 query AlbumsPage($pagination: PaginationInput!) {
   albums(pagination: $pagination) {
-    edges {
-      node {
-        ...Album
-      }
+    nodes {
+      ...Album
     }
+
     pageInfo {
       endCursor
       hasNextPage

@@ -25,16 +25,14 @@
         },
         strategy: CONFIG.albumYearStrategy,
       },
-    })
+    }).then((res) => res.data.artist?.albumParticipations)
 
-    if (!res.data.artist) {
+    if (!res) {
       throw new Error("Failed to fetch artist's data")
     }
 
-    currentPageInfo = res.data.artist.albumParticipations.pageInfo
-    const newAlbums = res.data.artist.albumParticipations.edges!.map((edge) => edge!.node)
-
-    albums = [...albums, ...newAlbums]
+    currentPageInfo = res.pageInfo
+    albums = [...albums, ...res.nodes]
   }
 
   let albums: Array<AlbumCard['$$prop_def']['album']> = []

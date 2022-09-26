@@ -24,9 +24,7 @@
     })
 
     currentPageInfo = res.data.albums.pageInfo
-    const newAlbums = res.data.albums.edges!.map((edge) => edge!.node)
-
-    albums = [...albums, ...newAlbums]
+    albums = [...albums, ...res.data.albums.nodes]
   }
 
   let albums: Array<AlbumCard['$$prop_def']['album']> = []

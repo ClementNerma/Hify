@@ -2,22 +2,21 @@ query ArtistPage($artistId: String!, $pagination: PaginationInput!, $strategy: A
   artist(id: $artistId) {
     name
     albumParticipations(pagination: $pagination) {
-      edges {
-        node {
+      nodes {
+        id
+        name
+        hasArtImage
+        genres {
           id
           name
-          hasArtImage
-          genres {
-            id
-            name
-          }
-          year(strategy: $strategy)
-          albumArtists {
-            id
-            name
-          }
+        }
+        year(strategy: $strategy)
+        albumArtists {
+          id
+          name
         }
       }
+
       pageInfo {
         endCursor
         hasNextPage

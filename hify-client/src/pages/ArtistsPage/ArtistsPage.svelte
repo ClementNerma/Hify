@@ -21,12 +21,10 @@
           first: ARTISTS_PER_LINE * LINES_PER_PAGE,
         },
       },
-    })
+    }).then((res) => res.data.albumsArtists)
 
-    currentPageInfo = res.data.albumsArtists.pageInfo
-    const newArtists = res.data.albumsArtists.edges!.map((edge) => edge!.node)
-
-    artists = [...artists, ...newArtists]
+    currentPageInfo = res.pageInfo
+    artists = [...artists, ...res.nodes]
   }
 
   let artists: Array<ArtistCard['$$prop_def']['artist']> = []
