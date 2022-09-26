@@ -8,7 +8,7 @@ use serde_json::Value;
 use crate::index::{TrackDate, TrackTags};
 
 pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
-    Ok(TrackTags {
+    let tags = TrackTags {
         title: tags.Title.context("Missing 'title' tag")?,
         artists: tags.Artist.map(parse_array_tag).unwrap_or_default(),
         composers: tags.Composer.map(parse_array_tag).unwrap_or_default(),
@@ -45,7 +45,13 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
             .or_else(|| tags.Popularimeter.map(parse_popularimeter))
             .transpose()?
             .flatten(),
-    })
+    };
+
+    if tags.artists.is_empty() && tags.album_artists.is_empty() {
+        bail!("Both artist(s) AND album artist(s) are missing!");
+    }
+
+    Ok(tags)
 }
 
 fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32> {
