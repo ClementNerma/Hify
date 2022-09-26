@@ -102,12 +102,19 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let cache = build_index_cache(&tracks, tracks_paths);
 
-    log(started, "Searching for album arts...");
+    let new_albums = cache
+        .albums_infos
+        .keys()
+        .filter(|key| !from.cache.albums_infos.contains_key(key))
+        .collect::<Vec<_>>();
 
-    let albums_arts = find_albums_arts(
-        cache.albums_infos.keys().collect::<Vec<_>>().as_slice(),
-        &cache,
+    log(
+        started,
+        &format!("Searching for new albums' ({}) arts...", new_albums.len()),
     );
+
+    let mut albums_arts = from.albums_arts;
+    albums_arts.extend(find_albums_arts(&new_albums, &cache));
 
     log(started, "Index has been generated.");
 
