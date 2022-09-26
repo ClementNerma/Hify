@@ -1,10 +1,9 @@
 use anyhow::{bail, Context, Result};
 
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
-    sync::atomic::{AtomicUsize, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
@@ -15,6 +14,7 @@ use super::{
     data::{Index, Track, TrackID},
     exiftool,
     sorted_map::SortedMap,
+    IndexCache,
 };
 
 pub fn log(time: SystemTime, message: &str) {
@@ -26,12 +26,40 @@ pub fn log(time: SystemTime, message: &str) {
     println!("[{: >4}s] {message}", elapsed);
 }
 
-pub fn build_index(from: PathBuf) -> Result<Index> {
+pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
+    let from = from.unwrap_or_else(|| Index {
+        from: dir.clone(),
+        fingerprint: String::new(),
+        tracks: SortedMap::empty(),
+        albums_arts: HashMap::new(),
+        cache: IndexCache {
+            tracks_paths: HashMap::new(),
+            artists_albums: HashMap::new(),
+            artists_tracks: HashMap::new(),
+            albums_artists_albums: HashMap::new(),
+            albums_tracks: HashMap::new(),
+            artists_infos: SortedMap::empty(),
+            albums_artists_infos: SortedMap::empty(),
+            albums_infos: SortedMap::empty(),
+            genres_tracks: HashMap::new(),
+            no_genre_tracks: HashSet::new(),
+        },
+    });
+
     let started = SystemTime::now();
 
     log(started, "Looking for audio files...");
 
-    let mut files = build_files_list(&from).context("Failed to build files list")?;
+    let files = build_files_list(&dir).context("Failed to build files list")?;
+
+    let existing = &from
+        .cache
+        .tracks_paths
+        .values()
+        .cloned()
+        .collect::<HashSet<_>>();
+
+    let mut files = files.difference(existing).cloned().collect::<Vec<_>>();
     files.sort();
 
     log(
@@ -41,19 +69,15 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
 
     let analyzed = exiftool::run_on(files.as_slice())?;
 
-    let mut tracks = vec![];
-    let mut tracks_paths = HashMap::new();
+    let mut tracks = from.tracks.into_values();
+    let mut tracks_paths = from.cache.tracks_paths;
 
-    for (i, track_metadata) in analyzed.into_iter().enumerate() {
-        let path = files.get(i).unwrap();
+    for (path, track_metadata) in analyzed.into_iter() {
         let path_str = path.to_str().unwrap();
 
-        let mut hasher = DefaultHasher::new();
-        path_str.hash(&mut hasher);
-        let id = TrackID(format!("{:x}", hasher.finish()));
-        path_str.hash(&mut hasher);
+        let id = get_track_id(path_str);
 
-        tracks_paths.insert(id.clone(), path.clone());
+        tracks_paths.insert(id.clone(), path.to_path_buf());
 
         tracks.push(Track {
             id,
@@ -73,20 +97,9 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
 
     log(started, "Searching for album arts...");
 
-    let found_album_arts = AtomicUsize::new(0);
-
     let albums_arts = find_albums_arts(
         cache.albums_infos.keys().collect::<Vec<_>>().as_slice(),
         &cache,
-    );
-
-    log(
-        started,
-        &format!(
-            "Found {}/{} album arts.",
-            found_album_arts.load(Ordering::SeqCst),
-            cache.albums_infos.len()
-        ),
     );
 
     log(started, "Index has been generated.");
@@ -99,14 +112,14 @@ pub fn build_index(from: PathBuf) -> Result<Index> {
 
     Ok(Index {
         fingerprint,
-        from,
+        from: dir,
         tracks,
         albums_arts,
         cache,
     })
 }
 
-fn build_files_list(from: &Path) -> Result<Vec<PathBuf>> {
+fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
@@ -130,5 +143,11 @@ fn build_files_list(from: &Path) -> Result<Vec<PathBuf>> {
             Ok(None) => None,
             Err(err) => Some(Err(err)),
         })
-        .collect::<Result<Vec<_>>>()
+        .collect()
+}
+
+fn get_track_id(track_path_str: &str) -> TrackID {
+    let mut hasher = DefaultHasher::new();
+    track_path_str.hash(&mut hasher);
+    TrackID(format!("{:x}", hasher.finish()))
 }

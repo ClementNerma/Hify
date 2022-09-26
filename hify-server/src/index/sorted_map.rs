@@ -60,8 +60,14 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         self.indexes.get(key).copied()
     }
 
-    // pub fn iter(&self) -> SortedMapIter<K, V> {
-    //     SortedMapIter::from(self)
+    // // TODO: improve by using .rev() on self.indexes instead of building a reversed vec of values
+    // pub fn to_vec(self) -> Vec<(K, V)> {
+    //     let mut values: Vec<_> = self.values.into_iter().rev().collect();
+
+    //     self.indexes
+    //         .into_iter()
+    //         .map(|(key, _)| (key, values.pop().unwrap()))
+    //         .collect()
     // }
 
     pub fn keys(&self) -> Keys<K, usize> {
@@ -72,31 +78,11 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         self.values.iter()
     }
 
+    pub fn into_values(self) -> Vec<V> {
+        self.values
+    }
+
     pub fn len(&self) -> usize {
         self.values.len()
     }
 }
-
-// pub struct SortedMapIter<'a, K: Eq + Hash, V: Ord> {
-//     parent: &'a SortedMap<K, V>,
-//     index: usize,
-// }
-
-// impl<'a, K: Eq + Hash, V: Ord> SortedMapIter<'a, K, V> {
-//     fn from(sorted_map: &'a SortedMap<K, V>) -> Self {
-//         Self {
-//             parent: sorted_map,
-//             index: 0,
-//         }
-//     }
-// }
-
-// impl<'a, K: Eq + Hash, V: Ord> Iterator for SortedMapIter<'a, K, V> {
-//     type Item = (&'a K, &'a V);
-
-//     fn next(&mut self) -> Option<Self::Item> {
-//         let item = self.parent.values.get(self.index)?;
-//         self.index += 1;
-//         Some(item)
-//     }
-// }

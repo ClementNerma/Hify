@@ -11,7 +11,8 @@ impl MutationRoot {
     async fn generate_index(&self, ctx: &Context<'_>) -> Result<bool, String> {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
 
-        build_index(ctx.app_state.index.read().await.from.clone())
+        // TODO
+        build_index(ctx.app_state.index.read().await.from.clone(), None)
             .map_err(|err| format!("{err:?}"))?;
 
         Ok(true)

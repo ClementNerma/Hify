@@ -1,6 +1,6 @@
 use std::{
     io::{stdout, BufRead, BufReader, Write},
-    path::Path,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{Arc, Mutex},
     time::Instant,
@@ -16,7 +16,9 @@ use crate::index::TrackMetadata;
 
 use super::file::{process_analyzed_file, ExifToolFile};
 
-pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
+pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
+    let original_count = files.len();
+
     let files = files
         .iter()
         .filter_map(|file| {
@@ -46,6 +48,11 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
         })
         .collect::<Result<Vec<_>>>()?;
 
+    println!(
+        "        Ignoring {} non-audio files",
+        original_count - files.len()
+    );
+
     let started = Instant::now();
     let mut previous = 0;
 
@@ -69,7 +76,12 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
         stdout().flush().unwrap();
     };
 
-    print!("Starting analysis...");
+    if files.is_empty() {
+        println!("        Nothing to do!");
+        return Ok(vec![]);
+    }
+
+    print!("        Starting analysis...");
 
     let files_count = u64::try_from(files.len()).unwrap();
 
@@ -181,7 +193,7 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
 
         for (i, analyzed) in parsed_output.0.into_iter().enumerate() {
             match process_analyzed_file(analyzed) {
-                Ok(data) => successes.push(data),
+                Ok(data) => successes.push((files.get(i).unwrap().clone(), data)),
                 Err(err) => {
                     let file = files.get(i).unwrap();
                     eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
@@ -190,6 +202,8 @@ pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
             }
         }
     }
+
+    println!();
 
     let files_count = files.len();
     let results_count = successes.len() + errors.len();

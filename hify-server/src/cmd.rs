@@ -15,5 +15,8 @@ pub struct Command {
     pub user_data_file: PathBuf,
 
     #[clap(short, long)]
+    pub rebuild_index: bool,
+
+    #[clap(short, long)]
     pub no_server: bool,
 }

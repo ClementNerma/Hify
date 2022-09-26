@@ -16,6 +16,7 @@ async fn main() {
         music_dir,
         index_file,
         user_data_file,
+        rebuild_index,
         no_server,
     } = cmd::Command::parse();
 
@@ -29,14 +30,19 @@ async fn main() {
 
     let index = if index_file.is_file() {
         println!("> Loading index from disk...");
-        let index = utils::save::load_index(&index_file).unwrap();
+        let mut index = utils::save::load_index(&index_file).unwrap();
+
+        if rebuild_index {
+            println!("> Rebuilding index as requested...");
+            index = index::build_index(music_dir, Some(index)).unwrap();
+        }
 
         println!("> Done.");
 
         index
     } else {
         println!("> Generating index...");
-        let index = index::build_index(music_dir).unwrap();
+        let index = index::build_index(music_dir, None).unwrap();
         utils::save::save_index(&index_file, &index).unwrap();
         println!("> Index saved on disk.");
 
