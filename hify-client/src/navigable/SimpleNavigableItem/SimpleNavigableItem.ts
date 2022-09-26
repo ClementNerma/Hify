@@ -45,6 +45,10 @@ export class SimpleNavigableItem extends NavigableItem {
       throw new Error('Tried to call unsupported action callback on navigable item')
     }
 
+    if (this.props.disabled) {
+      return null
+    }
+
     return fn() ?? null
   }
 
@@ -101,6 +105,8 @@ export type SimpleNavigableItemCallback = () => NavigableItem | null | void
 export type SimpleNavigableItemProps = {
   position: number | null
   hasFocusPriority: boolean | null
+
+  disabled?: boolean
 
   onFocus?: () => void
   onUnfocus?: () => void

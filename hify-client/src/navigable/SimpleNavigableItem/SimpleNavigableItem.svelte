@@ -11,6 +11,8 @@
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
 
+  export let disabled: SimpleNavigableItemProps['disabled'] = null
+
   export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
   export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
 
