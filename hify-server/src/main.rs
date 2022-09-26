@@ -79,7 +79,9 @@ async fn inner_main() -> Result<()> {
         let server = http::launch(
             index,
             user_data,
-            Box::new(move |index| utils::save::save_index(&index_file, index)),
+            Box::new(move |index| {
+                utils::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
+            }),
         )
         .await
         .context("Failed to launch HTTP server")?;

@@ -13,7 +13,12 @@ impl MutationRoot {
 
         let current = Index::clone(&*ctx.app_state.index.read().await);
 
-        build_index(current.from.clone(), Some(current)).map_err(|err| format!("{err:?}"))?;
+        let index =
+            build_index(current.from.clone(), Some(current)).map_err(|err| format!("{err:?}"))?;
+
+        (ctx.save_index)(&index)?;
+
+        *ctx.app_state.index.write().await = index;
 
         Ok(true)
     }

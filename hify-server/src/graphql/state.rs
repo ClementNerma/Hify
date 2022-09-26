@@ -1,5 +1,3 @@
-use anyhow::Result;
-
 use crate::{http::AppState, index::Index};
 
 pub struct GraphQLContext {
@@ -7,7 +5,7 @@ pub struct GraphQLContext {
     pub save_index: SaveIndexFn,
 }
 
-pub type SaveIndexFn = Box<dyn Fn(&Index) -> Result<()> + Send + Sync + 'static>;
+pub type SaveIndexFn = Box<dyn Fn(&Index) -> Result<(), String> + Send + Sync + 'static>;
 
 impl GraphQLContext {
     pub fn new(app_state: AppState, save_index: SaveIndexFn) -> Self {
