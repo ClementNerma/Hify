@@ -1,0 +1,229 @@
+use std::{
+    io::{stdout, BufRead, BufReader, Write},
+    path::Path,
+    process::{Command, Stdio},
+    sync::{Arc, Mutex},
+    time::Instant,
+};
+
+use anyhow::{anyhow, bail, Context, Result};
+use once_cell::sync::Lazy;
+use pomsky_macro::pomsky;
+use regex::Regex;
+use serde::Deserialize;
+
+use crate::index::TrackMetadata;
+
+use super::file::{process_analyzed_file, ExifToolFile};
+
+pub fn run_on(files: &[impl AsRef<Path>]) -> Result<Vec<TrackMetadata>> {
+    let files = files
+        .iter()
+        .filter_map(|file| {
+            let audio_ext = file
+                .as_ref()
+                .extension()
+                .and_then(|ext| ext.to_str())?
+                .to_ascii_lowercase();
+
+            if matches!(
+                audio_ext.as_str(),
+                "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
+            ) {
+                return Some(Err(anyhow!(
+                    "File format unsupported by web players: {audio_ext}"
+                )));
+            }
+
+            if !matches!(
+                audio_ext.as_str(),
+                "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
+            ) {
+                return None;
+            }
+
+            Some(Ok(file.as_ref().to_path_buf()))
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    let started = Instant::now();
+    let mut previous = 0;
+
+    let display_progress = |elapsed: u64, current: u64, total: u64| {
+        let minutes = elapsed / 60;
+        let seconds = elapsed % 60;
+
+        print!(
+            "\r        Progress: {} / {} ({}%) in {}{}s...",
+            current,
+            total,
+            current * 100 / total,
+            if minutes > 0 {
+                format!("{minutes}m ")
+            } else {
+                String::new()
+            },
+            seconds
+        );
+
+        stdout().flush().unwrap();
+    };
+
+    print!("Starting analysis...");
+
+    let files_count = u64::try_from(files.len()).unwrap();
+
+    const FILES_PER_CHUNK: usize = 100;
+
+    let mut successes = vec![];
+    let mut errors = vec![];
+
+    for (chunk_num, files) in files.chunks(FILES_PER_CHUNK).enumerate() {
+        let chunk_start = u64::try_from(FILES_PER_CHUNK * chunk_num).unwrap();
+
+        let mut handle = Command::new("exiftool")
+            .args(&["-n", "-json", "-progress"])
+            .args(files)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .context("Failed to launch ExifTool")?;
+
+        let stdout_reader = BufReader::new(
+            handle
+                .stdout
+                .take()
+                .context("Failed to get command's STDOUT")?,
+        );
+
+        let stderr_reader = BufReader::new(
+            handle
+                .stderr
+                .take()
+                .context("Failed to get the command's SDTERR")?,
+        );
+
+        let stdout_lines = Arc::new(Mutex::new(vec![]));
+        let stderr_lines = Arc::new(Mutex::new(vec![]));
+
+        let stdout_lines_for_reader = Arc::clone(&stdout_lines);
+        let stderr_lines_for_reader = Arc::clone(&stderr_lines);
+
+        std::thread::spawn(move || {
+            for line in stdout_reader.lines() {
+                match line {
+                    Ok(line) => stdout_lines_for_reader.lock().unwrap().push(line),
+                    Err(err) => {
+                        eprintln!("{err:?}");
+                        // TODO
+                    }
+                }
+            }
+        });
+
+        std::thread::spawn(move || {
+            for line in stderr_reader.lines() {
+                match line {
+                    Ok(line) => match PARSE_PROGRESS_LINE.captures(&line) {
+                        Some(m) => {
+                            let current =
+                                m.name("current").unwrap().as_str().parse::<u64>().unwrap();
+
+                            let elapsed = started.elapsed().as_secs();
+
+                            if elapsed != previous || current == files_count {
+                                previous = elapsed;
+                                display_progress(elapsed, chunk_start + current, files_count);
+                            }
+                        }
+                        None => {
+                            stderr_lines_for_reader.lock().unwrap().push(line);
+                        }
+                    },
+                    Err(err) => {
+                        eprintln!("{err:?}");
+                        // TODO
+                    }
+                }
+            }
+        });
+
+        let status = handle.wait().with_context(|| {
+            format!(
+                "ExifTool failed: {}",
+                stderr_lines.lock().unwrap().join("\n")
+            )
+        })?;
+
+        if !status.success() {
+            bail!(
+                "ExifTool failed: {}",
+                stderr_lines.lock().unwrap().join("\n")
+            );
+        }
+
+        let stdout_lines = stdout_lines.lock().unwrap().join("\n");
+
+        let parsed_output = serde_json::from_str::<ExifToolOutput>(&stdout_lines).map_err(|e| {
+            anyhow!(
+                "Failed to parse ExifTool output: {}\n\n{}",
+                e,
+                stdout_lines
+                    .lines()
+                    .enumerate()
+                    .skip(if e.line() < 15 { 0 } else { e.line() - 15 })
+                    .take(15)
+                    .map(|(i, line)| format!("[{: >5}s] *| {line}", i + 1))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            )
+        })?;
+
+        for (i, analyzed) in parsed_output.0.into_iter().enumerate() {
+            match process_analyzed_file(analyzed) {
+                Ok(data) => successes.push(data),
+                Err(err) => {
+                    let file = files.get(i).unwrap();
+                    eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
+                    errors.push((file, err));
+                }
+            }
+        }
+    }
+
+    let files_count = files.len();
+    let results_count = successes.len() + errors.len();
+
+    if results_count != files_count {
+        bail!(
+            "Found invalid number of results returned by ExifTool: expected {}, found {}",
+            files_count,
+            results_count
+        );
+    }
+
+    if !errors.is_empty() {
+        bail!(
+            "Failed with the following errors:\n\n{}",
+            errors
+                .iter()
+                .map(|(success, err)| format!("* {}: {err:?}", success.to_string_lossy()))
+                .collect::<Vec<_>>()
+                .join("\n")
+        )
+    }
+
+    Ok(successes)
+}
+
+#[derive(Deserialize)]
+pub struct ExifToolOutput(pub Vec<ExifToolFile>);
+
+static PARSE_PROGRESS_LINE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start
+            "======== " Codepoint+ " [" :current([digit]+) "/" [digit]+ "]"
+        End
+    ))
+    .unwrap()
+});
