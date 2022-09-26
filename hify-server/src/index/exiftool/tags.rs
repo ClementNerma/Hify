@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
@@ -38,6 +38,13 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
             .transpose()?,
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
+
+        note: tags
+            .Rating
+            .map(|rating| Ok(Some(rating as u8)))
+            .or_else(|| tags.Popularimeter.map(parse_popularimeter))
+            .transpose()?
+            .flatten(),
     })
 }
 
@@ -87,6 +94,25 @@ fn parse_date(input: &str) -> Result<TrackDate> {
     })
 }
 
+fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
+    let captured = PARSE_MUSICBEE_POPM
+        .captures(popm.as_ref())
+        .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm.as_ref()))?;
+
+    match captured.name("score").unwrap().as_str() {
+        "0" => Ok(None),
+        "1" => Ok(Some(20)),
+        "64" => Ok(Some(40)),
+        "128" => Ok(Some(60)),
+        "196" => Ok(Some(80)),
+        "255" => Ok(Some(100)),
+        score => bail!(
+            "Failed to parse MusicBee score in 'Popularimeter' tag: invalid value {}",
+            score
+        ),
+    }
+}
+
 fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
     tag_content
         .as_ref()
@@ -125,6 +151,12 @@ pub struct ExifToolFileTags {
     PartOfSet: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
+    Popularimeter: Option<String>,
+
+    #[serde(default)]
+    Rating: Option<f64>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
     ReleaseTime: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
@@ -138,8 +170,6 @@ pub struct ExifToolFileTags {
 
     #[serde(default, deserialize_with = "ensure_string")]
     Year: Option<String>,
-    // #[serde(default)]
-    // Popularimeter: Option<String>,
 }
 
 fn ensure_string<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<String>, D::Error> {
@@ -233,6 +263,13 @@ static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
         Start
             :year([digit]{4})
             (';' | End)
+    ))
+    .unwrap()
+});
+
+static PARSE_MUSICBEE_POPM: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start "MusicBee " :score([digit]+) " 0" End
     ))
     .unwrap()
 });

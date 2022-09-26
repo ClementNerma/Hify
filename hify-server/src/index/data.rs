@@ -169,7 +169,8 @@ pub struct TrackTags {
 
     pub date: Option<TrackDate>,
     pub genres: Vec<String>,
-    // pub note: Option<u8>,
+
+    pub note: Option<u8>,
 }
 
 impl TrackTags {
