@@ -4,7 +4,7 @@ query GenrePage($genreId: String!, $pagination: PaginationInput!) {
     name
     albums(pagination: $pagination) {
       nodes {
-        ...Album
+        ...AlbumCard
       }
 
       pageInfo {

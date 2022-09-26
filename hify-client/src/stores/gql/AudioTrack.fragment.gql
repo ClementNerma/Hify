@@ -12,7 +12,7 @@ fragment AudioTrack on Track {
         name
       }
       album {
-        ...Album
+        ...AlbumCard
         year(strategy: $albumYearStrategy)
       }
       disc

@@ -1,4 +1,4 @@
-fragment Album on AlbumInfos {
+fragment AlbumCard on AlbumInfos {
   id
   name
   albumArtists {
