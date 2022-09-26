@@ -10,8 +10,8 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, hasMinimumNote } from '../../utils'
-  import TrackNote from '../../atoms/TrackNote/TrackNote.svelte'
+  import { bind, hasMinimumRating } from '../../utils'
+  import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
 
   export let albumId: string
@@ -31,7 +31,7 @@
   })
 
   function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
-    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumNote(track, 80)) : tracks
+    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 80)) : tracks
   }
 
   let onlyShowGreatSongs = false
@@ -88,9 +88,9 @@
             <tr>
               <td class="trackno">{tags.trackNo}</td>
               <td class="title">{tags.title}</td>
-              <td class="note">
-                {#if tags.note}
-                  <TrackNote note={tags.note} />
+              <td class="rating">
+                {#if tags.rating}
+                  <TrackRating rating={tags.rating} />
                 {/if}
               </td>
             </tr>
