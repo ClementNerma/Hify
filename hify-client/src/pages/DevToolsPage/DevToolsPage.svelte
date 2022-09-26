@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '../../atoms/Button/Button.svelte'
+  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
@@ -8,14 +9,6 @@
 
   let hideDebugLogs = true
 
-  function toggleDebugLogsDisplay() {
-    hideDebugLogs = !hideDebugLogs
-  }
-
-  function toggleDistractionFreeEnabling() {
-    enableDistractionFreeModeFeature.update((set) => !set)
-  }
-
   $: slicedAppLogs = $appLogs.slice(0, 100).filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
 </script>
 
@@ -23,12 +16,13 @@
 
 <NavigableRow>
   <Button onPress={() => location.reload()}>Reload the application</Button>
-  <Button onPress={toggleDebugLogsDisplay}>
-    <input type="checkbox" checked={hideDebugLogs} /> Hide debug logs
-  </Button>
-  <Button onPress={toggleDistractionFreeEnabling}>
-    <input type="checkbox" checked={$enableDistractionFreeModeFeature} /> Enable distraction-free mode
-  </Button>
+  <Checkbox bind:checked={hideDebugLogs}>Hide debug logs</Checkbox>
+  <Checkbox
+    checked={$enableDistractionFreeModeFeature}
+    onChange={(checked) => enableDistractionFreeModeFeature.set(checked)}
+  >
+    Enable distraction-free mode
+  </Checkbox>
 </NavigableRow>
 
 <NavigableList>
