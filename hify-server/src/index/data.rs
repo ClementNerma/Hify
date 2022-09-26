@@ -34,10 +34,10 @@ pub struct IndexCache {
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
 
-    pub genres_tracks: HashMap<String, Vec<TrackID>>,
+    pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
     pub no_genre_tracks: HashSet<TrackID>,
 
-    pub genres_albums: HashMap<String, SortedMap<AlbumID, AlbumInfos>>,
+    pub genres_albums: HashMap<GenreID, SortedMap<AlbumID, AlbumInfos>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -112,6 +112,9 @@ pub struct AlbumID(pub String);
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct ArtistID(pub String);
+
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+pub struct GenreID(pub String);
 
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]

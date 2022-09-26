@@ -3,7 +3,9 @@ use std::{
     path::PathBuf,
 };
 
-use super::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexCache, SortedMap, Track, TrackID};
+use super::{
+    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, IndexCache, SortedMap, Track, TrackID,
+};
 
 // TODO: lots of optimization to perform here
 pub fn build_index_cache(
@@ -21,10 +23,10 @@ pub fn build_index_cache(
     let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
-    let mut genres_tracks = HashMap::<String, Vec<TrackID>>::new();
+    let mut genres_tracks = HashMap::<GenreID, Vec<TrackID>>::new();
     let mut no_genre_tracks = HashSet::new();
 
-    let mut genres_albums = HashMap::<String, BTreeSet<AlbumInfos>>::new();
+    let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
 
     for track in tracks.values() {
         tracks_formats.insert(track.id.clone(), track.metadata.format);
@@ -74,12 +76,12 @@ pub fn build_index_cache(
         } else {
             for genre in &track.metadata.tags.genres {
                 genres_tracks
-                    .entry(genre.clone())
+                    .entry(GenreID(genre.clone()))
                     .or_default()
                     .push(track.id.clone());
 
                 genres_albums
-                    .entry(genre.clone())
+                    .entry(GenreID(genre.clone()))
                     .or_default()
                     .insert(album_infos.clone());
             }
