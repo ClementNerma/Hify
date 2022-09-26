@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { NavigableGridProps } from '../../navigable/NavigableGrid/NavigableGrid'
   import NavigableGrid from '../../navigable/NavigableGrid/NavigableGrid.svelte'
 
   export let columns: number
-  export let lazyLoader: NavigableGrid['$$prop_def']['lazyLoader'] = undefined
+  export let lazyLoader: NavigableGridProps['lazyLoader'] = undefined
 
   const columnsSize = new Array(columns).fill(`${100 / columns}%`).join(' ')
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AsyncGenrePage } from '../../graphql/generated'
+  import { AlbumCardFragment, AsyncGenrePage } from '../../graphql/generated'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
@@ -38,7 +38,7 @@
     albums = [...albums, ...newAlbums]
   }
 
-  let albums: Array<AlbumCard['$$prop_def']['album']> = []
+  let albums: AlbumCardFragment[] = []
   let genreName: string | null = null
   let genreNotFound: boolean | null = null
 </script>

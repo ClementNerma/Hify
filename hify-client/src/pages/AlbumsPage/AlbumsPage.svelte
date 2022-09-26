@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AsyncAlbumsPage } from '../../graphql/generated'
+  import { AlbumCardFragment, AsyncAlbumsPage } from '../../graphql/generated'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
@@ -27,7 +27,7 @@
     albums = [...albums, ...res.data.albums.nodes]
   }
 
-  let albums: Array<AlbumCard['$$prop_def']['album']> = []
+  let albums: AlbumCardFragment[] = []
 </script>
 
 {#await feedMore()}

@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { SimpleNavigableItemProps } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let max: number
   export let value: number | null
   export let onChange: (newValue: number) => void
   export let directionalAmount: number
-  export let onPress: SimpleNavigableItem['$$prop_def']['onPress'] = undefined
+  export let onPress: SimpleNavigableItemProps['onPress'] = undefined
 
   let input: HTMLInputElement
 
