@@ -35,6 +35,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
             albums_artists_albums: HashMap::new(),
             artists_mean_score: HashMap::new(),
+            albums_artists_mean_score: HashMap::new(),
 
             albums_tracks: HashMap::new(),
             albums_mean_score: HashMap::new(),

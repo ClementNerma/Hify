@@ -111,7 +111,7 @@ pub fn build_index_cache(
                 SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
             )
         })
-        .collect();
+        .collect::<HashMap<_, _>>();
 
     let artists_tracks = artists_tracks
         .into_iter()
@@ -183,6 +183,25 @@ pub fn build_index_cache(
         })
         .collect();
 
+    let albums_artists_mean_score = albums_artists_albums
+        .iter()
+        .filter_map(|(artist_id, artist_albums)| {
+            let noted_tracks: Vec<_> = artist_albums
+                .keys()
+                .flat_map(|album_id| albums_tracks.get(album_id).unwrap())
+                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.note)
+                .map(|note| note as f64)
+                .collect();
+
+            if noted_tracks.is_empty() {
+                return None;
+            }
+
+            let mean = noted_tracks.iter().sum::<f64>() / (noted_tracks.len() as f64);
+            Some((artist_id.clone(), mean))
+        })
+        .collect();
+
     IndexCache {
         tracks_paths,
 
@@ -194,6 +213,7 @@ pub fn build_index_cache(
 
         albums_mean_score,
         artists_mean_score,
+        albums_artists_mean_score,
 
         artists_infos: SortedMap::from_hashmap(artists_infos),
         albums_artists_infos: SortedMap::from_hashmap(albums_artists_infos),

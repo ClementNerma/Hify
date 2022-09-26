@@ -49,7 +49,7 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper) -> Feed {
     let popular_artists = dedup_clone(
         popular_tracks
             .iter()
-            .flat_map(|track| track.metadata.tags.get_artists_infos())
+            .flat_map(|track| track.metadata.tags.get_album_artists_infos())
             .collect(),
     );
 
@@ -57,9 +57,10 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper) -> Feed {
         index.cache.albums_infos.get(album_id).unwrap().clone()
     });
 
-    let random_great_artists = get_random_great(&index.cache.artists_mean_score, |artist_id| {
-        index.cache.artists_infos.get(artist_id).unwrap().clone()
-    });
+    let random_great_artists =
+        get_random_great(&index.cache.albums_artists_mean_score, |artist_id| {
+            index.cache.artists_infos.get(artist_id).unwrap().clone()
+        });
 
     Feed {
         last_listened_to,
