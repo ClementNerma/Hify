@@ -1,0 +1,25 @@
+query GenrePage($genreId: String!, $pagination: PaginationInput!) {
+  genre(id: $genreId) {
+    id
+    name
+    albums(pagination: $pagination) {
+      nodes {
+        id
+        name
+        genres {
+          id
+          name
+        }
+        albumArtists {
+          id
+          name
+        }
+      }
+
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}

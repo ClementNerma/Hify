@@ -56,9 +56,9 @@
         <div class="album-genres">
           <NavigableRow>
             {#each album.genres as genre}
-              <SimpleNavigableItem onPress={() => alert("TODO: go to genre's page: " + genre)}>
+              <SimpleNavigableItem onPress={bind(genre.id, (id) => navigate(ROUTES.genre(id)))}>
                 <span class="album-genre">
-                  {genre}
+                  {genre.name}
                 </span>
               </SimpleNavigableItem>
             {/each}

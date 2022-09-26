@@ -22,7 +22,10 @@ fragment AudioTrack on Track {
       }
       disc
       trackNo
-      genres
+      genres {
+        id
+        name
+      }
       date {
         year
         month

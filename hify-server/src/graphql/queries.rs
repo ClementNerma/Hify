@@ -103,17 +103,13 @@ impl QueryRoot {
             .cloned()
     }
 
-    async fn genres(
-        &self,
-        ctx: &Context<'_>,
-        pagination: PaginationInput,
-    ) -> Paginated<GenreID, GenreInfos> {
-        let index = graphql_index!(ctx);
-        paginate(
-            pagination,
-            &index.cache.genre_infos,
-            |genre: &GenreInfos| genre.get_id(),
-        )
+    async fn genres(&self, ctx: &Context<'_>) -> Vec<GenreInfos> {
+        graphql_index!(ctx)
+            .cache
+            .genre_infos
+            .values()
+            .cloned()
+            .collect()
     }
 
     async fn genre(&self, ctx: &Context<'_>, id: String) -> Option<GenreInfos> {

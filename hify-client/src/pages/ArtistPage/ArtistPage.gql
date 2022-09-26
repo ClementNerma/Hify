@@ -7,7 +7,10 @@ query ArtistPage($artistId: String!, $pagination: PaginationInput!, $strategy: A
           id
           name
           hasArtImage
-          genres
+          genres {
+            id
+            name
+          }
           year(strategy: $strategy)
           albumArtists {
             id

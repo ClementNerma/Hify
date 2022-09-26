@@ -18,6 +18,8 @@
   import NowPlaying from './pages/NowPlayingPage/NowPlayingPage.svelte'
   import SearchPage from './pages/SearchPage/SearchPage.svelte'
   import DevToolsPage from './pages/DevToolsPage/DevToolsPage.svelte'
+  import GenresPage from './pages/GenresPage/GenresPage.svelte'
+  import GenrePage from './pages/GenrePage/GenrePage.svelte'
 </script>
 
 <Router primary={false}>
@@ -34,12 +36,20 @@
       <ArtistsPage />
     </Route>
 
+    <Route path={ROUTES.genres}>
+      <GenresPage />
+    </Route>
+
     <Route path={ROUTES.album(':id')} let:params>
       <AlbumPage albumId={params['id']} />
     </Route>
 
     <Route path={ROUTES.artist(':id')} let:params>
       <ArtistPage artistId={params['id']} />
+    </Route>
+
+    <Route path={ROUTES.genre(':id')} let:params>
+      <GenrePage genreId={params['id']} />
     </Route>
 
     <Route path={ROUTES.history}>

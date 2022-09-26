@@ -2,7 +2,10 @@ query AlbumPage($albumId: String!, $albumYearStrategy: AlbumYearStrategy!) {
   album(id: $albumId) {
     name
     year(strategy: $albumYearStrategy)
-    genres
+    genres {
+      id
+      name
+    }
     albumArtists {
       id
       name
