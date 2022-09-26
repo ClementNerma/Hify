@@ -1,9 +1,27 @@
 query HomePage {
-  indexInfos {
-    fingerprint
-    albumsCount
-    albumsArtistsCount
-    artistsCount
-    tracksCount
+  generateFeed {
+    lastListenedTo {
+      ...AudioTrack
+    }
+
+    popularTracks {
+      ...AudioTrack
+    }
+
+    popularAlbums {
+      ...AlbumCard
+    }
+
+    popularArtists {
+      ...ArtistCard
+    }
+
+    randomGreatAlbums {
+      ...AlbumCard
+    }
+
+    randomGreatArtists {
+      ...ArtistCard
+    }
   }
 }
