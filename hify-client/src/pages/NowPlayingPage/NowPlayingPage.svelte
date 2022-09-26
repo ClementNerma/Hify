@@ -24,7 +24,7 @@
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
 {:else}
   <img
-    class="album-art {$readableDistractionFreeMode ? 'centered' : ''}"
+    class="album-art {!$readableDistractionFreeMode ? 'darkened' : ''}"
     width={$readableDistractionFreeMode ? '' : 250}
     height={$readableDistractionFreeMode ? '' : 250}
     src={getAlbumArtUri($currentTrack.metadata.tags.album.id)}
@@ -59,5 +59,11 @@
 
     -o-object-fit: contain;
     object-fit: contain;
+
+    transition: opacity 0.5s;
+  }
+
+  .album-art.darkened {
+    opacity: 0.5;
   }
 </style>
