@@ -39,7 +39,7 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
 
-        note: tags
+        rating: tags
             .Rating
             .map(|rating| Ok(Some(rating as u8)))
             .or_else(|| tags.Popularimeter.map(parse_popularimeter))

@@ -171,7 +171,7 @@ pub struct TrackTags {
     #[graphql(skip)]
     pub genres: Vec<String>,
 
-    pub note: Option<u8>,
+    pub rating: Option<u8>,
 }
 
 impl TrackTags {
