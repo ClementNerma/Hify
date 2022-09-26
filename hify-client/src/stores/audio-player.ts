@@ -103,11 +103,14 @@ export function replayTrack() {
   setPlayingAudioProgress(0)
 }
 
-export function stopAudioPlayer(justPause = false) {
+export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
   const player = get(audioPlayer)
 
   if (!player) {
-    logWarn('Tried to stop audio playback while no audio is playing')
+    if (!ignoreNoPlayer) {
+      logWarn('Tried to stop audio playback while no audio is playing')
+    }
+
     return
   }
 
@@ -134,4 +137,4 @@ export function humanReadableDuration(seconds: number): string {
   return `${hoursPrefix}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
 }
 
-document.addEventListener('visibilitychange', () => stopAudioPlayer(true))
+document.addEventListener('visibilitychange', () => stopAudioPlayer(true, true))
