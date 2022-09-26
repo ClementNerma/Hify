@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use anyhow::{Context as _, Result};
-use async_graphql::{ComplexObject, Context, Enum, Object, SimpleObject};
+use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
@@ -232,7 +232,7 @@ impl AlbumInfos {
             .collect()
     }
 
-    async fn year(&self, ctx: &Context<'_>, strategy: AlbumYearStrategy) -> Option<i32> {
+    async fn year(&self, ctx: &Context<'_>) -> Option<i32> {
         let index = graphql_index!(ctx);
         let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
         let years: Vec<_> = album_tracks
@@ -243,15 +243,19 @@ impl AlbumInfos {
 
         let first_track_year = *years.first()?;
 
-        if years.iter().all(|year| *year == first_track_year) {
-            return Some(first_track_year);
-        }
+        Some(first_track_year)
 
-        match strategy {
-            AlbumYearStrategy::IdenticalOnly => None,
-            AlbumYearStrategy::IdenticalOrFirstTrack => Some(first_track_year),
-            AlbumYearStrategy::IdenticalOrLowestYear => Some(*years.iter().min().unwrap()),
-        }
+        // TODO: make it configurable with *global* options
+        //
+        // if years.iter().all(|year| *year == first_track_year) {
+        //     return Some(first_track_year);
+        // }
+        //
+        // match strategy {
+        //     AlbumYearStrategy::IdenticalOnly => None,
+        //     AlbumYearStrategy::IdenticalOrFirstTrack => Some(first_track_year),
+        //     AlbumYearStrategy::IdenticalOrLowestYear => Some(*years.iter().min().unwrap()),
+        // }
     }
 
     async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<GenreInfos> {
@@ -280,13 +284,13 @@ impl AlbumInfos {
     }
 }
 
-#[derive(Enum, Clone, Copy, PartialEq, Eq)]
-#[allow(clippy::enum_variant_names)]
-pub enum AlbumYearStrategy {
-    IdenticalOnly,
-    IdenticalOrFirstTrack,
-    IdenticalOrLowestYear,
-}
+// #[derive(Enum, Clone, Copy, PartialEq, Eq)]
+// #[allow(clippy::enum_variant_names)]
+// pub enum AlbumYearStrategy {
+//     IdenticalOnly,
+//     IdenticalOrFirstTrack,
+//     IdenticalOrLowestYear,
+// }
 
 #[Object]
 impl ArtistInfos {
