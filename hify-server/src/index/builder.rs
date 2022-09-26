@@ -4,7 +4,7 @@ use std::{
     collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     path::{Path, PathBuf},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
 
@@ -17,13 +17,8 @@ use super::{
     IndexCache,
 };
 
-pub fn log(time: SystemTime, message: &str) {
-    let elapsed = match time.elapsed() {
-        Ok(time) => time.as_secs().to_string(),
-        Err(_) => "?".to_string(),
-    };
-
-    println!("[{: >4}s] {message}", elapsed);
+pub fn log(time: Instant, message: &str) {
+    println!("[{: >4}s] {message}", time.elapsed().as_secs());
 }
 
 pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
@@ -48,7 +43,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         },
     });
 
-    let started = SystemTime::now();
+    let started = Instant::now();
 
     log(started, "Looking for audio files...");
 
