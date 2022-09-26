@@ -271,7 +271,7 @@ fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 }
 
 fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32> {
-    PARSE_DISC_NUMBER
+    PARSE_TRACK_OR_DISC_NUMBER
         .captures(input)
         .with_context(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
@@ -432,11 +432,11 @@ fn decode_value_as_string(value: Value) -> Result<Option<String>, String> {
     }
 }
 
-static PARSE_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
+static PARSE_TRACK_OR_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
     Regex::new(pomsky!(
         Start
             :number([digit]+)
-            ("/" [digit]+)?
+            (("/" | " of ") [digit]+)?
         End
     ))
     .unwrap()
