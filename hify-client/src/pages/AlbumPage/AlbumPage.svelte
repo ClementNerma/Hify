@@ -3,7 +3,7 @@
 
   import { ROUTES } from '../../routes'
   import { getAlbumArtUri } from '../../rest-api'
-  import { AsyncAlbumPage } from '../../graphql/generated'
+  import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
@@ -29,6 +29,10 @@
 
     return album
   })
+
+  function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
+    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumNote(track, 80)) : tracks
+  }
 
   let onlyShowGreatSongs = false
 </script>
@@ -75,7 +79,7 @@
   <NavigableList>
     <table>
       <tbody>
-        {#each album.tracks.filter((track) => (!onlyShowGreatSongs ? track : hasMinimumNote(track, 80))) as track}
+        {#each filterTracks(album.tracks, onlyShowGreatSongs) as track (track.id)}
           {@const tags = track.metadata.tags}
 
           <NavigableTrack transparent={true} tracks={album.tracks} goToAlbumOption={false} {track}>
