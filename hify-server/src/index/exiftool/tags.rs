@@ -101,16 +101,23 @@ fn parse_date(input: &str) -> Result<TrackDate> {
 }
 
 fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
+    let popm = popm.as_ref();
+
     let captured = PARSE_MUSICBEE_WMP_POPM
-        .captures(popm.as_ref())
-        .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm.as_ref()))?;
+        .captures(popm)
+        .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm))?;
 
     match captured.name("score").unwrap().as_str() {
         "0" => Ok(None),
         "1" => Ok(Some(20)),
+        "13" => Ok(Some(10)),
+        "54" => Ok(Some(30)),
         "64" => Ok(Some(40)),
+        "118" => Ok(Some(50)),
         "128" => Ok(Some(60)),
+        "186" => Ok(Some(70)),
         "196" => Ok(Some(80)),
+        "242" => Ok(Some(90)),
         "255" => Ok(Some(100)),
         score => bail!(
             "Failed to parse score in 'Popularimeter' tag: invalid value {}",
