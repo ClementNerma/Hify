@@ -4,28 +4,17 @@
   export let checked = false
   export let onChange: ((checked: boolean) => void) | null = null
 
+  export let fullHeight = false
+
   function onPress() {
     checked = !checked
     onChange?.(checked)
   }
 </script>
 
-<Button {onPress}>
-  <div class="container">
-    <input type="checkbox" {checked} />
-    <span class="label">
-      <slot />
-    </span>
-  </div>
+<Button {onPress} {fullHeight}>
+  <input type="checkbox" {checked} />
+  <span class="label">
+    <slot />
+  </span>
 </Button>
-
-<style>
-  .container {
-    display: flex;
-    align-items: center;
-  }
-
-  .label {
-    margin-left: 5px;
-  }
-</style>

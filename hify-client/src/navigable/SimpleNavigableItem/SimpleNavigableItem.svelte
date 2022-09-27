@@ -6,7 +6,6 @@
 
   export let transparent = false
   export let displayBlock = false
-  export let style: string | undefined = undefined
 
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
@@ -98,7 +97,6 @@
   class:mouseHover
   class:transparent
   class:displayBlock
-  {style}
 >
   <slot {item} requestFocus={() => item.requestFocus()} />
 </navigable-item-wrapper>
