@@ -49,7 +49,7 @@
   <div class="container">
     <NavigableList>
       <div class="header">
-        <img class="art" width={256} height={256} src={getAlbumArtUri(albumId)} alt="" />
+        <img class="art" width={192} height={192} src={getAlbumArtUri(albumId)} alt="" />
 
         <div class="infos">
           <div class="name">
