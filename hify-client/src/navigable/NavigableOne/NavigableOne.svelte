@@ -11,6 +11,7 @@
 
   const nav = getParentNavigable()
   const one = new NavigableOne(nav, position, hasFocusPriority)
+  one.onFocusChangeCallback = whenFocusChanges
 
   nav.append(one)
 
