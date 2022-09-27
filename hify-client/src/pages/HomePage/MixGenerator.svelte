@@ -10,6 +10,7 @@
       variables: {
         input: {},
       },
+      fetchPolicy: 'no-cache',
     })
 
     if (mix.data.generateMix) {
