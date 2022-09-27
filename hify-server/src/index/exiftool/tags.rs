@@ -21,6 +21,7 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         disc: tags
             .Discnumber
+            .or(tags.DiscNumber)
             .or(tags.PartOfSet)
             .map(|value| parse_set_number(&value, "disc number"))
             .transpose()?,
@@ -156,6 +157,9 @@ pub struct ExifToolFileTags {
 
     #[serde(default, deserialize_with = "ensure_string")]
     Discnumber: Option<String>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
+    DiscNumber: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
     Genre: Option<String>,
