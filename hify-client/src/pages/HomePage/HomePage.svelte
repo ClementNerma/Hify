@@ -19,31 +19,31 @@
 {#await feed}
   <h1>Loading...</h1>
 {:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
-  <h2>Tracks you like to listen to:</h2>
+  <h3>Tracks you like to listen to:</h3>
 
   <TracksRow tracks={popularTracks} />
 
-  <h2>Last songs you listened to:</h2>
+  <h3>Last songs you listened to:</h3>
 
   <TracksRow tracks={lastListenedTo} />
 
-  <h2>Albums you like to listen to:</h2>
+  <h3>Albums you like to listen to:</h3>
 
   <AlbumsRow albums={popularAlbums} />
 
-  <h2>Artists you like to listen to:</h2>
+  <h3>Artists you like to listen to:</h3>
 
   <ArtistsRow artists={popularArtists} />
 
-  <h2>Random great albums:</h2>
+  <h3>Random great albums:</h3>
 
   <AlbumsRow albums={randomGreatAlbums} />
 
-  <h2>Random great artists:</h2>
+  <h3>Random great artists:</h3>
 
   <ArtistsRow artists={randomGreatArtists} />
 
-  <h2>Tools</h2>
+  <h3>Tools</h3>
 
   <Row>
     <IndexUpdater />
