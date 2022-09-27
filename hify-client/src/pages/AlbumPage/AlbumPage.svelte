@@ -16,6 +16,7 @@
   import Button from '../../atoms/Button/Button.svelte'
   import Emoji from '../../atoms/Emoji/Emoji.svelte'
   import { queueAsNext } from '../../stores/play-queue'
+  import Row from '../../atoms/Row/Row.svelte'
 
   export let albumId: string
 
@@ -85,10 +86,10 @@
             </NavigableRow>
           </div>
 
-          <div class="actions">
+          <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
             <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
-          </div>
+          </Row>
         </div>
       </div>
     </NavigableList>
@@ -141,10 +142,6 @@
   .infos .name {
     font-size: 2rem;
     font-weight: bold;
-  }
-
-  .actions {
-    display: flex;
   }
 
   table {
