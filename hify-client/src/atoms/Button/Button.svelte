@@ -6,14 +6,15 @@
 </script>
 
 <SimpleNavigableItem transparent {onPress} {disabled}>
-  <p class="button {disabled ? 'disabled' : ''}">
+  <span class="button {disabled ? 'disabled' : ''}">
     <slot />
-  </p>
+  </span>
 </SimpleNavigableItem>
 
 <style>
   .button {
     display: inline-block;
+    width: fit-content;
     padding: 5px;
     margin: 5px;
     border: 1px solid white;
