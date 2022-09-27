@@ -13,6 +13,9 @@
   import { bind, hasMinimumRating } from '../../utils'
   import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
+  import Button from '../../atoms/Button/Button.svelte'
+  import Emoji from '../../atoms/Emoji/Emoji.svelte'
+  import { queueAsNext } from '../../stores/play-queue'
 
   export let albumId: string
 
@@ -82,7 +85,10 @@
             </NavigableRow>
           </div>
 
-          <Checkbox bind:checked={onlyShowGreatSongs}>Only show great songs</Checkbox>
+          <div class="actions">
+            <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
+            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
+          </div>
         </div>
       </div>
     </NavigableList>
@@ -135,6 +141,10 @@
   .infos .name {
     font-size: 2rem;
     font-weight: bold;
+  }
+
+  .actions {
+    display: flex;
   }
 
   table {
