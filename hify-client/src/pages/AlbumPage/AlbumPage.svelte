@@ -131,7 +131,13 @@
               {#each disc.tracks as track, i (track.id)}
                 {@const tags = track.metadata.tags}
 
-                <NavigableTrack position={i} transparent tracks={disc.tracks} goToAlbumOption={false} {track}>
+                <NavigableTrack
+                  position={filteredTracks.indexOf(track)}
+                  transparent
+                  tracks={filteredTracks}
+                  goToAlbumOption={false}
+                  {track}
+                >
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>
