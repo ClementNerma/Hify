@@ -11,6 +11,21 @@
 </script>
 
 <Button {onPress}>
-  <input type="checkbox" {checked} />
-  <slot />
+  <div class="container">
+    <input type="checkbox" {checked} />
+    <span class="label">
+      <slot />
+    </span>
+  </div>
 </Button>
+
+<style>
+  .container {
+    display: flex;
+    align-items: center;
+  }
+
+  .label {
+    margin-left: 5px;
+  }
+</style>
