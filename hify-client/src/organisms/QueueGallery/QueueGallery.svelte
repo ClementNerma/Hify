@@ -7,7 +7,7 @@
 {#if $readablePlayQueue && $queuePosition !== null}
   <NavigableRow>
     <div class="queue-gallery">
-      {#each $readablePlayQueue.tracks as track (track.id)}
+      {#each $readablePlayQueue.tracks as track (track.idInQueue)}
         <QueueGalleryTrack
           isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
           position={$readablePlayQueue.tracks.indexOf(track)}

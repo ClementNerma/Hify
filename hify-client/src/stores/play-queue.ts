@@ -4,9 +4,11 @@ import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer }
 import { logFatal, logInfo, logWarn } from './debugger'
 
 type PlayQueue = {
-  tracks: AudioTrackFragment[]
+  tracks: QueuedTrack[]
   position: number | null
 }
+
+type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
 
 const playQueue = writable<PlayQueue>({
   tracks: [],
@@ -18,6 +20,10 @@ export const currentTrack = derived(playQueue, ({ tracks, position }) => positio
 export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
+
+function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
+  return { ...track, idInQueue: Math.random().toString() }
+}
 
 export async function playTrackFromFetchableQueue(tracksIds: string[], position: number): Promise<void> {
   if (!tracksIds[position]) {
@@ -34,12 +40,12 @@ export async function playTrackFromFetchableQueue(tracksIds: string[], position:
 }
 
 export async function playNewQueueFromBeginning(tracks: AudioTrackFragment[]): Promise<void> {
-  playQueue.set({ tracks, position: 0 })
+  playQueue.set({ tracks: tracks.map(makeQueuedTrack), position: 0 })
   startAudioPlayer(tracks[0], playNextTrack)
 }
 
 export async function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number): Promise<void> {
-  playQueue.set({ tracks, position })
+  playQueue.set({ tracks: tracks.map(makeQueuedTrack), position })
   startAudioPlayer(tracks[position], playNextTrack)
 }
 
@@ -116,10 +122,10 @@ export function queueAsNext(list: AudioTrackFragment[]): void {
       position,
       tracks:
         position === null
-          ? list
+          ? list.map(makeQueuedTrack)
           : tracks
               .slice(0, position + 1)
-              .concat(list)
+              .concat(list.map(makeQueuedTrack))
               .concat(tracks.slice(position + 1)),
     }
   })
