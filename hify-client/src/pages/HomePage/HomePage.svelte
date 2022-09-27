@@ -7,10 +7,16 @@
   import IndexUpdater from './IndexUpdater.svelte'
   import MixGenerator from './MixGenerator.svelte'
 
-  const indexInfos = AsyncHomePage({ variables: {}, fetchPolicy: 'no-cache' }).then((res) => res.data.generateFeed)
+  const feed = AsyncHomePage({
+    variables: {
+      input: {},
+    },
+
+    fetchPolicy: 'no-cache',
+  }).then((res) => res.data.generateFeed)
 </script>
 
-{#await indexInfos}
+{#await feed}
   <h1>Loading...</h1>
 {:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
   <h2>Tracks you like to listen to:</h2>

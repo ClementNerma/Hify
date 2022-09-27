@@ -6,7 +6,11 @@
   import { playNewQueueFromBeginning } from '../../stores/play-queue'
 
   async function generateAndPlayMix() {
-    const mix = await AsyncMixGenerator({ variables: {} })
+    const mix = await AsyncMixGenerator({
+      variables: {
+        input: {},
+      },
+    })
 
     if (mix.data.generateMix) {
       playNewQueueFromBeginning(mix.data.generateMix)
