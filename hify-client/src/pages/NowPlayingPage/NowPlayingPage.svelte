@@ -10,7 +10,7 @@
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
 
-  setupDistractionFreeListener(
+  const setDistractionFree = setupDistractionFreeListener(
     3000,
     ['MediaPlayPause', 'MediaRewind', 'MediaFastForward'],
     () => $readableAudioPaused === false,
@@ -18,6 +18,8 @@
 
   onMount(() => blackBackground.set(true))
   onDestroy(() => blackBackground.set(false))
+
+  currentTrack.subscribe(() => setDistractionFree(false))
 </script>
 
 {#if !$currentTrack}
