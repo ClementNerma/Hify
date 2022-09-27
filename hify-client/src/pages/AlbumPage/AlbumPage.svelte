@@ -52,9 +52,11 @@
             {album.name}
           </div>
 
-          <div class="year">
-            <span class="year" data-item-like-style>🕒 {album.year ?? '?'}</span>
-          </div>
+          {#if album.year}
+            <div>
+              <span class="year" data-item-like-style>🕒 {album.year ?? '?'}</span>
+            </div>
+          {/if}
 
           <div class="artists">
             <NavigableRow>
