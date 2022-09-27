@@ -135,6 +135,7 @@
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>
+                    <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
                     <td class="rating">
                       {#if tags.rating}
                         <TrackRating rating={tags.rating} />
@@ -198,5 +199,9 @@
 
   td.title {
     width: 100%;
+  }
+
+  td.duration {
+    text-align: right;
   }
 </style>
