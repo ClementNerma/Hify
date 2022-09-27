@@ -66,6 +66,7 @@ export function setupDistractionFreeListener(
 
   onDestroy(() => {
     destroyed = true
+    _distractionFreeMode.set(false)
     resetDistractionFreeMode()
   })
 
