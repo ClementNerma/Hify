@@ -122,8 +122,9 @@
 
 <style>
   .container {
-    margin-left: 10%;
-    width: 80%;
+    margin-top: 10%;
+    margin-left: 15%;
+    width: 70%;
   }
 
   .header {
@@ -145,6 +146,7 @@
   }
 
   table {
+    margin-top: 10px;
     width: 100%;
     border-collapse: collapse;
   }
