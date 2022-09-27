@@ -10,7 +10,7 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, hasMinimumRating } from '../../utils'
+  import { bind, dedup, filterMap, hasMinimumRating, isDefined } from '../../utils'
   import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Button from '../../atoms/Button/Button.svelte'
@@ -22,9 +22,20 @@
   export let albumId: string
 
   function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
+    const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
+      number: num.toString(),
+      tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+    }))
+
+    const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
+
+    if (tracksWithoutDisc.length > 0) {
+      discs.unshift({ number: '?', tracks: tracksWithoutDisc })
+    }
+
     return {
       totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x),
-      discs: Math.max(...filteredTracks.map((track) => track.metadata.tags.disc ?? 1)),
+      discs,
     }
   }
 
@@ -96,7 +107,8 @@
           </div>
 
           <div class="length" data-item-like-style>
-            ⌛ {humanReadableDuration(totalDuration)} / {filteredTracks.length} track(s) {#if discs > 1}/ {discs} discs{/if}
+            ⌛ {humanReadableDuration(totalDuration)} / {filteredTracks.length} track(s) {#if discs.length > 1}/ {discs.length}
+              discs{/if}
           </div>
 
           <Row>
@@ -108,25 +120,31 @@
     </NavigableList>
 
     <NavigableList>
-      <table>
-        <tbody>
-          {#each filteredTracks as track, i (track.id)}
-            {@const tags = track.metadata.tags}
+      {#each discs as disc (disc.number)}
+        {#if discs.length > 1}
+          <h2>Disc {disc.number}</h2>
+        {/if}
 
-            <NavigableTrack position={i} transparent tracks={filteredTracks} goToAlbumOption={false} {track}>
-              <tr class:notFirst={i !== 0}>
-                <td class="trackno">{tags.trackNo}</td>
-                <td class="title">{tags.title}</td>
-                <td class="rating">
-                  {#if tags.rating}
-                    <TrackRating rating={tags.rating} />
-                  {/if}
-                </td>
-              </tr>
-            </NavigableTrack>
-          {/each}
-        </tbody>
-      </table>
+        <table>
+          <tbody>
+            {#each disc.tracks as track, i (track.id)}
+              {@const tags = track.metadata.tags}
+
+              <NavigableTrack position={i} transparent tracks={disc.tracks} goToAlbumOption={false} {track}>
+                <tr class:notFirst={i !== 0}>
+                  <td class="trackno">{tags.trackNo}</td>
+                  <td class="title">{tags.title}</td>
+                  <td class="rating">
+                    {#if tags.rating}
+                      <TrackRating rating={tags.rating} />
+                    {/if}
+                  </td>
+                </tr>
+              </NavigableTrack>
+            {/each}
+          </tbody>
+        </table>
+      {/each}
     </NavigableList>
   </div>
 {:catch e}

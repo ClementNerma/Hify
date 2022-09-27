@@ -21,3 +21,25 @@ export function hasMinimumRating(track: AudioTrackFragment, min: number): boolea
   const rating = track.metadata.tags.rating
   return rating !== null && rating !== undefined && rating >= min
 }
+
+export function filterMap<T, U>(array: T[], track: (value: T) => U | null | undefined): U[] {
+  const out: U[] = []
+
+  for (const item of array) {
+    const mapped = track(item)
+
+    if (mapped !== null && mapped !== undefined) {
+      out.push(mapped)
+    }
+  }
+
+  return out
+}
+
+export function dedup<T>(array: T[]): T[] {
+  return [...new Set(array)]
+}
+
+export function isDefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}
