@@ -3,7 +3,7 @@
 
   import { ROUTES } from '../../routes'
   import { getAlbumArtUri } from '../../rest-api'
-  import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
+  import { AlbumInfos, AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
@@ -17,8 +17,16 @@
   import Emoji from '../../atoms/Emoji/Emoji.svelte'
   import { queueAsNext } from '../../stores/play-queue'
   import Row from '../../atoms/Row/Row.svelte'
+  import { humanReadableDuration } from '../../stores/audio-player'
 
   export let albumId: string
+
+  function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
+    return {
+      totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x),
+      discs: Math.max(...filteredTracks.map((track) => track.metadata.tags.disc ?? 1)),
+    }
+  }
 
   const album = AsyncAlbumPage({
     variables: {
@@ -45,6 +53,7 @@
   <h2>Loading...</h2>
 {:then album}
   {@const filteredTracks = filterTracks(album.tracks, onlyShowGreatSongs)}
+  {@const { totalDuration, discs } = getAlbumInfos(filteredTracks)}
 
   <div class="container">
     <NavigableList>
@@ -84,6 +93,10 @@
                 </SimpleNavigableItem>
               {/each}
             </NavigableRow>
+          </div>
+
+          <div class="length" data-item-like-style>
+            ⌛ {humanReadableDuration(totalDuration)} / {filteredTracks.length} track(s) {#if discs > 1}/ {discs} discs{/if}
           </div>
 
           <Row>
