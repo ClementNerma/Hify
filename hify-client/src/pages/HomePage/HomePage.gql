@@ -1,5 +1,5 @@
 query HomePage {
-  generateFeed {
+  generateFeed(input: {}) {
     lastListenedTo {
       ...AudioTrack
     }
