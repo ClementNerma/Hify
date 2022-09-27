@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte'
-import { get, writable } from 'svelte/store'
+import { get, Writable, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
 import { handleInput, registerLongPressableKeys, REMAPPED_KEYS } from './input-manager'
 
@@ -27,15 +27,31 @@ export enum NavigationComingFrom {
 export type OnFocusChangeCallback = (isFocused: boolean) => void
 
 export abstract class NavigableCommon {
+  readonly parent: NavigableContainer
   readonly identity: symbol
   readonly page: NavigablePage
+
+  protected focused = writable(false)
+
   public onFocusChangeCallback: OnFocusChangeCallback | null = null
 
   constructor(
-    readonly parent: NavigableContainer,
+    parent: NavigableContainer | symbol,
     public position: number | null,
     public hasFocusPriority: boolean | null,
   ) {
+    if (!(parent instanceof NavigableContainer)) {
+      if (parent !== PAGE_CTR_TOKEN) {
+        throw new Error('Invalid page construction token provided!')
+      }
+
+      this.parent = undefined as any
+      this.identity = undefined as any
+      this.page = undefined as any
+      return
+    }
+
+    this.parent = parent
     this.identity = parent.identity
     this.page = parent.page
   }
@@ -168,22 +184,13 @@ export abstract class NavigableItem extends NavigableCommon {
   }
 }
 
-interface _NavigableContainerLike extends NavigableContainer {
-  readonly identity: symbol
+class NavigablePage extends NavigableContainer {
+  override readonly identity: symbol
+  override readonly page: NavigablePage
+  override readonly parent: NavigableContainer
 
-  // Required to ensure compatibility
-  asContainer(): NavigableContainer
-}
-
-class NavigablePage implements _NavigableContainerLike {
-  readonly identity = Symbol()
-  readonly page: NavigablePage
   readonly priorityFocusables: NavigableItem[] = []
-  readonly position = null
-  readonly hasFocusPriority = null
   readonly ordered = false
-
-  public onFocusChangeCallback: ((isFocused: boolean) => void) | null = null
 
   private onlyChild: Navigable | null = null
 
@@ -191,11 +198,19 @@ class NavigablePage implements _NavigableContainerLike {
     private readonly onRequestFocus: (item: NavigableItem) => void,
     private readonly getFocusedItem: () => NavigableItem | null,
   ) {
+    super(PAGE_CTR_TOKEN, null, null)
+
+    this.identity = Symbol()
     this.page = this
+    this.parent = this
   }
 
-  get parent(): NavigableContainer {
-    throw new Error("Cannot access parent from the page's root component")
+  override canHandleAction(_: NavigationAction): boolean {
+    return false
+  }
+
+  override handleAction(_: NavigationAction): NavigableItem | null {
+    throw new Error('Tried to make the navigable page component handle an action')
   }
 
   append(navigable: Navigable): void {
@@ -222,7 +237,7 @@ class NavigablePage implements _NavigableContainerLike {
     this.onlyChild = null
   }
 
-  navigate(_: NavigableContainer, __: NavigationDirection): NavigableItem | null {
+  navigate(_: Navigable, __: NavigationDirection): NavigableItem | null {
     return null
   }
 
@@ -232,14 +247,6 @@ class NavigablePage implements _NavigableContainerLike {
 
   navigateToLastItem(): NavigableItem | null {
     return this.onlyChild ? this.onlyChild.navigateToLastItem() : null
-  }
-
-  canHandleAction(_: NavigationAction): boolean {
-    return false
-  }
-
-  handleAction(_: NavigationAction): NavigableItem | null {
-    throw new Error('Tried to make the navigable page component handle an action')
   }
 
   requestFocus(): boolean {
@@ -510,6 +517,7 @@ export type Navigable = NavigableContainer | NavigableItem
 
 const NAVIGATION_CTX = Symbol()
 const NAVIGABLE_ITEM_DETECTION_CTX = Symbol()
+const PAGE_CTR_TOKEN = Symbol()
 
 type NavState = {
   page: NavigablePage
