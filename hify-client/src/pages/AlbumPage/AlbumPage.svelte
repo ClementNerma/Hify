@@ -135,12 +135,12 @@
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>
-                    <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
                     <td class="rating">
                       {#if tags.rating}
                         <TrackRating rating={tags.rating} />
                       {/if}
                     </td>
+                    <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
                   </tr>
                 </NavigableTrack>
               {/each}
