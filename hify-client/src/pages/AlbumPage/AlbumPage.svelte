@@ -125,25 +125,27 @@
           <h2>Disc {disc.number}</h2>
         {/if}
 
-        <table>
-          <tbody>
-            {#each disc.tracks as track, i (track.id)}
-              {@const tags = track.metadata.tags}
+        <NavigableList>
+          <table>
+            <tbody>
+              {#each disc.tracks as track, i (track.id)}
+                {@const tags = track.metadata.tags}
 
-              <NavigableTrack position={i} transparent tracks={disc.tracks} goToAlbumOption={false} {track}>
-                <tr class:notFirst={i !== 0}>
-                  <td class="trackno">{tags.trackNo}</td>
-                  <td class="title">{tags.title}</td>
-                  <td class="rating">
-                    {#if tags.rating}
-                      <TrackRating rating={tags.rating} />
-                    {/if}
-                  </td>
-                </tr>
-              </NavigableTrack>
-            {/each}
-          </tbody>
-        </table>
+                <NavigableTrack position={i} transparent tracks={disc.tracks} goToAlbumOption={false} {track}>
+                  <tr class:notFirst={i !== 0}>
+                    <td class="trackno">{tags.trackNo}</td>
+                    <td class="title">{tags.title}</td>
+                    <td class="rating">
+                      {#if tags.rating}
+                        <TrackRating rating={tags.rating} />
+                      {/if}
+                    </td>
+                  </tr>
+                </NavigableTrack>
+              {/each}
+            </tbody>
+          </table>
+        </NavigableList>
       {/each}
     </NavigableList>
   </div>
