@@ -10,7 +10,7 @@ use crate::{
         IndexSearchResults, SortedMap, Track, TrackID, TrackTags,
     },
     library::{
-        feed::{self, Feed},
+        feed::{self, Feed, FeedParams},
         mixer::{self, MixerParams},
     },
     transparent_cursor_type,
@@ -165,8 +165,8 @@ impl QueryRoot {
         Ok(search_index(&index, &mut search_cache, &input, limit))
     }
 
-    async fn generate_feed(&self, ctx: &Context<'_>) -> Feed {
-        feed::generate_feed(&*graphql_index!(ctx), &*graphql_user_data!(ctx))
+    async fn generate_feed(&self, ctx: &Context<'_>, input: FeedParams) -> Feed {
+        feed::generate_feed(&*graphql_index!(ctx), &*graphql_user_data!(ctx), input)
     }
 
     async fn generate_mix(&self, ctx: &Context<'_>, input: MixerParams) -> Vec<Track> {

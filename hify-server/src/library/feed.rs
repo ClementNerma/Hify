@@ -3,7 +3,7 @@ use std::{
     hash::Hash,
 };
 
-use async_graphql::SimpleObject;
+use async_graphql::{InputObject, SimpleObject};
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
@@ -21,21 +21,27 @@ pub struct Feed {
     random_great_artists: Vec<ArtistInfos>,
 }
 
-static ITEMS: usize = 10;
-static GREAT_THRESOLD: f64 = 80.0;
+#[derive(InputObject)]
+pub struct FeedParams {
+    min_rating: Option<f64>,
+    max_items: Option<u8>,
+}
 
-pub fn generate_feed(index: &Index, user_data: &UserDataWrapper) -> Feed {
+pub fn generate_feed(index: &Index, user_data: &UserDataWrapper, params: FeedParams) -> Feed {
+    let min_rating = params.min_rating.unwrap_or(80.0);
+    let max_items = usize::from(params.max_items.unwrap_or(50));
+
     let last_listened_to = user_data
         .history()
         .iter()
         .filter_map(|id| index.tracks.get(id))
-        .take(ITEMS)
+        .take(max_items)
         .cloned()
         .collect();
 
     let popular_tracks: Vec<_> = get_popular_tracks(user_data)
         .filter_map(|id| index.tracks.get(id))
-        .take(ITEMS)
+        .take(max_items)
         .cloned()
         .collect();
 
@@ -53,14 +59,19 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper) -> Feed {
             .collect(),
     );
 
-    let random_great_albums = get_random_great(&index.cache.albums_mean_score, |album_id| {
-        index.cache.albums_infos.get(album_id).unwrap().clone()
-    });
+    let random_great_albums = get_random_great(
+        &index.cache.albums_mean_score,
+        |album_id| index.cache.albums_infos.get(album_id).unwrap().clone(),
+        min_rating,
+        max_items,
+    );
 
-    let random_great_artists =
-        get_random_great(&index.cache.albums_artists_mean_score, |artist_id| {
-            index.cache.artists_infos.get(artist_id).unwrap().clone()
-        });
+    let random_great_artists = get_random_great(
+        &index.cache.albums_artists_mean_score,
+        |artist_id| index.cache.artists_infos.get(artist_id).unwrap().clone(),
+        min_rating,
+        max_items,
+    );
 
     Feed {
         last_listened_to,
@@ -78,12 +89,17 @@ fn get_popular_tracks(user_data: &UserDataWrapper) -> impl Iterator<Item = &Trac
     popular_tracks.into_iter().map(|(id, _)| id)
 }
 
-fn get_random_great<T, U>(mean_scores: &HashMap<T, f64>, mapper: impl Fn(&T) -> U) -> Vec<U> {
+fn get_random_great<T, U>(
+    mean_scores: &HashMap<T, f64>,
+    mapper: impl Fn(&T) -> U,
+    min_rating: f64,
+    max_items: usize,
+) -> Vec<U> {
     let mut great: Vec<_> = mean_scores
         .iter()
-        .filter(|(_, mean_score)| **mean_score >= GREAT_THRESOLD)
+        .filter(|(_, mean_score)| **mean_score >= min_rating)
         .map(|(id, _)| id)
-        .take(ITEMS)
+        .take(max_items)
         .map(mapper)
         .collect();
 
