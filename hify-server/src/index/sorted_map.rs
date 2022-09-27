@@ -60,16 +60,6 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         self.indexes.get(key).copied()
     }
 
-    // // TODO: improve by using .rev() on self.indexes instead of building a reversed vec of values
-    // pub fn to_vec(self) -> Vec<(K, V)> {
-    //     let mut values: Vec<_> = self.values.into_iter().rev().collect();
-
-    //     self.indexes
-    //         .into_iter()
-    //         .map(|(key, _)| (key, values.pop().unwrap()))
-    //         .collect()
-    // }
-
     pub fn keys(&self) -> Keys<K, usize> {
         self.indexes.keys()
     }
