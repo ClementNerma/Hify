@@ -101,7 +101,7 @@
             {@const tags = track.metadata.tags}
 
             <NavigableTrack position={tags.trackNo} transparent tracks={filteredTracks} goToAlbumOption={false} {track}>
-              <tr class={i === 0 ? '' : 'not-first'}>
+              <tr class:notFirst={i !== 0}>
                 <td class="trackno">{tags.trackNo}</td>
                 <td class="title">{tags.title}</td>
                 <td class="rating">
@@ -153,7 +153,7 @@
     width: 100%;
   }
 
-  tr.not-first {
+  tr.notFirst {
     border-top: 1px solid rgb(50, 50, 50);
   }
 

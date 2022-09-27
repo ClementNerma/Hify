@@ -26,7 +26,7 @@
   $: album = tags.album
 </script>
 
-<div class="player-bottom {isQueueFocused ? 'queue-focused' : ''}">
+<div class="player-bottom" class:isQueueFocused>
   <div class="track-infos">
     <NavigableRow>
       <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
@@ -102,7 +102,7 @@
     transition: bottom 0.3s;
   }
 
-  .player-bottom.queue-focused {
+  .player-bottom.isQueueFocused {
     bottom: 0px;
 
     transition: bottom 0.3s;

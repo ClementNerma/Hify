@@ -24,7 +24,8 @@
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
 {:else}
   <img
-    class="album-art {!$readableDistractionFreeMode ? 'darkened' : ''}"
+    class="album-art"
+    class:darkened={!$readableDistractionFreeMode}
     width={$readableDistractionFreeMode ? '' : 250}
     height={$readableDistractionFreeMode ? '' : 250}
     src={getAlbumArtUri($currentTrack.metadata.tags.album.id)}

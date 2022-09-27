@@ -12,8 +12,8 @@
   export let enforceMaxWidth = false
 </script>
 
-<div class="card {enforceMaxWidth ? 'enforce-max-width' : ''}" style="--width: {boxSize}px">
-  <img class="cover {rounded ? 'rounded' : ''}" width={boxSize} height={boxSize} src={pictureUrl} alt="" />
+<div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
+  <img class="cover" class:rounded width={boxSize} height={boxSize} src={pictureUrl} alt="" />
   <div class="title experimental-line-limiter">{title}</div>
   <div class="subtitle experimental-line-limiter">{subtitle}</div>
 </div>
@@ -23,7 +23,7 @@
     text-align: center;
   }
 
-  .card.enforce-max-width {
+  .card.enforceMaxWidth {
     max-width: var(--width);
   }
 

@@ -33,7 +33,7 @@
   let isFocused: boolean
 </script>
 
-<div class="container {isFocused ? 'focused' : ''}">
+<div class="container" class:isFocused>
   <NavigableRow>
     {#each tabs as tab, i}
       <SimpleNavigableItem
@@ -63,7 +63,7 @@
     margin-bottom: 10px;
   }
 
-  .container:not(.focused) {
+  .container:not(.isFocused) {
     opacity: 0.2;
     transition: opacity linear 0.8s;
     transition-delay: 0.2s;

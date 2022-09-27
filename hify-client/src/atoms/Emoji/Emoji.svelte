@@ -2,7 +2,7 @@
   export let alone = false
 </script>
 
-<span class="emoji {alone ? 'alone' : ''}">
+<span class="emoji" class:alone>
   <slot />
 </span>
 

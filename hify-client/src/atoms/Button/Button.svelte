@@ -8,8 +8,8 @@
 
 <SimpleNavigableItem transparent {onPress} {disabled}>
   <span class="for-margin">
-    <span class="container {fullHeight ? 'full-height' : ''}">
-      <div class="button {fullHeight ? 'full-height' : ''} {disabled ? 'disabled' : ''}">
+    <span class="container" class:fullHeight>
+      <div class="button" class:fullHeight class:disabled>
         <slot />
       </div>
     </span>
@@ -35,7 +35,7 @@
     border: 1px solid white;
   }
 
-  .button.full-height {
+  .button.fullHeight {
     /* TODO: investigate why 50% is required instead of 100% */
     height: calc(50% + 4px);
   }
