@@ -37,7 +37,7 @@
 
   .button.full-height {
     /* TODO: investigate why 50% is required instead of 100% */
-    height: calc(50% + 3px);
+    height: calc(50% + 4px);
   }
 
   .button.disabled {
