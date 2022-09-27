@@ -1,53 +1,52 @@
 import { onDestroy } from 'svelte'
-import { derived, get, writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 import { handleInput } from '../navigable/input-manager'
 
-export const enableDistractionFreeModeFeature = writable(true)
+const _distractionFreeMode = writable(false)
 
-enableDistractionFreeModeFeature.subscribe((set) => {
-  if (!set) {
-    distractionFreeMode.set(false)
-  }
-})
+export const distractionFreeMode = derived(_distractionFreeMode, (_) => _)
 
-const distractionFreeMode = writable(false)
+export function setupDistractionFreeListener(
+  delay: number,
+  ignoreKeys?: string[],
+  interceptTurningOn?: () => boolean,
+): (enabled: boolean) => void {
+  function restartDistractionFreeTimeout() {
+    if (destroyed) {
+      return
+    }
 
-export const readableDistractionFreeMode = derived(distractionFreeMode, (_) => _)
+    if (distractionModeTimeout !== null) {
+      clearTimeout(distractionModeTimeout)
+    }
 
-export function setDistractionFreeMode(set: boolean) {
-  if (!get(enableDistractionFreeModeFeature)) {
-    return
-  }
-
-  distractionFreeMode.set(set)
-}
-
-// distractionFreeMode.subscribe((set) => {
-//   if (set) {
-//     document.body.classList.add(DISTRACTION_FREE_CLASSNAME)
-//   } else {
-//     document.body.classList.remove(DISTRACTION_FREE_CLASSNAME)
-//   }
-// })
-
-export function setupDistractionFreeListener(delay: number, ignoreKeys?: string[], interceptTurningOn?: () => boolean) {
-  function startDistractionFreeTimeout(): number | null {
-    return window.setTimeout(() => {
+    distractionModeTimeout = window.setTimeout(() => {
       if (interceptTurningOn?.() !== false) {
-        setDistractionFreeMode(true)
+        _distractionFreeMode.set(true)
       }
     }, delay)
   }
 
-  function resetDistractionFreeMode(stop = false): void {
-    if (distractionModeTimeout !== null) {
-      window.clearTimeout(distractionModeTimeout)
+  function resetDistractionFreeMode(): void {
+    if (destroyed) {
+      return
     }
 
-    if (!stop) {
-      distractionFreeMode.set(false)
-      distractionModeTimeout = startDistractionFreeTimeout()
+    _distractionFreeMode.set(false)
+    restartDistractionFreeTimeout()
+  }
+
+  function externallySetDistractionFreeMode(value: boolean): void {
+    if (destroyed) {
+      return
     }
+
+    if (!value) {
+      resetDistractionFreeMode()
+      return
+    }
+
+    restartDistractionFreeTimeout()
   }
 
   let destroyed = false
@@ -62,10 +61,13 @@ export function setupDistractionFreeListener(delay: number, ignoreKeys?: string[
     }
   })
 
-  let distractionModeTimeout = startDistractionFreeTimeout()
+  let distractionModeTimeout: number | null = null
+  restartDistractionFreeTimeout()
 
   onDestroy(() => {
     destroyed = true
-    resetDistractionFreeMode(true)
+    resetDistractionFreeMode()
   })
+
+  return externallySetDistractionFreeMode
 }

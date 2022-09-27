@@ -5,7 +5,6 @@
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
-  import { enableDistractionFreeModeFeature } from '../../stores/distraction-free'
 
   let hideDebugLogs = true
 
@@ -17,12 +16,6 @@
 <NavigableRow>
   <Button onPress={() => location.reload()}>Reload the application</Button>
   <Checkbox bind:checked={hideDebugLogs}>Hide debug logs</Checkbox>
-  <Checkbox
-    checked={$enableDistractionFreeModeFeature}
-    onChange={(checked) => enableDistractionFreeModeFeature.set(checked)}
-  >
-    Enable distraction-free mode
-  </Checkbox>
 </NavigableRow>
 
 <NavigableList>

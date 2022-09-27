@@ -5,7 +5,7 @@
 
   import { setupDistractionFreeListener } from '../../stores/distraction-free'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import { readableDistractionFreeMode } from '../../stores/distraction-free'
+  import { distractionFreeMode } from '../../stores/distraction-free'
   import { onMount, onDestroy } from 'svelte'
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
@@ -25,9 +25,9 @@
 {:else}
   <img
     class="album-art"
-    class:darkened={!$readableDistractionFreeMode}
-    width={$readableDistractionFreeMode ? '' : 250}
-    height={$readableDistractionFreeMode ? '' : 250}
+    class:darkened={!$distractionFreeMode}
+    width={$distractionFreeMode ? '' : 250}
+    height={$distractionFreeMode ? '' : 250}
     src={getAlbumArtUri($currentTrack.metadata.tags.album.id)}
     alt=""
   />
