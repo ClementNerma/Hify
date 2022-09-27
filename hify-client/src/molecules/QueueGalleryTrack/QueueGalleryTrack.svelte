@@ -46,7 +46,7 @@
     onLongPress={() => showContextMenu(contextMenuStore, buildContextMenuOptions())}
     hasFocusPriority={isCurrent}
     displayBlock={true}
-    style="min-height: 100%;"
+    fullHeight
   >
     <div>
       <img class="album-art" width={80} height={80} src={getAlbumArtUri(track.metadata.tags.album.id)} alt="" />

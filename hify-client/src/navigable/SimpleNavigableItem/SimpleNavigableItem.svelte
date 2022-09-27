@@ -6,6 +6,7 @@
 
   export let transparent = false
   export let displayBlock = false
+  export let fullHeight = false
 
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
@@ -97,6 +98,7 @@
   class:mouseHover
   class:transparent
   class:displayBlock
+  class:fullHeight
 >
   <slot {item} requestFocus={() => item.requestFocus()} />
 </navigable-item-wrapper>
@@ -108,5 +110,9 @@
 
   .displayBlock {
     display: block;
+  }
+
+  .fullHeight {
+    min-height: 100%;
   }
 </style>
