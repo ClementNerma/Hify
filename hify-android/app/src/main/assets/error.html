@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application error</title>
+    <meta charset="utf-8 "/>
+    <style type="text/css">
+        body {
+            background: black;
+            color: white;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: white;
+            color: black;
+            border-radius: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Application failed to load 😢</h1>
+    <h2 id="message"></h2>
+    <p>Press <strong class="button">OK</strong> (or Enter / Return) to update the application's URL.</p>
+
+    <script type="text/javascript">
+        "use strict"
+
+        const message = new URLSearchParams(location.search).get('message')
+        document.getElementById('message').innerText = message
+
+        document.body.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                hifyAndroidInjectedObject.updateAppUrl()
+            }
+        })
+    </script>
+</body>
+</html>

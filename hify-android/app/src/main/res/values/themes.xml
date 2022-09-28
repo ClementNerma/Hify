@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.Hify" parent="@style/Theme.Leanback" />
+</resources>
