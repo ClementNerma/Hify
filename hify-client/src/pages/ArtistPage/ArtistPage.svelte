@@ -15,7 +15,7 @@
       return
     }
 
-    const res = await AsyncArtistPage({
+    const artist = await AsyncArtistPage({
       variables: {
         artistId,
         pagination: {
@@ -23,23 +23,27 @@
           first: ALBUMS_PER_PAGE,
         },
       },
-    }).then((res) => res.data.artist?.albumParticipations)
+    }).then((res) => res.data.artist)
 
-    if (!res) {
+    if (!artist) {
       throw new Error("Failed to fetch artist's data")
     }
 
-    currentPageInfo = res.pageInfo
-    albums = [...albums, ...res.nodes]
+    currentPageInfo = artist.albumParticipations.pageInfo
+    albums = [...albums, ...artist.albumParticipations.nodes]
+    artistName = artist.name
   }
 
+  let artistName: string | null = null
   let albums: AlbumCardFragment[] = []
 </script>
 
 {#await feedMore()}
   <h2>Loading...</h2>
 {:then _}
-  <h2>Albums ({albums.length})</h2>
+  <h2>Artist: {artistName}</h2>
+
+  <h3>Albums ({albums.length})</h3>
 
   <Grid columns={5} lazyLoader={feedMore}>
     {#each albums as album}
