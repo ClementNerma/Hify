@@ -9,6 +9,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::graphql::Paginable;
 
+/// An immutable map type that keeps the order of its element
+/// Also allows to get the ordered value list as well as the index from a key
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SortedMap<K: Eq + Hash, V: Ord> {
     values: Vec<V>,
