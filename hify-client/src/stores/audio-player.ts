@@ -45,7 +45,6 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
         .catch((e: unknown) => logError('Failed to play audio', e))
     }
 
-    // TODO: wait? handle errors?
     HistoryPush({
       variables: {
         trackId: track.id,
