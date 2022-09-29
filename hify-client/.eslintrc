@@ -22,10 +22,6 @@
     "svelte3/typescript": true
   },
   "root": true,
-  "env": {
-    "node": true,
-    "jest": true
-  },
   "ignorePatterns": [".eslintrc", "node_modules", "src/graphql/generated.ts"],
   "rules": {
     "prettier/prettier": "error",
