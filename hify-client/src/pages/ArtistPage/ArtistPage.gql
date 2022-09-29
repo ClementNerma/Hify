@@ -3,18 +3,7 @@ query ArtistPage($artistId: String!, $pagination: PaginationInput!) {
     name
     albumParticipations(pagination: $pagination) {
       nodes {
-        id
-        name
-        hasArtImage
-        genres {
-          id
-          name
-        }
-        year
-        albumArtists {
-          id
-          name
-        }
+        ...AlbumCard
       }
 
       pageInfo {
