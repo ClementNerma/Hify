@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput, registerLongPressableKeys } from './input-manager'
+import { handleInput, KeyPressHandling, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -45,9 +45,13 @@ export abstract class NavigableCommon {
         throw new Error('Invalid page construction token provided!')
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       this.parent = undefined as any
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       this.identity = undefined as any
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       this.page = undefined as any
+
       return
     }
 
@@ -64,7 +68,8 @@ export abstract class NavigableCommon {
 
   abstract requestFocus(): boolean
 
-  interceptKeyPress(_key: string): boolean | void {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void {}
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
@@ -333,7 +338,7 @@ export function wasNavigableDestroyed(navigable: Navigable): boolean {
   return false
 }
 
-export function handleKeyboardEvent(key: string, long: boolean): void | false {
+export function handleKeyboardEvent(key: string, long: boolean): void {
   const state = get(navState)
 
   if (!state) {
@@ -370,7 +375,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
   const current = __current
 
   for (const item of _getItemChain(current)) {
-    if (item.interceptKeyPress(key) === false) {
+    if (item.interceptKeyPress(key, long) === KeyPressHandling.Intercepted) {
       return
     }
   }

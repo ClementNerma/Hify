@@ -1,3 +1,4 @@
+import { InputHandler, KeyPressHandling } from '../input-manager'
 import { NavigableOne } from '../NavigableOne/NavigableOne'
 import { NavigableContainer, NavigableItem, NavigationAction } from '../navigation'
 
@@ -10,7 +11,7 @@ export type NavigableWithHandlersProps = {
   onBack?: () => NavigableItem | null | void
   onLongBack?: () => NavigableItem | null | void
 
-  onKeyPress?: (key: string) => boolean | void
+  onKeyPress?: InputHandler
 }
 
 export class NavigableWithHandlers extends NavigableOne {
@@ -50,7 +51,7 @@ export class NavigableWithHandlers extends NavigableOne {
     }
   }
 
-  override interceptKeyPress(key: string): boolean | void {
-    return this.props.onKeyPress?.(key)
+  override interceptKeyPress(key: string, long: boolean): KeyPressHandling | void {
+    return this.props.onKeyPress?.(key, long)
   }
 }

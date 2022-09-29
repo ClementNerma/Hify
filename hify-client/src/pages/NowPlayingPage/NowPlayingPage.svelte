@@ -10,25 +10,26 @@
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import { KeyPressHandling } from '../../navigable/input-manager'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
   const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
 
-  function onKeyPress(key: string): boolean {
+  function onKeyPress(key: string): KeyPressHandling {
     const dfMode = $distractionFreeMode
 
     if (!dfMode && key === 'Escape') {
       setDistractionFree(true)
-      return false
+      return KeyPressHandling.Intercepted
     }
 
     if (dfMode && !ignoredKeys.includes(key)) {
       setDistractionFree(false)
-      return false
+      return KeyPressHandling.Intercepted
     }
 
-    return true
+    return KeyPressHandling.Propagate
   }
 
   onMount(() => blackBackground.set(true))

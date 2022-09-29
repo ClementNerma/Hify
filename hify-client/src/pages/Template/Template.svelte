@@ -14,7 +14,7 @@
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
-  import { handleInput, registerLongPressableKeys } from '../../navigable/input-manager'
+  import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import TplContextMenu from './TplContextMenu.svelte'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
 
@@ -55,7 +55,7 @@
         return
     }
 
-    return false
+    return KeyPressHandling.Propagate
   })
 
   let requestFocus: () => void

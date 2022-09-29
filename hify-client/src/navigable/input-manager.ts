@@ -16,7 +16,7 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
   }
 
   for (const handler of inputHandlers) {
-    if (handler(key, long) === false) {
+    if (handler(key, long) === KeyPressHandling.Intercepted) {
       return
     }
   }
@@ -36,7 +36,7 @@ export function registerLongPressableKeys(...keys: string[]): void {
 
 export const LONG_PRESS_THRESOLD_MS = 250
 
-export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => boolean | void
+export type InputHandler = (key: KeyboardEvent['key'], long: boolean) => KeyPressHandling | void
 
 const inputHandlers: InputHandler[] = []
 
@@ -53,6 +53,11 @@ type RegisteredKeyPress = {
 export enum KeyPressType {
   Simple,
   Long,
+}
+
+export enum KeyPressHandling {
+  Intercepted,
+  Propagate,
 }
 
 document.body.addEventListener('keydown', (e) => {
