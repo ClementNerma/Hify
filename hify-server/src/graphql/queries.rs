@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
+    pagination::{paginate, Paginated, PaginationInput},
     GraphQLContext,
 };
 
@@ -333,23 +333,31 @@ impl ArtistInfos {
         )
     }
 
+    // Slow as f*ck, waiting for answers on https://github.com/async-graphql/async-graphql/issues/1090
+    // This will allow to use a `Paginated<usize, Track>` thanks to `paginated_mapped_slice`
     async fn track_participations(
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Paginated<usize, Track> {
+    ) -> Paginated<TrackID, Track> {
         let index = graphql_index!(ctx);
 
-        let tracks = index
+        let track_ids = index
             .cache
             .artists_track_participations
             .get(&self.get_id())
             .map(Vec::as_slice)
             .unwrap_or(&[]);
 
-        paginate_mapped_slice(pagination, tracks, |track_id| {
-            index.tracks.get(track_id).unwrap().clone()
-        })
+        let tracks: Vec<_> = track_ids
+            .iter()
+            .map(|track| index.tracks.get(track).unwrap())
+            .cloned()
+            .collect();
+
+        let map = SortedMap::from_vec(tracks, |track| track.id.clone());
+
+        paginate(pagination, &map, |track| track.id.clone())
     }
 }
 
