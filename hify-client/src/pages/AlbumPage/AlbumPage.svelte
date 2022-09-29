@@ -107,7 +107,9 @@
           </div>
 
           <div class="length" data-item-like-style>
-            ⌛ {humanReadableDuration(totalDuration)} / {filteredTracks.length} track(s) {#if discs.length > 1}/ {discs.length}
+            ⌛ {humanReadableDuration(totalDuration)} /
+            {filteredTracks.length} track{filteredTracks.length > 1 ? 's' : ''}
+            {#if discs.length > 1}/ {discs.length}
               discs{/if}
           </div>
 
