@@ -26,7 +26,7 @@
     "node": true,
     "jest": true
   },
-  "ignorePatterns": [".eslintrc", "node_modules", "**/*.svelte"],
+  "ignorePatterns": [".eslintrc", "node_modules", "**/*.svelte", "src/graphql/generated.ts"],
   "rules": {
     "prettier/prettier": "error",
     "@typescript-eslint/no-explicit-any": "off",
