@@ -41,13 +41,13 @@
     src={getAlbumArtUri($currentTrack.metadata.tags.album.id)}
     alt=""
   />
-
-  <DistractionFreeTogglable>
-    <NavigableWithHandlers onBack={() => setDistractionFree(true)} {onKeyPress}>
-      <NowPlayingBottomPanel currentTrack={$currentTrack} />
-    </NavigableWithHandlers>
-  </DistractionFreeTogglable>
 {/if}
+
+<DistractionFreeTogglable>
+  <NavigableWithHandlers onBack={() => setDistractionFree(true)} {onKeyPress}>
+    <NowPlayingBottomPanel currentTrack={$currentTrack} />
+  </NavigableWithHandlers>
+</DistractionFreeTogglable>
 
 <style>
   .no-playing {
