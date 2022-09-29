@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { navigate } from 'svelte-navigator'
+  import Button from '../../atoms/Button/Button.svelte'
   import Row from '../../atoms/Row/Row.svelte'
   import { AsyncHomePage } from '../../graphql/generated'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
   import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
+  import { ROUTES } from '../../routes'
   import IndexUpdater from './IndexUpdater.svelte'
   import MixGenerator from './MixGenerator.svelte'
 
@@ -48,6 +51,7 @@
   <Row>
     <IndexUpdater />
     <MixGenerator />
+    <Button onPress={() => navigate(ROUTES.devTools)}>👷 Go the developper's tools page</Button>
   </Row>
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
