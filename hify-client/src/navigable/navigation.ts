@@ -64,7 +64,7 @@ export abstract class NavigableCommon {
 
   abstract requestFocus(): boolean
 
-  interceptKey(key: string): boolean | void {}
+  interceptKeyPress(key: string): boolean | void {}
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
@@ -370,7 +370,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
   const current = __current
 
   for (const item of _getItemChain(current)) {
-    if (item.interceptKey(key)) {
+    if (item.interceptKeyPress(key)) {
       return
     }
   }

@@ -50,7 +50,7 @@ export class NavigableWithHandlers extends NavigableOne {
     }
   }
 
-  override interceptKey(key: string): boolean | void {
+  override interceptKeyPress(key: string): boolean | void {
     return this.props.onKeyPress?.(key)
   }
 }
