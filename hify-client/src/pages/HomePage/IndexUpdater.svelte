@@ -22,7 +22,9 @@
   let updateResult: { type: 'ok' } | { type: 'err'; err: Error } | null = null
 </script>
 
-<Button onPress={() => updateIndex()} disabled={isUpdating}>Update the index (this might take a while)</Button>
+<Button onPress={() => updateIndex()} disabled={isUpdating} fullHeight
+  >Update the index (this might take a while)</Button
+>
 
 <span>
   {#if isUpdating}

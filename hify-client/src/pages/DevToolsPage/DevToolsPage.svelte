@@ -16,10 +16,10 @@
 <h2>Developer Tools</h2>
 
 <Row>
-  <Button onPress={() => location.reload()}>Reload the application</Button>
-  <Checkbox bind:checked={hideDebugLogs}>Hide debug logs</Checkbox>
+  <Button onPress={() => location.reload()} fullHeight>Reload the application</Button>
+  <Checkbox bind:checked={hideDebugLogs} fullHeight>Hide debug logs</Checkbox>
   {#if hifyInterface}
-    <Button onPress={bind(hifyInterface, (h) => h.updateAppUrl())}>🛠️ Change the application's URL</Button>
+    <Button onPress={bind(hifyInterface, (h) => h.updateAppUrl())} fullHeight>🛠️ Change the application's URL</Button>
   {/if}
 </Row>
 

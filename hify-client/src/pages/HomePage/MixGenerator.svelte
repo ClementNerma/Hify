@@ -20,4 +20,4 @@
   }
 </script>
 
-<Button onPress={() => generateAndPlayMix()}>Mix some magic ✨</Button>
+<Button onPress={() => generateAndPlayMix()} fullHeight>Mix some magic ✨</Button>

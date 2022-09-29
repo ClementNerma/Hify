@@ -51,7 +51,7 @@
   <Row>
     <IndexUpdater />
     <MixGenerator />
-    <Button onPress={() => navigate(ROUTES.devTools)}>👷 Go the developper's tools page</Button>
+    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
   </Row>
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
