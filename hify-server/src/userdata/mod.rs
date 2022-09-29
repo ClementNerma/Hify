@@ -7,15 +7,15 @@ use crate::index::TrackID;
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserData {
     history: Vec<TrackID>,
-    history_size: usize,
+    history_capacity: usize,
     listenings: HashMap<TrackID, u32>,
 }
 
 impl UserData {
-    pub fn new(history_size: usize) -> Self {
+    pub fn new(history_capacity: usize) -> Self {
         Self {
             history: vec![],
-            history_size,
+            history_capacity,
             listenings: HashMap::new(),
         }
     }
@@ -46,7 +46,7 @@ impl UserDataWrapper {
             }
 
             None => {
-                if self.inner.history.len() == self.inner.history_size {
+                if self.inner.history.len() == self.inner.history_capacity {
                     self.inner.history.pop().unwrap();
                 }
             }
