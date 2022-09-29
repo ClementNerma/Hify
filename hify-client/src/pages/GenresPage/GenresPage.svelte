@@ -1,6 +1,7 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { AsyncGenresPage } from '../../graphql/generated'
+  import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import Grid from '../../organisms/Grid/Grid.svelte'
   import { ROUTES } from '../../routes'
@@ -16,16 +17,12 @@
   <Grid columns={6}>
     {#each genres as genre}
       <SimpleNavigableItem onPress={() => navigate(ROUTES.genre(genre.id))}>
-        <p class="genre">{genre.name} ({genre.albumsCount})</p>
+        <ItemStyleLayer>
+          <p>{genre.name} ({genre.albumsCount})</p>
+        </ItemStyleLayer>
       </SimpleNavigableItem>
     {/each}
   </Grid>
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}
-
-<style>
-  .genre {
-    padding: 10px;
-  }
-</style>
