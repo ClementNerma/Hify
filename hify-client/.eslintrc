@@ -24,7 +24,7 @@
   "root": true,
   "ignorePatterns": [".eslintrc", "node_modules", "src/graphql/generated.ts"],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": "warn",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-implicit-any-catch": "error",
     "@typescript-eslint/no-unnecessary-condition": "error",
