@@ -2,11 +2,13 @@
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import { RequestFocus } from '../../navigable/navigation'
 
-  export let requestFocus: RequestFocus
+  let _requestFocus: RequestFocus
+
+  export const requestFocus = () => _requestFocus()
 </script>
 
 <div class="column">
-  <NavigableList bind:requestFocus>
+  <NavigableList bind:requestFocus={_requestFocus}>
     <slot />
   </NavigableList>
 </div>

@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte'
-import { get, Writable, writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
 import { handleInput, registerLongPressableKeys } from './input-manager'
 
@@ -64,7 +64,7 @@ export abstract class NavigableCommon {
 
   abstract requestFocus(): boolean
 
-  interceptKeyPress(key: string): boolean | void {}
+  interceptKeyPress(_key: string): boolean | void {}
 }
 
 export abstract class NavigableContainer extends NavigableCommon {

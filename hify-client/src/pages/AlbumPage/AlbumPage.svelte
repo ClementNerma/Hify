@@ -3,7 +3,7 @@
 
   import { ROUTES } from '../../routes'
   import { getAlbumArtUri } from '../../rest-api'
-  import { AlbumInfos, AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
+  import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
