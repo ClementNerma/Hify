@@ -50,7 +50,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
       variables: {
         trackId: track.id,
       },
-    })
+    }).catch(() => logError('Failed to push to history'))
 
     return newAudio
   })
