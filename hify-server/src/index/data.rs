@@ -23,23 +23,46 @@ pub struct Index {
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
+    // Albums where the artist is listed in the "album artists" tag
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+
+    // Albums where the artist is listed in one of the tracks but not in the "album artists" tag
     pub artists_album_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+
+    // Tracks where the artist is listed in
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
+    // Tracks belonging to an album
     pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 
+    // Mean score of a score
     pub albums_mean_score: HashMap<AlbumID, f64>,
+
+    // Mean score of an artist
     pub artists_mean_score: HashMap<ArtistID, f64>,
+
+    // Mean score of an album artist (= artist who has at least 1 album)
     pub albums_artists_mean_score: HashMap<ArtistID, f64>,
 
+    // Informations about artists
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
+
+    // Informations about album arists
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
+
+    // Informations about albums
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
+
+    // Informations about genres
     pub genre_infos: SortedMap<GenreID, GenreInfos>,
 
+    // List of album for each genre
     pub genres_albums: HashMap<GenreID, SortedMap<AlbumID, AlbumInfos>>,
+
+    // List of tracks for each genre
     pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
+
+    // List of tracks who don't have a genre
     pub no_genre_tracks: HashSet<TrackID>,
 }
 
