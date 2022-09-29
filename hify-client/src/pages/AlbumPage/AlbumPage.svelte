@@ -34,7 +34,7 @@
     }
 
     return {
-      totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x),
+      totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
       discs,
     }
   }
