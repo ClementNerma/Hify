@@ -113,7 +113,7 @@
     padding: 5px;
   }
 
-  .fullHeight {
+  :global(navigable-item-wrapper.fullHeight > :first-child) {
     min-height: 100%;
   }
 </style>
