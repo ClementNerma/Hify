@@ -2,7 +2,6 @@
   import { navigate } from 'svelte-navigator'
   import Button from '../../atoms/Button/Button.svelte'
   import Row from '../../atoms/Row/Row.svelte'
-  import Spacer from '../../atoms/Spacer/Spacer.svelte'
   import { AsyncHomePage } from '../../graphql/generated'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
   import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
