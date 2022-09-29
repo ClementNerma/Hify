@@ -1,0 +1,12 @@
+query HistoryPage($pagination: PaginationInput!) {
+  history(pagination: $pagination) {
+    nodes {
+      ...AudioTrack
+    }
+
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
