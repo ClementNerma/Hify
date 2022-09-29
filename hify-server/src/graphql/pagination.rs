@@ -162,7 +162,7 @@ impl<T> Paginable for &[T] {
     }
 
     fn ordered_values(&self) -> &[Self::Item] {
-        &self
+        self
     }
 }
 
