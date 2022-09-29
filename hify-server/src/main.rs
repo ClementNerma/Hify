@@ -45,7 +45,7 @@ async fn inner_main() -> Result<()> {
             let mut index = utils::save::load_index(&index_file).context("Failed to load index")?;
 
             if update_index {
-                println!("> Rebuilding index as requested...");
+                println!("> Updating index as requested...");
                 index = index::build_index(music_dir, Some(index))
                     .context("Failed to rebuild index")?;
             }
