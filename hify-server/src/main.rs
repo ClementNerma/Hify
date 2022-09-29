@@ -48,6 +48,8 @@ async fn inner_main() -> Result<()> {
                 println!("> Updating index as requested...");
                 index = index::build_index(music_dir, Some(index))
                     .context("Failed to rebuild index")?;
+            } else if rebuild_cache {
+                index = index::rebuild_cache(index);
             }
 
             println!("> Done.");
@@ -63,11 +65,6 @@ async fn inner_main() -> Result<()> {
 
             index
         }
-    };
-
-    let index = match rebuild_cache {
-        true => index::rebuild_cache(index),
-        false => index,
     };
 
     let user_data = match user_data_file.is_file() {
