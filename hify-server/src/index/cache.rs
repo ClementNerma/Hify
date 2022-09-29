@@ -17,6 +17,7 @@ pub fn build_index_cache(
 
     let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut artists_album_participations = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
+    let mut artists_track_participations = HashMap::<ArtistID, Vec<TrackID>>::new();
     let mut artists_tracks = HashMap::<ArtistID, Vec<TrackID>>::new();
     let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
 
@@ -62,11 +63,18 @@ pub fn build_index_cache(
                 .push(track.id.clone());
         }
 
-        for artist_infos in tags.get_artists_infos() {
+        for non_album_artist_infos in tags.get_artists_infos() {
+            let artist_id = non_album_artist_infos.get_id();
+
             artists_album_participations
-                .entry(artist_infos.get_id())
+                .entry(artist_id.clone())
                 .or_default()
                 .insert(album_infos.clone());
+
+            artists_track_participations
+                .entry(artist_id)
+                .or_default()
+                .push(track.id.clone())
         }
 
         albums_tracks
@@ -208,8 +216,9 @@ pub fn build_index_cache(
         tracks_paths,
 
         artists_albums,
-        artists_tracks,
         artists_album_participations,
+        artists_tracks,
+        artists_track_participations,
 
         albums_tracks,
 
