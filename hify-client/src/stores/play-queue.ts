@@ -83,7 +83,7 @@ export function playPreviousTrackOrRewind(): void {
         logInfo('No previous track to play')
       }
 
-      return { tracks, position: newPosition }
+      return { tracks, position: newPosition ?? position }
     })
   }
 }
@@ -110,7 +110,7 @@ export function playNextTrack(): void {
       logInfo('No more track to play')
     }
 
-    return { tracks, position: newPosition }
+    return { tracks, position: newPosition ?? position }
   })
 }
 
