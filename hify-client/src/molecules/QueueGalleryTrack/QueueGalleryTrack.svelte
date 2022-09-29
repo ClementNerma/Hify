@@ -45,7 +45,6 @@
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
     onLongPress={() => showContextMenu(contextMenuStore, buildContextMenuOptions())}
     hasFocusPriority={isCurrent}
-    displayBlock={true}
     fullHeight
   >
     <div>
