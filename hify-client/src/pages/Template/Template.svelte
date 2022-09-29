@@ -28,7 +28,7 @@
         if (!long) {
           toggleAudioPlayback()
         } else {
-          navigate([ROUTES.search, ROUTES.home].includes($location.pathname) ? ROUTES.nowPlaying : ROUTES.search)
+          navigate($location.pathname === ROUTES.nowPlaying ? ROUTES.search : ROUTES.nowPlaying)
         }
 
         break
