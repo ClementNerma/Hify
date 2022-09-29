@@ -10,6 +10,7 @@
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 

@@ -110,7 +110,7 @@ export function playNextTrack(): void {
       logInfo('No more track to play')
     }
 
-    return { tracks, position: newPosition ?? position }
+    return { tracks, position: newPosition }
   })
 }
 

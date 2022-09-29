@@ -4,7 +4,7 @@
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 </script>
 
-{#if $readablePlayQueue && $queuePosition !== null}
+{#if $readablePlayQueue}
   <NavigableRow>
     <div class="queue-gallery">
       {#each $readablePlayQueue.tracks as track (track.idInQueue)}
