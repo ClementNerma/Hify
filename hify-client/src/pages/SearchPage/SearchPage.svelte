@@ -53,8 +53,9 @@
   <SimpleNavigableItem
     onFocus={() => searchField.focus()}
     onUnfocus={() => searchField?.blur()}
-    transparent={true}
     bind:requestFocus
+    display="transparent"
+    notRounded
   >
     <input
       class="search"

@@ -15,7 +15,7 @@
 
   <Grid columns={6}>
     {#each genres as genre}
-      <SimpleNavigableItem onPress={() => navigate(ROUTES.genre(genre.id))} transparent={true}>
+      <SimpleNavigableItem onPress={() => navigate(ROUTES.genre(genre.id))}>
         <p class="genre">{genre.name} ({genre.albumsCount})</p>
       </SimpleNavigableItem>
     {/each}
