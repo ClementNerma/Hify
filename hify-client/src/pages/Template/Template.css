@@ -21,8 +21,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  overflow: auto;
-
+  overflow: hidden;
   color: rgb(230, 230, 230);
 
   background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
