@@ -20,7 +20,12 @@ pub struct Command {
     #[clap(long, help = "Update the index")]
     pub update_index: bool,
 
-    #[clap(long, help = "Rebuild the cache", conflicts_with = "update_index")]
+    #[clap(
+        long,
+        help = "Rebuild the cache",
+        conflicts_with = "update_index",
+        conflicts_with = "rebuild_index"
+    )]
     pub rebuild_cache: bool,
 
     #[clap(long, help = "Don't start the server")]
