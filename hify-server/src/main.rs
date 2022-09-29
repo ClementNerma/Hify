@@ -39,38 +39,40 @@ async fn inner_main() -> Result<()> {
         bail!("Index file must not be a directory");
     }
 
-    let index = if index_file.is_file() && !rebuild_index {
-        println!("> Loading index from disk...");
-        let mut index = utils::save::load_index(&index_file).context("Failed to load index")?;
+    let index = match index_file.is_file() && !rebuild_index {
+        true => {
+            println!("> Loading index from disk...");
+            let mut index = utils::save::load_index(&index_file).context("Failed to load index")?;
 
-        if update_index {
-            println!("> Rebuilding index as requested...");
-            index =
-                index::build_index(music_dir, Some(index)).context("Failed to rebuild index")?;
+            if update_index {
+                println!("> Rebuilding index as requested...");
+                index = index::build_index(music_dir, Some(index))
+                    .context("Failed to rebuild index")?;
+            }
+
+            println!("> Done.");
+
+            index
         }
 
-        println!("> Done.");
+        false => {
+            println!("> Generating index...");
+            let index = index::build_index(music_dir, None).context("Failed to build index")?;
+            utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
+            println!("> Index saved on disk.");
 
-        index
-    } else {
-        println!("> Generating index...");
-        let index = index::build_index(music_dir, None).context("Failed to build index")?;
-        utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
-        println!("> Index saved on disk.");
-
-        index
+            index
+        }
     };
 
-    let index = if rebuild_cache {
-        index::rebuild_cache(index)
-    } else {
-        index
+    let index = match rebuild_cache {
+        true => index::rebuild_cache(index),
+        false => index,
     };
 
-    let user_data = if user_data_file.is_file() {
-        utils::save::load_user_data(&user_data_file).context("Failed to save user data")?
-    } else {
-        userdata::UserData::new(200)
+    let user_data = match user_data_file.is_file() {
+        true => utils::save::load_user_data(&user_data_file).context("Failed to save user data")?,
+        false => userdata::UserData::new(200),
     };
 
     let user_data = userdata::UserDataWrapper::new(
@@ -81,21 +83,23 @@ async fn inner_main() -> Result<()> {
         }),
     );
 
-    if !no_server {
-        println!("> Launching server...");
-
-        let server = http::launch(
-            index,
-            user_data,
-            Box::new(move |index| {
-                utils::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
-            }),
-        )
-        .await
-        .context("Failed to launch HTTP server")?;
-
-        server.shutdown().await;
+    if no_server {
+        return Ok(());
     }
+
+    println!("> Launching server...");
+
+    let server = http::launch(
+        index,
+        user_data,
+        Box::new(move |index| {
+            utils::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
+        }),
+    )
+    .await
+    .context("Failed to launch HTTP server")?;
+
+    server.shutdown().await;
 
     Ok(())
 }
