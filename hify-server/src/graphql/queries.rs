@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, Paginated, PaginationInput},
+    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
     GraphQLContext,
 };
 
@@ -123,14 +123,17 @@ impl QueryRoot {
             .cloned()
     }
 
-    async fn tracks<'c>(
-        &self,
-        ctx: &Context<'_>,
-        pagination: PaginationInput,
-    ) -> Paginated<TrackID, Track> {
-        let index = graphql_index!(ctx);
-        paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
-    }
+    // Slow Waiting for answers on https://github.com/async-graphql/async-graphql/issues/1090
+    // This will allow to use a `Paginated<TrackID, Track>` alongside the current `Paginated<usize, Track>`
+    //
+    // async fn tracks<'c>(
+    //     &self,
+    //     ctx: &Context<'_>,
+    //     pagination: PaginationInput,
+    // ) -> Paginated<TrackID, Track> {
+    //     let index = graphql_index!(ctx);
+    //     paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
+    // }
 
     async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<String>) -> Result<Vec<Track>> {
         let index = graphql_index!(ctx);
@@ -333,13 +336,11 @@ impl ArtistInfos {
         )
     }
 
-    // Slow as f*ck, waiting for answers on https://github.com/async-graphql/async-graphql/issues/1090
-    // This will allow to use a `Paginated<usize, Track>` thanks to `paginated_mapped_slice`
     async fn track_participations(
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Paginated<TrackID, Track> {
+    ) -> Paginated<usize, Track> {
         let index = graphql_index!(ctx);
 
         let track_ids = index
@@ -349,15 +350,9 @@ impl ArtistInfos {
             .map(Vec::as_slice)
             .unwrap_or(&[]);
 
-        let tracks: Vec<_> = track_ids
-            .iter()
-            .map(|track| index.tracks.get(track).unwrap())
-            .cloned()
-            .collect();
-
-        let map = SortedMap::from_vec(tracks, |track| track.id.clone());
-
-        paginate(pagination, &map, |track| track.id.clone())
+        paginate_mapped_slice(pagination, track_ids, |track| {
+            index.tracks.get(track).unwrap().clone()
+        })
     }
 }
 
