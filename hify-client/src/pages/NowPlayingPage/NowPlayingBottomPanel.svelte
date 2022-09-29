@@ -24,6 +24,7 @@
 
   $: tags = currentTrack.metadata.tags
   $: album = tags.album
+  $: artists = tags.artists.length > 0 ? tags.artists : album.albumArtists
 </script>
 
 <div class="player-bottom" class:isQueueFocused>
@@ -41,9 +42,9 @@
         </div>
       {/if}
 
-      {#each album.albumArtists as albumArtist}
-        <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
-          <div class="track-info">🎤 {albumArtist.name}</div>
+      {#each artists as artist}
+        <SimpleNavigableItem onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}>
+          <div class="track-info">🎤 {artist.name}</div>
         </SimpleNavigableItem>
       {/each}
     </NavigableRow>
