@@ -35,14 +35,6 @@ pub fn paginate<C: CursorType + Send + Sync, T: OutputType + Clone>(
     )
 }
 
-/// Compute a paginated result from a list of items and a [`PaginationInput`]
-pub fn paginate_slice<T: OutputType + Clone>(
-    pagination: PaginationInput,
-    items: &[T],
-) -> Paginated<usize, T> {
-    paginate_mapped_slice(pagination, items, |item| item.clone())
-}
-
 /// Compute a paginated result from a list of mappable items and a [`PaginationInput`]
 pub fn paginate_mapped_slice<T, U: OutputType>(
     pagination: PaginationInput,
