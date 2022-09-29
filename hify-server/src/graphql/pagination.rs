@@ -5,8 +5,6 @@ use async_graphql::{
     InputObject, OutputType, Result,
 };
 
-use crate::index::SortedMap;
-
 /// Pagination input for GraphQL
 /// Can do one of the following:
 /// * Fetch the N first items by specifying only `first`
@@ -28,7 +26,7 @@ pub type Paginated<C, T> = Result<Connection<C, T>>;
 /// Requires an index cache to quickly avoid performing a full slice lookup
 pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + OutputType>(
     pagination: PaginationInput,
-    items: &SortedMap<C, T>,
+    items: impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T) -> C,
 ) -> Paginated<C, T> {
     // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
@@ -99,7 +97,8 @@ pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + Output
 
     // Compute the paginated results' edges lazily
     let edges = items
-        .values()
+        .ordered_values()
+        .iter()
         .skip(start_at)
         .take(count)
         .map(|item| Edge::new(item_cursor(item), item.clone()));
@@ -112,6 +111,15 @@ pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + Output
 
     // Success!
     Ok(connection)
+}
+
+pub trait Paginable {
+    type By: CursorType;
+    type Item: OutputType + Clone;
+
+    fn len(&self) -> usize;
+    fn get_index(&self, cursor: &Self::By) -> Option<usize>;
+    fn ordered_values(&self) -> &[Self::Item];
 }
 
 enum Direction {

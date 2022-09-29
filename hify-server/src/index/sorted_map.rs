@@ -4,7 +4,10 @@ use std::{
     slice::Iter,
 };
 
+use async_graphql::{connection::CursorType, OutputType};
 use serde::{Deserialize, Serialize};
+
+use crate::graphql::Paginable;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SortedMap<K: Eq + Hash, V: Ord> {
@@ -74,5 +77,22 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
 
     pub fn len(&self) -> usize {
         self.values.len()
+    }
+}
+
+impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ SortedMap<K, V> {
+    type By = K;
+    type Item = V;
+
+    fn len(&self) -> usize {
+        SortedMap::len(self)
+    }
+
+    fn get_index(&self, cursor: &Self::By) -> Option<usize> {
+        SortedMap::get_index(self, cursor)
+    }
+
+    fn ordered_values(&self) -> &[Self::Item] {
+        &self.values
     }
 }
