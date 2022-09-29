@@ -12,5 +12,6 @@
   .row {
     display: flex;
     flex-direction: row;
+    overflow-x: hidden;
   }
 </style>
