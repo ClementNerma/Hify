@@ -36,13 +36,7 @@
   />
 
   <DistractionFreeTogglable>
-    <NavigableWithHandlers
-      onBack={() => {
-        if (!$readableAudioPaused) {
-          setDistractionFree(true)
-        }
-      }}
-    >
+    <NavigableWithHandlers onBack={() => setDistractionFree(true)}>
       <NowPlayingBottomPanel currentTrack={$currentTrack} />
     </NavigableWithHandlers>
   </DistractionFreeTogglable>
