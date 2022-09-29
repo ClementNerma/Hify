@@ -10,19 +10,25 @@
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
   const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
 
   function onKeyPress(key: string): boolean {
-    if ($distractionFreeMode && !ignoredKeys.includes(key)) {
-      setDistractionFree(false)
-      return true
+    const dfMode = $distractionFreeMode
+
+    if (!dfMode && key === 'Escape') {
+      setDistractionFree(true)
+      return false
     }
 
-    return false
+    if (dfMode && !ignoredKeys.includes(key)) {
+      setDistractionFree(false)
+      return false
+    }
+
+    return true
   }
 
   onMount(() => blackBackground.set(true))
@@ -45,7 +51,7 @@
 {/if}
 
 <DistractionFreeTogglable>
-  <NavigableWithHandlers onBack={() => setDistractionFree(true)} {onKeyPress}>
+  <NavigableWithHandlers {onKeyPress}>
     <NowPlayingBottomPanel currentTrack={$currentTrack} />
   </NavigableWithHandlers>
 </DistractionFreeTogglable>
