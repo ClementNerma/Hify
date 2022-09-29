@@ -77,9 +77,9 @@
           </div>
 
           {#if album.year}
-            <div>
-              <span class="year" data-item-like-style>🕒 {album.year ?? '?'}</span>
-            </div>
+            <SimpleNavigableItem justForStyle>
+              <span class="year">🕒 {album.year ?? '?'}</span>
+            </SimpleNavigableItem>
           {/if}
 
           <div class="artists">
@@ -106,12 +106,14 @@
             </NavigableRow>
           </div>
 
-          <div class="length" data-item-like-style>
-            ⌛ {humanReadableDuration(totalDuration)} /
-            {filteredTracks.length} track{filteredTracks.length > 1 ? 's' : ''}
-            {#if discs.length > 1}/ {discs.length}
-              discs{/if}
-          </div>
+          <SimpleNavigableItem justForStyle>
+            <div class="length">
+              ⌛ {humanReadableDuration(totalDuration)} /
+              {filteredTracks.length} track{filteredTracks.length > 1 ? 's' : ''}
+              {#if discs.length > 1}/ {discs.length}
+                discs{/if}
+            </div>
+          </SimpleNavigableItem>
 
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>

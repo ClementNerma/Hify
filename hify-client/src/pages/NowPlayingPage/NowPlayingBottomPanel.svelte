@@ -41,9 +41,9 @@
               <div class="track-info">💿 {album.name}</div>
             </SimpleNavigableItem>
             {#if tags.date}
-              <div data-item-like-style>
+              <SimpleNavigableItem justForStyle>
                 <div class="track-info">🕒 {formatDate(tags.date)}</div>
-              </div>
+              </SimpleNavigableItem>
             {/if}
 
             {#each artists as artist}

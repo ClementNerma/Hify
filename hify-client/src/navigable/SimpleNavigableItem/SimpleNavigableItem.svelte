@@ -13,6 +13,8 @@
   export let marginRight = 0
   export let notRounded = false
 
+  export let justForStyle = false
+
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
 
@@ -55,20 +57,16 @@
     onRight,
     onDown,
 
-    getUnderlyingElement: () => {
-      if (!wrapper) {
-        throw new Error("Tried to access navigable item's underlying wrapper before it is ready")
-      }
-
-      return wrapper
-    },
+    getUnderlyingElement: () => wrapper,
   })
 
   const nav = getParentNavigable(true)
 
   const item = new SimpleNavigableItem(nav, itemProps())
 
-  nav.append(item)
+  if (!justForStyle) {
+    nav.append(item)
+  }
 
   afterUpdate(() => {
     item.position = position
@@ -76,7 +74,7 @@
     item.props = itemProps()
   })
 
-  onDestroy(() => nav.remove(item))
+  onDestroy(() => !justForStyle && nav.remove(item))
 
   export const requestFocus = () => item.requestFocus()
 
