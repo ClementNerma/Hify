@@ -2,6 +2,8 @@
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
+
+  const COLUMNS = 10
 </script>
 
 {#if $readablePlayQueue}
@@ -11,7 +13,7 @@
         <QueueGalleryTrack
           isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
           position={$readablePlayQueue.tracks.indexOf(track)}
-          columns={7}
+          columns={COLUMNS}
           {track}
         />
       {/each}
