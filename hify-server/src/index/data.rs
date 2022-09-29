@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use super::sorted_map::SortedMap;
 
+/// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Index {
     pub from: PathBuf,
@@ -19,56 +20,59 @@ pub struct Index {
     pub cache: IndexCache,
 }
 
+/// Index cache, used to accelerate requests by pre-computing some results once after index generation.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct IndexCache {
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
-    // Albums where the artist is listed in the "album artists" tag
+    /// Albums where the artist is listed in the "album artists" tag
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 
-    // Albums where the artist is listed in one of the tracks but not in the "album artists" tag
+    /// Albums where the artist is listed in one of the tracks but not in the "album artists" tag
     pub artists_album_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 
-    // Tracks where the artist is listed in
+    /// Tracks where the artist is listed in
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
-    // Trachs where the artist is listed in but belonging to an album they're not an "album artist" of
+    /// Trachs where the artist is listed in but belonging to an album they're not an "album artist" of
     pub artists_track_participations: HashMap<ArtistID, Vec<TrackID>>,
 
-    // Tracks belonging to an album
+    /// Tracks belonging to an album
     pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 
-    // Mean score of a score
+    /// Mean score of a score
     pub albums_mean_score: HashMap<AlbumID, f64>,
 
-    // Mean score of an artist
+    /// Mean score of an artist
     pub artists_mean_score: HashMap<ArtistID, f64>,
 
-    // Mean score of an album artist (= artist who has at least 1 album)
+    /// Mean score of an album artist (= artist who has at least 1 album)
     pub albums_artists_mean_score: HashMap<ArtistID, f64>,
 
-    // Informations about artists
+    /// Informations about artists
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
 
-    // Informations about album arists
+    /// Informations about album arists
     pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
 
-    // Informations about albums
+    /// Informations about albums
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
 
-    // Informations about genres
+    /// Informations about genres
     pub genre_infos: SortedMap<GenreID, GenreInfos>,
 
-    // List of album for each genre
+    /// List of album for each genre
     pub genres_albums: HashMap<GenreID, SortedMap<AlbumID, AlbumInfos>>,
 
-    // List of tracks for each genre
+    /// List of tracks for each genre
     pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
 
-    // List of tracks who don't have a genre
+    /// List of tracks who don't have a genre
     pub no_genre_tracks: HashSet<TrackID>,
 }
 
+/// Album infos, identifying an album
+/// Mainly aimed to allow fetching album-related data (e.g. tracks) from the GraphQL API
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AlbumInfos {
     pub name: String,
@@ -90,6 +94,8 @@ impl AlbumInfos {
     }
 }
 
+/// Artist infos, identifying an artist
+/// Mainly aimed to allow fetching artist-related data (e.g. albums) from the GraphQL API
 #[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArtistInfos {
     pub name: String,
@@ -107,6 +113,8 @@ impl ArtistInfos {
     }
 }
 
+/// Genre infos, identifying a genre
+/// Mainly aimed to allow fetching genre-related data (e.g. albums) from the GraphQL API
 #[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GenreInfos {
     pub name: String,
@@ -136,6 +144,8 @@ pub struct ArtistID(pub String);
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct GenreID(pub String);
 
+/// Full track informations
+/// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct Track {
@@ -165,38 +175,62 @@ impl Ord for Track {
     }
 }
 
+/// List of audio-related metadata
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 pub struct TrackMetadata {
+    /// Audio file format
     pub format: AudioFormat,
+
+    /// File size, in bytes
     pub size: u64,
+
+    /// Duration, in seconds
     pub duration: u32,
+
+    /// Audio tags
     pub tags: TrackTags,
 }
 
+/// List of audio tags
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct TrackTags {
+    /// The track's title
     pub title: String,
 
+    /// The track's artists list
+    /// Not shown in GraphQL as another method is present to fetch a list of ArtistInfos instead
     #[graphql(skip)]
     pub artists: Vec<String>,
 
+    /// The track's composers
     pub composers: Vec<String>,
 
+    /// The track's album
+    /// Not shown in GraphQL as another method is present to fetch an AlbumInfos instead
     #[graphql(skip)]
     pub album: String,
 
+    /// The track's album artists list
+    /// Not shown in GraphQL as another method is present to fetch a list of ArtistInfos instead
     #[graphql(skip)]
     pub album_artists: Vec<String>,
 
+    /// The disc number the track is present on
     pub disc: Option<u32>,
+
+    /// The track's number in its own disc
     pub track_no: Option<u32>,
 
+    /// The track's release date
     pub date: Option<TrackDate>,
 
+    /// The track's genres list
+    /// Not shown in GraphQL as another method is present to fetch a list of GenreInfos instead
     #[graphql(skip)]
     pub genres: Vec<String>,
 
+    /// The track's rating, from 0 to 100
     pub rating: Option<u8>,
 }
 
@@ -223,6 +257,8 @@ impl TrackTags {
     }
 }
 
+/// List of supported audio formats
+/// Other formats may be supported by the extraction tool, but not listed here as not supported by web browsers
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Enum)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum AudioFormat {
@@ -234,9 +270,15 @@ pub enum AudioFormat {
     M4A,
 }
 
+/// The release date of a track
 #[derive(Serialize, Deserialize, Clone, Copy, SimpleObject, PartialEq, Eq)]
 pub struct TrackDate {
+    /// The full year
     pub year: u32,
+
+    /// Day, starting from 1
     pub month: Option<u8>,
+
+    /// Day, starting from 1
     pub day: Option<u8>,
 }
