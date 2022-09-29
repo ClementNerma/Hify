@@ -17,6 +17,15 @@
     () => $readableAudioPaused === false,
   )
 
+  function onKeyPress(): boolean {
+    if ($distractionFreeMode) {
+      setDistractionFree(false)
+      return true
+    }
+
+    return false
+  }
+
   onMount(() => blackBackground.set(true))
   onDestroy(() => blackBackground.set(false))
 
@@ -36,7 +45,7 @@
   />
 
   <DistractionFreeTogglable>
-    <NavigableWithHandlers onBack={() => setDistractionFree(true)}>
+    <NavigableWithHandlers onBack={() => setDistractionFree(true)} {onKeyPress}>
       <NowPlayingBottomPanel currentTrack={$currentTrack} />
     </NavigableWithHandlers>
   </DistractionFreeTogglable>
