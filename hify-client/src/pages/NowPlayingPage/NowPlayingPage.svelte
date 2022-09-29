@@ -11,14 +11,12 @@
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
 
-  const setDistractionFree = setupDistractionFreeListener(
-    3000,
-    ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape'],
-    () => $readableAudioPaused === false,
-  )
+  const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
-  function onKeyPress(): boolean {
-    if ($distractionFreeMode) {
+  const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
+
+  function onKeyPress(key: string): boolean {
+    if ($distractionFreeMode && !ignoredKeys.includes(key)) {
       setDistractionFree(false)
       return true
     }
