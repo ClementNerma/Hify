@@ -36,6 +36,7 @@
     )}
   {position}
   {display}
+  fullHeight
 >
   <slot {item} />
 </SimpleNavigableItem>

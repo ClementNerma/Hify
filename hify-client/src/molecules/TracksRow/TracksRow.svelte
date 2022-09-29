@@ -8,6 +8,9 @@
 
 <Row>
   {#each tracks as track, i (track.id)}
-    <TrackCard {track} {tracks} position={i} />
+    <!-- This <div> allows the inner item to reach full height -->
+    <div>
+      <TrackCard {track} {tracks} position={i} />
+    </div>
   {/each}
 </Row>
