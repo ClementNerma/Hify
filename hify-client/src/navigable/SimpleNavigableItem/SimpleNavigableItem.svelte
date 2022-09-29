@@ -34,6 +34,8 @@
     position,
     hasFocusPriority,
 
+    disabled,
+
     onFocus: () => {
       focused = true
       onFocus?.()
