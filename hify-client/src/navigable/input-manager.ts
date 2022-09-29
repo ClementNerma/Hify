@@ -56,6 +56,11 @@ document.body.addEventListener('keydown', (e) => {
     return
   }
 
+  // Allow to open developer tools
+  if (e.key === 'F12') {
+    return
+  }
+
   e.preventDefault()
   e.stopImmediatePropagation()
 
