@@ -31,9 +31,9 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             tracks_paths: HashMap::new(),
 
             artists_albums: HashMap::new(),
+            artists_album_participations: HashMap::new(),
             artists_tracks: HashMap::new(),
 
-            albums_artists_albums: HashMap::new(),
             artists_mean_score: HashMap::new(),
             albums_artists_mean_score: HashMap::new(),
 

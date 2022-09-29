@@ -309,7 +309,7 @@ impl ArtistInfos {
             pagination,
             index
                 .cache
-                .albums_artists_albums
+                .artists_albums
                 .get(&self.get_id())
                 .unwrap_or(&SortedMap::empty()),
             |album| album.get_id(),
@@ -326,7 +326,7 @@ impl ArtistInfos {
             pagination,
             index
                 .cache
-                .artists_albums
+                .artists_album_participations
                 .get(&self.get_id())
                 .unwrap_or(&SortedMap::empty()),
             |album| album.get_id(),

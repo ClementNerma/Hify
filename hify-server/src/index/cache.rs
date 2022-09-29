@@ -16,8 +16,8 @@ pub fn build_index_cache(
     let mut tracks_formats = HashMap::new();
 
     let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
+    let mut artists_album_participations = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut artists_tracks = HashMap::<ArtistID, Vec<TrackID>>::new();
-    let mut albums_artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
 
     let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
@@ -42,7 +42,7 @@ pub fn build_index_cache(
         for album_artist_infos in tags.get_album_artists_infos() {
             albums_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
 
-            albums_artists_albums
+            artists_albums
                 .entry(album_artist_infos.get_id())
                 .or_default()
                 .insert(album_infos.clone());
@@ -56,15 +56,17 @@ pub fn build_index_cache(
 
             artists_infos.insert(artist_id.clone(), artist_infos.clone());
 
-            artists_albums
-                .entry(artist_id.clone())
-                .or_default()
-                .insert(album_infos.clone());
-
             artists_tracks
-                .entry(artist_id.clone())
+                .entry(artist_id)
                 .or_default()
                 .push(track.id.clone());
+        }
+
+        for artist_infos in tags.get_artists_infos() {
+            artists_album_participations
+                .entry(artist_infos.get_id())
+                .or_default()
+                .insert(album_infos.clone());
         }
 
         albums_tracks
@@ -93,7 +95,7 @@ pub fn build_index_cache(
         }
     }
 
-    let artists_albums = artists_albums
+    let artists_album_participations = artists_album_participations
         .into_iter()
         .map(|(k, v)| {
             (
@@ -103,7 +105,7 @@ pub fn build_index_cache(
         })
         .collect();
 
-    let albums_artists_albums = albums_artists_albums
+    let artists_albums = artists_albums
         .into_iter()
         .map(|(k, v)| {
             (
@@ -183,7 +185,7 @@ pub fn build_index_cache(
         })
         .collect();
 
-    let albums_artists_mean_score = albums_artists_albums
+    let albums_artists_mean_score = artists_albums
         .iter()
         .filter_map(|(artist_id, artist_albums)| {
             let rated_tracks: Vec<_> = artist_albums
@@ -207,9 +209,9 @@ pub fn build_index_cache(
 
         artists_albums,
         artists_tracks,
+        artists_album_participations,
 
         albums_tracks,
-        albums_artists_albums,
 
         albums_mean_score,
         artists_mean_score,
