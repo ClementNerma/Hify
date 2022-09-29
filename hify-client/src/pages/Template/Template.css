@@ -22,7 +22,7 @@ body {
   right: 0;
   bottom: 0;
   color: rgb(230, 230, 230);
-  overflow-x: hidden;
+  overflow: auto;
 
   background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
   background-attachment: fixed;
