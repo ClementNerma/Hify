@@ -45,7 +45,7 @@ export class SimpleNavigableItem extends NavigableItem {
       throw new Error('Tried to call unsupported action callback on navigable item')
     }
 
-    if (this.props.disabled) {
+    if (this.props.disabled === true) {
       return null
     }
 
