@@ -27,11 +27,6 @@
 
   <MixGenerator />
 
-  <Row>
-    <IndexUpdater />
-    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
-  </Row>
-
   <h3>Tracks you like to listen to:</h3>
 
   <TracksRow tracks={popularTracks} />
@@ -58,7 +53,10 @@
 
   <h3>Tools</h3>
 
-  <Spacer />
+  <Row>
+    <IndexUpdater />
+    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
+  </Row>
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
 {/await}
