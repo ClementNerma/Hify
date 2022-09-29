@@ -3,11 +3,6 @@ html {
   font-size: 12px;
 }
 
-html,
-body {
-  overflow-x: hidden;
-}
-
 @property --linear-start {
   syntax: '<color>';
   initial-value: rgba(8, 4, 45, 1);
@@ -27,6 +22,7 @@ body {
   right: 0;
   bottom: 0;
   color: rgb(230, 230, 230);
+  overflow-x: hidden;
 
   background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
   background-attachment: fixed;
