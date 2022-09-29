@@ -3,7 +3,7 @@
   import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 
-  const COLUMNS = 9
+  const COLUMNS = 8
 </script>
 
 {#if $readablePlayQueue}
