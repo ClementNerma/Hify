@@ -3,9 +3,7 @@
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import Button from '../../atoms/Button/Button.svelte'
-  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import Card from '../../molecules/Card/Card.svelte'
-  import { getAlbumArtUri } from '../../rest-api'
+  import TrackCard from '../../molecules/TrackCard/TrackCard.svelte'
 
   export let artistId: string
 
@@ -48,16 +46,8 @@
   <h3>Tracks from other artists' albums ({tracks.length})</h3>
 
   <Grid columns={TRACKS_PER_LINE}>
-    {#each tracks as track, i}
-      <NavigableTrack {track} {tracks} position={i}>
-        <Card
-          title={track.metadata.tags.title}
-          subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
-            .map((artist) => artist.name)
-            .join(' / ')}`}
-          pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-        />
-      </NavigableTrack>
+    {#each tracks as track}
+      <TrackCard {track} {tracks} />
     {/each}
   </Grid>
 
