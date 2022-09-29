@@ -135,6 +135,13 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     })
 }
 
+pub fn rebuild_cache(index: Index) -> Index {
+    Index {
+        cache: build_index_cache(&index.tracks, index.cache.tracks_paths),
+        ..index
+    }
+}
+
 fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
     WalkDir::new(from)
         .min_depth(1)

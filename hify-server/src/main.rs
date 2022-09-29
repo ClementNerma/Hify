@@ -20,12 +20,14 @@ async fn main() {
 }
 
 async fn inner_main() -> Result<()> {
+    #[deny(unused_variables)]
     let cmd::Command {
         music_dir,
         index_file,
         user_data_file,
         rebuild_index,
         update_index,
+        rebuild_cache,
         no_server,
     } = cmd::Command::parse();
 
@@ -56,6 +58,12 @@ async fn inner_main() -> Result<()> {
         utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
         println!("> Index saved on disk.");
 
+        index
+    };
+
+    let index = if rebuild_cache {
+        index::rebuild_cache(index)
+    } else {
         index
     };
 
