@@ -43,7 +43,7 @@ pub fn build_index_cache(
         let album_artists: HashSet<_> = tags.get_album_artists_infos().collect();
 
         let track_artists = tags.get_artists_infos().collect::<HashSet<_>>();
-        let non_album_artists = &album_artists - &track_artists;
+        let non_album_artists = &track_artists - &album_artists;
 
         for album_artist_infos in &album_artists {
             albums_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
@@ -52,17 +52,6 @@ pub fn build_index_cache(
                 .entry(album_artist_infos.get_id())
                 .or_default()
                 .insert(album_infos.clone());
-        }
-
-        for artist_infos in album_artists.iter().chain(non_album_artists.iter()) {
-            let artist_id = artist_infos.get_id();
-
-            artists_infos.insert(artist_id.clone(), artist_infos.clone());
-
-            artists_tracks
-                .entry(artist_id)
-                .or_default()
-                .push(track.id.clone());
         }
 
         for non_album_artist_infos in &non_album_artists {
@@ -77,6 +66,17 @@ pub fn build_index_cache(
                 .entry(artist_id)
                 .or_default()
                 .push(track.id.clone())
+        }
+
+        for artist_infos in album_artists.iter().chain(non_album_artists.iter()) {
+            let artist_id = artist_infos.get_id();
+
+            artists_infos.insert(artist_id.clone(), artist_infos.clone());
+
+            artists_tracks
+                .entry(artist_id)
+                .or_default()
+                .push(track.id.clone());
         }
 
         albums_tracks
