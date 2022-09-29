@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, Writable, writable } from 'svelte/store'
 import { logFatal, logWarn } from '../stores/debugger'
-import { handleInput, registerLongPressableKeys, REMAPPED_KEYS } from './input-manager'
+import { handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
   Up,
@@ -396,11 +396,9 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
     case 'Enter':
     case 'Escape':
-    case REMAPPED_KEYS.Escape:
       const events: { [key in typeof key]: NavigationAction } = {
         Enter: long ? NavigationAction.LongPress : NavigationAction.Press,
         Escape: long ? NavigationAction.LongBack : NavigationAction.Back,
-        [REMAPPED_KEYS.Escape]: long ? NavigationAction.LongBack : NavigationAction.Back,
       }
 
       const event = events[key]
