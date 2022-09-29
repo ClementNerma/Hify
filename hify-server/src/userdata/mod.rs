@@ -52,15 +52,17 @@ impl UserDataWrapper {
             }
         }
 
-        self.inner.history.insert(0, track_id.clone());
+        self.inner.history.insert(0, track_id);
 
+        (self.on_change)(&self.inner);
+    }
+
+    pub fn increase_listenings(&mut self, track_id: TrackID) {
         match self.inner.listenings.entry(track_id) {
             Entry::Occupied(mut occ) => *occ.get_mut() += 1,
             Entry::Vacant(vac) => {
                 vac.insert(1);
             }
         };
-
-        (self.on_change)(&self.inner);
     }
 }
