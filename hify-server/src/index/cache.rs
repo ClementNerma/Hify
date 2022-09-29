@@ -40,7 +40,12 @@ pub fn build_index_cache(
 
         albums_infos.insert(album_id.clone(), album_infos.clone());
 
-        for album_artist_infos in tags.get_album_artists_infos() {
+        let album_artists: HashSet<_> = tags.get_album_artists_infos().collect();
+
+        let track_artists = tags.get_artists_infos().collect::<HashSet<_>>();
+        let non_album_artists = &album_artists - &track_artists;
+
+        for album_artist_infos in &album_artists {
             albums_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
 
             artists_albums
@@ -49,10 +54,7 @@ pub fn build_index_cache(
                 .insert(album_infos.clone());
         }
 
-        for artist_infos in tags
-            .get_album_artists_infos()
-            .chain(tags.get_artists_infos())
-        {
+        for artist_infos in album_artists.iter().chain(non_album_artists.iter()) {
             let artist_id = artist_infos.get_id();
 
             artists_infos.insert(artist_id.clone(), artist_infos.clone());
@@ -63,7 +65,7 @@ pub fn build_index_cache(
                 .push(track.id.clone());
         }
 
-        for non_album_artist_infos in tags.get_artists_infos() {
+        for non_album_artist_infos in &non_album_artists {
             let artist_id = non_album_artist_infos.get_id();
 
             artists_album_participations
