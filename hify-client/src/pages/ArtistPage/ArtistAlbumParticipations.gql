@@ -1,0 +1,14 @@
+query ArtistAlbumParticipations($artistId: String!, $pagination: PaginationInput!) {
+  artist(id: $artistId) {
+    albumParticipations(pagination: $pagination) {
+      nodes {
+        ...AlbumCard
+      }
+
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}

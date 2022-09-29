@@ -1,0 +1,14 @@
+query ArtistTrackParticipations($artistId: String!, $pagination: PaginationInput!) {
+  artist(id: $artistId) {
+    trackParticipations(pagination: $pagination) {
+      nodes {
+        ...AudioTrack
+      }
+
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}

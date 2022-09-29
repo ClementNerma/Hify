@@ -1,15 +1,5 @@
-query ArtistPage($artistId: String!, $pagination: PaginationInput!) {
+query ArtistPage($artistId: String!) {
   artist(id: $artistId) {
     name
-    albumParticipations(pagination: $pagination) {
-      nodes {
-        ...AlbumCard
-      }
-
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-    }
   }
 }
