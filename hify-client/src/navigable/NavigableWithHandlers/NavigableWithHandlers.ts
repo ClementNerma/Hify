@@ -9,6 +9,8 @@ export type NavigableWithHandlersProps = {
   onLongPress?: () => NavigableItem | null | void
   onBack?: () => NavigableItem | null | void
   onLongBack?: () => NavigableItem | null | void
+
+  onKeyPress?: (key: string) => boolean | void
 }
 
 export class NavigableWithHandlers extends NavigableOne {
@@ -46,5 +48,9 @@ export class NavigableWithHandlers extends NavigableOne {
       case NavigationAction.LongBack:
         return this.props.onLongBack?.() ?? null
     }
+  }
+
+  override interceptKey(key: string): boolean | void {
+    return this.props.onKeyPress?.(key)
   }
 }

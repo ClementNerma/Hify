@@ -63,6 +63,8 @@ export abstract class NavigableCommon {
   abstract handleAction(key: NavigationAction): NavigableItem | null
 
   abstract requestFocus(): boolean
+
+  interceptKey(key: string): boolean | void {}
 }
 
 export abstract class NavigableContainer extends NavigableCommon {
@@ -367,6 +369,12 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
   const current = __current
 
+  for (const item of _getItemChain(current)) {
+    if (item.interceptKey(key)) {
+      return
+    }
+  }
+
   let next: NavigableItem | null
 
   switch (key) {
@@ -410,7 +418,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
 
       next = null
 
-      for (const nav of _getParentsWithItem(current)) {
+      for (const nav of _getItemChain(current)) {
         if (!nav.canHandleAction(event)) {
           continue
         }
@@ -443,22 +451,17 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
   }
 }
 
-function _getParents(item: NavigableItem): NavigableContainer[] {
-  const parents: NavigableContainer[] = []
+function _getItemChain(item: NavigableItem): Navigable[] {
+  const out: Navigable[] = [item]
 
   let current: NavigableContainer = item.parent
 
   while (!(current instanceof NavigablePage)) {
-    parents.push(current)
+    out.push(current)
     current = current.parent
   }
 
-  return parents
-}
-
-function _getParentsWithItem(item: NavigableItem): Navigable[] {
-  const out: Navigable[] = [item]
-  return out.concat(_getParents(item))
+  return out
 }
 
 function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
@@ -501,12 +504,9 @@ function _generateUpdatedNavState(
 }
 
 function _propagateFocusChangeEvent(item: NavigableItem, focused: boolean): void {
-  let curr: NavigableCommon = item
-
-  do {
-    curr.onFocusChangeCallback?.(focused)
-    curr = curr.parent
-  } while (!(curr instanceof NavigablePage))
+  for (const subItem of _getItemChain(item)) {
+    subItem.onFocusChangeCallback?.(focused)
+  }
 }
 
 export type RequestFocus = () => boolean
