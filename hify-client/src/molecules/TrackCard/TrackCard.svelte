@@ -4,9 +4,9 @@
   import { getAlbumArtUri } from '../../rest-api'
   import Card from '../Card/Card.svelte'
 
-  let track: AudioTrackFragment
-  let tracks: AudioTrackFragment[]
-  let position: number | null = null
+  export let track: AudioTrackFragment
+  export let tracks: AudioTrackFragment[]
+  export let position: number | null = null
 </script>
 
 <NavigableTrack {track} {tracks} {position}>
