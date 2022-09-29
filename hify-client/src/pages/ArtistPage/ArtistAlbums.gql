@@ -1,6 +1,6 @@
-query ArtistAlbumParticipations($artistId: String!, $pagination: PaginationInput!) {
+query ArtistAlbums($artistId: String!, $pagination: PaginationInput!) {
   artist(id: $artistId) {
-    albumParticipations(pagination: $pagination) {
+    albums(pagination: $pagination) {
       nodes {
         ...AlbumCard
       }

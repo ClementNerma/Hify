@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AsyncArtistPage } from '../../graphql/generated'
 
-  import ArtistAlbumParticipations from './ArtistAlbumParticipations.svelte'
+  import ArtistAlbums from './ArtistAlbums.svelte'
   import ArtistTrackParticipations from './ArtistTrackParticipations.svelte'
 
   export let artistId: string
@@ -19,7 +19,7 @@
   {:else}
     <h2>Artist: {artist.name}</h2>
 
-    <ArtistAlbumParticipations {artistId} />
+    <ArtistAlbums {artistId} />
 
     <ArtistTrackParticipations {artistId} />
   {/if}

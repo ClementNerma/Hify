@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncArtistAlbumParticipations } from '../../graphql/generated'
+  import { AlbumCardFragment, AsyncArtistAlbums } from '../../graphql/generated'
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
@@ -17,7 +17,7 @@
       return currentPageInfo
     }
 
-    const res = await AsyncArtistAlbumParticipations({
+    const res = await AsyncArtistAlbums({
       variables: {
         artistId,
         pagination: {
@@ -25,7 +25,7 @@
           first: ALBUMS_PER_LINE * LINES_PER_REQUEST,
         },
       },
-    }).then((res) => res.data.artist?.albumParticipations)
+    }).then((res) => res.data.artist?.albums)
 
     if (!res) {
       throw new Error("Failed to fetch artist's data")
