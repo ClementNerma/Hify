@@ -50,6 +50,8 @@ async fn inner_main() -> Result<()> {
                     .context("Failed to rebuild index")?;
             } else if rebuild_cache {
                 index = index::rebuild_cache(index);
+                utils::save::save_index(&index_file, &index)
+                    .context("Failed to save index file with rebuilt cache")?;
             }
 
             println!("> Done.");
