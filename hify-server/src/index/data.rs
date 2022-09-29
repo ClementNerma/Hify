@@ -142,8 +142,8 @@ impl Ord for Track {
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 pub struct TrackMetadata {
     pub format: AudioFormat,
-    pub size: i32,
-    pub duration: i32,
+    pub size: u64,
+    pub duration: u32,
     pub tags: TrackTags,
 }
 
@@ -163,8 +163,8 @@ pub struct TrackTags {
     #[graphql(skip)]
     pub album_artists: Vec<String>,
 
-    pub disc: Option<i32>,
-    pub track_no: Option<i32>,
+    pub disc: Option<u32>,
+    pub track_no: Option<u32>,
 
     pub date: Option<TrackDate>,
 
@@ -210,7 +210,7 @@ pub enum AudioFormat {
 
 #[derive(Serialize, Deserialize, Clone, Copy, SimpleObject, PartialEq, Eq)]
 pub struct TrackDate {
-    pub year: i32,
-    pub month: Option<i32>,
-    pub day: Option<i32>,
+    pub year: u32,
+    pub month: Option<u8>,
+    pub day: Option<u8>,
 }

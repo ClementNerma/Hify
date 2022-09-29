@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 use serde::Deserialize;
 
 use crate::index::{AudioFormat, TrackMetadata};
@@ -18,13 +18,8 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
 
     Ok(TrackMetadata {
         format,
-        size: i32::try_from(analyzed.FileSize).with_context(|| {
-            format!(
-                "Size is too big to be returned to GraphQL: {}",
-                analyzed.FileSize
-            )
-        })?,
-        duration: analyzed.Duration as i32,
+        size: analyzed.FileSize,
+        duration: analyzed.Duration.round() as u32,
         tags: parse_exiftool_tags(analyzed.tags)?,
     })
 }
@@ -33,7 +28,7 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
 #[allow(non_snake_case)]
 pub struct ExifToolFile {
     FileType: String,
-    Duration: f32,
+    Duration: f64,
     FileSize: u64,
 
     #[serde(flatten)]

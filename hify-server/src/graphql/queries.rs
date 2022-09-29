@@ -32,10 +32,10 @@ impl QueryRoot {
 
         IndexInfos {
             fingerprint: index.fingerprint.clone(),
-            albums_count: index.cache.albums_infos.len() as i32,
-            albums_artists_count: index.cache.albums_artists_infos.len() as i32,
-            artists_count: index.cache.artists_infos.len() as i32,
-            tracks_count: index.tracks.len() as i32,
+            albums_count: index.cache.albums_infos.len(),
+            albums_artists_count: index.cache.albums_artists_infos.len(),
+            artists_count: index.cache.artists_infos.len(),
+            tracks_count: index.tracks.len(),
         }
     }
 
@@ -154,11 +154,8 @@ impl QueryRoot {
         &self,
         ctx: &Context<'_>,
         input: String,
-        limit: i32,
+        limit: usize,
     ) -> Result<IndexSearchResults> {
-        let limit =
-            usize::try_from(limit).context("Invalid value provided for parameter 'limit'")?;
-
         let index = graphql_index!(ctx);
         let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
 
@@ -177,10 +174,10 @@ impl QueryRoot {
 #[derive(SimpleObject)]
 pub struct IndexInfos {
     fingerprint: String,
-    albums_count: i32,
-    artists_count: i32,
-    albums_artists_count: i32,
-    tracks_count: i32,
+    albums_count: usize,
+    artists_count: usize,
+    albums_artists_count: usize,
+    tracks_count: usize,
 }
 
 #[ComplexObject]
@@ -232,7 +229,7 @@ impl AlbumInfos {
             .collect()
     }
 
-    async fn year(&self, ctx: &Context<'_>) -> Option<i32> {
+    async fn year(&self, ctx: &Context<'_>) -> Option<u32> {
         let index = graphql_index!(ctx);
         let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
         let years: Vec<_> = album_tracks

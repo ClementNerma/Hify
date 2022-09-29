@@ -55,19 +55,14 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
     Ok(tags)
 }
 
-fn parse_set_number(input: &str, category: &'static str) -> Result</*u16*/ i32> {
+fn parse_set_number(input: &str, category: &'static str) -> Result<u32> {
     PARSE_TRACK_OR_DISC_NUMBER
         .captures(input)
         .with_context(|| format!("Invalid {category} value: {input}"))
         .and_then(|c| {
-            c.name("number")
-                .unwrap()
-                .as_str()
-                .parse::<u16>()
-                .map(i32::from)
-                .with_context(|| {
-                    format!("Internal error: failed to parse validated {category} number: {input}")
-                })
+            c.name("number").unwrap().as_str().parse().with_context(|| {
+                format!("Internal error: failed to parse validated {category} number: {input}")
+            })
         })
 }
 
@@ -83,21 +78,17 @@ fn parse_date(input: &str) -> Result<TrackDate> {
             .name("year")
             .unwrap()
             .as_str()
-            .parse::<u16>()
-            .map(i32::from)
+            .parse::<u32>()
             .context("Invalid year number")?,
 
         month: captured
             .name("month")
             .map(|month| month.as_str().parse::<u8>().context("Invalid month number"))
-            .transpose()?
-            .map(i32::from),
-
+            .transpose()?,
         day: captured
             .name("day")
             .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
-            .transpose()?
-            .map(i32::from),
+            .transpose()?,
     })
 }
 
