@@ -23,8 +23,8 @@ pub struct Command {
     #[clap(
         long,
         help = "Rebuild the cache",
-        conflicts_with = "update_index",
-        conflicts_with = "rebuild_index"
+        conflicts_with = "update-index",
+        conflicts_with = "rebuild-index"
     )]
     pub rebuild_cache: bool,
 
