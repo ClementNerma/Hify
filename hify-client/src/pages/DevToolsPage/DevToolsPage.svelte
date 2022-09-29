@@ -1,9 +1,9 @@
 <script lang="ts">
   import Button from '../../atoms/Button/Button.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
+  import Row from '../../atoms/Row/Row.svelte'
   import { hifyInterface } from '../../injected'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
   import { bind } from '../../utils'
@@ -15,13 +15,13 @@
 
 <h2>Developer Tools</h2>
 
-<NavigableRow>
+<Row>
   <Button onPress={() => location.reload()}>Reload the application</Button>
   <Checkbox bind:checked={hideDebugLogs}>Hide debug logs</Checkbox>
   {#if hifyInterface}
     <Button onPress={bind(hifyInterface, (h) => h.updateAppUrl())}>🛠️ Change the application's URL</Button>
   {/if}
-</NavigableRow>
+</Row>
 
 <NavigableList>
   {#each slicedAppLogs as logEntry}
