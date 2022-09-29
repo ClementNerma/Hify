@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, Paginated, PaginationInput},
+    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
     GraphQLContext,
 };
 
@@ -331,6 +331,25 @@ impl ArtistInfos {
                 .unwrap_or(&SortedMap::empty()),
             |album| album.get_id(),
         )
+    }
+
+    async fn track_participations(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track> {
+        let index = graphql_index!(ctx);
+
+        let tracks = index
+            .cache
+            .artists_track_participations
+            .get(&self.get_id())
+            .map(Vec::as_slice)
+            .unwrap_or(&[]);
+
+        paginate_mapped_slice(pagination, tracks, |track_id| {
+            index.tracks.get(track_id).unwrap().clone()
+        })
     }
 }
 
