@@ -39,16 +39,17 @@ impl QueryRoot {
         }
     }
 
-    async fn history(&self, ctx: &Context<'_>) -> Vec<Track> {
+    async fn history(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track> {
         let index = graphql_index!(ctx);
         let user_data = graphql_user_data!(ctx);
 
-        user_data
-            .history()
-            .iter()
-            .filter_map(|id| index.tracks.get(id))
-            .cloned()
-            .collect()
+        paginate_mapped_slice(pagination, &user_data.history(), |track_id| {
+            index.tracks.get(track_id).unwrap().clone()
+        })
     }
 
     async fn albums(
