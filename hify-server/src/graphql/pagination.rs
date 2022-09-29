@@ -1,5 +1,3 @@
-use std::hash::Hash;
-
 use async_graphql::{
     connection::{Connection, CursorType, Edge},
     InputObject, OutputType, Result,
@@ -22,13 +20,45 @@ pub struct PaginationInput {
 /// Can be returned directly from a GraphQL query
 pub type Paginated<C, T> = Result<Connection<C, T>>;
 
-/// Compute a paginated result from a list of items and a [`PaginationInput`]
+/// Compute a paginated result from a paginable container and a [`PaginationInput`]
 /// Requires an index cache to quickly avoid performing a full slice lookup
-pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + OutputType>(
+pub fn paginate<C: CursorType + Send + Sync, T: OutputType + Clone>(
     pagination: PaginationInput,
     items: impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T) -> C,
 ) -> Paginated<C, T> {
+    raw_paginate(
+        pagination,
+        items,
+        |item, _| item_cursor(item),
+        |item| item.clone(),
+    )
+}
+
+/// Compute a paginated result from a list of items and a [`PaginationInput`]
+pub fn paginate_slice<T: OutputType + Clone>(
+    pagination: PaginationInput,
+    items: &[T],
+) -> Paginated<usize, T> {
+    paginate_mapped_slice(pagination, items, |item| item.clone())
+}
+
+/// Compute a paginated result from a list of mappable items and a [`PaginationInput`]
+pub fn paginate_mapped_slice<T, U: OutputType>(
+    pagination: PaginationInput,
+    items: &[T],
+    mapper: impl Fn(&T) -> U,
+) -> Paginated<usize, U> {
+    raw_paginate(pagination, items, |_, i| i, |item| mapper(item))
+}
+
+/// Compute raw pagination
+pub fn raw_paginate<C: CursorType + Send + Sync, T, U: OutputType>(
+    pagination: PaginationInput,
+    items: impl Paginable<By = C, Item = T>,
+    item_cursor: impl Fn(&T, usize) -> C,
+    mapper: impl Fn(&T) -> U,
+) -> Paginated<C, U> {
     // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
     let (cursor, count, direction) = match (
         pagination.after,
@@ -93,7 +123,7 @@ pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + Output
     };
 
     // Create a Relay value
-    let mut connection = Connection::<C, T>::new(start_at > 0, start_at + count < items.len());
+    let mut connection = Connection::<C, U>::new(start_at > 0, start_at + count < items.len());
 
     // Compute the paginated results' edges lazily
     let edges = items
@@ -101,7 +131,8 @@ pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + Output
         .iter()
         .skip(start_at)
         .take(count)
-        .map(|item| Edge::new(item_cursor(item), item.clone()));
+        .enumerate()
+        .map(|(i, item)| Edge::new(item_cursor(item, i), mapper(item)));
 
     // Produce the paginated results
     match direction {
@@ -114,12 +145,33 @@ pub fn paginate<C: CursorType + Eq + Hash + Send + Sync, T: Clone + Ord + Output
 }
 
 pub trait Paginable {
-    type By: CursorType;
-    type Item: OutputType + Clone;
+    type By;
+    type Item;
 
     fn len(&self) -> usize;
     fn get_index(&self, cursor: &Self::By) -> Option<usize>;
     fn ordered_values(&self) -> &[Self::Item];
+}
+
+impl<T> Paginable for &[T] {
+    type By = usize;
+    type Item = T;
+
+    fn len(&self) -> usize {
+        (self as &[T]).len()
+    }
+
+    fn get_index(&self, cursor: &Self::By) -> Option<usize> {
+        if *cursor >= self.len() {
+            None
+        } else {
+            Some(*cursor)
+        }
+    }
+
+    fn ordered_values(&self) -> &[Self::Item] {
+        &self
+    }
 }
 
 enum Direction {
