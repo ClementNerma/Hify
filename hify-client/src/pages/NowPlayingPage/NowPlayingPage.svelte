@@ -9,10 +9,11 @@
   import { onMount, onDestroy } from 'svelte'
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
+  import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
 
   const setDistractionFree = setupDistractionFreeListener(
     3000,
-    ['MediaPlayPause', 'MediaRewind', 'MediaFastForward'],
+    ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape'],
     () => $readableAudioPaused === false,
   )
 
@@ -35,7 +36,15 @@
   />
 
   <DistractionFreeTogglable>
-    <NowPlayingBottomPanel currentTrack={$currentTrack} />
+    <NavigableWithHandlers
+      onBack={() => {
+        if (!$readableAudioPaused) {
+          setDistractionFree(true)
+        }
+      }}
+    >
+      <NowPlayingBottomPanel currentTrack={$currentTrack} />
+    </NavigableWithHandlers>
   </DistractionFreeTogglable>
 {/if}
 

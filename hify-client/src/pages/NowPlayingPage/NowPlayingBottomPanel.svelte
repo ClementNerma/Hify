@@ -18,6 +18,7 @@
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
   import NavigableOne from '../../navigable/NavigableOne/NavigableOne.svelte'
+  import Column from '../../atoms/Column/Column.svelte'
 
   export let currentTrack: AudioTrackFragment
   let isQueueFocused = false
@@ -28,62 +29,64 @@
 </script>
 
 <div class="player-bottom" class:isQueueFocused>
-  <div class="track-infos">
-    <NavigableRow>
-      <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
-        <div class="track-info">🎵 {tags.title}</div>
-      </SimpleNavigableItem>
-      <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
-        <div class="track-info">💿 {album.name}</div>
-      </SimpleNavigableItem>
-      {#if tags.date}
-        <div data-item-like-style>
-          <div class="track-info">🕒 {formatDate(tags.date)}</div>
-        </div>
-      {/if}
-
-      {#each artists as artist}
-        <SimpleNavigableItem onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}>
-          <div class="track-info">🎤 {artist.name}</div>
+  <Column>
+    <div class="track-infos">
+      <NavigableRow>
+        <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+          <div class="track-info">🎵 {tags.title}</div>
         </SimpleNavigableItem>
-      {/each}
-    </NavigableRow>
-  </div>
+        <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
+          <div class="track-info">💿 {album.name}</div>
+        </SimpleNavigableItem>
+        {#if tags.date}
+          <div data-item-like-style>
+            <div class="track-info">🕒 {formatDate(tags.date)}</div>
+          </div>
+        {/if}
 
-  <div class="player-time">
-    <div class="track-progress">
-      {#if $readableAudioProgress !== null}
-        {humanReadableDuration($readableAudioProgress)}
-      {:else}
-        --:--
-      {/if}
-      {#if $readableAudioPaused}
-        ⏸️
-      {/if}
+        {#each artists as artist}
+          <SimpleNavigableItem onPress={bind(artist.id, (id) => navigate(ROUTES.artist(id)))}>
+            <div class="track-info">🎤 {artist.name}</div>
+          </SimpleNavigableItem>
+        {/each}
+      </NavigableRow>
     </div>
-    <div class="track-duration">
-      {humanReadableDuration(currentTrack.metadata.duration)}
-    </div>
-  </div>
-  <div class="progress-range">
-    <ProgressRange
-      max={currentTrack.metadata.duration}
-      value={$readableAudioProgress}
-      onChange={setPlayingAudioProgress}
-      onPress={toggleAudioPlayback}
-      directionalAmount={30}
-    />
-  </div>
 
-  <div class="play-queue-gallery">
-    <NavigableOne
-      whenFocusChanges={(focused) => {
-        isQueueFocused = focused
-      }}
-    >
-      <QueueGallery />
-    </NavigableOne>
-  </div>
+    <div class="player-time">
+      <div class="track-progress">
+        {#if $readableAudioProgress !== null}
+          {humanReadableDuration($readableAudioProgress)}
+        {:else}
+          --:--
+        {/if}
+        {#if $readableAudioPaused}
+          ⏸️
+        {/if}
+      </div>
+      <div class="track-duration">
+        {humanReadableDuration(currentTrack.metadata.duration)}
+      </div>
+    </div>
+    <div class="progress-range">
+      <ProgressRange
+        max={currentTrack.metadata.duration}
+        value={$readableAudioProgress}
+        onChange={setPlayingAudioProgress}
+        onPress={toggleAudioPlayback}
+        directionalAmount={30}
+      />
+    </div>
+
+    <div class="play-queue-gallery">
+      <NavigableOne
+        whenFocusChanges={(focused) => {
+          isQueueFocused = focused
+        }}
+      >
+        <QueueGallery />
+      </NavigableOne>
+    </div>
+  </Column>
 </div>
 
 <style>
