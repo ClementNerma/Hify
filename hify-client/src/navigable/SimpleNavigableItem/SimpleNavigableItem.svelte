@@ -113,6 +113,15 @@
     padding: 5px;
   }
 
+  navigable-item-wrapper.fullHeight {
+    /* -10px for the 2x 5px padding */
+    height: calc(100% - 10px);
+  }
+
+  navigable-item-wrapper.fullHeight.noPadding {
+    height: 100%;
+  }
+
   :global(navigable-item-wrapper.fullHeight > :first-child) {
     min-height: 100%;
   }
