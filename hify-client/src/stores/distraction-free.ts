@@ -41,12 +41,11 @@ export function setupDistractionFreeListener(
       return
     }
 
-    if (!value) {
+    if (value) {
+      _distractionFreeMode.set(true)
+    } else {
       resetDistractionFreeMode()
-      return
     }
-
-    restartDistractionFreeTimeout()
   }
 
   let destroyed = false
