@@ -43,16 +43,20 @@
 {#await feedMore()}
   <h3>Loading...</h3>
 {:then lastPageInfo}
-  <h3>Tracks from other artists' albums ({tracks.length})</h3>
+  {#if tracks.length === 0}
+    <h3>No participation on other artists' albums</h3>
+  {:else}
+    <h3>Tracks from other artists' albums ({tracks.length})</h3>
 
-  <Grid columns={TRACKS_PER_LINE}>
-    {#each tracks as track}
-      <TrackCard {track} {tracks} />
-    {/each}
-  </Grid>
+    <Grid columns={TRACKS_PER_LINE}>
+      {#each tracks as track}
+        <TrackCard {track} {tracks} />
+      {/each}
+    </Grid>
 
-  {#if lastPageInfo.hasNextPage}
-    <Button onPress={() => feedMore()}>Load more</Button>
+    {#if lastPageInfo.hasNextPage}
+      <Button onPress={() => feedMore()}>Load more</Button>
+    {/if}
   {/if}
 {:catch e}
   <h2>Failed: {e.message}</h2>

@@ -43,16 +43,20 @@
 {#await feedMore()}
   <h3>Loading...</h3>
 {:then lastPageInfo}
-  <h3>Albums ({albums.length})</h3>
+  {#if albums.length === 0}
+    <h3>No album</h3>
+  {:else}
+    <h3>Albums ({albums.length})</h3>
 
-  <Grid columns={ALBUMS_PER_LINE}>
-    {#each albums as album}
-      <AlbumCard {album} />
-    {/each}
-  </Grid>
+    <Grid columns={ALBUMS_PER_LINE}>
+      {#each albums as album}
+        <AlbumCard {album} />
+      {/each}
+    </Grid>
 
-  {#if lastPageInfo.hasNextPage}
-    <Button onPress={() => feedMore()}>Load more</Button>
+    {#if lastPageInfo.hasNextPage}
+      <Button onPress={() => feedMore()}>Load more</Button>
+    {/if}
   {/if}
 {:catch e}
   <h2>Failed: {e.message}</h2>
