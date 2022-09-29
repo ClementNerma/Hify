@@ -370,7 +370,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void | false {
   const current = __current
 
   for (const item of _getItemChain(current)) {
-    if (item.interceptKeyPress(key)) {
+    if (item.interceptKeyPress(key) === false) {
       return
     }
   }
