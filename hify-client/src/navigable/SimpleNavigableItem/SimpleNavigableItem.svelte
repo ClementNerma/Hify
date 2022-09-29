@@ -1,12 +1,17 @@
+<script context="module" lang="ts">
+  export type ItemDisplay = 'inline-block' | 'block' | 'transparent' | null
+</script>
+
 <script lang="ts">
   import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
   import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
   import { afterUpdate, onDestroy } from 'svelte'
-  import { logError } from '../../stores/debugger'
 
-  export let transparent = false
-  export let displayBlock = false
   export let fullHeight = false
+  export let noPadding = false
+  export let display: ItemDisplay = null
+  export let marginRight = 0
+  export let notRounded = false
 
   export let position: SimpleNavigableItemProps['position'] = null
   export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
@@ -24,11 +29,6 @@
   export let onLeft: SimpleNavigableItemProps['onLeft'] = undefined
   export let onRight: SimpleNavigableItemProps['onRight'] = undefined
   export let onDown: SimpleNavigableItemProps['onDown'] = undefined
-
-  if (transparent && displayBlock) {
-    logError('Cannot provide both "displayBlock" and "fillHeight" at the same time!')
-    transparent = false
-  }
 
   const itemProps = (): SimpleNavigableItemProps => ({
     position,
@@ -83,6 +83,8 @@
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean
   let mouseHover = false
+
+  $: translatedDisplay = display === 'transparent' ? 'contents' : display ?? 'inline-block'
 </script>
 
 <navigable-item-wrapper
@@ -98,20 +100,17 @@
   class:focusedOrMouseHover={focused || mouseHover}
   class:focused
   class:mouseHover
-  class:transparent
-  class:displayBlock
   class:fullHeight
+  class:noPadding
+  class:notRounded
+  style="display: {translatedDisplay}; margin-right: {marginRight}px;"
 >
   <slot {item} requestFocus={() => item.requestFocus()} />
 </navigable-item-wrapper>
 
 <style>
-  .transparent {
-    display: contents;
-  }
-
-  .displayBlock {
-    display: block;
+  :global(navigable-item-wrapper:not(.noPadding) > :first-child) {
+    padding: 5px;
   }
 
   .fullHeight {

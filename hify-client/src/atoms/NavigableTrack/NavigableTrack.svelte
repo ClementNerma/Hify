@@ -3,7 +3,7 @@
   import { AudioTrackFragment } from '../../graphql/generated'
   import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
 
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem, { ItemDisplay } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue, queueAsNext } from '../../stores/play-queue'
@@ -11,8 +11,8 @@
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
   export let position: number | null = null
-  export let transparent = false
   export let goToAlbumOption = true
+  export let display: ItemDisplay = null
 
   function play() {
     playTrackFromNewQueue(tracks, tracks.indexOf(track))
@@ -35,7 +35,7 @@
       ]),
     )}
   {position}
-  {transparent}
+  {display}
 >
   <slot {item} />
 </SimpleNavigableItem>

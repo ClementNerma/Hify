@@ -25,7 +25,7 @@
 
 <NavigableList>
   {#each slicedAppLogs as logEntry}
-    <SimpleNavigableItem displayBlock={true}>
+    <SimpleNavigableItem display="block">
       <div class="log-entry {logEntry.level}">
         <u>{logEntry.level.toLocaleUpperCase()}</u>
         <strong>{logEntry.at.toLocaleTimeString()}</strong>: {logEntry.message}

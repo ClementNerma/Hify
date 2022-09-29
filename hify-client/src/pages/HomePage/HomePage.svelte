@@ -23,6 +23,15 @@
 {#await feed}
   <h1>Loading...</h1>
 {:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
+  <h2>Welcome!</h2>
+
+  <MixGenerator />
+
+  <Row>
+    <IndexUpdater />
+    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
+  </Row>
+
   <h3>Tracks you like to listen to:</h3>
 
   <TracksRow tracks={popularTracks} />
@@ -48,12 +57,6 @@
   <ArtistsRow artists={randomGreatArtists} />
 
   <h3>Tools</h3>
-
-  <Row>
-    <IndexUpdater />
-    <MixGenerator />
-    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
-  </Row>
 
   <Spacer />
 {:catch e}

@@ -45,39 +45,31 @@ body.black-background {
   transition: --linear-start 1s, --linear-end 1s, opacity 1s;
 } */
 
-navigable-item-wrapper,
 [data-item-like-style] {
   padding: 5px;
 }
 
-navigable-item-wrapper.focusedOrMouseHover,
-navigable-item-wrapper:hover {
+navigable-item-wrapper.focusedOrMouseHover > :first-child,
+navigable-item-wrapper:hover > :first-child {
   outline: none;
   color: black;
   background-color: white;
+  cursor: pointer;
+}
+
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > :first-child,
+navigable-item-wrapper:not(.notRounded):hover > :first-child {
   border-radius: 5px;
-  cursor: pointer;
 }
 
-navigable-item-wrapper.transparent > :first-child,
-[data-item-like-style].transparent > :first-child {
-  cursor: pointer;
-}
-
-navigable-item-wrapper.focusedOrMouseHover.transparent > *,
-navigable-item-wrapper.transparent:hover > * {
-  outline: none;
-  background-color: white;
-}
-
-navigable-item-wrapper.focusedOrMouseHover > tr > td:first-child,
-navigable-item-wrapper:hover > tr > td:first-child {
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > tr:first-child > td:first-child,
+navigable-item-wrapper:not(.notRounded):hover > tr:first-child > td:first-child {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 
-navigable-item-wrapper.focusedOrMouseHover tr td:last-child,
-navigable-item-wrapper:hover tr td:last-child {
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > tr:first-child td:last-child,
+navigable-item-wrapper:not(.notRounded):hover > tr:first-child td:last-child {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }

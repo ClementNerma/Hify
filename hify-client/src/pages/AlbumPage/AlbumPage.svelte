@@ -135,9 +135,9 @@
 
                 <NavigableTrack
                   position={filteredTracks.indexOf(track)}
-                  transparent
                   tracks={filteredTracks}
                   goToAlbumOption={false}
+                  display="transparent"
                   {track}
                 >
                   <tr class:notFirst={i !== 0}>

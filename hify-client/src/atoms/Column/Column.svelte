@@ -1,9 +1,12 @@
-<script>
+<script lang="ts">
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
+  import { RequestFocus } from '../../navigable/navigation'
+
+  export let requestFocus: RequestFocus
 </script>
 
 <div class="column">
-  <NavigableList>
+  <NavigableList bind:requestFocus>
     <slot />
   </NavigableList>
 </div>

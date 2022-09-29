@@ -22,10 +22,11 @@
 
   import { getParentNavigable, NavigableItem, RequestFocus } from '../../navigable/navigation'
 
-  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { logFatal } from '../../stores/debugger'
+  import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
+  import Column from '../../atoms/Column/Column.svelte'
 
   const nav = getParentNavigable()
 
@@ -89,25 +90,26 @@
     prevItem?.requestFocus()
   }
 
-  let requestFocus: RequestFocus | undefined
+  let requestFocus: RequestFocus
 </script>
 
 {#if $store && $store.options.length > 0}
   <NavigableWithHandlers onBack={hideContextMenu}>
     <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
-      <NavigableList bind:requestFocus>
+      <Column bind:requestFocus>
         {#each $store.options as { label, onPress }}
           <SimpleNavigableItem
             onPress={() => {
               hideContextMenu()
               onPress()
             }}
-            transparent={true}
           >
-            <div class="option">{label}</div>
+            <ItemStyleLayer>
+              <div class="option">{label}</div>
+            </ItemStyleLayer>
           </SimpleNavigableItem>
         {/each}
-      </NavigableList>
+      </Column>
     </div>
   </NavigableWithHandlers>
 {/if}
