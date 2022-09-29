@@ -47,7 +47,7 @@ impl UserDataWrapper {
 
             None => {
                 if self.inner.history.len() == self.inner.history_size {
-                    self.inner.history.remove(0);
+                    self.inner.history.pop().unwrap();
                 }
             }
         }
