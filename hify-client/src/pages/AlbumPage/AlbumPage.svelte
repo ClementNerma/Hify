@@ -10,12 +10,12 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, dedup, filterMap, hasMinimumRating, isDefined } from '../../globals/utils'
+  import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '../../globals/utils'
   import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Button from '../../atoms/Button/Button.svelte'
   import Emoji from '../../atoms/Emoji/Emoji.svelte'
-  import { queueAsNext } from '../../stores/play-queue'
+  import { playNewQueueFromBeginning, queueAsNext } from '../../stores/play-queue'
   import Row from '../../atoms/Row/Row.svelte'
   import { humanReadableDuration } from '../../stores/audio-player'
 
@@ -118,6 +118,9 @@
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
             <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
+            <Button onPress={() => playNewQueueFromBeginning(shuffle(filteredTracks))} fullHeight
+              ><Emoji>🔀</Emoji> Shuffle</Button
+            >
           </Row>
         </div>
       </div>

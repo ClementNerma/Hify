@@ -43,3 +43,7 @@ export function dedup<T>(array: T[]): T[] {
 export function isDefined<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
+
+export function shuffle<T>(array: T[]): T[] {
+  return [...array].sort(() => (Math.random() > 0.5 ? 1 : -1))
+}
