@@ -28,6 +28,9 @@ pub struct IndexCache {
     /// Absolute filesystem path to each track
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
+    /// List of all artists (track's album's artists + track's own artists) for each track
+    pub tracks_all_artists: HashMap<TrackID, HashSet<ArtistID>>,
+
     /// Albums where the artist is listed in the "album artists" tag
     pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 

@@ -29,6 +29,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         albums_arts: HashMap::new(),
         cache: IndexCache {
             tracks_paths: HashMap::new(),
+            tracks_all_artists: HashMap::new(),
 
             artists_albums: HashMap::new(),
             artists_album_participations: HashMap::new(),

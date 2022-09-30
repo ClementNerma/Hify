@@ -14,6 +14,7 @@ pub fn build_index_cache(
     tracks_paths: HashMap<TrackID, PathBuf>,
 ) -> IndexCache {
     let mut tracks_formats = HashMap::new();
+    let mut tracks_all_artists = HashMap::new();
 
     let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut artists_album_participations = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
@@ -103,6 +104,15 @@ pub fn build_index_cache(
                     .insert(album_infos.clone());
             }
         }
+
+        tracks_all_artists.insert(
+            track.id.clone(),
+            album_artists
+                .iter()
+                .chain(non_album_artists.iter())
+                .map(ArtistInfos::get_id)
+                .collect(),
+        );
     }
 
     let artists_album_participations = artists_album_participations
@@ -216,6 +226,7 @@ pub fn build_index_cache(
 
     IndexCache {
         tracks_paths,
+        tracks_all_artists,
 
         artists_albums,
         artists_album_participations,
