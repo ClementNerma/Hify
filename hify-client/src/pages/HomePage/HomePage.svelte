@@ -1,6 +1,7 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import Button from '../../atoms/Button/Button.svelte'
+  import MixButton from '../../atoms/MixButton/MixButton.svelte'
   import Row from '../../atoms/Row/Row.svelte'
   import { AsyncHomePage } from '../../graphql/generated'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
@@ -8,7 +9,6 @@
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
   import { ROUTES } from '../../routes'
   import IndexUpdater from './IndexUpdater.svelte'
-  import MixGenerator from './MixGenerator.svelte'
 
   const feed = AsyncHomePage({
     variables: {
@@ -24,7 +24,7 @@
 {:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
   <h2>Welcome!</h2>
 
-  <MixGenerator />
+  <MixButton mixParams={{}} />
 
   <h3>Tracks you like to listen to:</h3>
 

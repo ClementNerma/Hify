@@ -5,8 +5,15 @@
   import { ROUTES } from '../../routes'
   import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
+  import { showContextMenu } from '../ContextMenu/context-menu'
+  import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
+  import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
 
   export let artist: ArtistCardFragment
+
+  $: contextMenuOptions = [
+    { label: 'Mix me some magic ✨', onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })) },
+  ]
 </script>
 
 <InteractiveCard
@@ -14,6 +21,6 @@
   subtitle=""
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
   pictureUrl={getArtistArtUri(artist.id)}
-  onLongPress={() => alert('TODO: context menu for playing options')}
+  onLongPress={() => showContextMenu(contextMenuStore, contextMenuOptions)}
   rounded={true}
 />
