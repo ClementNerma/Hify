@@ -1,7 +1,7 @@
 use async_graphql::InputObject;
 use rand::{seq::SliceRandom, thread_rng};
 
-use crate::index::{AlbumID, ArtistID, ArtistInfos, GenreID, Index, Track};
+use crate::index::{ArtistID, ArtistInfos, GenreID, Index, Track};
 
 #[derive(InputObject)]
 pub struct MixParams {
@@ -56,9 +56,8 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
             Some(genre_id) => track
                 .metadata
                 .tags
-                .genres
-                .iter()
-                .any(|id| id == &genre_id.0),
+                .get_genres_infos()
+                .any(|genre| &genre.get_id() == genre_id),
             None => true,
         })
         .collect();
