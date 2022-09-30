@@ -2,11 +2,11 @@
   import Button from '../../atoms/Button/Button.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Row from '../../atoms/Row/Row.svelte'
-  import { hifyInterface } from '../../injected'
+  import { hifyInterface } from '../../globals/injected'
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { appLogs } from '../../stores/debugger'
-  import { bind } from '../../utils'
+  import { bind } from '../../globals/utils'
 
   let hideDebugLogs = true
 

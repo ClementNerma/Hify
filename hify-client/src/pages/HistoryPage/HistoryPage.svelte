@@ -4,10 +4,10 @@
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
   import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
   import Grid from '../../organisms/Grid/Grid.svelte'
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue } from '../../stores/play-queue'
-  import { bind } from '../../utils'
+  import { bind } from '../../globals/utils'
   import { contextMenuStore } from '../Template/TplContextMenu.svelte'
 
   const TRACKS_PER_LINE = 7

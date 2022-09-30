@@ -1,9 +1,9 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { ArtistCardFragment } from '../../graphql/generated'
-  import { getArtistArtUri } from '../../rest-api'
+  import { getArtistArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
-  import { bind } from '../../utils'
+  import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
 
   export let artist: ArtistCardFragment

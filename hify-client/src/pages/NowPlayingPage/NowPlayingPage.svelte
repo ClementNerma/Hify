@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../globals/rest-api'
   import { readableAudioPaused } from '../../stores/audio-player'
   import { currentTrack } from '../../stores/play-queue'
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { bind, formatDate } from '../../utils'
+  import { bind, formatDate } from '../../globals/utils'
 
   import {
     humanReadableDuration,

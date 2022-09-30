@@ -1,7 +1,7 @@
 <script lang="ts">
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
   import { AudioTrackFragment } from '../../graphql/generated'
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../globals/rest-api'
   import Card from '../Card/Card.svelte'
 
   export let track: AudioTrackFragment

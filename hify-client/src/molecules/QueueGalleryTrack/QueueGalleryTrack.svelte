@@ -5,10 +5,10 @@
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
-  import { bind } from '../../utils'
+  import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '../ContextMenu/ContextMenu.svelte'
 

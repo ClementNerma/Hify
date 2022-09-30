@@ -1,5 +1,5 @@
 import { derived, get, writable } from 'svelte/store'
-import { getStreamUri } from '../rest-api'
+import { getStreamUri } from '../globals/rest-api'
 import { logInfo, logDebug, logWarn, logError } from './debugger'
 import { AudioTrackFragment, HistoryPush } from '../graphql/generated'
 

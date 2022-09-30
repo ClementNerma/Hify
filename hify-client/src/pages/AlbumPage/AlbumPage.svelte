@@ -2,7 +2,7 @@
   import { navigate } from 'svelte-navigator'
 
   import { ROUTES } from '../../routes'
-  import { getAlbumArtUri } from '../../rest-api'
+  import { getAlbumArtUri } from '../../globals/rest-api'
   import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
@@ -10,7 +10,7 @@
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, dedup, filterMap, hasMinimumRating, isDefined } from '../../utils'
+  import { bind, dedup, filterMap, hasMinimumRating, isDefined } from '../../globals/utils'
   import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Button from '../../atoms/Button/Button.svelte'
