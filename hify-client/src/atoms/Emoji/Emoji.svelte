@@ -8,6 +8,6 @@
 
 <style>
   .emoji:not(.alone) {
-    margin-right: 1px;
+    margin-right: 2px;
   }
 </style>
