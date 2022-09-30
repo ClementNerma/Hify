@@ -1,5 +1,6 @@
 <script lang="ts">
   import './Template.css'
+  import '../../navigable/navigation.css'
 
   import { useLocation, navigate } from 'svelte-navigator'
 

@@ -1,0 +1,24 @@
+navigable-item-wrapper.focusedOrMouseHover > :first-child,
+navigable-item-wrapper:hover > :first-child {
+  outline: none;
+  color: black;
+  background-color: white;
+  cursor: pointer;
+}
+
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > :first-child,
+navigable-item-wrapper:not(.notRounded):hover > :first-child {
+  border-radius: 5px;
+}
+
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > tr:first-child > td:first-child,
+navigable-item-wrapper:not(.notRounded):hover > tr:first-child > td:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+navigable-item-wrapper:not(.notRounded).focusedOrMouseHover > tr:first-child td:last-child,
+navigable-item-wrapper:not(.notRounded):hover > tr:first-child td:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
