@@ -1,11 +1,12 @@
 import { derived, get, writable } from 'svelte/store'
 import { getStreamUri } from '../globals/rest-api'
-import { logInfo, logDebug, logWarn, logError } from './debugger'
+import { logInfo, logDebug, logWarn, logError, logFatal } from './debugger'
 import { AudioTrackFragment, HistoryPush } from '../graphql/generated'
 
 const audioPlayer = writable<HTMLAudioElement | null>(null)
 const audioProgress = writable<number | null>(null)
 const audioPaused = writable<boolean | null>(null)
+const audioListeningDuration = writable<number | null>(null)
 
 export const readableAudioProgress = derived(audioProgress, (_) => _)
 export const readableAudioPaused = derived(audioPaused, (_) => _)
@@ -30,8 +31,17 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
       const currentTime = Math.round(newAudio.currentTime)
 
       if (currentTime !== lastTimeUpdate) {
-        lastTimeUpdate = currentTime
         audioProgress.set(currentTime)
+
+        // Don't increase listening duration in case of jump (>= 5s elapsed)
+        // Also don't increase when going back
+        if (currentTime < lastTimeUpdate + 5 && currentTime > lastTimeUpdate) {
+          audioListeningDuration.update((d) =>
+            d !== null ? d + 1 : logFatal('Tried to increment null audio listening duration!'),
+          )
+        }
+
+        lastTimeUpdate = currentTime
       }
     })
 
@@ -41,6 +51,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
         .then(() => {
           audioPaused.set(false)
           audioProgress.set(0)
+          audioListeningDuration.set(0)
         })
         .catch((e: unknown) => logError('Failed to play audio', e))
     }
