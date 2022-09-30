@@ -6,18 +6,22 @@ use crate::index::TrackID;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserData {
+    config: UserDataConfig,
     history: Vec<TrackID>,
-    history_capacity: usize,
     listenings: HashMap<TrackID, u32>,
 }
 
 impl UserData {
-    pub fn new(history_capacity: usize) -> Self {
+    pub fn new(config: UserDataConfig) -> Self {
         Self {
+            config,
             history: vec![],
-            history_capacity,
             listenings: HashMap::new(),
         }
+    }
+
+    pub fn with_default_config() -> Self {
+        Self::new(UserDataConfig::default())
     }
 }
 
@@ -46,7 +50,7 @@ impl UserDataWrapper {
             }
 
             None => {
-                if self.inner.history.len() == self.inner.history_capacity {
+                if self.inner.history.len() == self.inner.config.history_capacity {
                     self.inner.history.pop().unwrap();
                 }
             }
@@ -64,5 +68,18 @@ impl UserDataWrapper {
                 vac.insert(1);
             }
         };
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct UserDataConfig {
+    history_capacity: usize,
+}
+
+impl Default for UserDataConfig {
+    fn default() -> Self {
+        Self {
+            history_capacity: 10_000,
+        }
     }
 }
