@@ -12,24 +12,27 @@
   import { RequestFocus } from '../../navigable/navigation'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
+  import { onMount } from 'svelte'
 
   const location = useLocation()
 
   export let tabs: Tab[]
   export let tabsFocusRequest = new Array<RequestFocus>(tabs.length)
 
-  export const requestFocus = (): void => {
-    for (let i = 0; i < tabs.length; i++) {
-      if ($location.pathname === tabs[i].uri) {
-        tabsFocusRequest[i]()
-        return
+  onMount(() =>
+    location.subscribe(() => {
+      for (let i = 0; i < tabs.length; i++) {
+        if ($location.pathname === tabs[i].uri) {
+          tabsFocusRequest[i]()
+          return
+        }
       }
-    }
 
-    if (tabsFocusRequest.length) {
-      tabsFocusRequest[0]()
-    }
-  }
+      if (tabsFocusRequest.length) {
+        tabsFocusRequest[0]()
+      }
+    }),
+  )
 
   let isFocused: boolean
 </script>

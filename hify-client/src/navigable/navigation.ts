@@ -34,14 +34,16 @@ export type NavigableCommonProps = {
 
 export type Props<N extends NavigableCommon> = N['props']
 
+export type NoProp = Record<string, never>
+
 export abstract class NavigableCommon<P = {}> {
-  readonly parent: NavigableContainer
+  readonly parent: NavigableContainer<unknown>
   readonly identity: symbol
   readonly page: NavigablePage
 
   protected focused = writable(false)
 
-  constructor(parent: NavigableContainer | symbol, protected _props: NavigableCommonProps & P) {
+  constructor(parent: NavigableContainer<unknown> | symbol, protected _props: NavigableCommonProps & P) {
     if (!(parent instanceof NavigableContainer)) {
       if (parent !== PAGE_CTR_TOKEN) {
         throw new Error('Invalid page construction token provided!')

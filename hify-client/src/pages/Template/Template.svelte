@@ -57,10 +57,6 @@
 
     return KeyPressHandling.Propagate
   })
-
-  let requestFocus: () => void
-
-  onMount(() => location.subscribe(requestFocus))
 </script>
 
 <NavigablePage>
@@ -80,7 +76,6 @@
               { label: 'Genres', uri: ROUTES.genres },
               { label: 'Search', uri: ROUTES.search },
             ]}
-            bind:requestFocus
           />
         </NavigableWithHandlers>
       </DistractionFreeTogglable>
