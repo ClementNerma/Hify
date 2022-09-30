@@ -1,4 +1,4 @@
-query ArtistAlbums($artistId: String!, $pagination: PaginationInput!) {
+query ArtistAlbums($artistId: ArtistID!, $pagination: PaginationInput!) {
   artist(id: $artistId) {
     albums(pagination: $pagination) {
       nodes {

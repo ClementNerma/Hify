@@ -1,4 +1,4 @@
-query MixGenerator($input: MixerParams!) {
+query MixGenerator($input: MixParams!) {
   generateMix(input: $input) {
     ...AudioTrack
   }

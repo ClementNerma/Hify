@@ -1,4 +1,4 @@
-query ArtistPage($artistId: String!) {
+query ArtistPage($artistId: ArtistID!) {
   artist(id: $artistId) {
     name
   }

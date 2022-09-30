@@ -1,4 +1,4 @@
-query AlbumPage($albumId: String!) {
+query AlbumPage($albumId: AlbumID!) {
   album(id: $albumId) {
     ...AlbumCard
     year

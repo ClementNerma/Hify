@@ -1,4 +1,4 @@
-query GenrePage($genreId: String!, $pagination: PaginationInput!) {
+query GenrePage($genreId: GenreID!, $pagination: PaginationInput!) {
   genre(id: $genreId) {
     id
     name
