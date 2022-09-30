@@ -1,5 +1,5 @@
 import { navigate } from 'svelte-navigator'
-import { ContextMenuOption } from '../molecules/ContextMenu/ContextMenu.svelte'
+import { ContextMenuOption } from '../molecules/ContextMenu/context-menu'
 import { ROUTES } from '../routes'
 
 export const ctxMenuOptions = {

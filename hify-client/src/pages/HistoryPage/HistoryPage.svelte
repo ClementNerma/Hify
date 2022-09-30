@@ -2,7 +2,7 @@
   import { navigate } from 'svelte-navigator'
   import { AsyncHistoryPage, AudioTrackFragment } from '../../graphql/generated'
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
-  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
+  import { showContextMenu } from '../../molecules/ContextMenu/context-menu'
   import Grid from '../../organisms/Grid/Grid.svelte'
   import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'

@@ -1,24 +1,5 @@
-<script context="module" lang="ts">
-  export type ContextMenuOption = {
-    label: string
-    onPress: () => void
-    // onLongPress?: () => void
-  }
-
-  export type ContextMenuStore = Writable<{ options: ContextMenuOption[] } | null>
-
-  export function createContextMenu(): ContextMenuStore {
-    return writable(null)
-  }
-
-  export function showContextMenu(store: ContextMenuStore, options: ContextMenuOption[]): void {
-    store.set({ options })
-  }
-</script>
-
 <script lang="ts">
   import { afterUpdate } from 'svelte'
-  import { Writable, writable } from 'svelte/store'
 
   import { getParentNavigable, NavigableItem, RequestFocus } from '../../navigable/navigation'
 
@@ -27,10 +8,11 @@
   import { logFatal } from '../../stores/debugger'
   import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
   import Column from '../../atoms/Column/Column.svelte'
-
-  const nav = getParentNavigable()
+  import { ContextMenuStore } from './context-menu'
 
   export let store: ContextMenuStore
+
+  const nav = getParentNavigable()
 
   let ctxTop = -1
   let ctxLeft = -1

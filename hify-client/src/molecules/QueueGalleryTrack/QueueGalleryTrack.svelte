@@ -8,7 +8,7 @@
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import { ContextMenuOption, showContextMenu } from '../ContextMenu/ContextMenu.svelte'
+  import { showContextMenu } from '../ContextMenu/context-menu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment

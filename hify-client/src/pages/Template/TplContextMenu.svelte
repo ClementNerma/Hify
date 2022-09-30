@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
-  import ContextMenu, { createContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
+  import { createContextMenu } from '../../molecules/ContextMenu/context-menu'
+  import ContextMenu from '../../molecules/ContextMenu/ContextMenu.svelte'
   import { logFatal } from '../../stores/debugger'
 
   export const contextMenuStore = createContextMenu()

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
-  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu.svelte'
+  import { showContextMenu } from '../../molecules/ContextMenu/context-menu'
 
   import SimpleNavigableItem, { ItemDisplay } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
