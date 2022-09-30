@@ -297,7 +297,7 @@ class NavigablePage extends NavigableContainer {
   }
 }
 
-export function getParentNavigable(item?: true): NavigableContainer {
+export function getParentNavigable(item?: true): NavigableContainer<unknown> {
   if (item) {
     if (Boolean(getContext(NAVIGABLE_ITEM_DETECTION_CTX))) {
       throw new Error('Cannot use a navigable inside an item')

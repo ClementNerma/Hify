@@ -2,13 +2,12 @@
   import { navigate } from 'svelte-navigator'
   import { AsyncHistoryPage, AudioTrackFragment } from '../../graphql/generated'
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
-  import { showContextMenu } from '../../molecules/ContextMenu/context-menu'
+  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu'
   import Grid from '../../organisms/Grid/Grid.svelte'
   import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
-  import { contextMenuStore } from '../Template/TplContextMenu.svelte'
 
   const TRACKS_PER_LINE = 7
   const LINES_PER_PAGE = 5
@@ -54,9 +53,7 @@
           navigate(ROUTES.nowPlaying)
         })}
         onLongPress={bind(tags.album, (album) =>
-          showContextMenu(contextMenuStore, [
-            { label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) },
-          ]),
+          showContextMenu([{ label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) }]),
         )}
       />
     {/each}

@@ -3,12 +3,11 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
   import { getAlbumArtUri } from '../../globals/rest-api'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import { showContextMenu } from '../ContextMenu/context-menu'
+  import { showContextMenu } from '../ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment
@@ -37,7 +36,7 @@
   <SimpleNavigableItem
     {position}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
-    onLongPress={() => showContextMenu(contextMenuStore, contextMenuOptions)}
+    onLongPress={() => showContextMenu(contextMenuOptions)}
     hasFocusPriority={isCurrent}
     fullHeight
   >

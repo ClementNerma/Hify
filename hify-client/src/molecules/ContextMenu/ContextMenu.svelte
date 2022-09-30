@@ -1,22 +1,25 @@
+<script context="module" lang="ts">
+  let _singletonChecker = false
+</script>
+
 <script lang="ts">
-  import { afterUpdate } from 'svelte'
+  import { afterUpdate, onDestroy, onMount } from 'svelte'
 
   import { getParentNavigable, NavigableItem, RequestFocus } from '../../navigable/navigation'
 
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { logFatal } from '../../stores/debugger'
   import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
   import Column from '../../atoms/Column/Column.svelte'
-  import { ContextMenuStore } from './context-menu'
-
-  export let store: ContextMenuStore
+  import { contextMenuStore } from './ContextMenu'
+    import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   const nav = getParentNavigable()
 
+  let prevFocusItem: NavigableItem<unknown> | null = null
+
   let ctxTop = -1
   let ctxLeft = -1
-  let prevItem: NavigableItem<unknown> | null = null
 
   function getBoundingClientRect(el: HTMLElement): DOMRect | null {
     let rect = el.getBoundingClientRect()
@@ -43,18 +46,10 @@
   }
 
   afterUpdate(() => {
-    if (!$store || !$store.options.length) {
-      return
-    }
-
     const focusedItem = nav.page.focusedItem()
 
-    if (!focusedItem) {
+    if (!$contextMenuStore || !$contextMenuStore.options.length || !focusedItem) {
       return
-    }
-
-    if (!requestFocus) {
-      return logFatal('Focus request binding is not defined in ContextMenu component')
     }
 
     const rect = getBoundingClientRect(focusedItem.underlyingElement())
@@ -62,27 +57,39 @@
     ctxTop = rect ? (rect.top + rect.bottom) / 2 : 0
     ctxLeft = rect ? (rect.left + rect.right) / 2 : 0
 
-    prevItem = focusedItem
+    prevFocusItem = focusedItem
+
     requestFocus()
-    return
   })
 
-  export function hideContextMenu(): void {
-    store.set(null)
-    prevItem?.requestFocus()
+  function closeContextMenu() {
+    prevFocusItem?.requestFocus()
+    contextMenuStore.set(null)
   }
+
+  onMount(() => {
+    if (_singletonChecker) {
+      logFatal('Cannot have two ContextMenu elements in the same components tree!')
+    }
+
+    _singletonChecker = true
+  })
+
+  onDestroy(() => {
+    _singletonChecker = false
+  })
 
   let requestFocus: RequestFocus
 </script>
 
-{#if $store && $store.options.length > 0}
-  <NavigableWithHandlers onBack={hideContextMenu}>
+{#if $contextMenuStore && $contextMenuStore.options.length > 0}
+  <NavigableWithHandlers onBack={closeContextMenu}>
     <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
       <Column bind:requestFocus>
-        {#each $store.options as { label, onPress }}
+        {#each $contextMenuStore.options as { label, onPress }}
           <SimpleNavigableItem
             onPress={() => {
-              hideContextMenu()
+              closeContextMenu()
               onPress()
             }}
           >

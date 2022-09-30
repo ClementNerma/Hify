@@ -11,7 +11,6 @@
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
   import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
-  import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
 
   export let searchTerms: string = ''
 

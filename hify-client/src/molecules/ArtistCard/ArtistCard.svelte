@@ -5,8 +5,7 @@
   import { ROUTES } from '../../routes'
   import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
-  import { showContextMenu } from '../ContextMenu/context-menu'
-  import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
+  import { showContextMenu } from '../ContextMenu/ContextMenu'
   import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
 
   export let artist: ArtistCardFragment
@@ -21,6 +20,6 @@
   subtitle=""
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
   pictureUrl={getArtistArtUri(artist.id)}
-  onLongPress={() => showContextMenu(contextMenuStore, contextMenuOptions)}
+  onLongPress={() => showContextMenu(contextMenuOptions)}
   rounded={true}
 />

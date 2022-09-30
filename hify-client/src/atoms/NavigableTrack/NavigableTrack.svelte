@@ -1,10 +1,9 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
-  import { showContextMenu } from '../../molecules/ContextMenu/context-menu'
+  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu'
 
   import SimpleNavigableItem, { ItemDisplay } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue, queueAsNext } from '../../stores/play-queue'
 
@@ -25,7 +24,6 @@
   onPress={play}
   onLongPress={() =>
     showContextMenu(
-      contextMenuStore,
       (goToAlbumOption
         ? [{ label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) }]
         : []

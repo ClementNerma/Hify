@@ -15,8 +15,8 @@
   import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
-  import TplContextMenu from './TplContextMenu.svelte'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+  import ContextMenu from '../../molecules/ContextMenu/ContextMenu.svelte'
 
   const location = useLocation()
 
@@ -66,7 +66,7 @@
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>
     <NavigableList>
-      <TplContextMenu />
+      <ContextMenu />
 
       <DistractionFreeTogglable>
         <NavigableWithHandlers onLongPress={() => navigate(ROUTES.devTools)}>
