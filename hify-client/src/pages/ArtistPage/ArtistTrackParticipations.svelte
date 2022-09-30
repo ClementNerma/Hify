@@ -43,9 +43,7 @@
 {#await feedMore()}
   <h3>Loading...</h3>
 {:then lastPageInfo}
-  {#if tracks.length === 0}
-    <h3>No participation on other artists' albums</h3>
-  {:else}
+  {#if tracks.length !== 0}
     <h3>Tracks from other artists' albums ({tracks.length})</h3>
 
     <Grid columns={TRACKS_PER_LINE}>
