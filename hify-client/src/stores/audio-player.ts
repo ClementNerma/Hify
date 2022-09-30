@@ -1,15 +1,16 @@
-import { derived, get, writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 import { getStreamUri } from '../globals/rest-api'
 import { logInfo, logDebug, logWarn, logError, logFatal } from './debugger'
 import { AudioTrackFragment, HistoryPush, LogListening } from '../graphql/generated'
+import { readonly } from '../globals/utils'
 
 const audioPlayer = writable<HTMLAudioElement | null>(null)
 const audioProgress = writable<number | null>(null)
 const audioPaused = writable<boolean | null>(null)
 const audioListeningDuration = writable<{ track: AudioTrackFragment; duration_s: number } | null>(null)
 
-export const readableAudioProgress = derived(audioProgress, (_) => _)
-export const readableAudioPaused = derived(audioPaused, (_) => _)
+export const readableAudioProgress = readonly(audioProgress)
+export const readableAudioPaused = readonly(audioPaused)
 
 const LISTENING_INCREASE_DURATION_THRESOLD = 10
 

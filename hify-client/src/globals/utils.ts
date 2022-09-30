@@ -1,3 +1,4 @@
+import { derived, Readable, Writable } from 'svelte/store'
 import { AudioTrackFragment } from '../graphql/generated'
 
 export function bind<T, U>(data: T, callback: (value: T) => U): () => U {
@@ -46,4 +47,8 @@ export function isDefined<T>(value: T | null | undefined): value is T {
 
 export function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => (Math.random() > 0.5 ? 1 : -1))
+}
+
+export function readonly<T>(store: Writable<T>): Readable<T> {
+  return derived(store, (_) => _)
 }

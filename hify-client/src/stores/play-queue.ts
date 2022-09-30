@@ -1,4 +1,5 @@
 import { derived, get, writable } from 'svelte/store'
+import { readonly } from '../globals/utils'
 import { AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo, logWarn } from './debugger'
@@ -15,7 +16,7 @@ const playQueue = writable<PlayQueue>({
   position: null,
 })
 
-export const readablePlayQueue = derived(playQueue, (_) => _)
+export const readablePlayQueue = readonly(playQueue)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
 export const queuePosition = derived(playQueue, ({ position }) => position)
 

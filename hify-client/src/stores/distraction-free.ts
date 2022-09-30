@@ -1,10 +1,11 @@
 import { onDestroy } from 'svelte'
-import { derived, writable } from 'svelte/store'
+import { writable } from 'svelte/store'
+import { readonly } from '../globals/utils'
 import { handleInput } from '../navigable/input-manager'
 
 const _distractionFreeMode = writable(false)
 
-export const distractionFreeMode = derived(_distractionFreeMode, (_) => _)
+export const distractionFreeMode = readonly(_distractionFreeMode)
 
 export function setupDistractionFreeListener(
   delay: number,
