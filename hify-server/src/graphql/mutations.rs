@@ -23,17 +23,17 @@ impl MutationRoot {
         Ok(true)
     }
 
-    async fn history_push(&self, ctx: &Context<'_>, track_id: String) -> bool {
+    async fn history_push(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
         let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.history_push(TrackID(track_id));
+        user_data.history_push(track_id);
         true
     }
 
-    async fn increase_listenings(&self, ctx: &Context<'_>, track_id: String) -> bool {
+    async fn increase_listenings(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
         let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.increase_listenings(TrackID(track_id));
+        user_data.increase_listenings(track_id);
         true
     }
 }
