@@ -49,6 +49,7 @@ async fn inner_main() -> Result<()> {
                 index = index::build_index(music_dir, Some(index))
                     .context("Failed to rebuild index")?;
             } else if rebuild_cache {
+                println!("> Rebuilding cache as requested...");
                 index = index::rebuild_cache(index);
                 utils::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
