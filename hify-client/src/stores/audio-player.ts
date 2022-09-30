@@ -17,6 +17,10 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
       prev.pause()
     }
 
+    audioPaused.set(false)
+    audioProgress.set(0)
+    audioListeningDuration.set(0)
+
     logInfo(`Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
 
     let lastTimeUpdate = 0
@@ -46,14 +50,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
     })
 
     if (play !== false) {
-      newAudio
-        .play()
-        .then(() => {
-          audioPaused.set(false)
-          audioProgress.set(0)
-          audioListeningDuration.set(0)
-        })
-        .catch((e: unknown) => logError('Failed to play audio', e))
+      newAudio.play().catch((e: unknown) => logError('Failed to play audio', e))
     }
 
     HistoryPush({
