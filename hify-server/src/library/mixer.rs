@@ -1,7 +1,7 @@
 use async_graphql::InputObject;
 use rand::{seq::SliceRandom, thread_rng};
 
-use crate::index::{ArtistID, GenreID, Index, Track};
+use crate::index::{AlbumID, ArtistID, ArtistInfos, GenreID, Index, Track};
 
 #[derive(InputObject)]
 pub struct MixParams {
@@ -30,14 +30,26 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
             None => min_rating == 0,
             Some(rating) => rating >= min_rating,
         })
+        // TODO: awfully unoptimized
         .filter(|track| match &from_artist {
-            Some(artist_id) => track
-                .metadata
-                .tags
-                .album_artists
-                .iter()
-                .chain(track.metadata.tags.artists.iter())
-                .any(|id| id == &artist_id.0),
+            Some(artist_id) => {
+                let album_artists = &index
+                    .cache
+                    .albums_infos
+                    .get(&track.metadata.tags.get_album_infos().get_id())
+                    .unwrap()
+                    .album_artists;
+
+                let mut all_artists_iter = album_artists.iter().map(ArtistInfos::get_id).chain(
+                    track
+                        .metadata
+                        .tags
+                        .get_artists_infos()
+                        .map(|infos| infos.get_id()),
+                );
+
+                all_artists_iter.any(|id| &id == artist_id)
+            }
             None => true,
         })
         .filter(|track| match &from_genre {
