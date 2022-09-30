@@ -79,7 +79,7 @@ pub struct UserDataConfig {
 impl Default for UserDataConfig {
     fn default() -> Self {
         Self {
-            history_capacity: 10_000,
+            history_capacity: 1000,
         }
     }
 }
