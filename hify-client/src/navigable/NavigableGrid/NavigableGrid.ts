@@ -1,5 +1,4 @@
 import {
-  NavigableContainer,
   Navigable,
   NavigableItem,
   NavigationComingFrom,
@@ -7,12 +6,8 @@ import {
   NavigableArrayContainer,
 } from '../navigation'
 
-export class NavigableGrid extends NavigableArrayContainer {
+export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGridProps & P> {
   private itemsBeforeLastLazyLoading = 0
-
-  constructor(parent: NavigableContainer, public props: NavigableGridProps) {
-    super(parent, props.position, props.hasFocusPriority)
-  }
 
   private _rows() {
     return new Array(Math.ceil(this.items.length / this.props.columns))
@@ -31,7 +26,7 @@ export class NavigableGrid extends NavigableArrayContainer {
     }
   }
 
-  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
+  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
     const itemIndex = this.items.indexOf(focusedChild)
 
     if (itemIndex === -1) {
@@ -100,7 +95,7 @@ export class NavigableGrid extends NavigableArrayContainer {
     return this.parent.navigate(this, direction)
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
     let rows = this._rows()
 
     switch (from) {
@@ -131,16 +126,13 @@ export class NavigableGrid extends NavigableArrayContainer {
     return null
   }
 
-  override navigateToLastItem(): NavigableItem | null {
+  override navigateToLastItem(): NavigableItem<unknown> | null {
     this._lazyLoading()
     return super.navigateToLastItem()
   }
 }
 
-export type NavigableGridProps = {
-  position: number | null
-  hasFocusPriority: boolean | null
-
+type NavigableGridProps = {
   columns: number
   lazyLoader?: () => void
 }

@@ -1,19 +1,19 @@
 <script lang="ts">
   import { afterUpdate, onDestroy } from 'svelte'
 
-  import { getParentNavigable, setChildrenNavigable } from '../navigation'
-  import { NavigableWithHandlers, NavigableWithHandlersProps } from './NavigableWithHandlers'
+  import { getParentNavigable, Props, setChildrenNavigable } from '../navigation'
+  import { NavigableWithHandlers } from './NavigableWithHandlers'
 
-  export let position: NavigableWithHandlersProps['position'] = null
-  export let hasFocusPriority: NavigableWithHandlersProps['hasFocusPriority'] = null
+  export let position: Props<NavigableWithHandlers>['position'] = null
+  export let hasFocusPriority: Props<NavigableWithHandlers>['hasFocusPriority'] = null
 
-  export let onPress: NavigableWithHandlersProps['onPress'] = undefined
-  export let onLongPress: NavigableWithHandlersProps['onLongPress'] = undefined
-  export let onBack: NavigableWithHandlersProps['onBack'] = undefined
-  export let onLongBack: NavigableWithHandlersProps['onLongBack'] = undefined
-  export let onKeyPress: NavigableWithHandlersProps['onKeyPress'] = undefined
+  export let onPress: Props<NavigableWithHandlers>['onPress'] = undefined
+  export let onLongPress: Props<NavigableWithHandlers>['onLongPress'] = undefined
+  export let onBack: Props<NavigableWithHandlers>['onBack'] = undefined
+  export let onLongBack: Props<NavigableWithHandlers>['onLongBack'] = undefined
+  export let onKeyPress: Props<NavigableWithHandlers>['onKeyPress'] = undefined
 
-  const containerProps = (): NavigableWithHandlersProps => ({
+  const containerProps = (): Props<NavigableWithHandlers> => ({
     position,
     hasFocusPriority,
     onPress,
@@ -24,21 +24,17 @@
   })
 
   const nav = getParentNavigable()
-  const row = new NavigableWithHandlers(nav, containerProps())
+  const handl = new NavigableWithHandlers(nav, containerProps())
 
-  nav.append(row)
+  nav.append(handl)
 
-  setChildrenNavigable(row)
+  setChildrenNavigable(handl)
 
-  afterUpdate(() => {
-    row.position = position
-    row.hasFocusPriority = hasFocusPriority
-    row.props = containerProps()
-  })
+  afterUpdate(() => handl.updateProps(containerProps()))
 
-  onDestroy(() => nav.remove(row))
+  onDestroy(() => nav.remove(handl))
 
-  export const requestFocus = () => row.requestFocus()
+  export const requestFocus = () => handl.requestFocus()
 </script>
 
-<slot nav={row} />
+<slot nav={handl} />

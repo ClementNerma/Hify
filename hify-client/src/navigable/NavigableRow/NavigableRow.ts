@@ -6,8 +6,8 @@ import {
   NavigableArrayContainer,
 } from '../navigation'
 
-export class NavigableRow extends NavigableArrayContainer {
-  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null {
+export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
+  navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
     const colIndex = this.items.indexOf(focusedChild)
 
     if (colIndex === -1) {
@@ -45,7 +45,7 @@ export class NavigableRow extends NavigableArrayContainer {
     }
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
     let tries: Navigable[]
 
     switch (from) {

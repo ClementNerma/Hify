@@ -34,7 +34,7 @@
 
   let ctxTop = -1
   let ctxLeft = -1
-  let prevItem: NavigableItem | null = null
+  let prevItem: NavigableItem<unknown> | null = null
 
   function getBoundingClientRect(el: HTMLElement): DOMRect | null {
     let rect = el.getBoundingClientRect()

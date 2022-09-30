@@ -26,20 +26,22 @@ export enum NavigationComingFrom {
 
 export type OnFocusChangeCallback = (isFocused: boolean) => void
 
-export abstract class NavigableCommon {
+export type NavigableCommonProps = {
+  position: number | null
+  hasFocusPriority: boolean | null
+  onFocusChangeCallback?: OnFocusChangeCallback | null
+}
+
+export type Props<N extends NavigableCommon> = N['props']
+
+export abstract class NavigableCommon<P = {}> {
   readonly parent: NavigableContainer
   readonly identity: symbol
   readonly page: NavigablePage
 
   protected focused = writable(false)
 
-  public onFocusChangeCallback: OnFocusChangeCallback | null = null
-
-  constructor(
-    parent: NavigableContainer | symbol,
-    public position: number | null,
-    public hasFocusPriority: boolean | null,
-  ) {
+  constructor(parent: NavigableContainer | symbol, protected _props: NavigableCommonProps & P) {
     if (!(parent instanceof NavigableContainer)) {
       if (parent !== PAGE_CTR_TOKEN) {
         throw new Error('Invalid page construction token provided!')
@@ -60,56 +62,64 @@ export abstract class NavigableCommon {
     this.page = parent.page
   }
 
-  abstract navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null
-  abstract navigateToLastItem(): NavigableItem | null
+  get props(): Readonly<NavigableCommonProps & P> {
+    return this._props
+  }
+
+  abstract navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null
+  abstract navigateToLastItem(): NavigableItem<unknown> | null
 
   abstract canHandleAction(key: NavigationAction): boolean
-  abstract handleAction(key: NavigationAction): NavigableItem | null
+  abstract handleAction(key: NavigationAction): NavigableItem<unknown> | null
 
   abstract requestFocus(): boolean
+
+  updateProps(props: NavigableCommonProps & P): void {
+    this._props = props
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
   interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void {}
 }
 
-export abstract class NavigableContainer extends NavigableCommon {
+export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
   abstract get ordered(): boolean
 
   abstract append(navigable: Navigable): void
   abstract hasChild(child: Navigable): boolean
   abstract remove(child: Navigable): void
-  abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem | null
+  abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null
 
   canHandleAction(_: NavigationAction): boolean {
     return false
   }
 
-  handleAction(_: NavigationAction): NavigableItem | null {
+  handleAction(_: NavigationAction): NavigableItem<unknown> | null {
     throw new Error('This navigable container does not support actions')
   }
 }
 
-export abstract class NavigableArrayContainer extends NavigableContainer {
+export abstract class NavigableArrayContainer<P = {}> extends NavigableContainer<P> {
   protected _unorderedItems: Navigable[] = []
 
   get ordered(): boolean {
-    return this._unorderedItems.length > 0 ? this._unorderedItems[0].position !== null : false
+    return this._unorderedItems.length > 0 ? this._unorderedItems[0].props.position !== null : false
   }
 
   protected get items(): Navigable[] {
     return this.ordered
       ? [...this._unorderedItems].sort((a, b) => {
-          if (a.position === null || b.position === null) {
+          if (a.props.position === null || b.props.position === null) {
             return logFatal('Internal error: position not definied in ordered items array')
           }
 
-          return a.position - b.position
+          return a.props.position - b.props.position
         })
       : this._unorderedItems
   }
 
   protected getFocusPriority(): Navigable | null {
-    return this._unorderedItems.find((item) => item.hasFocusPriority === true) ?? null
+    return this._unorderedItems.find((item) => item.props.hasFocusPriority === true) ?? null
   }
 
   requestFocus(): boolean {
@@ -118,9 +128,9 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
 
   append(navigable: Navigable): void {
     if (this._unorderedItems.length > 0) {
-      if (this.ordered && navigable.position === null) {
+      if (this.ordered && navigable.props.position === null) {
         throw new Error('Cannot append a non-positioned item to an ordered container')
-      } else if (!this.ordered && navigable.position !== null) {
+      } else if (!this.ordered && navigable.props.position !== null) {
         throw new Error('Cannot append a positioned item to an unordered container')
       }
     }
@@ -142,7 +152,7 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
     return this._unorderedItems.indexOf(child) !== -1
   }
 
-  navigateToLastItem(): NavigableItem | null {
+  navigateToLastItem(): NavigableItem<unknown> | null {
     for (let c = this._unorderedItems.length - 1; c >= 0; c--) {
       const target = this._unorderedItems[c].navigateToLastItem()
 
@@ -155,20 +165,20 @@ export abstract class NavigableArrayContainer extends NavigableContainer {
   }
 }
 
-export abstract class NavigableItem extends NavigableCommon {
+export abstract class NavigableItem<P = {}> extends NavigableCommon<P> {
   abstract canHandleDirection(direction: NavigationDirection): boolean
-  abstract handleDirection(direction: NavigationDirection): NavigableItem | null
+  abstract handleDirection(direction: NavigationDirection): NavigableItem<unknown> | null
 
   abstract underlyingElement(): HTMLNavigableItemWrapperElement
 
   abstract onFocus(): void
   abstract onUnfocus(): void
 
-  navigateToFirstItemDown(_: NavigationComingFrom): NavigableItem {
+  navigateToFirstItemDown(_: NavigationComingFrom): NavigableItem<unknown> {
     return this
   }
 
-  navigateToLastItem(): NavigableItem | null {
+  navigateToLastItem(): NavigableItem<unknown> | null {
     return this
   }
 
@@ -196,16 +206,16 @@ class NavigablePage extends NavigableContainer {
   override readonly page: NavigablePage
   override readonly parent: NavigableContainer
 
-  readonly priorityFocusables: NavigableItem[] = []
+  readonly priorityFocusables: NavigableItem<unknown>[] = []
   readonly ordered = false
 
   private onlyChild: Navigable | null = null
 
   constructor(
-    private readonly onRequestFocus: (item: NavigableItem) => void,
-    private readonly getFocusedItem: () => NavigableItem | null,
+    private readonly onRequestFocus: (item: NavigableItem<unknown>) => void,
+    private readonly getFocusedItem: () => NavigableItem<unknown> | null,
   ) {
-    super(PAGE_CTR_TOKEN, null, null)
+    super(PAGE_CTR_TOKEN, { position: null, hasFocusPriority: null })
 
     this.identity = Symbol()
     this.page = this
@@ -216,7 +226,7 @@ class NavigablePage extends NavigableContainer {
     return false
   }
 
-  override handleAction(_: NavigationAction): NavigableItem | null {
+  override handleAction(_: NavigationAction): NavigableItem<unknown> | null {
     throw new Error('Tried to make the navigable page component handle an action')
   }
 
@@ -244,15 +254,15 @@ class NavigablePage extends NavigableContainer {
     this.onlyChild = null
   }
 
-  navigate(_: Navigable, __: NavigationDirection): NavigableItem | null {
+  navigate(_: Navigable, __: NavigationDirection): NavigableItem<unknown> | null {
     return null
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
     return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
-  navigateToLastItem(): NavigableItem | null {
+  navigateToLastItem(): NavigableItem<unknown> | null {
     return this.onlyChild ? this.onlyChild.navigateToLastItem() : null
   }
 
@@ -264,7 +274,7 @@ class NavigablePage extends NavigableContainer {
     return this
   }
 
-  requestPageFocus(item: NavigableItem): void {
+  requestPageFocus(item: NavigableItem<unknown>): void {
     if (item.parent.page !== this) {
       throw new Error("Cannot request focus for an element that isn't part of the same page")
     }
@@ -272,7 +282,7 @@ class NavigablePage extends NavigableContainer {
     this.onRequestFocus(item)
   }
 
-  focusedItem(): NavigableItem | null {
+  focusedItem(): NavigableItem<unknown> | null {
     const item = this.getFocusedItem()
 
     if (!item) {
@@ -380,7 +390,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
     }
   }
 
-  let next: NavigableItem | null
+  let next: NavigableItem<unknown> | null
 
   switch (key) {
     case 'ArrowUp':
@@ -456,7 +466,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
   }
 }
 
-function _getItemChain(item: NavigableItem): Navigable[] {
+function _getItemChain(item: NavigableItem<unknown>): Navigable[] {
   const out: Navigable[] = [item]
 
   let current: NavigableContainer = item.parent
@@ -469,7 +479,7 @@ function _getItemChain(item: NavigableItem): Navigable[] {
   return out
 }
 
-function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
+function _checkItemValidity(item: NavigableItem<unknown>, page: NavigablePage): boolean {
   if (item.identity !== page.identity) {
     logWarn('Previously-focused element has a different identity than the current page, removing focus')
     item.onUnfocus()
@@ -485,15 +495,15 @@ function _checkItemValidity(item: NavigableItem, page: NavigablePage): boolean {
   return true
 }
 
-function _requestFocus(item: NavigableItem) {
+function _requestFocus(item: NavigableItem<unknown>): void {
   navState.update((state) =>
     state && _checkItemValidity(item, state.page) ? _generateUpdatedNavState(state.focused, item, state.page) : state,
   )
 }
 
 function _generateUpdatedNavState(
-  oldFocused: NavigableItem | null,
-  newFocused: NavigableItem,
+  oldFocused: NavigableItem<unknown> | null,
+  newFocused: NavigableItem<unknown>,
   page: NavigablePage,
 ): NavState {
   if (oldFocused) {
@@ -508,15 +518,15 @@ function _generateUpdatedNavState(
   return { page, focused: newFocused }
 }
 
-function _propagateFocusChangeEvent(item: NavigableItem, focused: boolean): void {
+function _propagateFocusChangeEvent(item: NavigableItem<unknown>, focused: boolean): void {
   for (const subItem of _getItemChain(item)) {
-    subItem.onFocusChangeCallback?.(focused)
+    subItem.props.onFocusChangeCallback?.(focused)
   }
 }
 
 export type RequestFocus = () => boolean
 
-export type Navigable = NavigableContainer | NavigableItem
+export type Navigable = NavigableContainer | NavigableItem<unknown>
 
 const NAVIGATION_CTX = Symbol()
 const NAVIGABLE_ITEM_DETECTION_CTX = Symbol()
@@ -524,7 +534,7 @@ const PAGE_CTR_TOKEN = Symbol()
 
 type NavState = {
   page: NavigablePage
-  focused: NavigableItem | null
+  focused: NavigableItem<unknown> | null
 }
 
 const navState = writable<NavState | null>(null)

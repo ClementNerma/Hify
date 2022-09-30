@@ -1,16 +1,16 @@
 <script lang="ts">
   import { afterUpdate, onDestroy } from 'svelte'
 
-  import { getParentNavigable, setChildrenNavigable } from '../navigation'
-  import { NavigableGrid, NavigableGridProps } from './NavigableGrid'
+  import { getParentNavigable, Props, setChildrenNavigable } from '../navigation'
+  import { NavigableGrid } from './NavigableGrid'
 
-  export let position: NavigableGridProps['position'] = null
-  export let hasFocusPriority: NavigableGridProps['hasFocusPriority'] = null
+  export let position: Props<NavigableGrid>['position'] = null
+  export let hasFocusPriority: Props<NavigableGrid>['hasFocusPriority'] = null
 
-  export let columns: NavigableGridProps['columns']
-  export let lazyLoader: NavigableGridProps['lazyLoader'] = undefined
+  export let columns: Props<NavigableGrid>['columns']
+  export let lazyLoader: Props<NavigableGrid>['lazyLoader'] = undefined
 
-  const gridProps = (): NavigableGridProps => ({
+  const gridProps = (): Props<NavigableGrid> => ({
     position,
     hasFocusPriority,
     columns,
@@ -24,11 +24,7 @@
 
   setChildrenNavigable(grid)
 
-  afterUpdate(() => {
-    grid.position = position
-    grid.hasFocusPriority = hasFocusPriority
-    grid.props = gridProps()
-  })
+  afterUpdate(() => grid.updateProps(gridProps()))
 
   onDestroy(() => nav.remove(grid))
 

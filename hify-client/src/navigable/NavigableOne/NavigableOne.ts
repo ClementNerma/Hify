@@ -1,6 +1,6 @@
 import { Navigable, NavigableContainer, NavigableItem, NavigationComingFrom, NavigationDirection } from '../navigation'
 
-export class NavigableOne extends NavigableContainer {
+export class NavigableOne<P = {}> extends NavigableContainer<P> {
   private onlyChild: Navigable | null = null
   readonly ordered = false
 
@@ -28,7 +28,7 @@ export class NavigableOne extends NavigableContainer {
     this.onlyChild = null
   }
 
-  navigate(focusedChild: NavigableContainer, direction: NavigationDirection): NavigableItem | null {
+  navigate(focusedChild: NavigableContainer, direction: NavigationDirection): NavigableItem<unknown> | null {
     if (focusedChild !== this.onlyChild) {
       throw new Error('Focused child does not belong to the current single container')
     }
@@ -36,11 +36,11 @@ export class NavigableOne extends NavigableContainer {
     return this.parent.navigate(this, direction)
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem | null {
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
     return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
   }
 
-  navigateToLastItem(): NavigableItem | null {
+  navigateToLastItem(): NavigableItem<unknown> | null {
     return this.onlyChild?.navigateToLastItem() ?? null
   }
 

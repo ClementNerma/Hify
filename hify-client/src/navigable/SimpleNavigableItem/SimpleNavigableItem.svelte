@@ -3,8 +3,8 @@
 </script>
 
 <script lang="ts">
-  import { SimpleNavigableItem, SimpleNavigableItemProps } from './SimpleNavigableItem'
-  import { getParentNavigable, HTMLNavigableItemWrapperElement } from '../navigation'
+  import { SimpleNavigableItem } from './SimpleNavigableItem'
+  import { getParentNavigable, HTMLNavigableItemWrapperElement, Props } from '../navigation'
   import { afterUpdate, onDestroy } from 'svelte'
 
   export let fullHeight = false
@@ -15,24 +15,24 @@
 
   export let justForStyle = false
 
-  export let position: SimpleNavigableItemProps['position'] = null
-  export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
+  export let position: Props<SimpleNavigableItem>['position'] = null
+  export let hasFocusPriority: Props<SimpleNavigableItem>['hasFocusPriority'] = null
 
-  export let disabled: SimpleNavigableItemProps['disabled'] = undefined
+  export let disabled: Props<SimpleNavigableItem>['disabled'] = undefined
 
-  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
-  export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
+  export let onFocus: Props<SimpleNavigableItem>['onFocus'] = undefined
+  export let onUnfocus: Props<SimpleNavigableItem>['onUnfocus'] = undefined
 
-  export let onPress: SimpleNavigableItemProps['onPress'] = undefined
-  export let onLongPress: SimpleNavigableItemProps['onLongPress'] = undefined
-  export let onBack: SimpleNavigableItemProps['onBack'] = undefined
+  export let onPress: Props<SimpleNavigableItem>['onPress'] = undefined
+  export let onLongPress: Props<SimpleNavigableItem>['onLongPress'] = undefined
+  export let onBack: Props<SimpleNavigableItem>['onBack'] = undefined
 
-  export let onUp: SimpleNavigableItemProps['onUp'] = undefined
-  export let onLeft: SimpleNavigableItemProps['onLeft'] = undefined
-  export let onRight: SimpleNavigableItemProps['onRight'] = undefined
-  export let onDown: SimpleNavigableItemProps['onDown'] = undefined
+  export let onUp: Props<SimpleNavigableItem>['onUp'] = undefined
+  export let onLeft: Props<SimpleNavigableItem>['onLeft'] = undefined
+  export let onRight: Props<SimpleNavigableItem>['onRight'] = undefined
+  export let onDown: Props<SimpleNavigableItem>['onDown'] = undefined
 
-  const itemProps = (): SimpleNavigableItemProps => ({
+  const itemProps = (): Props<SimpleNavigableItem> => ({
     position,
     hasFocusPriority,
 
@@ -68,11 +68,7 @@
     nav.append(item)
   }
 
-  afterUpdate(() => {
-    item.position = position
-    item.hasFocusPriority = hasFocusPriority
-    item.props = itemProps()
-  })
+  afterUpdate(() => item.updateProps(itemProps()))
 
   onDestroy(() => !justForStyle && nav.remove(item))
 

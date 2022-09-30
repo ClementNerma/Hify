@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { SimpleNavigableItemProps } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem'
+  import { Props } from '../../navigable/navigation'
+  import { SimpleNavigableItem as Nav } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let onPress: () => void
   export let disabled = false
   export let fullHeight = false
 
-  export let hasFocusPriority: SimpleNavigableItemProps['hasFocusPriority'] = null
-  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
-  export let onUnfocus: SimpleNavigableItemProps['onFocus'] = undefined
+  export let hasFocusPriority: Props<Nav>['hasFocusPriority'] = null
+  export let onFocus: Props<Nav>['onFocus'] = undefined
+  export let onUnfocus: Props<Nav>['onFocus'] = undefined
 </script>
 
 <SimpleNavigableItem

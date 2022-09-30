@@ -84,7 +84,7 @@
 
     <div class="play-queue-gallery">
       <NavigableOne
-        whenFocusChanges={(focused) => {
+        onFocusChangeCallback={(focused) => {
           isQueueFocused = focused
         }}
       >

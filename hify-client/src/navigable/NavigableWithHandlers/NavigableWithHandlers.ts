@@ -1,24 +1,8 @@
 import { InputHandler, KeyPressHandling } from '../input-manager'
 import { NavigableOne } from '../NavigableOne/NavigableOne'
-import { NavigableContainer, NavigableItem, NavigationAction } from '../navigation'
+import { NavigableItem, NavigationAction } from '../navigation'
 
-export type NavigableWithHandlersProps = {
-  position: number | null
-  hasFocusPriority: boolean | null
-
-  onPress?: () => NavigableItem | null | void
-  onLongPress?: () => NavigableItem | null | void
-  onBack?: () => NavigableItem | null | void
-  onLongBack?: () => NavigableItem | null | void
-
-  onKeyPress?: InputHandler
-}
-
-export class NavigableWithHandlers extends NavigableOne {
-  constructor(parent: NavigableContainer, public props: NavigableWithHandlersProps) {
-    super(parent, props.position, props.hasFocusPriority)
-  }
-
+export class NavigableWithHandlers<P = {}> extends NavigableOne<NavigableWithHandlersProps & P> {
   override canHandleAction(action: NavigationAction): boolean {
     switch (action) {
       case NavigationAction.Press:
@@ -35,7 +19,7 @@ export class NavigableWithHandlers extends NavigableOne {
     }
   }
 
-  override handleAction(action: NavigationAction): NavigableItem | null {
+  override handleAction(action: NavigationAction): NavigableItem<unknown> | null {
     switch (action) {
       case NavigationAction.Press:
         return this.props.onPress?.() ?? null
@@ -54,4 +38,13 @@ export class NavigableWithHandlers extends NavigableOne {
   override interceptKeyPress(key: string, long: boolean): KeyPressHandling | void {
     return this.props.onKeyPress?.(key, long)
   }
+}
+
+export type NavigableWithHandlersProps = {
+  onPress?: () => NavigableItem<unknown> | null | void
+  onLongPress?: () => NavigableItem<unknown> | null | void
+  onBack?: () => NavigableItem<unknown> | null | void
+  onLongBack?: () => NavigableItem<unknown> | null | void
+
+  onKeyPress?: InputHandler
 }

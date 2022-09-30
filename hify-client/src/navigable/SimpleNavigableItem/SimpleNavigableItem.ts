@@ -1,16 +1,6 @@
-import {
-  HTMLNavigableItemWrapperElement,
-  NavigableContainer,
-  NavigableItem,
-  NavigationAction,
-  NavigationDirection,
-} from '../navigation'
+import { HTMLNavigableItemWrapperElement, NavigableItem, NavigationAction, NavigationDirection } from '../navigation'
 
-export class SimpleNavigableItem extends NavigableItem {
-  constructor(parent: NavigableContainer, public props: SimpleNavigableItemProps) {
-    super(parent, props.position, props.hasFocusPriority)
-  }
-
+export class SimpleNavigableItem<P = {}> extends NavigableItem<P & SimpleNavigableItemProps> {
   underlyingElement(): HTMLNavigableItemWrapperElement {
     return this.props.getUnderlyingElement()
   }
@@ -31,7 +21,7 @@ export class SimpleNavigableItem extends NavigableItem {
     }
   }
 
-  handleAction(action: NavigationAction): NavigableItem | null {
+  handleAction(action: NavigationAction): NavigableItem<unknown> | null {
     const callbacks: { [action in NavigationAction]: SimpleNavigableItemCallback | undefined } = {
       [NavigationAction.Press]: this.props.onPress,
       [NavigationAction.LongPress]: this.props.onLongPress,
@@ -68,7 +58,7 @@ export class SimpleNavigableItem extends NavigableItem {
     }
   }
 
-  handleDirection(direction: NavigationDirection): NavigableItem | null {
+  handleDirection(direction: NavigationDirection): NavigableItem<unknown> | null {
     const callbacks: { [action in NavigationDirection]: SimpleNavigableItemCallback | undefined } = {
       [NavigationDirection.Up]: this.props.onUp,
       [NavigationDirection.Left]: this.props.onLeft,
@@ -100,12 +90,9 @@ export class SimpleNavigableItem extends NavigableItem {
   }
 }
 
-export type SimpleNavigableItemCallback = () => NavigableItem | null | void
+export type SimpleNavigableItemCallback = () => NavigableItem<unknown> | null | void
 
 export type SimpleNavigableItemProps = {
-  position: number | null
-  hasFocusPriority: boolean | null
-
   disabled?: boolean
 
   onFocus?: () => void

@@ -1,23 +1,20 @@
 <script lang="ts">
   import { afterUpdate, onDestroy } from 'svelte'
 
-  import { getParentNavigable, setChildrenNavigable } from '../navigation'
+  import { getParentNavigable, Props, setChildrenNavigable } from '../navigation'
   import { NavigableList } from './NavigableList'
 
-  export let position: number | null = null
-  export let hasFocusPriority: boolean | null = null
+  export let position: Props<NavigableList>['position'] = null
+  export let hasFocusPriority: Props<NavigableList>['hasFocusPriority'] = null
 
   const nav = getParentNavigable()
-  const list = new NavigableList(nav, position, hasFocusPriority)
+  const list = new NavigableList(nav, { position, hasFocusPriority })
 
   nav.append(list)
 
   setChildrenNavigable(list)
 
-  afterUpdate(() => {
-    list.position = position
-    list.hasFocusPriority = hasFocusPriority
-  })
+  afterUpdate(() => list.updateProps({ position, hasFocusPriority }))
 
   onDestroy(() => nav.remove(list))
 
