@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AlbumCardFragment, AsyncGenrePage } from '../../graphql/generated'
 
-  import Grid from '../../organisms/Grid/Grid.svelte'
+  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
   import MixButton from '../../atoms/MixButton/MixButton.svelte'
 

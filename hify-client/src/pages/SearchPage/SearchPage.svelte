@@ -5,7 +5,7 @@
 
   import { logInfo } from '../../stores/debugger'
 
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import { RequestFocus } from '../../navigable/navigation'
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'

@@ -12,13 +12,13 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
 
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
-  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
+  import ProgressRange from '../../navigable/ui/atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import NavigableOne from '../../navigable/NavigableOne/NavigableOne.svelte'
-  import Column from '../../atoms/Column/Column.svelte'
+  import NavigableOne from '../../navigable/headless/NavigableOne/NavigableOne.svelte'
+  import Column from '../../navigable/ui/molecules/Column/Column.svelte'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false

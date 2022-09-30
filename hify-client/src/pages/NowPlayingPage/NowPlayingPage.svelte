@@ -9,7 +9,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
-  import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']

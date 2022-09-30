@@ -2,12 +2,12 @@
   import { afterUpdate } from 'svelte'
 
   import { AudioTrackFragment } from '../../graphql/generated'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { getAlbumArtUri } from '../../globals/rest-api'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import { showContextMenu } from '../ContextMenu/ContextMenu'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AlbumCardFragment, AsyncAlbumsPage } from '../../graphql/generated'
 
-  import Grid from '../../organisms/Grid/Grid.svelte'
+  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
 
   const ALBUMS_PER_LINE = 6

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Row from '../../atoms/Row/Row.svelte'
+  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { AlbumCardFragment } from '../../graphql/generated'
   import AlbumCard from '../AlbumCard/AlbumCard.svelte'
 

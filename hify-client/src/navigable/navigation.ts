@@ -1,6 +1,5 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { logFatal, logWarn } from '../stores/debugger'
 import { handleInput, KeyPressHandling, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
@@ -112,7 +111,7 @@ export abstract class NavigableArrayContainer<P = {}> extends NavigableContainer
     return this.ordered
       ? [...this._unorderedItems].sort((a, b) => {
           if (a.props.position === null || b.props.position === null) {
-            return logFatal('Internal error: position not definied in ordered items array')
+            throw new Error('Internal error: position not definied in ordered items array')
           }
 
           return a.props.position - b.props.position
@@ -192,13 +191,13 @@ export abstract class NavigableItem<P = {}> extends NavigableCommon<P> {
     }
 
     if (!el.children.length || !(el.children[0] instanceof HTMLElement)) {
-      return logWarn('Failed to scroll to element has it does not have a valid child element')
+      return console.warn('Failed to scroll to element has it does not have a valid child element')
     }
 
     if (el.children.length > 0) {
       el.children[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
     } else {
-      logWarn('Navigable item has no children ; cannot scroll into view')
+      console.warn('Navigable item has no children ; cannot scroll into view')
     }
   }
 }
@@ -361,11 +360,11 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
 
   if (__current) {
     if (__current.identity !== state.page.identity) {
-      logWarn('Previously-focused element has a different identity than the current page, removing focus')
+      console.warn('Previously-focused element has a different identity than the current page, removing focus')
       __current.onUnfocus()
       __current = null
     } else if (wasNavigableDestroyed(__current)) {
-      logWarn('Previously-focused element was destroyed, removing focus')
+      console.warn('Previously-focused element was destroyed, removing focus')
       __current.onUnfocus()
       __current = null
     }
@@ -377,7 +376,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
     __current = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
 
     if (!__current) {
-      logWarn('No navigable item in this page')
+      console.warn('No navigable item in this page')
       return
     }
 
@@ -471,7 +470,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
 function _getItemChain(item: NavigableItem<unknown>): Navigable[] {
   const out: Navigable[] = [item]
 
-  let current: NavigableContainer = item.parent
+  let current: NavigableContainer<unknown> = item.parent
 
   while (!(current instanceof NavigablePage)) {
     out.push(current)
@@ -483,13 +482,13 @@ function _getItemChain(item: NavigableItem<unknown>): Navigable[] {
 
 function _checkItemValidity(item: NavigableItem<unknown>, page: NavigablePage): boolean {
   if (item.identity !== page.identity) {
-    logWarn('Previously-focused element has a different identity than the current page, removing focus')
+    console.warn('Previously-focused element has a different identity than the current page, removing focus')
     item.onUnfocus()
     return false
   }
 
   if (wasNavigableDestroyed(item)) {
-    logWarn('Previously-focused element was destroyed, removing focus')
+    console.warn('Previously-focused element was destroyed, removing focus')
     item.onUnfocus()
     return false
   }
@@ -528,7 +527,7 @@ function _propagateFocusChangeEvent(item: NavigableItem<unknown>, focused: boole
 
 export type RequestFocus = () => boolean
 
-export type Navigable = NavigableContainer | NavigableItem<unknown>
+export type Navigable = NavigableContainer<unknown> | NavigableItem<unknown>
 
 const NAVIGATION_CTX = Symbol()
 const NAVIGABLE_ITEM_DETECTION_CTX = Symbol()

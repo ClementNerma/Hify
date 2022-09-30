@@ -2,10 +2,10 @@
   import { navigate } from 'svelte-navigator'
   import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
   import { AsyncGenresPage } from '../../graphql/generated'
-  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu'
-  import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import Grid from '../../organisms/Grid/Grid.svelte'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
+  import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import { ROUTES } from '../../routes'
 
   const genres = AsyncGenresPage({ variables: {} }).then((res) => res.data.genres)

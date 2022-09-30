@@ -1,9 +1,10 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
-  import { showContextMenu } from '../../molecules/ContextMenu/ContextMenu'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
 
-  import SimpleNavigableItem, { ItemDisplay } from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { ItemDisplay } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue, queueAsNext } from '../../stores/play-queue'
 

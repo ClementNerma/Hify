@@ -5,18 +5,18 @@
   import { getAlbumArtUri } from '../../globals/rest-api'
   import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
-  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
+  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
   import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '../../globals/utils'
   import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
-  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
-  import Button from '../../atoms/Button/Button.svelte'
-  import Emoji from '../../atoms/Emoji/Emoji.svelte'
+  import Checkbox from '../../navigable/ui/atoms/Checkbox/Checkbox.svelte'
+  import Button from '../../navigable/ui/atoms/Button/Button.svelte'
+  import Emoji from '../../navigable/ui/atoms/Emoji/Emoji.svelte'
   import { playNewQueueFromBeginning, queueAsNext } from '../../stores/play-queue'
-  import Row from '../../atoms/Row/Row.svelte'
+  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { humanReadableDuration } from '../../stores/audio-player'
 
   export let albumId: string

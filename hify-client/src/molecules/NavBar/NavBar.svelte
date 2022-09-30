@@ -8,10 +8,10 @@
 <script lang="ts">
   import { useLocation, navigate } from 'svelte-navigator'
 
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
+  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
   import { RequestFocus } from '../../navigable/navigation'
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import ItemStyleLayer from '../../navigable/SimpleNavigableItem/ItemStyleLayer.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte';
+  import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte';
   import { onMount } from 'svelte'
 
   const location = useLocation()

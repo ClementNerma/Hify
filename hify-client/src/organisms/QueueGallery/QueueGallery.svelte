@@ -1,6 +1,6 @@
 <script lang="ts">
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
+  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 
   const COLUMNS = 8

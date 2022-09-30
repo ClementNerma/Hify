@@ -1,7 +1,7 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
 
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 </script>
 
 <SimpleNavigableItem onPress={() => navigate(-1)}>

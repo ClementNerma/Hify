@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ArtistCardFragment, AsyncArtistsPage } from '../../graphql/generated'
 
-  import Grid from '../../organisms/Grid/Grid.svelte'
+  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import ArtistCard from '../../molecules/ArtistCard/ArtistCard.svelte'
 
   const ARTISTS_PER_LINE = 6

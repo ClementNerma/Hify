@@ -5,7 +5,7 @@
   import { ROUTES } from '../../routes'
   import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
-  import { showContextMenu } from '../ContextMenu/ContextMenu'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
 
   export let artist: ArtistCardFragment

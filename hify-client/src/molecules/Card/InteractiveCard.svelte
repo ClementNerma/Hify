@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import Card from './Card.svelte'
 
   export let pictureUrl: string

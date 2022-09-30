@@ -1,5 +1,3 @@
-import { logDebug } from '../stores/debugger'
-
 export const REMAPPED_KEYS: Record<string, string> = {
   F4: 'Escape',
 }
@@ -9,7 +7,7 @@ export function handleInput(handler: InputHandler): void {
 }
 
 export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
-  logDebug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
+  console.debug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
 
   if (Object.prototype.hasOwnProperty.call(REMAPPED_KEYS, key)) {
     key = REMAPPED_KEYS[key]

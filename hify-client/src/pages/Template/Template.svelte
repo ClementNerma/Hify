@@ -1,7 +1,6 @@
 <script lang="ts">
   import './Template.css'
 
-  import { onMount } from 'svelte'
   import { useLocation, navigate } from 'svelte-navigator'
 
   import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
@@ -9,14 +8,14 @@
 
   import { ROUTES } from '../../routes'
 
-  import NavigableList from '../../navigable/NavigableList/NavigableList.svelte'
-  import NavigablePage from '../../navigable/NavigablePage/NavigablePage.svelte'
+  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
+  import NavigablePage from '../../navigable/headless/NavigablePage/NavigablePage.svelte'
 
-  import NavigableWithHandlers from '../../navigable/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import ContextMenu from '../../molecules/ContextMenu/ContextMenu.svelte'
+  import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
 
   const location = useLocation()
 
