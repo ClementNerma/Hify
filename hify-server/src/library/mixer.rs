@@ -4,12 +4,12 @@ use rand::{seq::SliceRandom, thread_rng};
 use crate::index::{Index, Track};
 
 #[derive(InputObject)]
-pub struct MixerParams {
+pub struct MixParams {
     min_rating: Option<u8>,
     max_tracks: Option<u8>,
 }
 
-pub fn generate_mix(index: &Index, params: MixerParams) -> Vec<Track> {
+pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
     let param_min_rating = params.min_rating.unwrap_or(80);
     let param_max_tracks = usize::from(params.max_tracks.unwrap_or(200));
 
