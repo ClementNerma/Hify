@@ -25,6 +25,7 @@ pub struct Index {
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct IndexCache {
+    /// Absolute filesystem path to each track
     pub tracks_paths: HashMap<TrackID, PathBuf>,
 
     /// Albums where the artist is listed in the "album artists" tag
