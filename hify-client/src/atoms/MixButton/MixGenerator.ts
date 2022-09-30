@@ -11,8 +11,6 @@ export async function generateAndPlayMix(input: MixParams) {
     fetchPolicy: 'no-cache',
   })
 
-  if (mix.data.generateMix) {
-    playNewQueueFromBeginning(mix.data.generateMix)
-    navigate(ROUTES.nowPlaying)
-  }
+  playNewQueueFromBeginning(mix.data.generateMix)
+  navigate(ROUTES.nowPlaying)
 }
