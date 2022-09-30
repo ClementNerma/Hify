@@ -1,16 +1,15 @@
 <script lang="ts">
   import { afterUpdate } from 'svelte'
 
-  import { navigate } from 'svelte-navigator'
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { contextMenuStore } from '../../pages/Template/TplContextMenu.svelte'
   import { getAlbumArtUri } from '../../globals/rest-api'
-  import { ROUTES } from '../../routes'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '../ContextMenu/ContextMenu.svelte'
+  import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment
   export let position: number
@@ -27,15 +26,9 @@
     wasCurrent = isCurrent
   })
 
-  function buildContextMenuOptions(): ContextMenuOption[] {
-    const options = [{ label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) }]
-
-    if (!isCurrent) {
-      options.push({ label: 'Remove from queue', onPress: () => removeFromQueue(position) })
-    }
-
-    return options
-  }
+  $: contextMenuOptions = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)].concat(
+    isCurrent ? [] : [{ label: 'Remove from queue', onPress: () => removeFromQueue(position) }],
+  )
 
   let wrapper: HTMLDivElement
 </script>
@@ -44,7 +37,7 @@
   <SimpleNavigableItem
     {position}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
-    onLongPress={() => showContextMenu(contextMenuStore, buildContextMenuOptions())}
+    onLongPress={() => showContextMenu(contextMenuStore, contextMenuOptions)}
     hasFocusPriority={isCurrent}
     fullHeight
   >
