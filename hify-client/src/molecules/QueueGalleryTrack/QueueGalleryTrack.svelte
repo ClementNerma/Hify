@@ -9,6 +9,7 @@
   import { ROUTES } from '../../routes'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../utils'
+  import Card from '../Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '../ContextMenu/ContextMenu.svelte'
 
   export let track: AudioTrackFragment
@@ -47,10 +48,12 @@
     hasFocusPriority={isCurrent}
     fullHeight
   >
-    <div>
-      <img class="album-art" width={80} height={80} src={getAlbumArtUri(track.metadata.tags.album.id)} alt="" />
-      <div class="title experimental-line-limiter">{track.metadata.tags.title}</div>
-    </div>
+    <Card
+      title={track.metadata.tags.title}
+      subtitle={null}
+      boxSize={80}
+      pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
+    />
   </SimpleNavigableItem>
 </div>
 
@@ -62,26 +65,11 @@
     max-width: var(--column-size);
   }
 
-  .title {
-    font-weight: bold;
-    vertical-align: middle;
-    overflow: hidden;
-  }
-
   .track.isCurrent {
     border-radius: 5px;
   }
 
   .track:not(.track.isCurrent) {
     opacity: 0.2;
-  }
-
-  /* TODO: remove experimental stuff */
-  .experimental-line-limiter {
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
   }
 </style>

@@ -2,7 +2,7 @@
   export let pictureUrl: string
 
   export let title: string
-  export let subtitle: string
+  export let subtitle: string | null
 
   export let boxSize = 120
   export let rounded = false
@@ -15,7 +15,10 @@
 <div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
   <img class="cover" class:rounded width={boxSize} height={boxSize} src={pictureUrl} alt="" />
   <div class="title experimental-line-limiter">{title}</div>
-  <div class="subtitle experimental-line-limiter">{subtitle}</div>
+
+  {#if subtitle}
+    <div class="subtitle experimental-line-limiter">{subtitle}</div>
+  {/if}
 </div>
 
 <style>
