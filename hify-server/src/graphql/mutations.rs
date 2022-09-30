@@ -30,10 +30,10 @@ impl MutationRoot {
         true
     }
 
-    async fn increase_listenings(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
+    async fn log_listening(&self, ctx: &Context<'_>, track_id: TrackID, duration_s: u32) -> bool {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
         let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.increase_listenings(track_id);
+        user_data.log_listening(track_id, duration_s);
         true
     }
 }

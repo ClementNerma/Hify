@@ -9,6 +9,7 @@ pub struct UserData {
     config: UserDataConfig,
     history: Vec<TrackID>,
     listenings: HashMap<TrackID, u32>,
+    listening_durations: HashMap<TrackID, u64>,
 }
 
 impl UserData {
@@ -17,6 +18,7 @@ impl UserData {
             config,
             history: vec![],
             listenings: HashMap::new(),
+            listening_durations: HashMap::new(),
         }
     }
 
@@ -61,11 +63,24 @@ impl UserDataWrapper {
         (self.on_change)(&self.inner);
     }
 
-    pub fn increase_listenings(&mut self, track_id: TrackID) {
-        match self.inner.listenings.entry(track_id) {
+    pub fn log_listening(&mut self, track_id: TrackID, duration_s: u32) {
+        if duration_s < self.inner.config.listening_duration_thresold {
+            return;
+        }
+
+        match self.inner.listenings.entry(track_id.clone()) {
             Entry::Occupied(mut occ) => *occ.get_mut() += 1,
             Entry::Vacant(vac) => {
                 vac.insert(1);
+            }
+        };
+
+        let duration = u64::from(duration_s);
+
+        match self.inner.listening_durations.entry(track_id) {
+            Entry::Occupied(mut occ) => *occ.get_mut() += duration,
+            Entry::Vacant(vac) => {
+                vac.insert(duration);
             }
         };
     }
@@ -74,12 +89,14 @@ impl UserDataWrapper {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserDataConfig {
     history_capacity: usize,
+    listening_duration_thresold: u32,
 }
 
 impl Default for UserDataConfig {
     fn default() -> Self {
         Self {
             history_capacity: 1000,
+            listening_duration_thresold: 10,
         }
     }
 }
