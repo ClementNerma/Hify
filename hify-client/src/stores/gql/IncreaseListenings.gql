@@ -1,0 +1,4 @@
+mutation IncreaseListenings($trackId: TrackID!) {
+  # TODO: do this separately, after a listening delay
+  increaseListenings(trackId: $trackId)
+}

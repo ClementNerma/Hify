@@ -1,6 +1,3 @@
-mutation HistoryPush($trackId: String!) {
+mutation HistoryPush($trackId: TrackID!) {
   historyPush(trackId: $trackId)
-
-  # TODO: do this separately, after a listening delay
-  increaseListenings(trackId: $trackId)
 }
