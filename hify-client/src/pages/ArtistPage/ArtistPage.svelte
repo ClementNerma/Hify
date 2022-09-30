@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MixButton from '../../atoms/MixButton/MixButton.svelte'
   import { AsyncArtistPage } from '../../graphql/generated'
 
   import ArtistAlbums from './ArtistAlbums.svelte'
@@ -18,6 +19,8 @@
     <h2>Artist was not found!</h2>
   {:else}
     <h2>Artist: {artist.name}</h2>
+
+    <MixButton mixParams={{ fromArtist: artistId }} />
 
     <ArtistAlbums {artistId} />
 

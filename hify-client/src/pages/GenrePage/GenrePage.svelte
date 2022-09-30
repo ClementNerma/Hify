@@ -3,6 +3,7 @@
 
   import Grid from '../../organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
+  import MixButton from '../../atoms/MixButton/MixButton.svelte'
 
   const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5
@@ -49,7 +50,10 @@
   {#if genreNotFound}
     <h2>Genre was not found!</h2>
   {:else}
-    <h2>Albums with "{genreName}" genre</h2>
+    <h2>Genre: {genreName}</h2>
+    <MixButton mixParams={{ fromGenre: genreId }} />
+
+    <h3>List of albums</h3>
 
     <Grid columns={ALBUMS_PER_LINE} lazyLoader={feedMore}>
       {#each albums as album}
