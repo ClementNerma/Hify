@@ -7,22 +7,46 @@ use crate::index::{Index, Track};
 pub struct MixParams {
     min_rating: Option<u8>,
     max_tracks: Option<u8>,
+    from_artist: Option<String>,
+    from_genre: Option<String>,
 }
 
 pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
-    let param_min_rating = params.min_rating.unwrap_or(80);
-    let param_max_tracks = usize::from(params.max_tracks.unwrap_or(200));
+    #[deny(unused_variables)]
+    let MixParams {
+        min_rating,
+        max_tracks,
+        from_artist,
+        from_genre,
+    } = params;
+
+    let min_rating = min_rating.unwrap_or(80);
+    let max_tracks = usize::from(max_tracks.unwrap_or(200));
 
     let mut tracks: Vec<_> = index
         .tracks
         .values()
         .filter(|track| match track.metadata.tags.rating {
-            None => param_min_rating == 0,
-            Some(rating) => rating >= param_min_rating,
+            None => min_rating == 0,
+            Some(rating) => rating >= min_rating,
+        })
+        .filter(|track| match &from_artist {
+            Some(artist_id) => track
+                .metadata
+                .tags
+                .album_artists
+                .iter()
+                .chain(track.metadata.tags.artists.iter())
+                .any(|id| id == artist_id),
+            None => true,
+        })
+        .filter(|track| match &from_genre {
+            Some(genre_id) => track.metadata.tags.genres.iter().any(|id| id == genre_id),
+            None => true,
         })
         .collect();
 
     tracks.shuffle(&mut thread_rng());
 
-    tracks.into_iter().take(param_max_tracks).cloned().collect()
+    tracks.into_iter().take(max_tracks).cloned().collect()
 }
