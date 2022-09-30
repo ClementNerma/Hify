@@ -8,6 +8,8 @@ use std::{
 use async_graphql::{Enum, SimpleObject};
 use serde::{Deserialize, Serialize};
 
+use crate::define_scalar_string;
+
 use super::sorted_map::SortedMap;
 
 /// Global index, contains all data on the music files contained in a provided directory
@@ -132,17 +134,19 @@ impl GenreInfos {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct TrackID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct AlbumID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct ArtistID(pub String);
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct GenreID(pub String);
+
+define_scalar_string!(TrackID, AlbumID, ArtistID, GenreID);
 
 /// Full track informations
 /// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway

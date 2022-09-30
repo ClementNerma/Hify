@@ -65,12 +65,8 @@ impl QueryRoot {
         )
     }
 
-    async fn album(&self, ctx: &Context<'_>, id: String) -> Option<AlbumInfos> {
-        graphql_index!(ctx)
-            .cache
-            .albums_infos
-            .get(&AlbumID(id))
-            .cloned()
+    async fn album(&self, ctx: &Context<'_>, id: AlbumID) -> Option<AlbumInfos> {
+        graphql_index!(ctx).cache.albums_infos.get(&id).cloned()
     }
 
     async fn artists(
@@ -99,12 +95,8 @@ impl QueryRoot {
         )
     }
 
-    async fn artist(&self, ctx: &Context<'_>, id: String) -> Option<ArtistInfos> {
-        graphql_index!(ctx)
-            .cache
-            .artists_infos
-            .get(&ArtistID(id))
-            .cloned()
+    async fn artist(&self, ctx: &Context<'_>, id: ArtistID) -> Option<ArtistInfos> {
+        graphql_index!(ctx).cache.artists_infos.get(&id).cloned()
     }
 
     async fn genres(&self, ctx: &Context<'_>) -> Vec<GenreInfos> {
@@ -116,12 +108,8 @@ impl QueryRoot {
             .collect()
     }
 
-    async fn genre(&self, ctx: &Context<'_>, id: String) -> Option<GenreInfos> {
-        graphql_index!(ctx)
-            .cache
-            .genre_infos
-            .get(&GenreID(id))
-            .cloned()
+    async fn genre(&self, ctx: &Context<'_>, id: GenreID) -> Option<GenreInfos> {
+        graphql_index!(ctx).cache.genre_infos.get(&id).cloned()
     }
 
     // Slow Waiting for answers on https://github.com/async-graphql/async-graphql/issues/1090
@@ -136,22 +124,22 @@ impl QueryRoot {
     //     paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
     // }
 
-    async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<String>) -> Result<Vec<Track>> {
+    async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<TrackID>) -> Result<Vec<Track>> {
         let index = graphql_index!(ctx);
         in_ids
             .into_iter()
             .map(|track_id| {
                 index
                     .tracks
-                    .get(&TrackID(track_id.clone()))
+                    .get(&track_id)
                     .cloned()
-                    .with_context(|| format!("Track not found for ID: {}", track_id))
+                    .with_context(|| format!("Track not found for ID: {:?}", track_id))
             })
             .collect::<Result<Vec<_>>>()
     }
 
-    async fn track(&self, ctx: &Context<'_>, id: String) -> Option<Track> {
-        graphql_index!(ctx).tracks.get(&TrackID(id)).cloned()
+    async fn track(&self, ctx: &Context<'_>, id: TrackID) -> Option<Track> {
+        graphql_index!(ctx).tracks.get(&id).cloned()
     }
 
     async fn search(
