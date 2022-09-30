@@ -1,5 +1,5 @@
 <script>
-  import NavigableRow from '../../navigable/NavigableRow/NavigableRow.svelte'
+  import NavigableRow from '../../../headless/NavigableRow/NavigableRow.svelte'
 </script>
 
 <div class="row">
