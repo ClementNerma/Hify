@@ -10,8 +10,8 @@
 
   import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
   import { RequestFocus } from '../../navigable/navigation'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte';
-  import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte';
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
   import { onMount } from 'svelte'
 
   const location = useLocation()

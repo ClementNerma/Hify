@@ -5,7 +5,7 @@
 <script lang="ts">
   import { SimpleNavigableItem } from './SimpleNavigableItem'
   import { getParentNavigable, HTMLNavigableItemWrapperElement, Props } from '../../navigation'
-  import { afterUpdate, onDestroy } from 'svelte'
+  import { afterUpdate } from 'svelte'
 
   export let fullHeight = false
   export let noPadding = false
@@ -15,7 +15,6 @@
 
   export let justForStyle = false
 
-  export let position: Props<SimpleNavigableItem>['position'] = null
   export let hasFocusPriority: Props<SimpleNavigableItem>['hasFocusPriority'] = null
 
   export let disabled: Props<SimpleNavigableItem>['disabled'] = undefined
@@ -33,7 +32,6 @@
   export let onDown: Props<SimpleNavigableItem>['onDown'] = undefined
 
   const itemProps = (): Props<SimpleNavigableItem> => ({
-    position,
     hasFocusPriority,
 
     disabled,
@@ -60,17 +58,9 @@
     getUnderlyingElement: () => wrapper,
   })
 
-  const nav = getParentNavigable(true)
-
-  const item = new SimpleNavigableItem(nav, itemProps())
-
-  if (!justForStyle) {
-    nav.append(item)
-  }
+  const item = new SimpleNavigableItem(getParentNavigable(true), itemProps())
 
   afterUpdate(() => item.updateProps(itemProps()))
-
-  onDestroy(() => !justForStyle && nav.remove(item))
 
   export const requestFocus = () => item.requestFocus()
 
@@ -82,6 +72,7 @@
 </script>
 
 <navigable-item-wrapper
+  data-navigable-item-id={!justForStyle ? item.id : ':just_for_style'}
   bind:this={wrapper}
   on:click={() => onPress?.()}
   on:contextmenu|preventDefault={() => onLongPress?.()}

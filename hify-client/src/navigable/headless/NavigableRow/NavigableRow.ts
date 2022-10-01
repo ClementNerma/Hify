@@ -1,14 +1,16 @@
 import {
   Navigable,
+  NavigableContainer,
   NavigableItem,
   NavigationComingFrom,
   NavigationDirection,
-  NavigableArrayContainer,
 } from '../../navigation'
 
-export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
+export class NavigableRow<P = {}> extends NavigableContainer<P> {
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
-    const colIndex = this.items.indexOf(focusedChild)
+    const items = this.children()
+
+    const colIndex = items.indexOf(focusedChild)
 
     if (colIndex === -1) {
       throw new Error('Focused element not found in navigable row')
@@ -19,7 +21,7 @@ export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
         return this.parent.navigate(this, NavigationDirection.Up)
 
       case NavigationDirection.Left:
-        for (const colItem of this.items.slice(0, colIndex).reverse()) {
+        for (const colItem of items.slice(0, colIndex).reverse()) {
           const item = colItem.navigateToFirstItemDown(NavigationComingFrom.Right)
 
           if (item) {
@@ -30,7 +32,7 @@ export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
         return this.parent.navigate(this, NavigationDirection.Right)
 
       case NavigationDirection.Right:
-        for (const colItem of this.items.slice(colIndex + 1)) {
+        for (const colItem of items.slice(colIndex + 1)) {
           const item = colItem.navigateToFirstItemDown(NavigationComingFrom.Left)
 
           if (item) {
@@ -45,7 +47,9 @@ export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
     }
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+  override navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+    const items = this.children()
+
     let tries: Navigable[]
 
     switch (from) {
@@ -57,15 +61,15 @@ export class NavigableRow<P = {}> extends NavigableArrayContainer<P> {
           return prio.navigateToFirstItemDown(from)
         }
 
-        tries = this.items
+        tries = items
         break
 
       case NavigationComingFrom.Left:
-        tries = this.items
+        tries = items
         break
 
       case NavigationComingFrom.Right:
-        tries = [...this.items].reverse()
+        tries = [...items].reverse()
         break
     }
 

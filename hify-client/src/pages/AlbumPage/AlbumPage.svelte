@@ -139,7 +139,6 @@
                 {@const tags = track.metadata.tags}
 
                 <NavigableTrack
-                  position={filteredTracks.indexOf(track)}
                   tracks={filteredTracks}
                   goToAlbumOption={false}
                   display="transparent"

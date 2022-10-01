@@ -1,29 +1,27 @@
 <script lang="ts">
-  import { afterUpdate, onDestroy } from 'svelte'
+  import { afterUpdate } from 'svelte'
 
   import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+  import InternalNavWrapper from '../InternalNavWrapper.svelte'
   import { NavigableRow } from './NavigableRow'
 
-  export let position: Props<NavigableRow>['position'] = null
   export let hasFocusPriority: Props<NavigableRow>['hasFocusPriority'] = null
+  export let onFocusChangeCallback: Props<NavigableRow>['onFocusChangeCallback'] | null = null
 
   const rowProps = (): Props<NavigableRow> => ({
-    position,
     hasFocusPriority,
+    onFocusChangeCallback,
   })
 
-  const nav = getParentNavigable()
-  const row = new NavigableRow(nav, rowProps())
-
-  nav.append(row)
+  const row = new NavigableRow(getParentNavigable(), rowProps())
 
   setChildrenNavigable(row)
 
   afterUpdate(() => row.updateProps(rowProps()))
 
-  onDestroy(() => nav.remove(row))
-
   export const requestFocus = () => row.requestFocus()
 </script>
 
-<slot nav={row} />
+<InternalNavWrapper navId={row.id}>
+  <slot nav={row} />
+</InternalNavWrapper>

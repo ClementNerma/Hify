@@ -10,12 +10,10 @@
   export let onPress: () => void
   export let onLongPress: (() => void) | undefined = undefined
 
-  export let position: number | null = null
-
   export let enforceMaxWidth: boolean | undefined = undefined
   export let rounded: boolean | undefined = undefined
 </script>
 
-<SimpleNavigableItem {onPress} {onLongPress} {position}>
+<SimpleNavigableItem {onPress} {onLongPress}>
   <Card {pictureUrl} {title} {subtitle} {enforceMaxWidth} {rounded} />
 </SimpleNavigableItem>

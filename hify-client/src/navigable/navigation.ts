@@ -26,7 +26,6 @@ export enum NavigationComingFrom {
 export type OnFocusChangeCallback = (isFocused: boolean) => void
 
 export type NavigableCommonProps = {
-  position: number | null
   hasFocusPriority: boolean | null
   onFocusChangeCallback?: OnFocusChangeCallback | null
 }
@@ -39,10 +38,19 @@ export abstract class NavigableCommon<P = {}> {
   readonly parent: NavigableContainer<unknown>
   readonly identity: symbol
   readonly page: NavigablePage
+  readonly id: string
 
   protected focused = writable(false)
 
   constructor(parent: NavigableContainer<unknown> | symbol, protected _props: NavigableCommonProps & P) {
+    if (!isValidNavigable(this)) {
+      throw new Error(
+        'Invalid navigable detected ; must be an instance of either "NavigableContainer" or "NavigableItem"',
+      )
+    }
+
+    this.id = generateNavigableId()
+
     if (!(parent instanceof NavigableContainer)) {
       if (parent !== PAGE_CTR_TOKEN) {
         throw new Error('Invalid page construction token provided!')
@@ -61,6 +69,8 @@ export abstract class NavigableCommon<P = {}> {
     this.parent = parent
     this.identity = parent.identity
     this.page = parent.page
+
+    this.page.registerNavigable(this)
   }
 
   get props(): Readonly<NavigableCommonProps & P> {
@@ -84,11 +94,10 @@ export abstract class NavigableCommon<P = {}> {
 }
 
 export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
-  abstract get ordered(): boolean
+  protected getFocusPriority(): Navigable | null {
+    return this.children().find((item) => item.props.hasFocusPriority === true) ?? null
+  }
 
-  abstract append(navigable: Navigable): void
-  abstract hasChild(child: Navigable): boolean
-  abstract remove(child: Navigable): void
   abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null
 
   canHandleAction(_: NavigationAction): boolean {
@@ -98,64 +107,29 @@ export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
   handleAction(_: NavigationAction): NavigableItem<unknown> | null {
     throw new Error('This navigable container does not support actions')
   }
-}
 
-export abstract class NavigableArrayContainer<P = {}> extends NavigableContainer<P> {
-  protected _unorderedItems: Navigable[] = []
+  children(): Navigable[] {
+    const children: Navigable[] = []
 
-  get ordered(): boolean {
-    return this._unorderedItems.length > 0 ? this._unorderedItems[0].props.position !== null : false
-  }
+    visitNavigableChildren(this.id, this.page, (nav) => {
+      children.push(nav)
+    })
 
-  protected get items(): Navigable[] {
-    return this.ordered
-      ? [...this._unorderedItems].sort((a, b) => {
-          if (a.props.position === null || b.props.position === null) {
-            throw new Error('Internal error: position not definied in ordered items array')
-          }
-
-          return a.props.position - b.props.position
-        })
-      : this._unorderedItems
-  }
-
-  protected getFocusPriority(): Navigable | null {
-    return this._unorderedItems.find((item) => item.props.hasFocusPriority === true) ?? null
-  }
-
-  requestFocus(): boolean {
-    return this.items[0]?.requestFocus() ?? false
-  }
-
-  append(navigable: Navigable): void {
-    if (this._unorderedItems.length > 0) {
-      if (this.ordered && navigable.props.position === null) {
-        throw new Error('Cannot append a non-positioned item to an ordered container')
-      } else if (!this.ordered && navigable.props.position !== null) {
-        throw new Error('Cannot append a positioned item to an unordered container')
-      }
+    // NOTE: Just a quick assertion to ensure there is no bug here
+    if (children.find((child) => child.id === this.id)) {
+      throw new Error('Self item found in its children!')
     }
 
-    this._unorderedItems.push(navigable)
+    return children
   }
 
-  remove(child: Navigable): void {
-    const indexOf = this._unorderedItems.indexOf(child)
-
-    if (indexOf === -1) {
-      throw new Error('Cannot remove unknown child')
-    }
-
-    this._unorderedItems.splice(indexOf, 1)
-  }
-
-  hasChild(child: Navigable): boolean {
-    return this._unorderedItems.indexOf(child) !== -1
+  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+    return this.children()[0]?.navigateToFirstItemDown(from) ?? null
   }
 
   navigateToLastItem(): NavigableItem<unknown> | null {
-    for (let c = this._unorderedItems.length - 1; c >= 0; c--) {
-      const target = this._unorderedItems[c].navigateToLastItem()
+    for (const child of this.children()) {
+      const target = child.navigateToLastItem()
 
       if (target) {
         return target
@@ -163,6 +137,11 @@ export abstract class NavigableArrayContainer<P = {}> extends NavigableContainer
     }
 
     return null
+  }
+
+  requestFocus(): boolean {
+    // TODO: don't get all the children, only find the first one!
+    return this.children()[0]?.requestFocus() ?? false
   }
 }
 
@@ -200,6 +179,10 @@ export abstract class NavigableItem<P = {}> extends NavigableCommon<P> {
       console.warn('Navigable item has no children ; cannot scroll into view')
     }
   }
+
+  wasDestroyed(): boolean {
+    return !this.page.containsItem(this)
+  }
 }
 
 class NavigablePage extends NavigableContainer {
@@ -207,20 +190,22 @@ class NavigablePage extends NavigableContainer {
   override readonly page: NavigablePage
   override readonly parent: NavigableContainer
 
+  // TODO: garbage collection when elements are removed (remove on 'onDestroy' event?)
+  protected readonly navigables: Map<string, Navigable>
+
   readonly priorityFocusables: NavigableItem<unknown>[] = []
   readonly ordered = false
-
-  private onlyChild: Navigable | null = null
 
   constructor(
     private readonly onRequestFocus: (item: NavigableItem<unknown>) => void,
     private readonly getFocusedItem: () => NavigableItem<unknown> | null,
   ) {
-    super(PAGE_CTR_TOKEN, { position: null, hasFocusPriority: null })
+    super(PAGE_CTR_TOKEN, { hasFocusPriority: null })
 
     this.identity = Symbol()
     this.page = this
     this.parent = this
+    this.navigables = new Map()
   }
 
   override canHandleAction(_: NavigationAction): boolean {
@@ -231,48 +216,40 @@ class NavigablePage extends NavigableContainer {
     throw new Error('Tried to make the navigable page component handle an action')
   }
 
-  append(navigable: Navigable): void {
-    if (this.onlyChild) {
-      throw new Error('Pages can only contain a single root navigable')
-    }
-
-    this.onlyChild = navigable
+  registerNavigable(nav: Navigable): void {
+    this.navigables.set(nav.id, nav)
   }
 
-  hasChild(child: Navigable): boolean {
-    return child === this.onlyChild
+  getNavigableFromId(navId: string): Navigable {
+    const nav = this.navigables.get(navId)
+
+    if (nav === undefined) {
+      throw new Error('Navigable element does not have an identity in the ancestor page!')
+    }
+
+    return nav
   }
 
-  remove(child: Navigable): void {
-    if (!this.onlyChild) {
-      throw new Error('Cannot remove component from empty navigable page')
+  getNavigableFromItemElement(el: Element): Navigable {
+    if (!(el instanceof HTMLNavigableItemWrapperElement)) {
+      throw new Error('Cannot get the navigable from a non-item wrapper element')
     }
 
-    if (this.onlyChild !== child) {
-      throw new Error("Tried to remove another navigable than the page's root one")
+    const navId = el.getAttribute(NAV_ITEM_ID_ATTR_NAME)
+
+    if (navId === null) {
+      throw new Error('Navigable ID is missing on item wrapper element!')
     }
 
-    this.onlyChild = null
+    return this.getNavigableFromId(navId)
+  }
+
+  containsItem(item: Navigable): boolean {
+    return this.navigables.has(item.id)
   }
 
   navigate(_: Navigable, __: NavigationDirection): NavigableItem<unknown> | null {
     return null
-  }
-
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
-    return this.onlyChild ? this.onlyChild.navigateToFirstItemDown(from) : null
-  }
-
-  navigateToLastItem(): NavigableItem<unknown> | null {
-    return this.onlyChild ? this.onlyChild.navigateToLastItem() : null
-  }
-
-  requestFocus(): boolean {
-    return this.onlyChild?.requestFocus() ?? false
-  }
-
-  asContainer(): NavigableContainer {
-    return this
   }
 
   requestPageFocus(item: NavigableItem<unknown>): void {
@@ -337,19 +314,121 @@ export function usePageNavigator(): NavigableContainer {
   return page
 }
 
-export function wasNavigableDestroyed(navigable: Navigable): boolean {
-  while (!(navigable instanceof NavigablePage)) {
-    if (!navigable.parent.hasChild(navigable)) {
-      return true
-    }
-
-    navigable = navigable.parent
-  }
-
-  return false
+export function isValidNavigable(nav: NavigableCommon<unknown>): nav is Navigable {
+  return nav instanceof NavigableContainer || nav instanceof NavigableItem
 }
 
-export function handleKeyboardEvent(key: string, long: boolean): void {
+function visitNavigableChildren(
+  navId: string,
+  page: NavigablePage,
+  inspector: (nav: Navigable) => void | boolean,
+): void | boolean {
+  const startFrom = document.evaluate(
+    `//comment()[. = ' @start-nav: ${navId} ']`,
+    document,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null,
+  ).singleNodeValue
+
+  if (startFrom === null) {
+    throw new Error(`Navigable with the provided ID "${navId}" was not found!`)
+  }
+
+  const visitNode = (node: Node): [boolean | void, number] => {
+    if (node.nodeType === Node.COMMENT_NODE) {
+      const match = node.textContent?.match(/^ @start-nav: (.*) $/)
+
+      if (!match) {
+        return [false, 0]
+      }
+
+      const result = inspector(page.getNavigableFromId(match[1]))
+
+      let next: Node | null = node
+
+      let i = 0
+
+      for (;;) {
+        next = next.nextSibling
+        i += 1
+
+        if (next === null) {
+          throw new Error(`Closing comment not found for navigable with ID "${match[1]}"!`)
+        }
+
+        if (next.nodeType === Node.COMMENT_NODE && next.textContent === ` @end-nav: ${match[1]} `) {
+          return [result, i]
+        }
+      }
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return [false, 0]
+    }
+
+    if (!(node instanceof Element)) {
+      throw new Error('Assertion error: element node is not an instance of Element')
+    }
+
+    if (
+      node.tagName.toLowerCase() === ITEM_WRAPPER_ELEMENT_TAG_NAME &&
+      node.getAttribute(NAV_ITEM_ID_ATTR_NAME) !== JUST_FOR_STYLE_ITEM_ID
+    ) {
+      return [inspector(page.getNavigableFromItemElement(node)), 0]
+    }
+
+    const children = Array.from(node.childNodes)
+
+    for (let i = 0; i < children.length; i++) {
+      const [result, skip] = visitNode(children[i])
+
+      if (result === true) {
+        return [result, skip]
+      }
+
+      i += skip
+    }
+
+    return [false, 0]
+  }
+
+  let curr: Node | null = startFrom
+
+  for (;;) {
+    curr = curr.nextSibling
+
+    if (curr === null) {
+      throw new Error('Closing comment not found for navigable!')
+    }
+
+    if (curr.nodeType === Node.COMMENT_NODE && curr.textContent === ` @end-nav: ${navId} `) {
+      return
+    }
+
+    if (visitNode(curr)[0] === true) {
+      return true
+    }
+  }
+}
+
+const NAVIGABLE_ID_CHARS = 'abcdefghijklmnopqrstuvwxyz01234567890'
+
+function generateNavigableId(): string {
+  let out = ''
+
+  for (let i = 0; i < 16; i++) {
+    if (i > 0 && i % 4 == 0) {
+      out += '-'
+    }
+
+    out += NAVIGABLE_ID_CHARS.charAt(Math.floor(Math.random() * NAVIGABLE_ID_CHARS.length))
+  }
+
+  return out
+}
+
+function handleKeyboardEvent(key: string, long: boolean): void {
   const state = get(navState)
 
   if (!state) {
@@ -363,7 +442,7 @@ export function handleKeyboardEvent(key: string, long: boolean): void {
       console.warn('Previously-focused element has a different identity than the current page, removing focus')
       __current.onUnfocus()
       __current = null
-    } else if (wasNavigableDestroyed(__current)) {
+    } else if (__current.wasDestroyed()) {
       console.warn('Previously-focused element was destroyed, removing focus')
       __current.onUnfocus()
       __current = null
@@ -487,7 +566,7 @@ function _checkItemValidity(item: NavigableItem<unknown>, page: NavigablePage): 
     return false
   }
 
-  if (wasNavigableDestroyed(item)) {
+  if (item.wasDestroyed()) {
     console.warn('Previously-focused element was destroyed, removing focus')
     item.onUnfocus()
     return false
@@ -507,6 +586,8 @@ function _generateUpdatedNavState(
   newFocused: NavigableItem<unknown>,
   page: NavigablePage,
 ): NavState {
+  // TODO: handle if oldFocused === newFocused
+
   if (oldFocused) {
     oldFocused.onUnfocus()
     _propagateFocusChangeEvent(oldFocused, false)
@@ -542,13 +623,18 @@ const navState = writable<NavState | null>(null)
 
 export class HTMLNavigableItemWrapperElement extends HTMLElement {}
 
-const itemWrapperInPlace = window.customElements.get('navigable-item-wrapper')
+export const ITEM_WRAPPER_ELEMENT_TAG_NAME = 'navigable-item-wrapper'
+
+const itemWrapperInPlace = window.customElements.get(ITEM_WRAPPER_ELEMENT_TAG_NAME)
 
 if (!itemWrapperInPlace) {
-  window.customElements.define('navigable-item-wrapper', HTMLNavigableItemWrapperElement)
+  window.customElements.define(ITEM_WRAPPER_ELEMENT_TAG_NAME, HTMLNavigableItemWrapperElement)
 } else if (itemWrapperInPlace.name !== HTMLNavigableItemWrapperElement.name) {
   throw new Error('An invalid item wrapper element is already in place')
 }
+
+export const NAV_ITEM_ID_ATTR_NAME = 'data-navigable-item-id'
+export const JUST_FOR_STYLE_ITEM_ID = ':just_for_style'
 
 // Support long-press for "Enter" key
 registerLongPressableKeys('Enter')

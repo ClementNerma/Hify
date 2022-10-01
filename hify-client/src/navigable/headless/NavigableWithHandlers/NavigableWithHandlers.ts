@@ -1,8 +1,11 @@
 import { InputHandler, KeyPressHandling } from '../../input-manager'
-import { NavigableOne } from '../NavigableOne/NavigableOne'
-import { NavigableItem, NavigationAction } from '../../navigation'
+import { Navigable, NavigableContainer, NavigableItem, NavigationAction, NavigationDirection } from '../../navigation'
 
-export class NavigableWithHandlers<P = {}> extends NavigableOne<NavigableWithHandlersProps & P> {
+export class NavigableWithHandlers<P = {}> extends NavigableContainer<NavigableWithHandlersProps & P> {
+  navigate(_: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
+    return this.parent.navigate(this, direction)
+  }
+
   override canHandleAction(action: NavigationAction): boolean {
     switch (action) {
       case NavigationAction.Press:

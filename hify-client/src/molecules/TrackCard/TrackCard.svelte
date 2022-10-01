@@ -6,10 +6,9 @@
 
   export let track: AudioTrackFragment
   export let tracks: AudioTrackFragment[]
-  export let position: number | null = null
 </script>
 
-<NavigableTrack {track} {tracks} {position}>
+<NavigableTrack {track} {tracks}>
   <Card
     title={track.metadata.tags.title}
     subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists

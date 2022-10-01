@@ -10,7 +10,6 @@
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
-  export let position: number | null = null
   export let goToAlbumOption = true
   export let display: ItemDisplay = null
 
@@ -33,7 +32,6 @@
         { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0) },
       ]),
     )}
-  {position}
   {display}
   fullHeight
 >

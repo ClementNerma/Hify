@@ -7,10 +7,10 @@
 </script>
 
 <Row>
-  {#each tracks as track, i (track.id)}
+  {#each tracks as track (track.id)}
     <!-- This <div> allows the inner item to reach full height -->
     <div>
-      <TrackCard {track} {tracks} position={i} />
+      <TrackCard {track} {tracks} />
     </div>
   {/each}
 </Row>

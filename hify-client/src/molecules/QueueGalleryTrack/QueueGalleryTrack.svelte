@@ -34,7 +34,6 @@
 
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
   <SimpleNavigableItem
-    {position}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
     onLongPress={() => showContextMenu(contextMenuOptions)}
     hasFocusPriority={isCurrent}

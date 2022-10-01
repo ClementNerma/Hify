@@ -1,24 +1,21 @@
 <script lang="ts">
-  import { afterUpdate, onDestroy } from 'svelte'
+  import { afterUpdate, onMount } from 'svelte'
 
   import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+  import InternalNavWrapper from '../InternalNavWrapper.svelte'
   import { NavigableList } from './NavigableList'
 
-  export let position: Props<NavigableList>['position'] = null
   export let hasFocusPriority: Props<NavigableList>['hasFocusPriority'] = null
 
-  const nav = getParentNavigable()
-  const list = new NavigableList(nav, { position, hasFocusPriority })
-
-  nav.append(list)
+  const list = new NavigableList(getParentNavigable(), { hasFocusPriority })
 
   setChildrenNavigable(list)
 
-  afterUpdate(() => list.updateProps({ position, hasFocusPriority }))
-
-  onDestroy(() => nav.remove(list))
+  afterUpdate(() => list.updateProps({ hasFocusPriority }))
 
   export const requestFocus = () => list.requestFocus()
 </script>
 
-<slot nav={list} />
+<InternalNavWrapper navId={list.id}>
+  <slot nav={list} />
+</InternalNavWrapper>

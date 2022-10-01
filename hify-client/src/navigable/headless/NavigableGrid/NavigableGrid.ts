@@ -3,37 +3,39 @@ import {
   NavigableItem,
   NavigationComingFrom,
   NavigationDirection,
-  NavigableArrayContainer,
+  NavigableContainer,
 } from '../../navigation'
 
-export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGridProps & P> {
+export class NavigableGrid<P = {}> extends NavigableContainer<NavigableGridProps & P> {
   private itemsBeforeLastLazyLoading = 0
 
-  private _rows() {
-    return new Array(Math.ceil(this.items.length / this.props.columns))
+  private _makeRows(items: Navigable[]): Navigable[][] {
+    return new Array(Math.ceil(items.length / this.props.columns))
       .fill(null)
-      .map((_, i) => this.items.slice(i * this.props.columns, i * this.props.columns + this.props.columns))
+      .map((_, i) => items.slice(i * this.props.columns, i * this.props.columns + this.props.columns))
   }
 
-  private _lazyLoading() {
+  private _lazyLoading(items: Navigable[]) {
     if (!this.props.lazyLoader) {
       return
     }
 
-    if (this.itemsBeforeLastLazyLoading !== this.items.length) {
-      this.itemsBeforeLastLazyLoading = this.items.length
+    if (this.itemsBeforeLastLazyLoading !== items.length) {
+      this.itemsBeforeLastLazyLoading = items.length
       this.props.lazyLoader()
     }
   }
 
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
-    const itemIndex = this.items.indexOf(focusedChild)
+    const items = this.children()
+
+    const itemIndex = items.indexOf(focusedChild)
 
     if (itemIndex === -1) {
       throw new Error('Focused element not found in navigable row')
     }
 
-    const rows = this._rows()
+    const rows = this._makeRows(items)
 
     switch (direction) {
       case NavigationDirection.Up: {
@@ -53,7 +55,7 @@ export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGrid
         // * We navigate to the last row from the above one
         // * We navigate to the last row from below
         if (rowIndex >= rows.length - 2) {
-          this._lazyLoading()
+          this._lazyLoading(items)
         }
 
         if (rowIndex === rows.length - 1) {
@@ -95,8 +97,10 @@ export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGrid
     return this.parent.navigate(this, direction)
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
-    let rows = this._rows()
+  override navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+    const items = this.children()
+
+    let rows = this._makeRows(items)
 
     switch (from) {
       case NavigationComingFrom.Above:
@@ -109,7 +113,7 @@ export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGrid
 
       case NavigationComingFrom.Below:
         rows = rows.reverse()
-        this._lazyLoading()
+        this._lazyLoading(items)
         break
     }
 
@@ -127,7 +131,8 @@ export class NavigableGrid<P = {}> extends NavigableArrayContainer<NavigableGrid
   }
 
   override navigateToLastItem(): NavigableItem<unknown> | null {
-    this._lazyLoading()
+    this._lazyLoading(this.children())
+
     return super.navigateToLastItem()
   }
 }

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { afterUpdate, onDestroy } from 'svelte'
+  import { afterUpdate, onDestroy, onMount } from 'svelte'
 
   import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+  import InternalNavWrapper from '../InternalNavWrapper.svelte'
   import { NavigableWithHandlers } from './NavigableWithHandlers'
 
-  export let position: Props<NavigableWithHandlers>['position'] = null
   export let hasFocusPriority: Props<NavigableWithHandlers>['hasFocusPriority'] = null
 
   export let onPress: Props<NavigableWithHandlers>['onPress'] = undefined
@@ -14,7 +14,6 @@
   export let onKeyPress: Props<NavigableWithHandlers>['onKeyPress'] = undefined
 
   const containerProps = (): Props<NavigableWithHandlers> => ({
-    position,
     hasFocusPriority,
     onPress,
     onLongPress,
@@ -23,18 +22,14 @@
     onKeyPress,
   })
 
-  const nav = getParentNavigable()
-  const handl = new NavigableWithHandlers(nav, containerProps())
-
-  nav.append(handl)
-
+  const handl = new NavigableWithHandlers(getParentNavigable(), containerProps())
   setChildrenNavigable(handl)
 
   afterUpdate(() => handl.updateProps(containerProps()))
 
-  onDestroy(() => nav.remove(handl))
-
   export const requestFocus = () => handl.requestFocus()
 </script>
 
-<slot nav={handl} />
+<InternalNavWrapper navId={handl.id}>
+  <slot nav={handl} />
+</InternalNavWrapper>

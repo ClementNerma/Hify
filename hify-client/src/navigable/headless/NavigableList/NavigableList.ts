@@ -1,14 +1,16 @@
 import {
   Navigable,
+  NavigableContainer,
   NavigableItem,
   NavigationComingFrom,
   NavigationDirection,
-  NavigableArrayContainer,
 } from '../../navigation'
 
-export class NavigableList<P = {}> extends NavigableArrayContainer<P> {
+export class NavigableList<P = {}> extends NavigableContainer<P> {
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
-    const rowIndex = this.items.indexOf(focusedChild)
+    const items = this.children()
+
+    const rowIndex = items.indexOf(focusedChild)
 
     if (rowIndex === -1) {
       throw new Error('Focused element not found in navigable list')
@@ -16,7 +18,7 @@ export class NavigableList<P = {}> extends NavigableArrayContainer<P> {
 
     switch (direction) {
       case NavigationDirection.Up:
-        for (const rowItem of this.items.slice(0, rowIndex).reverse()) {
+        for (const rowItem of items.slice(0, rowIndex).reverse()) {
           const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Below)
 
           if (item) {
@@ -33,7 +35,7 @@ export class NavigableList<P = {}> extends NavigableArrayContainer<P> {
         return this.parent.navigate(this, NavigationDirection.Right)
 
       case NavigationDirection.Down:
-        for (const rowItem of this.items.slice(rowIndex + 1)) {
+        for (const rowItem of items.slice(rowIndex + 1)) {
           const item = rowItem.navigateToFirstItemDown(NavigationComingFrom.Above)
 
           if (item) {
@@ -45,7 +47,9 @@ export class NavigableList<P = {}> extends NavigableArrayContainer<P> {
     }
   }
 
-  navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+  override navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
+    const items = this.children()
+
     let tries: Navigable[]
 
     switch (from) {
@@ -57,15 +61,15 @@ export class NavigableList<P = {}> extends NavigableArrayContainer<P> {
           return prio.navigateToFirstItemDown(from)
         }
 
-        tries = this.items
+        tries = items
         break
 
       case NavigationComingFrom.Above:
-        tries = this.items
+        tries = items
         break
 
       case NavigationComingFrom.Below:
-        tries = [...this.items].reverse()
+        tries = [...items].reverse()
         break
     }
 

@@ -1,3 +1,7 @@
+navigable-container-wrapper {
+  display: 'contents';
+}
+
 navigable-item-wrapper.focusedOrMouseHover > :first-child,
 navigable-item-wrapper:hover > :first-child {
   outline: none;

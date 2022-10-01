@@ -17,7 +17,6 @@
   import ProgressRange from '../../navigable/ui/atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import NavigableOne from '../../navigable/headless/NavigableOne/NavigableOne.svelte'
   import Column from '../../navigable/ui/molecules/Column/Column.svelte'
 
   export let currentTrack: AudioTrackFragment | false
@@ -83,13 +82,13 @@
     </Column>
 
     <div class="play-queue-gallery">
-      <NavigableOne
-        onFocusChangeCallback={(focused) => {
-          isQueueFocused = focused
-        }}
-      >
-        <QueueGallery />
-      </NavigableOne>
+      <Column>
+        <QueueGallery
+          onFocusChangeCallback={(focused) => {
+            isQueueFocused = focused
+          }}
+        />
+      </Column>
     </div>
   </Column>
 </div>
