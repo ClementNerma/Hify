@@ -12,12 +12,20 @@ const audioListeningDuration = writable<{ track: AudioTrackFragment; duration_s:
 export const readableAudioProgress = readonly(audioProgress)
 export const readableAudioPaused = readonly(audioPaused)
 
-const LISTENING_INCREASE_DURATION_THRESOLD = 10
-
 export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => void, play = true) {
   audioPlayer.update((prev): HTMLAudioElement => {
     if (prev && !prev.paused) {
       prev.pause()
+    }
+
+    const prevDuration = get(audioListeningDuration)
+
+    if (prevDuration !== null) {
+      const { track, duration_s } = prevDuration
+
+      LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
+        logError('Failed to play audio', e),
+      )
     }
 
     audioPaused.set(false)
@@ -43,21 +51,11 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
         // Don't increase listening duration in case of jump (>= 5s elapsed)
         // Also don't increase when going back
         if (currentTime < lastTimeUpdate + 5 && currentTime > lastTimeUpdate) {
-          audioListeningDuration.update((d) => {
-            if (d === null) {
-              return logFatal('Tride to increment null audio listening duration!')
-            }
-
-            const duration_s = d.duration_s + 1
-
-            if (duration_s === LISTENING_INCREASE_DURATION_THRESOLD) {
-              LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
-                logError('Failed to play audio', e),
-              )
-            }
-
-            return { track: d.track, duration_s }
-          })
+          audioListeningDuration.update((d) =>
+            d !== null
+              ? { track: d.track, duration_s: d.duration_s + 1 }
+              : logFatal('Tried to increment null audio listening duration!'),
+          )
         }
 
         lastTimeUpdate = currentTime
