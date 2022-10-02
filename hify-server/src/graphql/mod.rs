@@ -2,6 +2,7 @@ mod entrypoint;
 mod mutations;
 mod pagination;
 mod queries;
+mod queries_types;
 mod routes;
 mod state;
 
