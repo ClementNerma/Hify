@@ -1,3 +1,7 @@
+mod config;
+
+pub use config::UserDataConfig;
+
 use std::collections::{hash_map::Entry, HashMap};
 
 use serde::{Deserialize, Serialize};
@@ -83,20 +87,5 @@ impl UserDataWrapper {
                 vac.insert(duration);
             }
         };
-    }
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct UserDataConfig {
-    history_capacity: usize,
-    listening_duration_thresold: u32,
-}
-
-impl Default for UserDataConfig {
-    fn default() -> Self {
-        Self {
-            history_capacity: 1000,
-            listening_duration_thresold: 10,
-        }
     }
 }
