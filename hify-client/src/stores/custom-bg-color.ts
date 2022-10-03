@@ -10,6 +10,6 @@ customBgColor.subscribe((value) => {
     const [r, g, b, a] = value
 
     document.body.classList.add('custom-bg-color')
-    document.body.setAttribute('style', `--custom-bg-color: rgba(${r}, ${g}, ${b}, ${a ?? 1})`)
+    document.body.setAttribute('style', `--linear-start: rgba(${r}, ${g}, ${b}, ${a ?? 1}); --linear-end: #000;`)
   }
 })
