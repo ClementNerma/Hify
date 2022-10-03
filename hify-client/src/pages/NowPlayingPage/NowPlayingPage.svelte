@@ -7,10 +7,11 @@
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import { distractionFreeMode } from '../../stores/distraction-free'
   import { onMount, onDestroy } from 'svelte'
-  import { blackBackground } from '../../stores/black-background'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
+  import { customBgColor } from '../../stores/custom-bg-color'
+  import { computeDominantColor } from '../../globals/dominant-color'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -32,10 +33,17 @@
     return KeyPressHandling.Propagate
   }
 
-  onMount(() => blackBackground.set(true))
-  onDestroy(() => blackBackground.set(false))
+  onMount(() => customBgColor.set('black'))
+  onDestroy(() => customBgColor.set(null))
 
-  currentTrack.subscribe(() => setDistractionFree(false))
+  currentTrack.subscribe(async (track) => {
+    setDistractionFree(false)
+
+    if (track) {
+      const [r, g, b] = await computeDominantColor(getAlbumArtUri(track.metadata.tags.album.id))
+      customBgColor.set(`rgb(${r}, ${g}, ${b});`)
+    }
+  })
 </script>
 
 {#if !$currentTrack}
