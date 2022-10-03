@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store'
 import { getStreamUri } from '../globals/rest-api'
 import { logInfo, logDebug, logWarn, logError, logFatal } from './debugger'
-import { AudioTrackFragment, HistoryPush, LogListening } from '../graphql/generated'
+import { AudioTrackFragment, LogListening } from '../graphql/generated'
 import { readonly } from '../globals/utils'
 
 const audioPlayer = writable<HTMLAudioElement | null>(null)
@@ -23,8 +23,8 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
     if (prevDuration !== null) {
       const { track, duration_s } = prevDuration
 
-      LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
-        logError('Failed to play audio', e),
+      LogListening({ variables: { entry: { trackId: track.id, at: Date.now(), durationS: duration_s } } }).catch(
+        (e: unknown) => logError('Failed to play audio', e),
       )
     }
 
@@ -65,12 +65,6 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
     if (play !== false) {
       newAudio.play().catch((e: unknown) => logError('Failed to play audio', e))
     }
-
-    HistoryPush({
-      variables: {
-        trackId: track.id,
-      },
-    }).catch(() => logError('Failed to push to history'))
 
     return newAudio
   })

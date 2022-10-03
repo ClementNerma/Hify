@@ -1,3 +1,0 @@
-mutation HistoryPush($trackId: TrackID!) {
-  historyPush(trackId: $trackId)
-}
