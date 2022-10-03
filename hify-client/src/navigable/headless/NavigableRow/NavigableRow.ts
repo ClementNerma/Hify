@@ -4,9 +4,10 @@ import {
   NavigableItem,
   NavigationComingFrom,
   NavigationDirection,
+  NoProp,
 } from '../../navigation'
 
-export class NavigableRow<P = {}> extends NavigableContainer<P> {
+export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
   navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
     const items = this.children()
 

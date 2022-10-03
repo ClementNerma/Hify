@@ -1,7 +1,14 @@
 import { InputHandler, KeyPressHandling } from '../../input-manager'
-import { Navigable, NavigableContainer, NavigableItem, NavigationAction, NavigationDirection } from '../../navigation'
+import {
+  Navigable,
+  NavigableContainer,
+  NavigableItem,
+  NavigationAction,
+  NavigationDirection,
+  NoProp,
+} from '../../navigation'
 
-export class NavigableWithHandlers<P = {}> extends NavigableContainer<NavigableWithHandlersProps & P> {
+export class NavigableWithHandlers<P = NoProp> extends NavigableContainer<NavigableWithHandlersProps & P> {
   navigate(_: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
     return this.parent.navigate(this, direction)
   }

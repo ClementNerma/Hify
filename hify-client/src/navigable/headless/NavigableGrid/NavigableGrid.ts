@@ -4,9 +4,10 @@ import {
   NavigationComingFrom,
   NavigationDirection,
   NavigableContainer,
+  NoProp,
 } from '../../navigation'
 
-export class NavigableGrid<P = {}> extends NavigableContainer<NavigableGridProps & P> {
+export class NavigableGrid<P = NoProp> extends NavigableContainer<NavigableGridProps & P> {
   private itemsBeforeLastLazyLoading = 0
 
   private _makeRows(items: Navigable[]): Navigable[][] {

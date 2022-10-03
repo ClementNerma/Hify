@@ -32,9 +32,11 @@ export type NavigableCommonProps = {
 
 export type Props<N extends NavigableCommon> = N['props']
 
-export type NoProp = Record<string, never>
+// TODO: When Typescript adds support for literal empty types, use it here
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type NoProp = {}
 
-export abstract class NavigableCommon<P = {}> {
+export abstract class NavigableCommon<P = NoProp> {
   readonly parent: NavigableContainer<unknown>
   readonly identity: symbol
   readonly page: NavigablePage
@@ -93,7 +95,7 @@ export abstract class NavigableCommon<P = {}> {
   interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void {}
 }
 
-export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
+export abstract class NavigableContainer<P = NoProp> extends NavigableCommon<P> {
   protected getFocusPriority(): Navigable | null {
     return this.children().find((item) => item.props.hasFocusPriority === true) ?? null
   }
@@ -151,7 +153,7 @@ export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
   }
 }
 
-export abstract class NavigableItem<P = {}> extends NavigableCommon<P> {
+export abstract class NavigableItem<P = NoProp> extends NavigableCommon<P> {
   abstract canHandleDirection(direction: NavigationDirection): boolean
   abstract handleDirection(direction: NavigationDirection): NavigableItem<unknown> | null
 

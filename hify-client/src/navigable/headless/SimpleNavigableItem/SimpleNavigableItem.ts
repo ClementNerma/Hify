@@ -1,6 +1,12 @@
-import { HTMLNavigableItemWrapperElement, NavigableItem, NavigationAction, NavigationDirection } from '../../navigation'
+import {
+  HTMLNavigableItemWrapperElement,
+  NavigableItem,
+  NavigationAction,
+  NavigationDirection,
+  NoProp,
+} from '../../navigation'
 
-export class SimpleNavigableItem<P = {}> extends NavigableItem<P & SimpleNavigableItemProps> {
+export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNavigableItemProps> {
   underlyingElement(): HTMLNavigableItemWrapperElement {
     return this.props.getUnderlyingElement()
   }
