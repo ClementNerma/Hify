@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store'
 
-export const customBgColor = writable<[r: number, g: number, b: number, a?: number] | null>(null)
+export type Color = [r: number, g: number, b: number, a?: number]
+
+export const customBgColor = writable<Color | null>(null)
 
 customBgColor.subscribe((value) => {
   if (value === null) {

@@ -1,6 +1,7 @@
+import { Color } from '../stores/custom-bg-color'
 import { ColorThief } from './color-thief.lib'
 
-export async function computeDominantColor(imgUrl: string): Promise<[r: number, g: number, b: number]> {
+export async function computeDominantColor(imgUrl: string): Promise<Color> {
   const img = new Image()
   img.crossOrigin = 'Anonymous'
   img.src = imgUrl
@@ -31,5 +32,7 @@ export async function computeDominantColor(imgUrl: string): Promise<[r: number, 
   }
 
   const c = new ColorThief()
-  return c.getColor(img)
+  const [r, g, b] = c.getColor(img)
+
+  return [r, g, b, 0.5]
 }
