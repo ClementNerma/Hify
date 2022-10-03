@@ -85,7 +85,7 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper, params: FeedPar
 }
 
 fn get_popular_tracks(user_data: &UserDataWrapper) -> impl Iterator<Item = &TrackID> {
-    let mut popular_tracks: Vec<_> = user_data.cache().listenings().iter().collect();
+    let mut popular_tracks: Vec<_> = user_data.cache().listening_durations().iter().collect();
     popular_tracks.sort_by_key(|(_, count)| u32::MAX - **count);
     popular_tracks.into_iter().map(|(id, _)| id)
 }
