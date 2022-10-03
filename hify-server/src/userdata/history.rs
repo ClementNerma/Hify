@@ -20,7 +20,7 @@ impl History {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, InputObject)]
+#[derive(Clone, Copy, Serialize, Deserialize, InputObject)]
 pub struct OneListening {
     pub at: u64,
     pub track_id: TrackID,

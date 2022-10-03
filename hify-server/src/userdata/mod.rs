@@ -37,7 +37,7 @@ pub struct UserDataWrapper {
 impl UserDataWrapper {
     pub fn new(inner: UserData, on_change: Box<dyn Fn(&UserData) + Send + Sync>) -> Self {
         Self {
-            cache: UserDataCache::new(&inner.history),
+            cache: UserDataCache::new(&inner.history, inner.config),
             inner,
             on_change,
         }
