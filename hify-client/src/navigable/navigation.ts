@@ -140,8 +140,14 @@ export abstract class NavigableContainer<P = {}> extends NavigableCommon<P> {
   }
 
   requestFocus(): boolean {
-    // TODO: don't get all the children, only find the first one!
-    return this.children()[0]?.requestFocus() ?? false
+    let result = false
+
+    visitNavigableChildren(this.id, this.page, (nav) => {
+      result = nav.requestFocus()
+      return true
+    })
+
+    return result
   }
 }
 
