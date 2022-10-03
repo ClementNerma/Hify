@@ -30,7 +30,6 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
             None => min_rating == 0,
             Some(rating) => rating >= min_rating,
         })
-        // TODO: awfully unoptimized
         .filter(|track| match &from_artist {
             Some(artist_id) => index
                 .cache
