@@ -11,7 +11,7 @@ pub fn find_albums_arts(
 ) -> HashMap<AlbumID, Option<PathBuf>> {
     album_ids
         .iter()
-        .map(|id| ((*id).clone(), find_album_art(id, cache)))
+        .map(|id| (**id, find_album_art(id, cache)))
         .inspect(|(album_id, art_path)| {
             if art_path.is_some() {
                 return;

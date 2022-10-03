@@ -27,11 +27,8 @@ impl UserDataCache {
     }
 
     pub fn update_with(&mut self, entry: &OneListening) {
-        *self.listenings.entry(entry.track.clone()).or_default() += 1;
-        *self
-            .listening_durations
-            .entry(entry.track.clone())
-            .or_default() += entry.duration_s;
+        *self.listenings.entry(entry.track).or_default() += 1;
+        *self.listening_durations.entry(entry.track).or_default() += entry.duration_s;
     }
 
     pub fn listenings(&self) -> &HashMap<TrackID, u32> {

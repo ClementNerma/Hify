@@ -32,14 +32,14 @@ pub fn build_index_cache(
     let mut no_genre_tracks = HashSet::new();
 
     for track in tracks.values() {
-        tracks_formats.insert(track.id.clone(), track.metadata.format);
+        tracks_formats.insert(track.id, track.metadata.format);
 
         let tags = &track.metadata.tags;
 
         let album_infos = tags.get_album_infos();
         let album_id = album_infos.get_id();
 
-        albums_infos.insert(album_id.clone(), album_infos.clone());
+        albums_infos.insert(album_id, album_infos.clone());
 
         let album_artists: HashSet<_> = tags.get_album_artists_infos().collect();
 
@@ -59,44 +59,35 @@ pub fn build_index_cache(
             let artist_id = non_album_artist_infos.get_id();
 
             artists_album_participations
-                .entry(artist_id.clone())
+                .entry(artist_id)
                 .or_default()
                 .insert(album_infos.clone());
 
             artists_track_participations
                 .entry(artist_id)
                 .or_default()
-                .push(track.id.clone())
+                .push(track.id)
         }
 
         for artist_infos in album_artists.iter().chain(non_album_artists.iter()) {
             let artist_id = artist_infos.get_id();
 
-            artists_infos.insert(artist_id.clone(), artist_infos.clone());
+            artists_infos.insert(artist_id, artist_infos.clone());
 
-            artists_tracks
-                .entry(artist_id)
-                .or_default()
-                .push(track.id.clone());
+            artists_tracks.entry(artist_id).or_default().push(track.id);
         }
 
-        albums_tracks
-            .entry(album_id.clone())
-            .or_default()
-            .push(track.id.clone());
+        albums_tracks.entry(album_id).or_default().push(track.id);
 
         if track.metadata.tags.genres.is_empty() {
-            no_genre_tracks.insert(track.id.clone());
+            no_genre_tracks.insert(track.id);
         } else {
             for genre in tags.get_genres_infos() {
                 let genre_id = genre.get_id();
 
-                genres_infos.insert(genre_id.clone(), genre.clone());
+                genres_infos.insert(genre_id, genre.clone());
 
-                genres_tracks
-                    .entry(genre_id.clone())
-                    .or_default()
-                    .push(track.id.clone());
+                genres_tracks.entry(genre_id).or_default().push(track.id);
 
                 genres_albums
                     .entry(genre_id)
@@ -106,7 +97,7 @@ pub fn build_index_cache(
         }
 
         tracks_all_artists.insert(
-            track.id.clone(),
+            track.id,
             album_artists
                 .iter()
                 .chain(non_album_artists.iter())
@@ -183,7 +174,7 @@ pub fn build_index_cache(
             }
 
             let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((album_id.clone(), mean))
+            Some((*album_id, mean))
         })
         .collect();
 
@@ -201,7 +192,7 @@ pub fn build_index_cache(
             }
 
             let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((artist_id.clone(), mean))
+            Some((*artist_id, mean))
         })
         .collect();
 
@@ -220,7 +211,7 @@ pub fn build_index_cache(
             }
 
             let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((artist_id.clone(), mean))
+            Some((*artist_id, mean))
         })
         .collect();
 
