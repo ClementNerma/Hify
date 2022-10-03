@@ -26,6 +26,7 @@
           first: TRACKS_PER_LINE * LINES_PER_PAGE,
         },
       },
+      fetchPolicy: 'no-cache',
     })
 
     currentPageInfo = res.data.history.pageInfo
