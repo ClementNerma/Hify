@@ -1,7 +1,10 @@
 use async_graphql::{Context, Object};
 
 use super::GraphQLContext;
-use crate::index::{build_index, Index, TrackID};
+use crate::{
+    index::{build_index, Index},
+    userdata::OneListening,
+};
 
 pub struct MutationRoot;
 
@@ -23,17 +26,10 @@ impl MutationRoot {
         Ok(true)
     }
 
-    async fn history_push(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
+    async fn log_listening(&self, ctx: &Context<'_>, entry: OneListening) -> bool {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
         let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.history_push(track_id);
-        true
-    }
-
-    async fn log_listening(&self, ctx: &Context<'_>, track_id: TrackID, duration_s: u32) -> bool {
-        let ctx = ctx.data::<GraphQLContext>().unwrap();
-        let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.log_listening(track_id, duration_s);
+        user_data.log_listening(entry);
         true
     }
 }
