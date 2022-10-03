@@ -11,7 +11,6 @@
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
   import { customBgColor } from '../../stores/custom-bg-color'
-  import { computeDominantColor } from '../../globals/dominant-color'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -36,13 +35,7 @@
   onMount(() => customBgColor.set([0, 0, 0]))
   onDestroy(() => customBgColor.set(null))
 
-  currentTrack.subscribe(async (track) => {
-    setDistractionFree(false)
-
-    if (track) {
-      customBgColor.set(await computeDominantColor(getAlbumArtUri(track.metadata.tags.album.id)))
-    }
-  })
+  currentTrack.subscribe(() => setDistractionFree(false))
 </script>
 
 {#if !$currentTrack}
