@@ -33,15 +33,14 @@
     return KeyPressHandling.Propagate
   }
 
-  onMount(() => customBgColor.set('black'))
+  onMount(() => customBgColor.set([0, 0, 0]))
   onDestroy(() => customBgColor.set(null))
 
   currentTrack.subscribe(async (track) => {
     setDistractionFree(false)
 
     if (track) {
-      const [r, g, b] = await computeDominantColor(getAlbumArtUri(track.metadata.tags.album.id))
-      customBgColor.set(`rgb(${r}, ${g}, ${b});`)
+      customBgColor.set(await computeDominantColor(getAlbumArtUri(track.metadata.tags.album.id)))
     }
   })
 </script>
