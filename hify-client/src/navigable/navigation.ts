@@ -412,8 +412,18 @@ function visitNavigableChildren(
       return
     }
 
-    if (visitNode(curr)[0] === true) {
+    const [result, skip] = visitNode(curr)
+
+    if (result === true) {
       return true
+    }
+
+    for (let i = 0; i < skip; i++) {
+      curr = curr.nextSibling
+
+      if (curr === null) {
+        throw new Error('Found inexistant node while skipping')
+      }
     }
   }
 }
