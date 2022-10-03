@@ -19,10 +19,13 @@ pub async fn album_art(
     ctx: &State<AppState>,
     id: String,
 ) -> FaillibleResponse<(ContentType, File)> {
+    let id = AlbumID::decode(&id)
+        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
+
     let index = ctx.index.read().await;
     let album_art_path = index
         .albums_arts
-        .get(&AlbumID(id))
+        .get(&id)
         .cloned()
         .ok_or_else(|| {
             rest_server_error(
@@ -65,12 +68,15 @@ pub async fn artist_art(
     ctx: &State<AppState>,
     id: String,
 ) -> FaillibleResponse<(ContentType, File)> {
+    let id = ArtistID::decode(&id)
+        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
+
     let index = ctx.index.read().await;
 
     let artist_first_album_id = index
         .cache
         .artists_albums
-        .get(&ArtistID(id))
+        .get(&id)
         .ok_or_else(|| {
             rest_server_error(
                 Status::NotFound,
@@ -126,19 +132,18 @@ pub async fn stream<'a>(
     ctx: &State<AppState>,
     id: String,
 ) -> FaillibleResponse<(ContentType, SeekStream<'a>)> {
-    let index = ctx.index.read().await;
-    let track_path = index
-        .cache
-        .tracks_paths
-        .get(&TrackID(id.clone()))
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Provided track ID was not found".to_string(),
-            )
-        })?;
+    let id = TrackID::decode(&id)
+        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
 
-    let track = index.tracks.get(&TrackID(id)).unwrap();
+    let index = ctx.index.read().await;
+    let track_path = index.cache.tracks_paths.get(&id).ok_or_else(|| {
+        rest_server_error(
+            Status::NotFound,
+            "Provided track ID was not found".to_string(),
+        )
+    })?;
+
+    let track = index.tracks.get(&id).unwrap();
 
     let stream = SeekStream::from_path(&track_path).map_err(|err| {
         rest_server_error(

@@ -176,10 +176,10 @@ enum Direction {
 macro_rules! transparent_cursor_type {
     ($typename: ident) => {
         impl async_graphql::connection::CursorType for $typename {
-            type Error = std::convert::Infallible;
+            type Error = std::num::ParseIntError;
 
             fn decode_cursor(s: &str) -> Result<Self, Self::Error> {
-                Ok($typename(String::decode_cursor(s)?))
+                Ok($typename(u64::decode_cursor(s)?))
             }
 
             fn encode_cursor(&self) -> String {

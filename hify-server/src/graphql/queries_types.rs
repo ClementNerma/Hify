@@ -4,7 +4,10 @@ use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
     graphql_index,
-    index::{AlbumID, AlbumInfos, ArtistInfos, GenreInfos, SortedMap, Track, TrackTags},
+    index::{
+        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, SortedMap, Track, TrackID,
+        TrackTags,
+    },
 };
 
 use super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput};
@@ -20,8 +23,8 @@ pub struct IndexInfos {
 
 #[ComplexObject]
 impl Track {
-    async fn id(&self) -> &str {
-        self.id.0.as_str()
+    async fn id(&self) -> TrackID {
+        self.id
     }
 }
 
@@ -46,8 +49,8 @@ impl TrackTags {
 
 #[Object]
 impl AlbumInfos {
-    async fn id(&self) -> String {
-        self.get_id().0
+    async fn id(&self) -> AlbumID {
+        self.get_id()
     }
 
     async fn name(&self) -> &str {
@@ -129,8 +132,8 @@ impl AlbumInfos {
 
 #[Object]
 impl ArtistInfos {
-    async fn id(&self) -> String {
-        self.get_id().0
+    async fn id(&self) -> ArtistID {
+        self.get_id()
     }
 
     async fn name(&self) -> &str {
@@ -193,8 +196,8 @@ impl ArtistInfos {
 
 #[Object]
 impl GenreInfos {
-    async fn id(&self) -> String {
-        self.get_id().0
+    async fn id(&self) -> GenreID {
+        self.get_id()
     }
 
     async fn name(&self) -> &str {

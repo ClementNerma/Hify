@@ -8,7 +8,7 @@ use std::{
 use async_graphql::{Enum, SimpleObject};
 use serde::{Deserialize, Serialize};
 
-use crate::define_scalar_string;
+use crate::define_id_type;
 
 use super::sorted_map::SortedMap;
 
@@ -96,7 +96,7 @@ impl AlbumInfos {
     pub fn get_id(&self) -> AlbumID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
-        AlbumID(format!("{:x}", hasher.finish()))
+        AlbumID(hasher.finish())
     }
 }
 
@@ -115,7 +115,7 @@ impl ArtistInfos {
     pub fn get_id(&self) -> ArtistID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
-        ArtistID(format!("{:x}", hasher.finish()))
+        ArtistID(hasher.finish())
     }
 }
 
@@ -134,23 +134,11 @@ impl GenreInfos {
     pub fn get_id(&self) -> GenreID {
         let mut hasher = DefaultHasher::new();
         self.hash(&mut hasher);
-        GenreID(format!("{:x}", hasher.finish()))
+        GenreID(hasher.finish())
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-pub struct TrackID(pub String);
-
-#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-pub struct AlbumID(pub String);
-
-#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-pub struct ArtistID(pub String);
-
-#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-pub struct GenreID(pub String);
-
-define_scalar_string!(TrackID, AlbumID, ArtistID, GenreID);
+define_id_type!(TrackID, AlbumID, ArtistID, GenreID);
 
 /// Full track informations
 /// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway
@@ -161,6 +149,22 @@ pub struct Track {
     pub id: TrackID,
     pub path: String,
     pub metadata: TrackMetadata,
+}
+
+impl Track {
+    pub fn new(path: String, metadata: TrackMetadata) -> Self {
+        Self {
+            id: TrackID(Self::compute_raw_id(&path)),
+            path,
+            metadata,
+        }
+    }
+
+    fn compute_raw_id(path: &str) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        path.hash(&mut hasher);
+        hasher.finish()
+    }
 }
 
 impl PartialOrd for Track {
@@ -289,4 +293,31 @@ pub struct TrackDate {
 
     /// Day, starting from 1
     pub day: Option<u8>,
+}
+
+#[macro_export]
+macro_rules! define_id_type {
+    ($typename: ident) => {
+        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
+        pub struct $typename(pub u64);
+
+        impl $typename {
+            #[allow(dead_code)]
+            pub fn encode(&self) -> String {
+                format!("{:x}", self.0)
+            }
+
+            #[allow(dead_code)]
+            pub fn decode(input: &str) -> Result<Self, ::std::num::ParseIntError> {
+                let id = u64::from_str_radix(input, 16)?;
+                Ok(Self(id))
+            }
+        }
+
+        $crate::define_scalar_string! { $typename }
+    };
+
+    ($($typename: ident),+) => {
+        $($crate::define_id_type!($typename);)+
+    }
 }

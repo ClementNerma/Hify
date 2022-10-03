@@ -1,8 +1,7 @@
 use anyhow::{bail, Context, Result};
 
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap, HashSet},
-    hash::{Hash, Hasher},
+    collections::{HashMap, HashSet},
     path::{Path, PathBuf},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
@@ -11,7 +10,7 @@ use walkdir::WalkDir;
 use super::{
     arts::find_albums_arts,
     cache::build_index_cache,
-    data::{Index, Track, TrackID},
+    data::{Index, Track},
     exiftool,
     sorted_map::SortedMap,
     IndexCache,
@@ -85,15 +84,11 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     for (path, track_metadata) in analyzed.into_iter() {
         let path_str = path.to_str().unwrap();
 
-        let id = get_track_id(path_str);
+        let track = Track::new(path_str.to_string(), track_metadata);
 
-        tracks_paths.insert(id.clone(), path.to_path_buf());
+        tracks_paths.insert(track.id, path.to_path_buf());
 
-        tracks.push(Track {
-            id,
-            path: path_str.to_string(),
-            metadata: track_metadata,
-        });
+        tracks.push(track);
     }
 
     log(
@@ -168,10 +163,4 @@ fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
             Err(err) => Some(Err(err)),
         })
         .collect()
-}
-
-fn get_track_id(track_path_str: &str) -> TrackID {
-    let mut hasher = DefaultHasher::new();
-    track_path_str.hash(&mut hasher);
-    TrackID(format!("{:x}", hasher.finish()))
 }

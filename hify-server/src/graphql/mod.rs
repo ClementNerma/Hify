@@ -18,19 +18,15 @@ macro_rules! define_scalar_string {
         impl ::async_graphql::ScalarType for $typename {
             fn parse(value: ::async_graphql::Value) -> ::async_graphql::InputValueResult<Self> {
                 if let ::async_graphql::Value::String(value) = value {
-                    Ok(Self(value))
+                    Ok(Self::decode(&value)?)
                 } else {
                     Err(::async_graphql::InputValueError::expected_type(value))
                 }
             }
 
             fn to_value(&self) -> ::async_graphql::Value {
-                ::async_graphql::Value::String(self.0.to_string())
+                ::async_graphql::Value::String(self.encode())
             }
         }
     };
-
-    ($($typename: ident),+) => {
-        $($crate::define_scalar_string!($typename);)+
-    }
 }
