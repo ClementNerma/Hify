@@ -32,8 +32,8 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper, params: FeedPar
     let max_items = usize::from(params.max_items.unwrap_or(50));
 
     let last_listened_to = user_data
-        .history()
-        .entries()
+        .cache()
+        .dedup_history()
         .iter()
         .filter_map(|entry| index.tracks.get(&entry.track_id))
         .take(max_items)

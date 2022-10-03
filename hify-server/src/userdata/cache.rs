@@ -12,9 +12,9 @@ use super::{
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserDataCache {
     config: UserDataConfig,
-    pub dedup_history: Vec<OneListening>,
-    pub listenings: HashMap<TrackID, u32>,
-    pub listening_durations: HashMap<TrackID, u32>,
+    dedup_history: Vec<OneListening>,
+    listenings: HashMap<TrackID, u32>,
+    listening_durations: HashMap<TrackID, u32>,
 }
 
 impl UserDataCache {
@@ -54,6 +54,10 @@ impl UserDataCache {
         }
 
         self.dedup_history.insert(0, *entry);
+    }
+
+    pub fn dedup_history(&self) -> &[OneListening] {
+        &self.dedup_history
     }
 
     pub fn listenings(&self) -> &HashMap<TrackID, u32> {
