@@ -46,7 +46,7 @@ impl QueryRoot {
         let user_data = graphql_user_data!(ctx);
 
         paginate_mapped_slice(pagination, user_data.history().entries(), |entry| {
-            index.tracks.get(&entry.track).unwrap().clone()
+            index.tracks.get(&entry.track_id).unwrap().clone()
         })
     }
 

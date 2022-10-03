@@ -35,7 +35,7 @@ pub fn generate_feed(index: &Index, user_data: &UserDataWrapper, params: FeedPar
         .history()
         .entries()
         .iter()
-        .filter_map(|entry| index.tracks.get(&entry.track))
+        .filter_map(|entry| index.tracks.get(&entry.track_id))
         .take(max_items)
         .cloned()
         .collect();

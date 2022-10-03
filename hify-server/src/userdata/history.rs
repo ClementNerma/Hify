@@ -23,6 +23,6 @@ impl History {
 #[derive(Clone, Serialize, Deserialize, InputObject)]
 pub struct OneListening {
     pub at: u64,
-    pub track: TrackID,
+    pub track_id: TrackID,
     pub duration_s: u32,
 }
