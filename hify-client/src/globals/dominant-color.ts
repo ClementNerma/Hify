@@ -1,3 +1,5 @@
+import { ColorThief } from './color-thief.lib'
+
 export async function computeDominantColor(imgUrl: string): Promise<[r: number, g: number, b: number]> {
   const img = new Image()
   img.crossOrigin = 'Anonymous'
@@ -23,21 +25,11 @@ export async function computeDominantColor(imgUrl: string): Promise<[r: number, 
 
   const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data
   const pixelsCount = canvas.width * canvas.height
-  console.log(pixelsCount)
 
   if (pixels.length !== pixelsCount * 4) {
     throw new Error('Invalid image data length from temporary canvas')
   }
 
-  const sum = { r: 0, g: 0, b: 0 }
-
-  for (let p = 0; p < pixelsCount; p++) {
-    sum.r += pixels[p * 4]
-    sum.g += pixels[p * 4 + 1]
-    sum.b += pixels[p * 4 + 2]
-  }
-
-  const mean = (sum: number) => Math.floor(sum / pixelsCount)
-
-  return [mean(sum.r), mean(sum.g), mean(sum.b)]
+  const c = new ColorThief()
+  return c.getColor(img)
 }
