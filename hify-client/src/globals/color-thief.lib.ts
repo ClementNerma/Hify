@@ -2,35 +2,10 @@
  * Taken from https://github.com/lokesh/color-thief/ (MIT license)
  */
 
-const t = {
-  map: function (t, r) {
-    const n = {}
-    return r
-      ? t.map(function (t, o) {
-          return (n.index = o), r.call(n, t)
-        })
-      : t.slice()
-  },
-  naturalOrder: function (t, r) {
-    return t < r ? -1 : t > r ? 1 : 0
-  },
-  sum: function (t, r) {
-    const n = {}
-    return t.reduce(
-      r
-        ? function (t, o, e) {
-            return (n.index = e), t + r.call(n, o)
-          }
-        : function (t, r) {
-            return t + r
-          },
-      0,
-    )
-  },
-  max: function (r, n) {
-    return Math.max.apply(null, n ? t.map(r, n) : r)
-  },
+function naturalOrder(t: number, r: number): -1 | 0 | 1 {
+  return t < r ? -1 : t > r ? 1 : 0
 }
+
 const r = (function () {
     const r = 5,
       n = 8 - r,
@@ -70,14 +45,14 @@ const r = (function () {
     }
     function a() {
       this.vboxes = new i(function (r, n) {
-        return t.naturalOrder(r.vbox.count() * r.vbox.volume(), n.vbox.count() * n.vbox.volume())
+        return naturalOrder(r.vbox.count() * r.vbox.volume(), n.vbox.count() * n.vbox.volume())
       })
     }
     function s(r, n) {
       if (n.count()) {
         const o = n.r2 - n.r1 + 1,
           i = n.g2 - n.g1 + 1,
-          u = t.max([o, i, n.b2 - n.b1 + 1])
+          u = Math.max(o, i, n.b2 - n.b1 + 1)
         if (1 == n.count()) return [n.copy()]
         let a,
           s,
@@ -227,7 +202,7 @@ const r = (function () {
         forcebw: function () {
           const r = this.vboxes
           r.sort(function (r, n) {
-            return t.naturalOrder(t.sum(r.color), t.sum(n.color))
+            return naturalOrder(t.sum(r.color), t.sum(n.color))
           })
           const n = r[0].color
           n[0] < 5 && n[1] < 5 && n[2] < 5 && (r[0].color = [0, 0, 0])
@@ -270,7 +245,7 @@ const r = (function () {
               )
             })(h, f),
             l = new i(function (r, n) {
-              return t.naturalOrder(r.count(), n.count())
+              return naturalOrder(r.count(), n.count())
             })
           function g(t, r) {
             for (var n, e = t.size(), i = 0; i < o; ) {
@@ -288,7 +263,7 @@ const r = (function () {
           l.push(v), g(l, 0.75 * c)
           for (
             var p = new i(function (r, n) {
-              return t.naturalOrder(r.count() * r.volume(), n.count() * n.volume())
+              return naturalOrder(r.count() * r.volume(), n.count() * n.volume())
             });
             l.size();
 
