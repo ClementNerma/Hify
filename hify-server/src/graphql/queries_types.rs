@@ -5,8 +5,8 @@ use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 use crate::{
     graphql_index,
     index::{
-        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, SortedMap, Track, TrackID,
-        TrackTags,
+        AlbumID, AlbumInfos, Art, ArtistID, ArtistInfos, GenreID, GenreInfos, SortedMap, Track,
+        TrackID, TrackTags,
     },
 };
 
@@ -111,6 +111,14 @@ impl AlbumInfos {
                     .get_genres_infos()
             })
             .collect()
+    }
+
+    async fn art(&self, ctx: &Context<'_>) -> Option<Art> {
+        graphql_index!(ctx)
+            .albums_arts
+            .get(&self.get_id())
+            .cloned()
+            .flatten()
     }
 }
 

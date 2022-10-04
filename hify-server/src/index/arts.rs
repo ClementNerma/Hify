@@ -9,6 +9,7 @@ use std::{
 };
 
 use anyhow::{bail, Context, Result};
+use async_graphql::SimpleObject;
 use color_thief::ColorFormat;
 use image::EncodableLayout;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
@@ -21,14 +22,16 @@ use super::{blurhash, AlbumID, IndexCache, SortedMap, Track, TrackID};
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, SimpleObject)]
 pub struct Art {
+    #[graphql(skip)]
     pub relative_path: PathBuf,
+
     pub blurhash: String,
     pub dominant_color: ArtRgb,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
 pub struct ArtRgb {
     pub r: u8,
     pub g: u8,
