@@ -321,7 +321,7 @@ pub struct Art {
     pub width: u32,
     pub height: u32,
 
-    pub blurhash: String,
+    // pub blurhash: String,
     pub dominant_color: ArtRgb,
 }
 

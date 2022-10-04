@@ -16,8 +16,8 @@ use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use crate::utils::progress::display_progress;
 
 use super::{
-    blurhash, AlbumID, AlbumInfos, Art, ArtID, ArtRgb, ArtTarget, ArtistID, IndexCache, SortedMap,
-    Track, TrackID,
+    AlbumID, AlbumInfos, Art, ArtID, ArtRgb, ArtTarget, ArtistID, IndexCache, SortedMap, Track,
+    TrackID,
 };
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
@@ -171,8 +171,6 @@ fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art
         bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
     }
 
-    let blurhash = blurhash::encode(9, 9, img.width(), img.height(), img.as_bytes())?;
-
     let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
 
     if dominant_color.len() != 2 {
@@ -197,7 +195,7 @@ fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art
         width: img.width(),
         height: img.height(),
 
-        blurhash,
+        // blurhash,
         dominant_color: ArtRgb {
             r: dominant_color.r,
             g: dominant_color.g,
