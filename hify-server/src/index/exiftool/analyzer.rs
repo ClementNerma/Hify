@@ -1,5 +1,5 @@
 use std::{
-    io::{stdout, BufRead, BufReader, Write},
+    io::{BufRead, BufReader},
     path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{Arc, Mutex},
@@ -12,7 +12,7 @@ use pomsky_macro::pomsky;
 use regex::Regex;
 use serde::Deserialize;
 
-use crate::index::TrackMetadata;
+use crate::{index::TrackMetadata, utils::progress::display_progress};
 
 use super::file::{process_analyzed_file, ExifToolFile};
 
@@ -46,26 +46,6 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     let started = Instant::now();
     let mut previous = 0;
 
-    let display_progress = |elapsed: u64, current: u64, total: u64| {
-        let minutes = elapsed / 60;
-        let seconds = elapsed % 60;
-
-        print!(
-            "\r        Progress: {} / {} ({}%) in {}{}s... ",
-            current,
-            total,
-            current * 100 / total,
-            if minutes > 0 {
-                format!("{minutes}m ")
-            } else {
-                String::new()
-            },
-            seconds
-        );
-
-        stdout().flush().unwrap();
-    };
-
     if files.is_empty() {
         println!("        Nothing to do!");
         return Ok(vec![]);
@@ -73,7 +53,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
     print!("        Starting analysis...");
 
-    let files_count = u64::try_from(files.len()).unwrap();
+    let files_count = files.len();
 
     const FILES_PER_CHUNK: usize = 100;
 
@@ -81,7 +61,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     let mut errors = vec![];
 
     for (chunk_num, files) in files.chunks(FILES_PER_CHUNK).enumerate() {
-        let chunk_start = u64::try_from(FILES_PER_CHUNK * chunk_num).unwrap();
+        let chunk_start = FILES_PER_CHUNK * chunk_num;
 
         let mut handle = Command::new("exiftool")
             .args(&["-n", "-json", "-progress"])
@@ -128,8 +108,12 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
                 match line {
                     Ok(line) => match PARSE_PROGRESS_LINE.captures(&line) {
                         Some(m) => {
-                            let current =
-                                m.name("current").unwrap().as_str().parse::<u64>().unwrap();
+                            let current = m
+                                .name("current")
+                                .unwrap()
+                                .as_str()
+                                .parse::<usize>()
+                                .unwrap();
 
                             let elapsed = started.elapsed().as_secs();
 
