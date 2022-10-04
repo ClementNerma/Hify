@@ -1,7 +1,10 @@
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicUsize, Ordering},
+    sync::{
+        atomic::{AtomicU64, AtomicUsize, Ordering},
+        Mutex,
+    },
     time::Instant,
 };
 
@@ -32,22 +35,31 @@ pub fn find_albums_arts(
     let total = album_ids.len();
     let done = AtomicUsize::new(0);
 
+    let errors = Mutex::new(vec![]);
+    let errors_count = AtomicU64::new(0);
+
     print!("        Starting...");
 
-    album_ids
+    let result = album_ids
         .par_iter()
         .map(|id| find_album_art(id, cache).map(|art| (**id, art)))
         .inspect(|result| {
             let current = done.load(Ordering::Acquire) + 1;
             done.store(current, Ordering::Release);
 
-            display_progress(started.elapsed().as_secs(), current, total);
+            display_progress(
+                started.elapsed().as_secs(),
+                current,
+                total,
+                errors_count.load(Ordering::Acquire),
+            );
 
             let album_id = match result {
                 Ok((album_id, album_art)) if album_art.is_none() => album_id,
                 Ok(_) => return,
                 Err(err) => {
-                    eprintln!("{:?}", err);
+                    errors.lock().unwrap().push(format!("{:?}", err));
+                    errors_count.store(errors_count.load(Ordering::Acquire) + 1, Ordering::Release);
                     return;
                 }
             };
@@ -66,7 +78,21 @@ pub fn find_albums_arts(
             );
         })
         .filter_map(|result| result.ok())
-        .collect()
+        .collect();
+
+    println!();
+
+    let errors = errors.lock().unwrap();
+
+    if !errors.is_empty() {
+        eprintln!("Found {} errors:\n", errors.len());
+
+        for err in errors.iter() {
+            eprintln!("> {err}");
+        }
+    }
+
+    result
 }
 
 fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>> {

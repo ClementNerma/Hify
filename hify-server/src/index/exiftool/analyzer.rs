@@ -119,7 +119,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
                             if elapsed != previous || current == files_count {
                                 previous = elapsed;
-                                display_progress(elapsed, chunk_start + current, files_count);
+                                display_progress(elapsed, chunk_start + current, files_count, 0);
                             }
                         }
                         None => {
