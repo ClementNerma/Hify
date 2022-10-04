@@ -1,5 +1,4 @@
 use std::{
-    io::{BufRead, BufReader},
     path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{
@@ -10,10 +9,7 @@ use std::{
 };
 
 use anyhow::{anyhow, bail, Context, Result};
-use once_cell::sync::Lazy;
-use pomsky_macro::pomsky;
-use rayon::{prelude::ParallelIterator, slice::ParallelSlice};
-use regex::Regex;
+use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::Deserialize;
 
 use crate::{index::TrackMetadata, utils::progress::display_progress};
@@ -48,7 +44,6 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
 
 pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     let started = Instant::now();
-    let mut previous = 0;
 
     if files.is_empty() {
         println!("        Nothing to do!");
@@ -59,136 +54,69 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
     let files_count = files.len();
 
-    const FILES_PER_CHUNK: usize = 100;
-
     let successes = Mutex::new(vec![]);
     let errors = Mutex::new(vec![]);
 
     let progress = Arc::new(AtomicUsize::new(0));
 
     files
-        .par_chunks(FILES_PER_CHUNK)
-        .map(|files| {
-            let mut handle = Command::new("exiftool")
-                .args(&["-n", "-json", "-progress"])
-                .args(files)
+        .par_iter()
+        .map(|file| {
+            let output = Command::new("exiftool")
+                .args(&["-n", "-json"])
+                .arg(file)
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
-                .spawn()
-                .context("Failed to launch ExifTool")?;
+                .output()
+                .context("Failed to run ExifTool")?;
 
-            let stdout_reader = BufReader::new(
-                handle
-                    .stdout
-                    .take()
-                    .context("Failed to get command's STDOUT")?,
-            );
+            let status = output.status;
 
-            let stderr_reader = BufReader::new(
-                handle
-                    .stderr
-                    .take()
-                    .context("Failed to get the command's SDTERR")?,
-            );
+            let current = progress.load(Ordering::Acquire) + 1;
+            progress.store(current, Ordering::Release);
 
-            let stdout_lines = Arc::new(Mutex::new(vec![]));
-            let stderr_lines = Arc::new(Mutex::new(vec![]));
-
-            let stdout_lines_for_reader = Arc::clone(&stdout_lines);
-            let stderr_lines_for_reader = Arc::clone(&stderr_lines);
-
-            std::thread::spawn(move || {
-                for line in stdout_reader.lines() {
-                    match line {
-                        Ok(line) => stdout_lines_for_reader.lock().unwrap().push(line),
-                        Err(err) => {
-                            eprintln!("{err:?}");
-                            // TODO
-                        }
-                    }
-                }
-            });
-
-            let progress = Arc::clone(&progress);
-
-            std::thread::spawn(move || {
-                for line in stderr_reader.lines() {
-                    match line {
-                        Ok(line) => match PARSE_PROGRESS_LINE.captures(&line) {
-                            Some(m) => {
-                                // Just to ensure valid output from ExifTool
-                                let _ = m
-                                    .name("current")
-                                    .unwrap()
-                                    .as_str()
-                                    .parse::<usize>()
-                                    .unwrap();
-
-                                let current = progress.load(Ordering::Acquire) + 1;
-                                progress.store(current, Ordering::Release);
-
-                                let elapsed = started.elapsed().as_secs();
-
-                                if elapsed != previous || current == files_count {
-                                    previous = elapsed;
-                                    display_progress(elapsed, current, files_count, 0);
-                                }
-                            }
-                            None => {
-                                stderr_lines_for_reader.lock().unwrap().push(line);
-                            }
-                        },
-                        Err(err) => {
-                            eprintln!("{err:?}");
-                            // TODO
-                        }
-                    }
-                }
-            });
-
-            let status = handle.wait().with_context(|| {
-                format!(
-                    "ExifTool failed: {}",
-                    stderr_lines.lock().unwrap().join("\n")
-                )
-            })?;
+            display_progress(started.elapsed().as_secs(), current, files_count, 0);
 
             if !status.success() {
                 bail!(
                     "ExifTool failed: {}",
-                    stderr_lines.lock().unwrap().join("\n")
+                    String::from_utf8_lossy(&output.stderr)
                 );
             }
 
-            let stdout_lines = stdout_lines.lock().unwrap().join("\n");
+            let stdout = String::from_utf8_lossy(&output.stdout);
 
-            let parsed_output =
-                serde_json::from_str::<ExifToolOutput>(&stdout_lines).map_err(|e| {
-                    anyhow!(
-                        "Failed to parse ExifTool output: {}\n\n{}",
-                        e,
-                        stdout_lines
-                            .lines()
-                            .enumerate()
-                            .skip(if e.line() < 15 { 0 } else { e.line() - 15 })
-                            .take(15)
-                            .map(|(i, line)| format!("Line {: >5} *| {line}", i + 1))
-                            .collect::<Vec<_>>()
-                            .join("\n")
-                    )
-                })?;
+            let parsed_output = serde_json::from_str::<ExifToolOutput>(&stdout).map_err(|e| {
+                anyhow!(
+                    "Failed to parse ExifTool output: {}\n\n{}",
+                    e,
+                    stdout
+                        .lines()
+                        .enumerate()
+                        .skip(if e.line() < 15 { 0 } else { e.line() - 15 })
+                        .take(15)
+                        .map(|(i, line)| format!("Line {: >5} *| {line}", i + 1))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                )
+            })?;
 
-            let mut successes = successes.lock().unwrap();
-            let mut errors = errors.lock().unwrap();
+            let mut analyzed = parsed_output.0;
 
-            for (i, analyzed) in parsed_output.0.into_iter().enumerate() {
-                match process_analyzed_file(analyzed) {
-                    Ok(data) => successes.push((files.get(i).unwrap().clone(), data)),
-                    Err(err) => {
-                        let file = files.get(i).unwrap();
-                        eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
-                        errors.push((file, err));
-                    }
+            if analyzed.len() != 1 {
+                bail!(
+                    "ExifTool was expected to return one element, but it returned {} instead.",
+                    analyzed.len()
+                );
+            }
+
+            let analyzed = analyzed.pop().unwrap();
+
+            match process_analyzed_file(analyzed) {
+                Ok(data) => successes.lock().unwrap().push((file.clone(), data)),
+                Err(err) => {
+                    eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
+                    errors.lock().unwrap().push((file, err));
                 }
             }
 
@@ -228,12 +156,3 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
 #[derive(Deserialize)]
 pub struct ExifToolOutput(pub Vec<ExifToolFile>);
-
-static PARSE_PROGRESS_LINE: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(pomsky!(
-        Start
-            "======== " Codepoint+ " [" :current([digit]+) "/" [digit]+ "]"
-        End
-    ))
-    .unwrap()
-});
