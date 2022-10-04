@@ -106,10 +106,13 @@ pub fn find_albums_arts(
     let errors = errors.lock().unwrap();
 
     if !errors.is_empty() {
-        eprintln!("Found {} errors:\n", errors.len());
-
-        for err in errors.iter() {
-            eprintln!("> ERROR: {}", err.lines().collect::<Vec<_>>().join("\\n"));
+        for (i, err) in errors.iter().enumerate() {
+            eprintln!(
+                "| Art error {} / {}: {}",
+                i + 1,
+                errors.len(),
+                err.lines().collect::<Vec<_>>().join("\\n")
+            );
         }
     }
 
