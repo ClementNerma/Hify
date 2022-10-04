@@ -27,6 +27,7 @@ async fn inner_main() -> Result<()> {
         user_data_file,
         rebuild_index,
         update_index,
+        rebuild_arts,
         rebuild_cache,
         no_server,
     } = cmd::Command::parse();
@@ -46,13 +47,25 @@ async fn inner_main() -> Result<()> {
 
             if update_index {
                 println!("> Updating index as requested...");
+
                 index = index::build_index(music_dir, Some(index))
                     .context("Failed to rebuild index")?;
             } else if rebuild_cache {
                 println!("> Rebuilding cache as requested...");
-                index = index::rebuild_cache(index);
+
+                index::rebuild_cache(&mut index);
+
                 utils::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
+            }
+
+            if rebuild_arts {
+                println!("> Rebuilding arts as requested...");
+
+                index::rebuild_arts(&mut index).context("Faield to rebuild arts")?;
+
+                utils::save::save_index(&index_file, &index)
+                    .context("Failed to save index file with rebuilt arts")?;
             }
 
             println!("> Done.");
