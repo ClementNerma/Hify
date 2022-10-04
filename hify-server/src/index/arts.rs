@@ -88,7 +88,7 @@ pub fn find_albums_arts(
         eprintln!("Found {} errors:\n", errors.len());
 
         for err in errors.iter() {
-            eprintln!("> {err}");
+            eprintln!("> ERROR: {}", err.lines().collect::<Vec<_>>().join("\\n"));
         }
     }
 
