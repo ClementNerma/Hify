@@ -43,9 +43,9 @@ impl UserDataWrapper {
         }
     }
 
-    pub fn history(&self) -> &History {
-        &self.inner.history
-    }
+    // pub fn history(&self) -> &History {
+    //     &self.inner.history
+    // }
 
     pub fn cache(&self) -> &UserDataCache {
         &self.cache

@@ -60,9 +60,9 @@ impl UserDataCache {
         &self.dedup_history
     }
 
-    pub fn listenings(&self) -> &HashMap<TrackID, u32> {
-        &self.listenings
-    }
+    // pub fn listenings(&self) -> &HashMap<TrackID, u32> {
+    //     &self.listenings
+    // }
 
     pub fn listening_durations(&self) -> &HashMap<TrackID, u32> {
         &self.listening_durations
