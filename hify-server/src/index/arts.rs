@@ -9,6 +9,7 @@ use std::{
 };
 
 use anyhow::{bail, Context, Result};
+use color_thief::ColorFormat;
 use image::EncodableLayout;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
@@ -24,6 +25,14 @@ static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"]
 pub struct Art {
     pub relative_path: PathBuf,
     pub blurhash: String,
+    pub dominant_color: ArtRgb,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize)]
+pub struct ArtRgb {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 pub fn find_albums_arts(
@@ -153,11 +162,24 @@ fn make_art(path: &Path, base_dir: &Path) -> Result<Art> {
 
     let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
 
+    let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
+
+    if dominant_color.len() != 2 {
+        bail!("Color Thief did not return exactly one color");
+    }
+
+    let dominant_color = dominant_color[0];
+
     Ok(Art {
         relative_path: path
             .strip_prefix(base_dir)
             .expect("Internal error: art path couldn't be stripped of the base directory")
             .to_path_buf(),
         blurhash,
+        dominant_color: ArtRgb {
+            r: dominant_color.r,
+            g: dominant_color.g,
+            b: dominant_color.b,
+        },
     })
 }
