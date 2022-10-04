@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getAlbumArtUri } from '../../globals/rest-api'
   import { readableAudioPaused } from '../../stores/audio-player'
   import { currentTrack } from '../../stores/play-queue'
 
@@ -11,6 +10,7 @@
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
   import { customBgColor } from '../../stores/custom-bg-color'
+  import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -36,19 +36,23 @@
   onDestroy(() => customBgColor.set(null))
 
   currentTrack.subscribe(() => setDistractionFree(false))
+
+  const COVER_SIZE = 250
 </script>
 
 {#if !$currentTrack}
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
 {:else}
-  <img
-    class="album-art"
-    class:darkened={!$distractionFreeMode}
-    width={$distractionFreeMode ? '' : 250}
-    height={$distractionFreeMode ? '' : 250}
-    src={getAlbumArtUri($currentTrack.metadata.tags.album.id)}
-    alt=""
-  />
+  <ImgLoader art={$currentTrack.metadata.tags.album.art} let:src>
+    <img
+      class="album-art"
+      class:darkened={!$distractionFreeMode}
+      width={$distractionFreeMode ? '' : COVER_SIZE}
+      height={$distractionFreeMode ? '' : COVER_SIZE}
+      {src}
+      alt=""
+    />
+  </ImgLoader>
 {/if}
 
 <DistractionFreeTogglable>

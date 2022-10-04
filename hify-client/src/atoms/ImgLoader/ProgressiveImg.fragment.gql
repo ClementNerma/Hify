@@ -1,0 +1,13 @@
+fragment ProgressiveImg on Art {
+  id
+
+  width
+  height
+
+  blurhash
+  dominantColor {
+    r
+    g
+    b
+  }
+}

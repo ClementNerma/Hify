@@ -1,5 +1,8 @@
 <script lang="ts">
-  export let pictureUrl: string
+  import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
+  import { ProgressiveImgFragment } from '../../graphql/generated'
+
+  export let art: ProgressiveImgFragment | null | undefined
 
   export let title: string
   export let subtitle: string | null
@@ -13,7 +16,10 @@
 </script>
 
 <div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
-  <img class="cover" class:rounded width={boxSize} height={boxSize} src={pictureUrl} alt="" />
+  <ImgLoader {art} let:src>
+    <img class="cover" class:rounded width={boxSize} height={boxSize} {src} alt="" />
+  </ImgLoader>
+
   <div class="title experimental-line-limiter">{title}</div>
 
   {#if subtitle}

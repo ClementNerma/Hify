@@ -2,7 +2,7 @@
   import QueueGalleryTrack from '../../molecules/QueueGalleryTrack/QueueGalleryTrack.svelte'
   import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
   import { NavigableRow as Nav } from '../../navigable/headless/NavigableRow/NavigableRow'
-  import { OnFocusChangeCallback, Props } from '../../navigable/navigation'
+  import { Props } from '../../navigable/navigation'
   import { queuePosition, readablePlayQueue } from '../../stores/play-queue'
 
   const COLUMNS = 8

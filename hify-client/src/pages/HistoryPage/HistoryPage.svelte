@@ -4,7 +4,6 @@
   import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
   import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
@@ -48,7 +47,7 @@
       <InteractiveCard
         title={tags.title}
         subtitle={tags.album.name}
-        pictureUrl={getAlbumArtUri(tags.album.id)}
+        art={tags.album.art}
         onPress={bind(i, (i) => {
           playTrackFromNewQueue(tracks, i)
           navigate(ROUTES.nowPlaying)

@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { ProgressiveImgFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import Card from './Card.svelte'
 
-  export let pictureUrl: string
+  export let art: ProgressiveImgFragment | null | undefined
 
   export let title: string
   export let subtitle: string
@@ -15,5 +16,5 @@
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress}>
-  <Card {pictureUrl} {title} {subtitle} {enforceMaxWidth} {rounded} />
+  <Card {art} {title} {subtitle} {enforceMaxWidth} {rounded} />
 </SimpleNavigableItem>

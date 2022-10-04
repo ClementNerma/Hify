@@ -1,7 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { ArtistCardFragment } from '../../graphql/generated'
-  import { getArtistArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
@@ -13,13 +12,15 @@
   $: contextMenuOptions = [
     { label: 'Mix me some magic ✨', onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })) },
   ]
+
+  // TODO: artist {art}
 </script>
 
 <InteractiveCard
   title={artist.name}
   subtitle=""
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
-  pictureUrl={getArtistArtUri(artist.id)}
   onLongPress={() => showContextMenu(contextMenuOptions)}
+  art={null}
   rounded={true}
 />

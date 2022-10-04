@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onDestroy, onMount } from 'svelte'
+  import { afterUpdate } from 'svelte'
 
   import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
   import InternalNavWrapper from '../InternalNavWrapper.svelte'

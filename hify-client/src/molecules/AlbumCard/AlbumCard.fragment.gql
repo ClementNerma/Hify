@@ -5,4 +5,7 @@ fragment AlbumCard on AlbumInfos {
     id
     name
   }
+  art {
+    ...ProgressiveImg
+  }
 }

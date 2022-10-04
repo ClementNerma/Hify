@@ -3,7 +3,6 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { getAlbumArtUri } from '../../globals/rest-api'
   import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
@@ -39,12 +38,7 @@
     hasFocusPriority={isCurrent}
     fullHeight
   >
-    <Card
-      title={track.metadata.tags.title}
-      subtitle={null}
-      boxSize={80}
-      pictureUrl={getAlbumArtUri(track.metadata.tags.album.id)}
-    />
+    <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
   </SimpleNavigableItem>
 </div>
 

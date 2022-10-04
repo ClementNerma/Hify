@@ -1,7 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
   import { AlbumCardFragment } from '../../graphql/generated'
-  import { getAlbumArtUri } from '../../globals/rest-api'
   import { ROUTES } from '../../routes'
   import { bind } from '../../globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
@@ -15,6 +14,6 @@
   subtitle={album.albumArtists.map((artist) => artist.name).join(', ')}
   onPress={bind(album, (album) => navigate(ROUTES.album(album.id)))}
   onLongPress={() => alert('TODO: context menu for playing options')}
-  pictureUrl={getAlbumArtUri(album.id)}
+  art={album.art}
   {enforceMaxWidth}
 />

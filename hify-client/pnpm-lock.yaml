@@ -10,6 +10,7 @@ specifiers:
   '@sveltejs/vite-plugin-svelte': ^1.0.8
   '@typescript-eslint/eslint-plugin': ^5.38.0
   '@typescript-eslint/parser': ^5.38.0
+  blurhash: ^2.0.3
   cross-env: ^7.0.3
   eslint: ^8.23.1
   eslint-config-prettier: ^8.5.0
@@ -29,6 +30,7 @@ specifiers:
 
 dependencies:
   '@apollo/client': 3.6.9_graphql@16.6.0
+  blurhash: 2.0.3
   graphql: 16.6.0
   graphql-tag: 2.12.6_graphql@16.6.0
   svelte: 3.50.1
@@ -1849,6 +1851,10 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
     dev: true
+
+  /blurhash/2.0.3:
+    resolution: {integrity: sha512-nTnJTOheiaV3b189f7rH5AbbrnQB2r3CcOZBg47GUDaE9DrxyBPD2w0HYp4ME2UBlTP7LMIa6nMWqg/58oyIzA==}
+    dev: false
 
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}

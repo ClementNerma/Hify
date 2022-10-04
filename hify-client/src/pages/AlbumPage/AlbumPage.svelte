@@ -2,7 +2,6 @@
   import { navigate } from 'svelte-navigator'
 
   import { ROUTES } from '../../routes'
-  import { getAlbumArtUri } from '../../globals/rest-api'
   import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
 
   import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
@@ -18,6 +17,7 @@
   import { playNewQueueFromBeginning, queueAsNext } from '../../stores/play-queue'
   import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { humanReadableDuration } from '../../stores/audio-player'
+  import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
 
   export let albumId: string
 
@@ -69,7 +69,9 @@
   <div class="container">
     <NavigableList>
       <div class="header">
-        <img class="art" width={192} height={192} src={getAlbumArtUri(albumId)} alt="" />
+        <ImgLoader art={album.art} let:src>
+          <img class="art" width={192} height={192} {src} alt="" />
+        </ImgLoader>
 
         <div class="infos">
           <div class="name">
@@ -138,12 +140,7 @@
               {#each disc.tracks as track, i (track.id)}
                 {@const tags = track.metadata.tags}
 
-                <NavigableTrack
-                  tracks={filteredTracks}
-                  goToAlbumOption={false}
-                  display="transparent"
-                  {track}
-                >
+                <NavigableTrack tracks={filteredTracks} goToAlbumOption={false} display="transparent" {track}>
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>
