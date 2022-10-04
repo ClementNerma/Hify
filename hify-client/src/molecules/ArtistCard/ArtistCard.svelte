@@ -12,8 +12,6 @@
   $: contextMenuOptions = [
     { label: 'Mix me some magic ✨', onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })) },
   ]
-
-  // TODO: artist {art}
 </script>
 
 <InteractiveCard
@@ -21,6 +19,6 @@
   subtitle=""
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
   onLongPress={() => showContextMenu(contextMenuOptions)}
-  art={null}
+  art={artist.art}
   rounded={true}
 />
