@@ -901,6 +901,7 @@ dependencies = [
  "pomsky",
  "pomsky-macro",
  "rand",
+ "rayon",
  "regex",
  "rocket",
  "rocket_seek_stream",

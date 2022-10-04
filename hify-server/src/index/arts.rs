@@ -1,6 +1,12 @@
-use std::{collections::HashMap, path::PathBuf, time::Instant};
+use std::{
+    collections::HashMap,
+    path::PathBuf,
+    sync::atomic::{AtomicUsize, Ordering},
+    time::Instant,
+};
 
 use anyhow::{Context, Result};
+use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
 use crate::utils::progress::display_progress;
@@ -23,17 +29,18 @@ pub fn find_albums_arts(
     let started = Instant::now();
 
     let total = album_ids.len();
-    let mut done = 0;
+    let done = AtomicUsize::new(0);
 
     print!("        Starting...");
 
     album_ids
-        .iter()
+        .par_iter()
         .map(|id| find_album_art(id, cache).map(|art| (**id, art)))
         .inspect(|result| {
-            done += 1;
+            let current = done.load(Ordering::Acquire) + 1;
+            done.store(current, Ordering::Release);
 
-            display_progress(started.elapsed().as_secs(), done, total);
+            display_progress(started.elapsed().as_secs(), current, total);
 
             let album_id = match result {
                 Ok((album_id, album_art)) if album_art.is_none() => album_id,
