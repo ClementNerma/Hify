@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::progress::display_progress;
 
-use super::{blurhash, AlbumID, IndexCache};
+use super::{blurhash, AlbumID, IndexCache, SortedMap, Track, TrackID};
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
@@ -28,6 +28,7 @@ pub struct Art {
 
 pub fn find_albums_arts(
     album_ids: &[&AlbumID],
+    tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> HashMap<AlbumID, Option<Art>> {
     let started = Instant::now();
@@ -42,7 +43,7 @@ pub fn find_albums_arts(
 
     let result = album_ids
         .par_iter()
-        .map(|id| find_album_art(id, cache).map(|art| (**id, art)))
+        .map(|id| find_album_art(id, tracks, cache).map(|art| (**id, art)))
         .inspect(|result| {
             let current = done.load(Ordering::Acquire) + 1;
             done.store(current, Ordering::Release);
@@ -95,13 +96,17 @@ pub fn find_albums_arts(
     result
 }
 
-fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>> {
+fn find_album_art(
+    album_id: &AlbumID,
+    tracks: &SortedMap<TrackID, Track>,
+    cache: &IndexCache,
+) -> Result<Option<Art>> {
     let album_tracks_ids = cache.albums_tracks.get(album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
     let first_track_id = album_tracks_ids.get(0).unwrap();
 
-    let track_path = cache.tracks_paths.get(first_track_id).unwrap();
+    let track_path = &tracks.get(first_track_id).unwrap().path;
 
     for dir in track_path.ancestors() {
         for filename in COVER_FILENAMES {

@@ -130,16 +130,14 @@ pub async fn stream<'a>(
         .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
 
     let index = ctx.index.read().await;
-    let track_path = index.cache.tracks_paths.get(&id).ok_or_else(|| {
+    let track = index.tracks.get(&id).ok_or_else(|| {
         rest_server_error(
             Status::NotFound,
             "Provided track ID was not found".to_string(),
         )
     })?;
 
-    let track = index.tracks.get(&id).unwrap();
-
-    let stream = SeekStream::from_path(&track_path).map_err(|err| {
+    let stream = SeekStream::from_path(&track.path).map_err(|err| {
         rest_server_error(
             Status::InternalServerError,
             format!("Failed to open seek stream for track file: {}", err),

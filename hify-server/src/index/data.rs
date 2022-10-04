@@ -2,7 +2,8 @@ use std::{
     cmp::Ordering,
     collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
-    path::PathBuf,
+    path::{Path, PathBuf},
+    time::SystemTime,
 };
 
 use async_graphql::{Enum, SimpleObject};
@@ -25,8 +26,8 @@ pub struct Index {
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct IndexCache {
-    /// Absolute filesystem path to each track
-    pub tracks_paths: HashMap<TrackID, PathBuf>,
+    /// List of all tracks' audio files with their modification time
+    pub tracks_files_mtime: HashMap<PathBuf, SystemTime>,
 
     /// List of all artists (track's album's artists + track's own artists) for each track
     pub tracks_all_artists: HashMap<TrackID, HashSet<ArtistID>>,
@@ -145,22 +146,34 @@ define_id_type!(TrackID, AlbumID, ArtistID, GenreID);
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct Track {
+    /// Track's identifier
     #[graphql(skip)]
     pub id: TrackID,
-    pub path: String,
+
+    /// Path to the track's audio file
+    #[graphql(skip)]
+    pub path: PathBuf,
+
+    /// Track's audio metadata
     pub metadata: TrackMetadata,
+
+    /// File's modification time when it was analyzed
+    /// Used to determine if the track changed since the last update
+    #[graphql(skip)]
+    pub mtime: SystemTime,
 }
 
 impl Track {
-    pub fn new(path: String, metadata: TrackMetadata) -> Self {
+    pub fn new(path: PathBuf, mtime: SystemTime, metadata: TrackMetadata) -> Self {
         Self {
             id: TrackID(Self::compute_raw_id(&path)),
             path,
             metadata,
+            mtime,
         }
     }
 
-    fn compute_raw_id(path: &str) -> u64 {
+    fn compute_raw_id(path: &Path) -> u64 {
         let mut hasher = DefaultHasher::new();
         path.hash(&mut hasher);
         hasher.finish()

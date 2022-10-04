@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeSet, HashMap, HashSet},
-    path::PathBuf,
-};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use super::{
     AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, SortedMap, Track,
@@ -9,10 +6,9 @@ use super::{
 };
 
 // TODO: lots of optimization to perform here
-pub fn build_index_cache(
-    tracks: &SortedMap<TrackID, Track>,
-    tracks_paths: HashMap<TrackID, PathBuf>,
-) -> IndexCache {
+pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
+    let mut tracks_files_mtime = HashMap::new();
+
     let mut tracks_formats = HashMap::new();
     let mut tracks_all_artists = HashMap::new();
 
@@ -32,6 +28,7 @@ pub fn build_index_cache(
     let mut no_genre_tracks = HashSet::new();
 
     for track in tracks.values() {
+        tracks_files_mtime.insert(track.path.clone(), track.mtime);
         tracks_formats.insert(track.id, track.metadata.format);
 
         let tags = &track.metadata.tags;
@@ -216,7 +213,7 @@ pub fn build_index_cache(
         .collect();
 
     IndexCache {
-        tracks_paths,
+        tracks_files_mtime,
         tracks_all_artists,
 
         artists_albums,

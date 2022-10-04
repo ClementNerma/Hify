@@ -2,7 +2,7 @@ use anyhow::{bail, Context, Result};
 use rayon::prelude::{ParallelBridge, ParallelIterator};
 
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     path::{Path, PathBuf},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
@@ -28,7 +28,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         tracks: SortedMap::empty(),
         albums_arts: HashMap::new(),
         cache: IndexCache {
-            tracks_paths: HashMap::new(),
+            tracks_files_mtime: HashMap::new(),
             tracks_all_artists: HashMap::new(),
 
             artists_albums: HashMap::new(),
@@ -59,38 +59,28 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let files = build_files_list(&dir).context("Failed to build files list")?;
 
-    let existing = &from
-        .cache
-        .tracks_paths
-        .values()
-        .cloned()
-        .collect::<HashSet<_>>();
+    let files_mtime = files
+        .into_iter()
+        .filter(|(path, _)| exiftool::is_audio_file(path))
+        .filter(
+            |(path, mtime)| match from.cache.tracks_files_mtime.get(path.as_path()) {
+                None => true,
+                Some(old_mtime) => old_mtime != mtime,
+            },
+        )
+        .collect::<BTreeMap<_, _>>();
 
-    let mut files = files
-        .difference(existing)
-        .filter(|path| exiftool::is_audio_file(path))
-        .cloned()
-        .collect::<Vec<_>>();
-
-    files.sort();
-
-    log(started, &format!("Found {} files.", files.len(),));
+    log(started, &format!("Found {} files.", files_mtime.len()));
     log(started, "Extracting audio metadata...");
 
-    let analyzed = exiftool::run_on(files.as_slice())?;
+    let analyzed = exiftool::run_on(files_mtime.keys().cloned().collect::<Vec<_>>().as_slice())?;
 
     let mut tracks = from.tracks.into_values();
-    let mut tracks_paths = from.cache.tracks_paths;
 
-    for (path, track_metadata) in analyzed.into_iter() {
-        let path_str = path.to_str().unwrap();
-
-        let track = Track::new(path_str.to_string(), track_metadata);
-
-        tracks_paths.insert(track.id, path.to_path_buf());
-
-        tracks.push(track);
-    }
+    tracks.extend(analyzed.into_iter().map(|(path, track_metadata)| {
+        let mtime = *files_mtime.get(&path).unwrap();
+        Track::new(path, mtime, track_metadata)
+    }));
 
     log(
         started,
@@ -99,7 +89,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let tracks = SortedMap::from_vec(tracks, |track| track.id.clone());
 
-    let cache = build_index_cache(&tracks, tracks_paths);
+    let cache = build_index_cache(&tracks);
 
     let new_albums = cache
         .albums_infos
@@ -113,7 +103,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     );
 
     let mut albums_arts = from.albums_arts;
-    albums_arts.extend(find_albums_arts(&new_albums, &cache));
+    albums_arts.extend(find_albums_arts(&new_albums, &tracks, &cache));
 
     log(started, "Index has been generated.");
 
@@ -133,7 +123,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 }
 
 pub fn rebuild_cache(index: &mut Index) {
-    index.cache = build_index_cache(&index.tracks, index.cache.tracks_paths.clone());
+    index.cache = build_index_cache(&index.tracks);
 }
 
 pub fn rebuild_arts(index: &mut Index) {
@@ -144,11 +134,12 @@ pub fn rebuild_arts(index: &mut Index) {
             .keys()
             .collect::<Vec<_>>()
             .as_slice(),
+        &index.tracks,
         &index.cache,
     );
 }
 
-fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
+fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
@@ -160,16 +151,25 @@ fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
                 return Ok(None);
             }
 
-            match item.path().to_str() {
-                None => bail!(
+            if item.path().to_str().is_none() {
+                bail!(
                     "Item does not have a valid UTF-8 path: {}",
                     item.path().to_string_lossy()
-                ),
-                Some(_) => Ok(Some(item.path().to_path_buf())),
+                );
             }
+
+            let metadata = item
+                .metadata()
+                .context("Failed to get the file's metadata")?;
+
+            let mtime = metadata
+                .modified()
+                .context("Failed to get file's modification time")?;
+
+            return Ok(Some((item.path().to_path_buf(), mtime)));
         })
         .filter_map(|entry| match entry {
-            Ok(Some(decoded)) => Some(Ok(decoded)),
+            Ok(Some(entry)) => Some(Ok(entry)),
             Ok(None) => None,
             Err(err) => Some(Err(err)),
         })
