@@ -1,3 +1,5 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use async_graphql::InputObject;
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +24,28 @@ impl History {
 
 #[derive(Clone, Copy, Serialize, Deserialize, InputObject)]
 pub struct OneListening {
-    pub at: u64,
+    at: u64,
     pub track_id: TrackID,
     pub duration_s: u32,
+}
+
+impl OneListening {
+    pub fn new_now(track_id: TrackID, duration_s: u32) -> Self {
+        Self {
+            at: Self::now(),
+            track_id,
+            duration_s,
+        }
+    }
+
+    fn now() -> u64 {
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Failed to get time since Unix' EPOCH")
+            .as_secs()
+    }
+
+    pub fn at(self) -> u64 {
+        self.at
+    }
 }
