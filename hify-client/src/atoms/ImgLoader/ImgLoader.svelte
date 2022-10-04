@@ -1,25 +1,20 @@
 <script lang="ts">
-  import { writable } from 'svelte/store'
+  /**
+   * Note: As both BlurHash decoding and Canvas painting + encoding is slow (both taking about 2 ms each)
+   *       this component's features were removed, until a more performant way is found
+   *
+   *       The component's properties are left for compatibility reasons and future-proofing.
+   */
+
   import { getArtUri } from '../../globals/rest-api'
   import { ProgressiveImgFragment } from '../../graphql/generated'
-  import { createBlurHashImageSrc } from './ImgLoader'
 
   export let art: ProgressiveImgFragment | null | undefined
-
-  const loaded = writable(false)
-
-  const fullImgUrl = art ? getArtUri(art.id) : 'about:blank'
-  const blurImgUrl = art ? createBlurHashImageSrc(art) : 'about:blank'
-
-  const img = new Image()
-  img.src = fullImgUrl
-  img.addEventListener('load', () => loaded.set(true))
+  export const quick: boolean | null = null
 </script>
 
-{#if $loaded}
-  <slot src={fullImgUrl} />
-{:else if art}
-  <slot src={blurImgUrl} />
+{#if art}
+  <slot src={getArtUri(art.id)} />
 {:else}
   <slot src="about:blank" />
 {/if}

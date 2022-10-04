@@ -4,7 +4,8 @@ fragment ProgressiveImg on Art {
   width
   height
 
-  blurhash
+  # blurhash
+
   dominantColor {
     r
     g
