@@ -12,7 +12,16 @@ fragment AudioTrack on Track {
       }
       album {
         ...AlbumCard
+
         year
+
+        art {
+          dominantColor {
+            r
+            g
+            b
+          }
+        }
       }
       disc
       trackNo

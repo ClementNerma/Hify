@@ -13,5 +13,6 @@ customBgColor.subscribe((value) => {
 
     document.body.classList.add('custom-bg-color')
     document.body.setAttribute('style', `--linear-start: rgba(${r}, ${g}, ${b}, ${a ?? 1}); --linear-end: #000;`)
+    console.log(value)
   }
 })

@@ -11,6 +11,7 @@
   import { KeyPressHandling } from '../../navigable/input-manager'
   import { customBgColor } from '../../stores/custom-bg-color'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
+  import { get } from 'svelte/store'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -32,10 +33,20 @@
     return KeyPressHandling.Propagate
   }
 
-  onMount(() => customBgColor.set([0, 0, 0]))
+  onMount(() => !get(currentTrack) && customBgColor.set([0, 0, 0]))
   onDestroy(() => customBgColor.set(null))
 
-  currentTrack.subscribe(() => setDistractionFree(false))
+  currentTrack.subscribe((track) => {
+    if (track) {
+      const dominantColor = track.metadata.tags.album.art?.dominantColor
+
+      if (dominantColor) {
+        customBgColor.set([dominantColor.r, dominantColor.g, dominantColor.b, 1])
+      }
+    }
+
+    setDistractionFree(false)
+  })
 
   const COVER_SIZE = 250
 </script>
