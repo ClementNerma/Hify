@@ -9,7 +9,7 @@ use std::{
 use walkdir::WalkDir;
 
 use super::{
-    arts::find_albums_arts,
+    arts::{find_albums_arts, generate_artist_art},
     cache::build_index_cache,
     data::{Index, Track},
     exiftool,
@@ -115,9 +115,19 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     let new_albums_arts = find_albums_arts(&new_albums, &dir, &tracks, &cache);
 
     let mut arts = from.arts;
+
     arts.extend(
         new_albums_arts
             .into_iter()
+            .map(|art| (art.id, art))
+            .collect::<HashMap<_, _>>(),
+    );
+
+    arts.extend(
+        cache
+            .artists_infos
+            .values()
+            .filter_map(|artist| generate_artist_art(artist.get_id(), &arts, &cache))
             .map(|art| (art.id, art))
             .collect::<HashMap<_, _>>(),
     );
@@ -157,6 +167,15 @@ pub fn rebuild_arts(index: &mut Index) {
     );
 
     index.arts = arts.into_iter().map(|art| (art.id, art)).collect();
+    index.arts.extend(
+        index
+            .cache
+            .artists_infos
+            .values()
+            .filter_map(|artist| generate_artist_art(artist.get_id(), &index.arts, &index.cache))
+            .map(|art| (art.id, art))
+            .collect::<HashMap<_, _>>(),
+    );
 }
 
 fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {

@@ -76,12 +76,14 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
             let current = progress.load(Ordering::Acquire) + 1;
             progress.store(current, Ordering::Release);
 
-            display_progress(
-                started.elapsed().as_secs(),
-                current,
-                files_count,
-                errors_counter.load(Ordering::Acquire),
-            );
+            if current % 10 == 0 || current == files_count - 1 {
+                display_progress(
+                    started.elapsed().as_secs(),
+                    current,
+                    files_count,
+                    errors_counter.load(Ordering::Acquire),
+                );
+            }
 
             if !status.success() {
                 bail!(

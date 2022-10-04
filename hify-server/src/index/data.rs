@@ -328,6 +328,7 @@ pub struct Art {
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum ArtTarget {
     AlbumCover(AlbumID),
+    Artist(ArtistID),
 }
 
 impl ArtTarget {

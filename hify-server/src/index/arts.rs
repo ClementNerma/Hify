@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     path::{Path, PathBuf},
     sync::{
         atomic::{AtomicU64, AtomicUsize, Ordering},
@@ -15,11 +16,34 @@ use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use crate::utils::progress::display_progress;
 
 use super::{
-    blurhash, AlbumID, AlbumInfos, Art, ArtRgb, ArtTarget, IndexCache, SortedMap, Track, TrackID,
+    blurhash, AlbumID, AlbumInfos, Art, ArtID, ArtRgb, ArtTarget, ArtistID, IndexCache, SortedMap,
+    Track, TrackID,
 };
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
+
+pub fn generate_artist_art(
+    artist_id: ArtistID,
+    arts: &HashMap<ArtID, Art>,
+    cache: &IndexCache,
+) -> Option<Art> {
+    let albums = cache
+        .artists_albums
+        .get(&artist_id)
+        .expect("Internal error: failed to get artist's albums");
+    let first_album = albums.values().next()?;
+
+    let album_art = arts.get(&ArtTarget::AlbumCover(first_album.get_id()).to_id())?;
+
+    let target = ArtTarget::Artist(artist_id);
+
+    Some(Art {
+        id: target.to_id(),
+        target,
+        ..album_art.clone()
+    })
+}
 
 pub fn find_albums_arts(
     albums: &[&AlbumInfos],
@@ -116,7 +140,7 @@ fn find_album_art(
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    let art = make_art(&art_path, base_dir, album_id).with_context(|| {
+                    let art = make_album_art(&art_path, base_dir, album_id).with_context(|| {
                         format!(
                             "Failed to make art for album covert at: {}",
                             art_path.to_string_lossy()
@@ -132,7 +156,7 @@ fn find_album_art(
     Ok(None)
 }
 
-fn make_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
+fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
     let mut img = image::open(path).context("Failed to open the image file")?;
 
     let img = img
