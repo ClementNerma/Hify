@@ -84,7 +84,7 @@ async fn inner_main() -> Result<()> {
     };
 
     let user_data = match user_data_file.is_file() {
-        true => utils::save::load_user_data(&user_data_file).context("Failed to save user data")?,
+        true => utils::save::load_user_data(&user_data_file).context("Failed to load user data")?,
         false => userdata::UserData::with_default_config(),
     };
 
