@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use rayon::prelude::{ParallelBridge, ParallelIterator};
 
 use std::{
     collections::{HashMap, HashSet},
@@ -151,6 +152,7 @@ fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
+        .par_bridge()
         .map(|item| {
             let item = item.context("Failed to read directory entry")?;
 
