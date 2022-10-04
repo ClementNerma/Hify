@@ -4,12 +4,7 @@ query SearchPage($input: String!, $limit: Int!) {
       ...AudioTrack
     }
     albums {
-      id
-      name
-      albumArtists {
-        id
-        name
-      }
+      ...AlbumCard
     }
     artists {
       ...ArtistCard
