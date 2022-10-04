@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::atomic::{AtomicUsize, Ordering},
     time::Instant,
 };
@@ -88,7 +88,13 @@ fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>>
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    let art = make_art(art_path)?;
+                    let art = make_art(&art_path).with_context(|| {
+                        format!(
+                            "Failed to make art for album covert at: {}",
+                            art_path.to_string_lossy()
+                        )
+                    })?;
+
                     return Ok(Some(art));
                 }
             }
@@ -98,13 +104,8 @@ fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>>
     Ok(None)
 }
 
-fn make_art(path: PathBuf) -> Result<Art> {
-    let mut img = image::open(&path).with_context(|| {
-        format!(
-            "Failed to open the image file at: {}",
-            path.to_string_lossy()
-        )
-    })?;
+fn make_art(path: &Path) -> Result<Art> {
+    let mut img = image::open(path).context("Failed to open the image file")?;
 
     let img = img
         .as_mut_rgb8()
@@ -119,5 +120,8 @@ fn make_art(path: PathBuf) -> Result<Art> {
 
     let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
 
-    Ok(Art { path, blurhash })
+    Ok(Art {
+        path: path.to_path_buf(),
+        blurhash,
+    })
 }
