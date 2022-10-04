@@ -62,7 +62,7 @@ async fn inner_main() -> Result<()> {
             if rebuild_arts {
                 println!("> Rebuilding arts as requested...");
 
-                index::rebuild_arts(&mut index).context("Faield to rebuild arts")?;
+                index::rebuild_arts(&mut index);
 
                 utils::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt arts")?;

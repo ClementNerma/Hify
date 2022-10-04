@@ -26,7 +26,7 @@ pub struct Art {
 pub fn find_albums_arts(
     album_ids: &[&AlbumID],
     cache: &IndexCache,
-) -> Result<HashMap<AlbumID, Option<Art>>> {
+) -> HashMap<AlbumID, Option<Art>> {
     let started = Instant::now();
 
     let total = album_ids.len();
@@ -45,7 +45,11 @@ pub fn find_albums_arts(
 
             let album_id = match result {
                 Ok((album_id, album_art)) if album_art.is_none() => album_id,
-                _ => return,
+                Ok(_) => return,
+                Err(err) => {
+                    eprintln!("{:?}", err);
+                    return;
+                }
             };
 
             let album_infos = cache.albums_infos.get(album_id).unwrap();
@@ -61,6 +65,7 @@ pub fn find_albums_arts(
                     .join(" / ")
             );
         })
+        .filter_map(|result| result.ok())
         .collect()
 }
 

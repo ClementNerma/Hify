@@ -112,7 +112,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     );
 
     let mut albums_arts = from.albums_arts;
-    albums_arts.extend(find_albums_arts(&new_albums, &cache)?);
+    albums_arts.extend(find_albums_arts(&new_albums, &cache));
 
     log(started, "Index has been generated.");
 
@@ -135,7 +135,7 @@ pub fn rebuild_cache(index: &mut Index) {
     index.cache = build_index_cache(&index.tracks, index.cache.tracks_paths.clone());
 }
 
-pub fn rebuild_arts(index: &mut Index) -> Result<()> {
+pub fn rebuild_arts(index: &mut Index) {
     index.albums_arts = find_albums_arts(
         index
             .cache
@@ -144,9 +144,7 @@ pub fn rebuild_arts(index: &mut Index) -> Result<()> {
             .collect::<Vec<_>>()
             .as_slice(),
         &index.cache,
-    )?;
-
-    Ok(())
+    );
 }
 
 fn build_files_list(from: &Path) -> Result<HashSet<PathBuf>> {
