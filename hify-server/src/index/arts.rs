@@ -6,6 +6,7 @@ use std::{
 };
 
 use anyhow::{bail, Context, Result};
+use image::EncodableLayout;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
@@ -93,12 +94,16 @@ fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>>
 }
 
 fn make_art(path: PathBuf) -> Result<Art> {
-    let img = image::open(&path).with_context(|| {
+    let mut img = image::open(&path).with_context(|| {
         format!(
             "Failed to open the image file at: {}",
             path.to_string_lossy()
         )
     })?;
+
+    let img = img
+        .as_mut_rgb8()
+        .context("Failed to get an RGB8 image from the album cover")?;
 
     let bytes_count = img.as_bytes().len();
     let expected = usize::try_from(img.width() * img.height() * 3).unwrap();
