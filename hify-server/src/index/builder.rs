@@ -123,6 +123,11 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             .collect::<HashMap<_, _>>(),
     );
 
+    println!(
+        "Generating artists' arts ({})...",
+        cache.artists_infos.len()
+    );
+
     arts.extend(
         cache
             .artists_infos

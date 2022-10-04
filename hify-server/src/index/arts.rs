@@ -28,10 +28,8 @@ pub fn generate_artist_art(
     arts: &HashMap<ArtID, Art>,
     cache: &IndexCache,
 ) -> Option<Art> {
-    let albums = cache
-        .artists_albums
-        .get(&artist_id)
-        .expect("Internal error: failed to get artist's albums");
+    let albums = cache.artists_albums.get(&artist_id)?;
+
     let first_album = albums.values().next()?;
 
     let album_art = arts.get(&ArtTarget::AlbumCover(first_album.get_id()).to_id())?;
