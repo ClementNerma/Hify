@@ -1,7 +1,9 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, time::Instant};
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
+
+use crate::utils::progress::display_progress;
 
 use super::{blurhash, AlbumID, IndexCache};
 
@@ -18,10 +20,21 @@ pub fn find_albums_arts(
     album_ids: &[&AlbumID],
     cache: &IndexCache,
 ) -> Result<HashMap<AlbumID, Option<Art>>> {
+    let started = Instant::now();
+
+    let total = album_ids.len();
+    let mut done = 0;
+
+    print!("        Starting...");
+
     album_ids
         .iter()
         .map(|id| find_album_art(id, cache).map(|art| (**id, art)))
         .inspect(|result| {
+            done += 1;
+
+            display_progress(started.elapsed().as_secs(), done, total);
+
             let album_id = match result {
                 Ok((album_id, album_art)) if album_art.is_none() => album_id,
                 _ => return,
