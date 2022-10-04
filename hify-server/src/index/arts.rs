@@ -10,7 +10,7 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 use color_thief::ColorFormat;
-use image::EncodableLayout;
+use image::{DynamicImage, EncodableLayout};
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::utils::progress::display_progress;
@@ -158,26 +158,7 @@ fn find_album_art(
 }
 
 fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
-    let mut img = image::open(path).context("Failed to open the image file")?;
-
-    let img = img
-        .as_mut_rgb8()
-        .context("Failed to get an RGB8 image from the album cover")?;
-
-    let bytes_count = img.as_bytes().len();
-    let expected = usize::try_from(img.width() * img.height() * 3).unwrap();
-
-    if bytes_count != expected {
-        bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
-    }
-
-    let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
-
-    if dominant_color.len() != 2 {
-        bail!("Color Thief did not return exactly one color");
-    }
-
-    let dominant_color = dominant_color[0];
+    let img = image::open(path).context("Failed to open the image file")?;
 
     let relative_path = path
         .strip_prefix(base_dir)
@@ -196,10 +177,34 @@ fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art
         height: img.height(),
 
         // blurhash,
-        dominant_color: ArtRgb {
-            r: dominant_color.r,
-            g: dominant_color.g,
-            b: dominant_color.b,
-        },
+        dominant_color: get_dominant_color(&img)?,
     })
+}
+
+fn get_dominant_color(img: &DynamicImage) -> Result<Option<ArtRgb>> {
+    let img = match img.as_rgb8() {
+        Some(img) => img,
+        None => return Ok(None),
+    };
+
+    let bytes_count = img.as_bytes().len();
+    let expected = usize::try_from(img.width() * img.height() * 3).unwrap();
+
+    if bytes_count != expected {
+        bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
+    }
+
+    let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
+
+    if dominant_color.len() != 2 {
+        bail!("Color Thief did not return exactly one color");
+    }
+
+    let dominant_color = dominant_color[0];
+
+    Ok(Some(ArtRgb {
+        r: dominant_color.r,
+        g: dominant_color.g,
+        b: dominant_color.b,
+    }))
 }

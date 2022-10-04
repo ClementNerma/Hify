@@ -322,7 +322,7 @@ pub struct Art {
     pub height: u32,
 
     // pub blurhash: String,
-    pub dominant_color: ArtRgb,
+    pub dominant_color: Option<ArtRgb>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
