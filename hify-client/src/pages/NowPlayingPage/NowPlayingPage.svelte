@@ -38,11 +38,8 @@
 
   currentTrack.subscribe((track) => {
     if (track) {
-      const dominantColor = track.metadata.tags.album.art?.dominantColor
-
-      if (dominantColor) {
-        customBgColor.set([dominantColor.r, dominantColor.g, dominantColor.b, 1])
-      }
+      const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+      customBgColor.set([color.r, color.g, color.b, 1])
     }
 
     setDistractionFree(false)
