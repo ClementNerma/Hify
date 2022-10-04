@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
 
-use super::{arts::Art, sorted_map::SortedMap};
+use super::sorted_map::SortedMap;
 
 /// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
@@ -19,7 +19,7 @@ pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
     pub tracks: SortedMap<TrackID, Track>,
-    pub albums_arts: HashMap<AlbumID, Option<Art>>,
+    pub arts: HashMap<ArtID, Art>,
     pub cache: IndexCache,
 }
 
@@ -139,7 +139,7 @@ impl GenreInfos {
     }
 }
 
-define_id_type!(TrackID, AlbumID, ArtistID, GenreID);
+define_id_type!(TrackID, AlbumID, ArtistID, GenreID, ArtID);
 
 /// Full track informations
 /// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway
@@ -306,6 +306,39 @@ pub struct TrackDate {
 
     /// Day, starting from 1
     pub day: Option<u8>,
+}
+
+#[derive(Clone, Serialize, Deserialize, SimpleObject)]
+pub struct Art {
+    #[graphql(skip)]
+    pub relative_path: PathBuf,
+
+    #[graphql(skip)]
+    pub target: ArtTarget,
+
+    pub id: ArtID,
+    pub blurhash: String,
+    pub dominant_color: ArtRgb,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ArtTarget {
+    AlbumCover(AlbumID),
+}
+
+impl ArtTarget {
+    pub fn to_id(self) -> ArtID {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        ArtID(hasher.finish())
+    }
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
+pub struct ArtRgb {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 #[macro_export]

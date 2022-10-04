@@ -26,7 +26,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         from: dir.clone(),
         fingerprint: String::new(),
         tracks: SortedMap::empty(),
-        albums_arts: HashMap::new(),
+        arts: HashMap::new(),
         cache: IndexCache {
             tracks_files_mtime: HashMap::new(),
             tracks_all_artists: HashMap::new(),
@@ -103,8 +103,8 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let new_albums = cache
         .albums_infos
-        .keys()
-        .filter(|key| !from.cache.albums_infos.contains_key(key))
+        .values()
+        .filter(|album| !from.cache.albums_infos.contains_key(&album.get_id()))
         .collect::<Vec<_>>();
 
     log(
@@ -112,8 +112,15 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Searching for new albums' ({}) arts...", new_albums.len()),
     );
 
-    let mut albums_arts = from.albums_arts;
-    albums_arts.extend(find_albums_arts(&new_albums, &dir, &tracks, &cache));
+    let new_albums_arts = find_albums_arts(&new_albums, &dir, &tracks, &cache);
+
+    let mut arts = from.arts;
+    arts.extend(
+        new_albums_arts
+            .into_iter()
+            .map(|art| (art.id, art))
+            .collect::<HashMap<_, _>>(),
+    );
 
     log(started, "Index has been generated.");
 
@@ -127,7 +134,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         fingerprint,
         from: dir,
         tracks,
-        albums_arts,
+        arts,
         cache,
     })
 }
@@ -137,17 +144,19 @@ pub fn rebuild_cache(index: &mut Index) {
 }
 
 pub fn rebuild_arts(index: &mut Index) {
-    index.albums_arts = find_albums_arts(
+    let arts = find_albums_arts(
         index
             .cache
             .albums_infos
-            .keys()
+            .values()
             .collect::<Vec<_>>()
             .as_slice(),
         &index.from,
         &index.tracks,
         &index.cache,
     );
+
+    index.arts = arts.into_iter().map(|art| (art.id, art)).collect();
 }
 
 fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {

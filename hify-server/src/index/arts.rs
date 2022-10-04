@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     path::{Path, PathBuf},
     sync::{
         atomic::{AtomicU64, AtomicUsize, Ordering},
@@ -9,44 +8,28 @@ use std::{
 };
 
 use anyhow::{bail, Context, Result};
-use async_graphql::SimpleObject;
 use color_thief::ColorFormat;
 use image::EncodableLayout;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
-use serde::{Deserialize, Serialize};
 
 use crate::utils::progress::display_progress;
 
-use super::{blurhash, AlbumID, IndexCache, SortedMap, Track, TrackID};
+use super::{
+    blurhash, AlbumID, AlbumInfos, Art, ArtRgb, ArtTarget, IndexCache, SortedMap, Track, TrackID,
+};
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
 
-#[derive(Clone, Serialize, Deserialize, SimpleObject)]
-pub struct Art {
-    #[graphql(skip)]
-    pub relative_path: PathBuf,
-
-    pub blurhash: String,
-    pub dominant_color: ArtRgb,
-}
-
-#[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
-pub struct ArtRgb {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-}
-
 pub fn find_albums_arts(
-    album_ids: &[&AlbumID],
+    albums: &[&AlbumInfos],
     base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
-) -> HashMap<AlbumID, Option<Art>> {
+) -> Vec<Art> {
     let started = Instant::now();
 
-    let total = album_ids.len();
+    let total = albums.len();
     let done = AtomicUsize::new(0);
 
     let errors = Mutex::new(vec![]);
@@ -54,10 +37,11 @@ pub fn find_albums_arts(
 
     print!("        Starting...");
 
-    let result = album_ids
+    let result = albums
         .par_iter()
-        .map(|id| find_album_art(id, base_dir, tracks, cache).map(|art| (**id, art)))
-        .inspect(|result| {
+        .filter_map(|album| {
+            let result = find_album_art(album.get_id(), base_dir, tracks, cache);
+
             let current = done.load(Ordering::Acquire) + 1;
             done.store(current, Ordering::Release);
 
@@ -68,31 +52,30 @@ pub fn find_albums_arts(
                 errors_count.load(Ordering::Acquire),
             );
 
-            let album_id = match result {
-                Ok((album_id, album_art)) if album_art.is_none() => album_id,
-                Ok(_) => return,
+            match result {
+                Ok(None) => {}
+                Ok(Some(art)) => return Some(art),
                 Err(err) => {
                     errors.lock().unwrap().push(format!("{:?}", err));
                     errors_count.store(errors_count.load(Ordering::Acquire) + 1, Ordering::Release);
-                    return;
+                    return None;
                 }
-            };
-
-            let album_infos = cache.albums_infos.get(album_id).unwrap();
+            }
 
             eprintln!(
                 "Warning: no album art found for album '{}' by '{}'",
-                album_infos.name,
-                album_infos
+                album.name,
+                album
                     .album_artists
                     .iter()
                     .map(|artist| artist.name.clone())
                     .collect::<Vec<_>>()
                     .join(" / ")
             );
+
+            None
         })
-        .filter_map(|result| result.ok())
-        .collect();
+        .collect::<Vec<_>>();
 
     println!();
 
@@ -110,12 +93,12 @@ pub fn find_albums_arts(
 }
 
 fn find_album_art(
-    album_id: &AlbumID,
+    album_id: AlbumID,
     base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> Result<Option<Art>> {
-    let album_tracks_ids = cache.albums_tracks.get(album_id).unwrap();
+    let album_tracks_ids = cache.albums_tracks.get(&album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
     let first_track_id = album_tracks_ids.get(0).unwrap();
@@ -133,7 +116,7 @@ fn find_album_art(
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    let art = make_art(&art_path, base_dir).with_context(|| {
+                    let art = make_art(&art_path, base_dir, album_id).with_context(|| {
                         format!(
                             "Failed to make art for album covert at: {}",
                             art_path.to_string_lossy()
@@ -149,7 +132,7 @@ fn find_album_art(
     Ok(None)
 }
 
-fn make_art(path: &Path, base_dir: &Path) -> Result<Art> {
+fn make_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
     let mut img = image::open(path).context("Failed to open the image file")?;
 
     let img = img
@@ -173,11 +156,17 @@ fn make_art(path: &Path, base_dir: &Path) -> Result<Art> {
 
     let dominant_color = dominant_color[0];
 
+    let relative_path = path
+        .strip_prefix(base_dir)
+        .expect("Internal error: art path couldn't be stripped of the base directory")
+        .to_path_buf();
+
+    let target = ArtTarget::AlbumCover(album_id);
+
     Ok(Art {
-        relative_path: path
-            .strip_prefix(base_dir)
-            .expect("Internal error: art path couldn't be stripped of the base directory")
-            .to_path_buf(),
+        id: target.to_id(),
+        relative_path,
+        target,
         blurhash,
         dominant_color: ArtRgb {
             r: dominant_color.r,

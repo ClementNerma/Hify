@@ -7,7 +7,6 @@ mod exiftool;
 mod search;
 mod sorted_map;
 
-pub use arts::{Art, ArtRgb};
 pub use builder::{build_index, rebuild_arts, rebuild_cache};
 pub use data::*;
 pub use search::{search_index, IndexSearchResults, SearchCache};

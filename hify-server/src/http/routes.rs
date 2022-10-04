@@ -5,38 +5,29 @@ use rocket::{
 };
 use rocket_seek_stream::SeekStream;
 
-use crate::index::{AlbumID, ArtistID, AudioFormat, TrackID};
+use crate::index::{ArtID, ArtTarget, ArtistID, AudioFormat, TrackID};
 
 use super::{
     server::{rest_server_error, FaillibleResponse},
     AppState,
 };
 
-#[rocket::get("/art/album/<id>")]
+#[rocket::get("/art/<id>")]
 pub async fn album_art(
     ctx: &State<AppState>,
     id: String,
 ) -> FaillibleResponse<(ContentType, File)> {
-    let id = AlbumID::decode(&id)
-        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
+    let id = ArtID::decode(&id).map_err(|_| {
+        rest_server_error(Status::BadRequest, "Invalid art ID provided".to_string())
+    })?;
 
     let index = ctx.index.read().await;
-    let album_art = index
-        .albums_arts
-        .get(&id)
-        .cloned()
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Provided album ID was not found".to_string(),
-            )
-        })?
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Provided album does not have an art image".to_string(),
-            )
-        })?;
+    let album_art = index.arts.get(&id).cloned().ok_or_else(|| {
+        rest_server_error(
+            Status::NotFound,
+            "Provided album cover was not found".to_string(),
+        )
+    })?;
 
     // Cannot fail given we only look for art files with specific file extensions
     let ext = album_art
@@ -96,10 +87,8 @@ pub async fn artist_art(
         })?;
 
     let album_art = index
-        .albums_arts
-        .get(artist_first_album_id)
-        .cloned()
-        .expect("Internal error: album not found from provided artist's first album ID")
+        .arts
+        .get(&ArtTarget::AlbumCover(*artist_first_album_id).to_id())
         .ok_or_else(|| {
             rest_server_error(
                 Status::NotFound,
