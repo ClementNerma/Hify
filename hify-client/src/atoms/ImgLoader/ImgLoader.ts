@@ -1,10 +1,15 @@
-import { decode } from 'blurhash'
+import { decode } from 'blurhash-wasm'
 import { ProgressiveImgFragment } from '../../graphql/generated'
 
+const PLACEHOLDER_WIDTH = 64
+
 export function createBlurHashImageSrc(art: ProgressiveImgFragment): string {
+  const width = PLACEHOLDER_WIDTH
+  const height = Math.round((art.height / art.width) * PLACEHOLDER_WIDTH)
+
   const canvas = document.createElement('canvas')
-  canvas.width = art.width
-  canvas.height = art.height
+  canvas.width = width
+  canvas.height = height
 
   const ctx = canvas.getContext('2d')
 
@@ -12,8 +17,13 @@ export function createBlurHashImageSrc(art: ProgressiveImgFragment): string {
     throw new Error('Failed to get 2D drawing context from temporary canvas')
   }
 
-  const decoded = decode(art.blurhash, art.width, art.height)
-  const imgData = new ImageData(decoded, art.width, art.height)
+  const decoded = decode(art.blurhash, width, height)
+
+  if (!decoded) {
+    throw new Error('Failed to decode blur hash :(')
+  }
+
+  const imgData = new ImageData(new Uint8ClampedArray(decoded), width, height)
 
   ctx.putImageData(imgData, 0, 0)
 
