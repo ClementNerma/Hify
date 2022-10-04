@@ -164,9 +164,14 @@ fn make_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
     let target = ArtTarget::AlbumCover(album_id);
 
     Ok(Art {
-        id: target.to_id(),
         relative_path,
         target,
+
+        id: target.to_id(),
+
+        width: img.width(),
+        height: img.height(),
+
         blurhash,
         dominant_color: ArtRgb {
             r: dominant_color.r,

@@ -317,6 +317,10 @@ pub struct Art {
     pub target: ArtTarget,
 
     pub id: ArtID,
+
+    pub width: u32,
+    pub height: u32,
+
     pub blurhash: String,
     pub dominant_color: ArtRgb,
 }
