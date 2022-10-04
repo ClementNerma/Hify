@@ -143,7 +143,7 @@ fn find_album_art(
                 if art_path.is_file() {
                     let art = make_album_art(&art_path, base_dir, album_id).with_context(|| {
                         format!(
-                            "Failed to make art for album covert at: {}",
+                            "Failed to make art for album cover at: {}",
                             art_path.to_string_lossy()
                         )
                     })?;
