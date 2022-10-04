@@ -191,6 +191,13 @@ impl ArtistInfos {
             index.tracks.get(track).unwrap().clone()
         })
     }
+
+    async fn art(&self, ctx: &Context<'_>) -> Option<Art> {
+        graphql_index!(ctx)
+            .arts
+            .get(&ArtTarget::Artist(self.get_id()).to_id())
+            .cloned()
+    }
 }
 
 #[Object]
