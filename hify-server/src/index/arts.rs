@@ -171,7 +171,7 @@ fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art
         bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
     }
 
-    let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
+    let blurhash = blurhash::encode(9, 9, img.width(), img.height(), img.as_bytes())?;
 
     let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
 
