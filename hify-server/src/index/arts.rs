@@ -1,8 +1,9 @@
 use std::{collections::HashMap, path::PathBuf};
 
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
-use super::{AlbumID, IndexCache};
+use super::{blurhash, AlbumID, IndexCache};
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
@@ -10,19 +11,21 @@ static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Art {
     pub path: PathBuf,
+    pub blurhash: String,
 }
 
 pub fn find_albums_arts(
     album_ids: &[&AlbumID],
     cache: &IndexCache,
-) -> HashMap<AlbumID, Option<Art>> {
+) -> Result<HashMap<AlbumID, Option<Art>>> {
     album_ids
         .iter()
-        .map(|id| (**id, find_album_art(id, cache)))
-        .inspect(|(album_id, art_path)| {
-            if art_path.is_some() {
-                return;
-            }
+        .map(|id| find_album_art(id, cache).map(|art| (**id, art)))
+        .inspect(|result| {
+            let album_id = match result {
+                Ok((album_id, album_art)) if album_art.is_none() => album_id,
+                _ => return,
+            };
 
             let album_infos = cache.albums_infos.get(album_id).unwrap();
 
@@ -40,7 +43,7 @@ pub fn find_albums_arts(
         .collect()
 }
 
-fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<Art> {
+fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Result<Option<Art>> {
     let album_tracks_ids = cache.albums_tracks.get(album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
@@ -59,11 +62,25 @@ fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<Art> {
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    return Some(Art { path: art_path });
+                    let art = make_art(art_path)?;
+                    return Ok(Some(art));
                 }
             }
         }
     }
 
-    None
+    Ok(None)
+}
+
+fn make_art(path: PathBuf) -> Result<Art> {
+    let img = image::open(&path).with_context(|| {
+        format!(
+            "Failed to open the image file at: {}",
+            path.to_string_lossy()
+        )
+    })?;
+
+    let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
+
+    Ok(Art { path, blurhash })
 }
