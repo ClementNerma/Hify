@@ -5,7 +5,7 @@ use std::{
     time::Instant,
 };
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
@@ -99,6 +99,13 @@ fn make_art(path: PathBuf) -> Result<Art> {
             path.to_string_lossy()
         )
     })?;
+
+    let bytes_count = img.as_bytes().len();
+    let expected = usize::try_from(img.width() * img.height() * 3).unwrap();
+
+    if bytes_count != expected {
+        bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
+    }
 
     let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
 
