@@ -112,14 +112,6 @@ impl AlbumInfos {
             })
             .collect()
     }
-
-    async fn has_art_image(&self, ctx: &Context<'_>) -> bool {
-        graphql_index!(ctx)
-            .albums_arts
-            .get(&self.get_id())
-            .unwrap()
-            .is_some()
-    }
 }
 
 // #[derive(Enum, Clone, Copy, PartialEq, Eq)]
