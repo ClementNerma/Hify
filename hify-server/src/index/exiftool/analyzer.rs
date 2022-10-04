@@ -2,7 +2,7 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
     sync::{
-        atomic::{AtomicUsize, Ordering},
+        atomic::{AtomicU64, AtomicUsize, Ordering},
         Arc, Mutex,
     },
     time::Instant,
@@ -56,6 +56,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
     let successes = Mutex::new(vec![]);
     let errors = Mutex::new(vec![]);
+    let errors_counter = AtomicU64::new(0);
 
     let progress = Arc::new(AtomicUsize::new(0));
 
@@ -75,7 +76,12 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
             let current = progress.load(Ordering::Acquire) + 1;
             progress.store(current, Ordering::Release);
 
-            display_progress(started.elapsed().as_secs(), current, files_count, 0);
+            display_progress(
+                started.elapsed().as_secs(),
+                current,
+                files_count,
+                errors_counter.load(Ordering::Acquire),
+            );
 
             if !status.success() {
                 bail!(
@@ -117,6 +123,10 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
                 Err(err) => {
                     eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
                     errors.lock().unwrap().push((file, err));
+                    errors_counter.store(
+                        errors_counter.load(Ordering::Acquire) + 1,
+                        Ordering::Release,
+                    );
                 }
             }
 
@@ -141,7 +151,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     }
 
     if !errors.is_empty() {
-        bail!(
+        eprintln!(
             "Failed with the following errors:\n\n{}",
             errors
                 .iter()
