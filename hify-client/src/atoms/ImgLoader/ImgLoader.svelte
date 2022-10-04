@@ -16,7 +16,7 @@
   img.addEventListener('load', () => loaded.set(true))
 </script>
 
-{#if loaded}
+{#if $loaded}
   <slot src={fullImgUrl} />
 {:else if art}
   <slot src={blurImgUrl} />
