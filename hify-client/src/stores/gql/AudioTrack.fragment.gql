@@ -1,6 +1,5 @@
 fragment AudioTrack on Track {
   id
-  path
   metadata {
     format
     duration
