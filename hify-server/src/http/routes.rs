@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use rocket::{
     http::{ContentType, Status},
     tokio::fs::File,
@@ -23,7 +21,7 @@ pub async fn album_art(
         .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
 
     let index = ctx.index.read().await;
-    let album_art_path = index
+    let album_art = index
         .albums_arts
         .get(&id)
         .cloned()
@@ -41,7 +39,7 @@ pub async fn album_art(
         })?;
 
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art_path.extension().unwrap().to_str().unwrap();
+    let ext = album_art.path.extension().unwrap().to_str().unwrap();
 
     let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
         rest_server_error(
@@ -51,14 +49,12 @@ pub async fn album_art(
         )
     })?;
 
-    let file = File::open(Path::new(&album_art_path))
-        .await
-        .map_err(|err| {
-            rest_server_error(
-                Status::InternalServerError,
-                format!("Failed to open art file: {err}"),
-            )
-        })?;
+    let file = File::open(&album_art.path).await.map_err(|err| {
+        rest_server_error(
+            Status::InternalServerError,
+            format!("Failed to open art file: {err}"),
+        )
+    })?;
 
     Ok((mime_type, file))
 }
@@ -92,7 +88,7 @@ pub async fn artist_art(
             )
         })?;
 
-    let album_art_path = index
+    let album_art = index
         .albums_arts
         .get(artist_first_album_id)
         .cloned()
@@ -105,7 +101,7 @@ pub async fn artist_art(
         })?;
 
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art_path.extension().unwrap().to_str().unwrap();
+    let ext = album_art.path.extension().unwrap().to_str().unwrap();
 
     let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
         rest_server_error(
@@ -115,14 +111,12 @@ pub async fn artist_art(
         )
     })?;
 
-    let file = File::open(Path::new(&album_art_path))
-        .await
-        .map_err(|err| {
-            rest_server_error(
-                Status::InternalServerError,
-                format!("Failed to open art file: {err}"),
-            )
-        })?;
+    let file = File::open(&album_art.path).await.map_err(|err| {
+        rest_server_error(
+            Status::InternalServerError,
+            format!("Failed to open art file: {err}"),
+        )
+    })?;
 
     Ok((mime_type, file))
 }

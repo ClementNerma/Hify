@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
 
-use super::sorted_map::SortedMap;
+use super::{arts::Art, sorted_map::SortedMap};
 
 /// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
     pub tracks: SortedMap<TrackID, Track>,
-    pub albums_arts: HashMap<AlbumID, Option<PathBuf>>,
+    pub albums_arts: HashMap<AlbumID, Option<Art>>,
     pub cache: IndexCache,
 }
 

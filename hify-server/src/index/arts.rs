@@ -1,14 +1,21 @@
 use std::{collections::HashMap, path::PathBuf};
 
+use serde::{Deserialize, Serialize};
+
 use super::{AlbumID, IndexCache};
 
 static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct Art {
+    pub path: PathBuf,
+}
+
 pub fn find_albums_arts(
     album_ids: &[&AlbumID],
     cache: &IndexCache,
-) -> HashMap<AlbumID, Option<PathBuf>> {
+) -> HashMap<AlbumID, Option<Art>> {
     album_ids
         .iter()
         .map(|id| (**id, find_album_art(id, cache)))
@@ -33,7 +40,7 @@ pub fn find_albums_arts(
         .collect()
 }
 
-fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<PathBuf> {
+fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<Art> {
     let album_tracks_ids = cache.albums_tracks.get(album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
@@ -52,7 +59,7 @@ fn find_album_art(album_id: &AlbumID, cache: &IndexCache) -> Option<PathBuf> {
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    return Some(art_path);
+                    return Some(Art { path: art_path });
                 }
             }
         }
