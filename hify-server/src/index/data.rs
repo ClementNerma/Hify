@@ -152,7 +152,7 @@ pub struct Track {
 
     /// Path to the track's audio file
     #[graphql(skip)]
-    pub path: PathBuf,
+    pub relative_path: PathBuf,
 
     /// Track's audio metadata
     pub metadata: TrackMetadata,
@@ -167,7 +167,7 @@ impl Track {
     pub fn new(path: PathBuf, mtime: SystemTime, metadata: TrackMetadata) -> Self {
         Self {
             id: TrackID(Self::compute_raw_id(&path)),
-            path,
+            relative_path: path,
             metadata,
             mtime,
         }
@@ -196,7 +196,7 @@ impl Ord for Track {
             .cmp(&b_tags.get_album_infos())
             .then_with(|| a_tags.disc.cmp(&b_tags.disc))
             .then_with(|| a_tags.track_no.cmp(&b_tags.track_no))
-            .then_with(|| self.path.cmp(&other.path))
+            .then_with(|| self.relative_path.cmp(&other.relative_path))
     }
 }
 

@@ -39,7 +39,12 @@ pub async fn album_art(
         })?;
 
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art.path.extension().unwrap().to_str().unwrap();
+    let ext = album_art
+        .relative_path
+        .extension()
+        .unwrap()
+        .to_str()
+        .unwrap();
 
     let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
         rest_server_error(
@@ -49,12 +54,14 @@ pub async fn album_art(
         )
     })?;
 
-    let file = File::open(&album_art.path).await.map_err(|err| {
-        rest_server_error(
-            Status::InternalServerError,
-            format!("Failed to open art file: {err}"),
-        )
-    })?;
+    let file = File::open(index.from.join(&album_art.relative_path))
+        .await
+        .map_err(|err| {
+            rest_server_error(
+                Status::InternalServerError,
+                format!("Failed to open art file: {err}"),
+            )
+        })?;
 
     Ok((mime_type, file))
 }
@@ -101,7 +108,12 @@ pub async fn artist_art(
         })?;
 
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art.path.extension().unwrap().to_str().unwrap();
+    let ext = album_art
+        .relative_path
+        .extension()
+        .unwrap()
+        .to_str()
+        .unwrap();
 
     let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
         rest_server_error(
@@ -111,7 +123,7 @@ pub async fn artist_art(
         )
     })?;
 
-    let file = File::open(&album_art.path).await.map_err(|err| {
+    let file = File::open(&album_art.relative_path).await.map_err(|err| {
         rest_server_error(
             Status::InternalServerError,
             format!("Failed to open art file: {err}"),
@@ -137,7 +149,7 @@ pub async fn stream<'a>(
         )
     })?;
 
-    let stream = SeekStream::from_path(&track.path).map_err(|err| {
+    let stream = SeekStream::from_path(index.from.join(&track.relative_path)).map_err(|err| {
         rest_server_error(
             Status::InternalServerError,
             format!("Failed to open seek stream for track file: {}", err),

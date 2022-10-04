@@ -62,12 +62,17 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     let files_mtime = files
         .into_iter()
         .filter(|(path, _)| exiftool::is_audio_file(path))
-        .filter(
-            |(path, mtime)| match from.cache.tracks_files_mtime.get(path.as_path()) {
+        .filter(|(path, mtime)| {
+            match from
+                .cache
+                .tracks_files_mtime
+                .get(path.strip_prefix(&dir).expect(
+                    "Internal error: audio file path couldn't be stripped of the base directory",
+                )) {
                 None => true,
                 Some(old_mtime) => old_mtime != mtime,
-            },
-        )
+            }
+        })
         .collect::<BTreeMap<_, _>>();
 
     log(started, &format!("Found {} files.", files_mtime.len()));
@@ -78,8 +83,13 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     let mut tracks = from.tracks.into_values();
 
     tracks.extend(analyzed.into_iter().map(|(path, track_metadata)| {
-        let mtime = *files_mtime.get(&path).unwrap();
-        Track::new(path, mtime, track_metadata)
+        Track::new(
+            path.strip_prefix(&dir)
+                .expect("Internal error: track path couldn't be stripped of the base directory")
+                .to_path_buf(),
+            *files_mtime.get(&path).unwrap(),
+            track_metadata,
+        )
     }));
 
     log(
@@ -103,7 +113,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     );
 
     let mut albums_arts = from.albums_arts;
-    albums_arts.extend(find_albums_arts(&new_albums, &tracks, &cache));
+    albums_arts.extend(find_albums_arts(&new_albums, &dir, &tracks, &cache));
 
     log(started, "Index has been generated.");
 
@@ -134,6 +144,7 @@ pub fn rebuild_arts(index: &mut Index) {
             .keys()
             .collect::<Vec<_>>()
             .as_slice(),
+        &index.from,
         &index.tracks,
         &index.cache,
     );

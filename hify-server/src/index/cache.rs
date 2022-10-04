@@ -28,7 +28,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
     let mut no_genre_tracks = HashSet::new();
 
     for track in tracks.values() {
-        tracks_files_mtime.insert(track.path.clone(), track.mtime);
+        tracks_files_mtime.insert(track.relative_path.clone(), track.mtime);
         tracks_formats.insert(track.id, track.metadata.format);
 
         let tags = &track.metadata.tags;

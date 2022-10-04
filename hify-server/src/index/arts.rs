@@ -22,12 +22,13 @@ static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"]
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Art {
-    pub path: PathBuf,
+    pub relative_path: PathBuf,
     pub blurhash: String,
 }
 
 pub fn find_albums_arts(
     album_ids: &[&AlbumID],
+    base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> HashMap<AlbumID, Option<Art>> {
@@ -43,7 +44,7 @@ pub fn find_albums_arts(
 
     let result = album_ids
         .par_iter()
-        .map(|id| find_album_art(id, tracks, cache).map(|art| (**id, art)))
+        .map(|id| find_album_art(id, base_dir, tracks, cache).map(|art| (**id, art)))
         .inspect(|result| {
             let current = done.load(Ordering::Acquire) + 1;
             done.store(current, Ordering::Release);
@@ -98,6 +99,7 @@ pub fn find_albums_arts(
 
 fn find_album_art(
     album_id: &AlbumID,
+    base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> Result<Option<Art>> {
@@ -106,7 +108,7 @@ fn find_album_art(
     // Cannot fail as albums need at least one track to be registered
     let first_track_id = album_tracks_ids.get(0).unwrap();
 
-    let track_path = &tracks.get(first_track_id).unwrap().path;
+    let track_path = base_dir.join(&tracks.get(first_track_id).unwrap().relative_path);
 
     for dir in track_path.ancestors() {
         for filename in COVER_FILENAMES {
@@ -119,7 +121,7 @@ fn find_album_art(
                 art_path.push(art_file);
 
                 if art_path.is_file() {
-                    let art = make_art(&art_path).with_context(|| {
+                    let art = make_art(&art_path, base_dir).with_context(|| {
                         format!(
                             "Failed to make art for album covert at: {}",
                             art_path.to_string_lossy()
@@ -135,7 +137,7 @@ fn find_album_art(
     Ok(None)
 }
 
-fn make_art(path: &Path) -> Result<Art> {
+fn make_art(path: &Path, base_dir: &Path) -> Result<Art> {
     let mut img = image::open(path).context("Failed to open the image file")?;
 
     let img = img
@@ -152,7 +154,10 @@ fn make_art(path: &Path) -> Result<Art> {
     let blurhash = blurhash::encode(3, 3, img.width(), img.height(), img.as_bytes())?;
 
     Ok(Art {
-        path: path.to_path_buf(),
+        relative_path: path
+            .strip_prefix(base_dir)
+            .expect("Internal error: art path couldn't be stripped of the base directory")
+            .to_path_buf(),
         blurhash,
     })
 }
