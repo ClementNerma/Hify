@@ -73,18 +73,20 @@
       },
     })
 
-    newTrackDisplay.update((data) => {
-      if (data !== null) {
-        clearTimeout(data.timeout)
-      }
+    if (!$distractionFreeMode) {
+      newTrackDisplay.update((data) => {
+        if (data !== null) {
+          clearTimeout(data.timeout)
+        }
 
-      return {
-        track,
-        timeout: setTimeout(() => {
-          newTrackDisplay.set(null)
-        }, NEW_TRACK_DISPLAY_TIMEOUT),
-      }
-    })
+        return {
+          track,
+          timeout: setTimeout(() => {
+            newTrackDisplay.set(null)
+          }, NEW_TRACK_DISPLAY_TIMEOUT),
+        }
+      })
+    }
   })
 
   const COVER_SIZE = 250
