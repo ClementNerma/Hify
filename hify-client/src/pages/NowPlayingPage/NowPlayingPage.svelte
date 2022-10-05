@@ -60,7 +60,7 @@
           g: Math.round(color.g / 2),
           b: Math.round(color.b / 2),
         },
-        colorSep: 50,
+        colorSep: 100,
       })
     }
 
@@ -116,6 +116,8 @@
     object-fit: contain;
 
     transition: opacity 0.5s;
+
+    filter: drop-shadow(0 0 1rem rgb(77, 77, 77));
   }
 
   .album-art.darkened {
