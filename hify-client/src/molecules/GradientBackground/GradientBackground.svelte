@@ -77,7 +77,5 @@
     z-index: -1;
 
     background-attachment: fixed;
-
-    transition: background 0.5s;
   }
 </style>
