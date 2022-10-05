@@ -48,8 +48,16 @@
     })
   }
 
-  function colorToRGBA(color: Color): string {
+  export function colorToRGBA(color: Color): string {
     return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a ?? 1})`
+  }
+
+  export function darken(color: Color, times: number): Color {
+    return {
+      r: Math.round(color.r / times),
+      g: Math.round(color.g / times),
+      b: Math.round(color.b / times),
+    }
   }
 
   const backgroundGradient = writable<string>('')

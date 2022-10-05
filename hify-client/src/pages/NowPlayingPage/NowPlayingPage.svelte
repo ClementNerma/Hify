@@ -12,6 +12,7 @@
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import { get, writable } from 'svelte/store'
   import {
+    darken,
     resetBackgroundGradient,
     setRadialGradient,
     setUniColor,
@@ -65,12 +66,8 @@
     const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
     setRadialGradient({
-      centerColor: color,
-      exteriorColor: {
-        r: Math.round(color.r / 2),
-        g: Math.round(color.g / 2),
-        b: Math.round(color.b / 2),
-      },
+      centerColor: darken(color, 1.5),
+      exteriorColor: darken(color, 2.5),
     })
 
     if ($distractionFreeMode) {
