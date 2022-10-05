@@ -66,8 +66,8 @@
     const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
     setRadialGradient({
-      centerColor: darken(color, 1.5),
-      exteriorColor: darken(color, 2.5),
+      centerColor: color,
+      exteriorColor: darken(color, 2),
     })
 
     if ($distractionFreeMode) {
