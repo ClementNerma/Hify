@@ -8,6 +8,8 @@
     a?: number
   }
 
+  export const black: Color = { r: 0, g: 0, b: 0 }
+
   export type VerticalGradient = {
     startColor: Color
     endColor: Color

@@ -12,9 +12,8 @@
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import { get, writable } from 'svelte/store'
   import {
-    changeBrightness,
+    black,
     resetBackgroundGradient,
-    setRadialGradient,
     setUniColor,
   } from '../../molecules/GradientBackground/GradientBackground.svelte'
   import { AudioTrackFragment } from '../../graphql/generated'
@@ -42,7 +41,7 @@
 
   onMount(() => {
     if (!get(currentTrack)) {
-      setUniColor({ r: 0, g: 0, b: 0 })
+      setUniColor(black)
     }
   })
 
@@ -63,12 +62,15 @@
       return
     }
 
-    const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+    // const color = track.metadata.tags.album.art?.dominantColor ?? black
 
-    setRadialGradient({
-      centerColor: changeBrightness(color, 0.5),
-      exteriorColor: changeBrightness(color, 0.2),
-    })
+    // setRadialGradient({
+    //   centerColor: changeBrightness(color, 0.5),
+    //   exteriorColor: changeBrightness(color, 0.2),
+    // })
+
+    // NOTE: used instead of a gradient
+    setUniColor(black)
 
     if ($distractionFreeMode) {
       newTrackDisplay.update((data) => {
@@ -172,7 +174,8 @@
 
     transition: opacity 0.5s;
 
-    filter: drop-shadow(0 0 1rem rgb(77, 77, 77));
+    /* NOTE: the line below works but removed for now to use a simpler styling */
+    /* filter: drop-shadow(0 0 1rem rgb(77, 77, 77)); */
   }
 
   .album-art.darkened {
