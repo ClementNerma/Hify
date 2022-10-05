@@ -17,6 +17,7 @@
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
+  import GradientBackground from '../../molecules/GradientBackground/GradientBackground.svelte'
 
   const location = useLocation()
 
@@ -58,6 +59,8 @@
     return KeyPressHandling.Propagate
   })
 </script>
+
+<GradientBackground />
 
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>

@@ -3,18 +3,6 @@ html {
   font-size: 12px;
 }
 
-@property --linear-start {
-  syntax: '<color>';
-  initial-value: rgba(8, 4, 45, 1);
-  inherits: false;
-}
-
-@property --linear-end {
-  syntax: '<color>';
-  initial-value: rgb(10, 38, 89);
-  inherits: false;
-}
-
 body {
   position: absolute;
   top: 0;
@@ -23,14 +11,4 @@ body {
   bottom: 0;
   color: rgb(230, 230, 230);
   overflow: auto;
-
-  background: linear-gradient(0deg, var(--linear-start) 20%, var(--linear-end) 100%);
-  background-attachment: fixed;
-
-  transition: --linear-start 0.5s, --linear-end 0.5s;
-}
-
-body.custom-bg-color {
-  background: linear-gradient(to bottom, var(--linear-start) 0%, var(--linear-end) 100%);
-  transition: --linear-start 1s, --linear-end 1s, background 1s, opacity 1s;
 }

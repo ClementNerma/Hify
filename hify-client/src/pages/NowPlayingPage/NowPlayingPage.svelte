@@ -9,9 +9,13 @@
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
-  import { customBgColor } from '../../stores/custom-bg-color'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import { get } from 'svelte/store'
+  import {
+    backgroundGradient,
+    Color,
+    resetBackgroundGradient,
+  } from '../../molecules/GradientBackground/GradientBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -33,13 +37,37 @@
     return KeyPressHandling.Propagate
   }
 
-  onMount(() => !get(currentTrack) && customBgColor.set([0, 0, 0]))
-  onDestroy(() => customBgColor.set(null))
+  function lightenDarkenColor(color: Color, amount: number): Color {
+    const bound = (cpm: number) => Math.max(Math.min(cpm, 255), 0)
+
+    return {
+      r: bound(color.r + amount),
+      g: bound(color.g + amount),
+      b: bound(color.b + amount),
+    }
+  }
+
+  onMount(() => {
+    if (!get(currentTrack)) {
+      backgroundGradient.set({
+        startColor: { r: 0, g: 0, b: 0 },
+        endColor: { r: 0, g: 0, b: 0 },
+        colorSep: 0,
+      })
+    }
+  })
+
+  onDestroy(() => resetBackgroundGradient())
 
   currentTrack.subscribe((track) => {
     if (track) {
       const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
-      customBgColor.set([color.r, color.g, color.b, 1])
+
+      backgroundGradient.set({
+        startColor: color,
+        endColor: lightenDarkenColor(color, -30),
+        colorSep: 100,
+      })
     }
 
     setDistractionFree(false)
