@@ -66,7 +66,7 @@
       backgroundGradient.set({
         startColor: color,
         endColor: lightenDarkenColor(color, -30),
-        colorSep: 100,
+        colorSep: 80,
       })
     }
 
