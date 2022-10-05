@@ -81,7 +81,6 @@
       return {
         track,
         timeout: setTimeout(() => {
-          console.log('yoh')
           newTrackDisplay.set(null)
         }, NEW_TRACK_DISPLAY_TIMEOUT),
       }
