@@ -12,9 +12,9 @@
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import { get } from 'svelte/store'
   import {
-    backgroundGradient,
-    Color,
     resetBackgroundGradient,
+    setRadialGradient,
+    setVerticalGradient,
   } from '../../molecules/GradientBackground/GradientBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
@@ -39,7 +39,7 @@
 
   onMount(() => {
     if (!get(currentTrack)) {
-      backgroundGradient.set({
+      setVerticalGradient({
         startColor: { r: 0, g: 0, b: 0 },
         endColor: { r: 0, g: 0, b: 0 },
         colorSep: 0,
@@ -53,14 +53,14 @@
     if (track) {
       const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
-      backgroundGradient.set({
-        startColor: color,
-        endColor: {
+      setRadialGradient({
+        centerColor: color,
+        exteriorColor: {
           r: Math.round(color.r / 2),
           g: Math.round(color.g / 2),
           b: Math.round(color.b / 2),
         },
-        colorSep: 80,
+        colorSep: 50,
       })
     }
 
