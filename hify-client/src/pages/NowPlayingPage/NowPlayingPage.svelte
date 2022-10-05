@@ -73,7 +73,7 @@
       },
     })
 
-    if (!$distractionFreeMode) {
+    if ($distractionFreeMode) {
       newTrackDisplay.update((data) => {
         if (data !== null) {
           clearTimeout(data.timeout)
