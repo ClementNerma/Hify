@@ -10,12 +10,14 @@
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
-  import { get } from 'svelte/store'
+  import { get, writable } from 'svelte/store'
   import {
     resetBackgroundGradient,
     setRadialGradient,
     setUniColor,
   } from '../../molecules/GradientBackground/GradientBackground.svelte'
+  import { AudioTrackFragment } from '../../graphql/generated'
+  import Emoji from '../../navigable/ui/atoms/Emoji/Emoji.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -45,24 +47,49 @@
 
   onDestroy(() => resetBackgroundGradient())
 
-  currentTrack.subscribe((track) => {
-    if (track) {
-      const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+  const newTrackDisplay = writable<{ timeout: number; track: AudioTrackFragment } | null>(null)
 
-      setRadialGradient({
-        centerColor: color,
-        exteriorColor: {
-          r: Math.round(color.r / 2),
-          g: Math.round(color.g / 2),
-          b: Math.round(color.b / 2),
-        },
+  currentTrack.subscribe((track) => {
+    if (!track) {
+      newTrackDisplay.update((data) => {
+        if (data !== null) {
+          clearTimeout(data.timeout)
+        }
+
+        return null
       })
+
+      return
     }
 
-    setDistractionFree(false)
+    const color = track.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+
+    setRadialGradient({
+      centerColor: color,
+      exteriorColor: {
+        r: Math.round(color.r / 2),
+        g: Math.round(color.g / 2),
+        b: Math.round(color.b / 2),
+      },
+    })
+
+    newTrackDisplay.update((data) => {
+      if (data !== null) {
+        clearTimeout(data.timeout)
+      }
+
+      return {
+        track,
+        timeout: setTimeout(() => {
+          console.log('yoh')
+          newTrackDisplay.set(null)
+        }, NEW_TRACK_DISPLAY_TIMEOUT),
+      }
+    })
   })
 
   const COVER_SIZE = 250
+  const NEW_TRACK_DISPLAY_TIMEOUT = 5000000000
 </script>
 
 {#if !$currentTrack}
@@ -86,6 +113,15 @@
   </NavigableWithHandlers>
 </DistractionFreeTogglable>
 
+{#if $newTrackDisplay}
+  {@const tags = $newTrackDisplay.track.metadata.tags}
+
+  <div class="new-track">
+    <div class="title"><Emoji>🎵</Emoji> {tags.title}</div>
+    <div class="album"><Emoji>💿</Emoji> {tags.album.name}</div>
+  </div>
+{/if}
+
 <style>
   .no-playing {
     position: fixed;
@@ -93,6 +129,32 @@
     width: 100%;
     text-align: center;
     font-size: 2rem;
+  }
+
+  .new-track {
+    position: fixed;
+
+    top: 10px;
+    left: 10px;
+
+    max-width: 300px;
+
+    padding: 5px;
+
+    border: 1px solid black;
+
+    background-color: rgb(77, 77, 77);
+    color: rgb(230, 230, 230);
+  }
+
+  /* TODO: remove experimental stuff */
+  .new-track > * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
   }
 
   .album-art {

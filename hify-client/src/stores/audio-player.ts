@@ -23,8 +23,8 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
     if (prevDuration !== null) {
       const { track, duration_s } = prevDuration
 
-      LogListening({ variables: { trackId: track.id, duration_s } }).catch(
-        (e: unknown) => logError('Failed to play audio', e),
+      LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
+        logError('Failed to play audio', e),
       )
     }
 
