@@ -37,16 +37,6 @@
     return KeyPressHandling.Propagate
   }
 
-  function lightenDarkenColor(color: Color, amount: number): Color {
-    const bound = (cpm: number) => Math.max(Math.min(cpm, 255), 0)
-
-    return {
-      r: bound(color.r + amount),
-      g: bound(color.g + amount),
-      b: bound(color.b + amount),
-    }
-  }
-
   onMount(() => {
     if (!get(currentTrack)) {
       backgroundGradient.set({
@@ -65,7 +55,11 @@
 
       backgroundGradient.set({
         startColor: color,
-        endColor: lightenDarkenColor(color, -30),
+        endColor: {
+          r: Math.round(color.r / 2),
+          g: Math.round(color.g / 2),
+          b: Math.round(color.b / 2),
+        },
         colorSep: 80,
       })
     }
