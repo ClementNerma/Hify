@@ -142,8 +142,6 @@
 
     padding: 5px;
 
-    border: 1px solid black;
-
     background-color: rgb(77, 77, 77);
     color: rgb(230, 230, 230);
   }
