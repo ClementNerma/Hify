@@ -65,7 +65,7 @@
   resetBackgroundGradient()
 </script>
 
-<div class="background" style="--gradient: {$backgroundGradient};" />
+<div class="background" style:background={$backgroundGradient} />
 
 <style>
   .background {
@@ -76,9 +76,8 @@
     bottom: 0;
     z-index: -1;
 
-    background: var(--gradient);
     background-attachment: fixed;
 
-    transition: --linear-start 0.5s, --linear-end 0.5s;
+    transition: background 0.5s;
   }
 </style>
