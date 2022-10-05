@@ -17,7 +17,11 @@
   export type RadialGradient = {
     centerColor: Color
     exteriorColor: Color
-    colorSep: number
+    endAt?: number
+  }
+
+  export function setUniColor(color: Color): void {
+    backgroundGradient.set(colorToRGBA(color))
   }
 
   export function setVerticalGradient(gradient: VerticalGradient): void {
@@ -31,7 +35,7 @@
   export function setRadialGradient(gradient: RadialGradient): void {
     backgroundGradient.set(
       `radial-gradient(circle, ${colorToRGBA(gradient.centerColor)} 0%, ${colorToRGBA(gradient.exteriorColor)} ${
-        gradient.colorSep
+        gradient.endAt ?? 100
       }%)`,
     )
   }

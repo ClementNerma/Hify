@@ -14,7 +14,7 @@
   import {
     resetBackgroundGradient,
     setRadialGradient,
-    setVerticalGradient,
+    setUniColor,
   } from '../../molecules/GradientBackground/GradientBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
@@ -39,11 +39,7 @@
 
   onMount(() => {
     if (!get(currentTrack)) {
-      setVerticalGradient({
-        startColor: { r: 0, g: 0, b: 0 },
-        endColor: { r: 0, g: 0, b: 0 },
-        colorSep: 0,
-      })
+      setUniColor({ r: 0, g: 0, b: 0 })
     }
   })
 
@@ -60,7 +56,6 @@
           g: Math.round(color.g / 2),
           b: Math.round(color.b / 2),
         },
-        colorSep: 100,
       })
     }
 
@@ -117,7 +112,7 @@
 
     transition: opacity 0.5s;
 
-    filter: drop-shadow(0 0 1rem rgb(77, 77, 77));
+    filter: drop-shadow(0 0 1rem black);
   }
 
   .album-art.darkened {
