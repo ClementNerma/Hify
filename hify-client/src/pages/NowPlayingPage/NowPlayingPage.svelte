@@ -89,7 +89,7 @@
   })
 
   const COVER_SIZE = 250
-  const NEW_TRACK_DISPLAY_TIMEOUT = 5000000000
+  const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 </script>
 
 {#if !$currentTrack}
