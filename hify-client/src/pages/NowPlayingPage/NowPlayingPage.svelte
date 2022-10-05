@@ -144,6 +144,8 @@
 
     background-color: rgb(77, 77, 77);
     color: rgb(230, 230, 230);
+
+    box-shadow: 0 0 5px #bbbbbb;
   }
 
   /* TODO: remove experimental stuff */
