@@ -15,12 +15,16 @@
     return `rgb(${color.r}, ${color.g}, ${color.b})`
   }
 
-  const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+  function computeBackground(track: AudioTrackFragment): string {
+    const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
-  const centerColor = color
-  const extColor = changeBrightness(color, 0.7)
+    const centerColor = color
+    const extColor = changeBrightness(color, 0.7)
 
-  const background = `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
+    return `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
+  }
+
+  $: background = track ? computeBackground(track) : 'black'
 </script>
 
 <div class="background" style:background />
