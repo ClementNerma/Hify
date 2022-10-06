@@ -19,8 +19,8 @@
   function computeBackground(track: AudioTrackFragment): string {
     const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
-    const centerColor = color
-    const extColor = changeBrightness(color, 0.5)
+    const centerColor = changeBrightness(color, 0.9)
+    const extColor = changeBrightness(color, 0.6)
 
     return `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
   }
