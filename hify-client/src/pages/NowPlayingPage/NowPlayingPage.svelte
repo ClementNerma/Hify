@@ -69,7 +69,7 @@
   const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 </script>
 
-<NowPlayingPageBackground track={$currentTrack || null} />
+<NowPlayingPageBackground track={$currentTrack || null} dim={!$distractionFreeMode} />
 
 {#if !$currentTrack}
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>

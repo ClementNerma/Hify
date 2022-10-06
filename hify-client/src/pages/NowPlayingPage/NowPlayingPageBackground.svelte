@@ -2,6 +2,7 @@
   import { ArtRgb, AudioTrackFragment } from '../../graphql/generated'
 
   export let track: AudioTrackFragment | null
+  export let dim = false
 
   function changeBrightness(color: ArtRgb, times: number): ArtRgb {
     return {
@@ -25,9 +26,10 @@
   }
 
   $: background = track ? computeBackground(track) : 'black'
+  $: filter = dim ? 'brightness(0.3)' : ''
 </script>
 
-<div class="background" style:background />
+<div class="background" style:background style:filter />
 
 <style>
   .background {
