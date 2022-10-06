@@ -20,7 +20,7 @@
     const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
     const centerColor = color
-    const extColor = changeBrightness(color, 0.7)
+    const extColor = changeBrightness(color, 0.5)
 
     return `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
   }
