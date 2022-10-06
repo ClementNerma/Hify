@@ -39,6 +39,8 @@
     bottom: 0;
     z-index: -1;
 
+    filter: brightness(0.8);
+
     transition: filter linear 1s;
   }
 
