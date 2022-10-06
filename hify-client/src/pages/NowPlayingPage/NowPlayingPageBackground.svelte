@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { get } from 'svelte/store'
   import { ArtRgb, AudioTrackFragment } from '../../graphql/generated'
-  import { currentTrack } from '../../stores/play-queue'
 
   export let track: AudioTrackFragment | null
 
@@ -20,8 +17,8 @@
 
   const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
-  const centerColor = changeBrightness(color, 0.3)
-  const extColor = changeBrightness(color, 0.1)
+  const centerColor = color
+  const extColor = changeBrightness(color, 0.7)
 
   const background = `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
 </script>
