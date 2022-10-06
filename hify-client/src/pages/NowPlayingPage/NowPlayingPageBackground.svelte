@@ -26,10 +26,9 @@
   }
 
   $: background = track ? computeBackground(track) : 'black'
-  $: filter = dim ? 'brightness(0.3)' : ''
 </script>
 
-<div class="background" style:background style:filter />
+<div class="background" style:background class:dim />
 
 <style>
   .background {
@@ -39,5 +38,11 @@
     right: 0;
     bottom: 0;
     z-index: -1;
+
+    transition: filter linear 1s;
+  }
+
+  .background.dim {
+    filter: brightness(0.3);
   }
 </style>
