@@ -1,0 +1,40 @@
+<script lang="ts">
+  import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
+  import { ArtRgb, AudioTrackFragment } from '../../graphql/generated'
+  import { currentTrack } from '../../stores/play-queue'
+
+  export let track: AudioTrackFragment | null
+
+  function changeBrightness(color: ArtRgb, times: number): ArtRgb {
+    return {
+      r: Math.round(color.r * times),
+      g: Math.round(color.g * times),
+      b: Math.round(color.b * times),
+    }
+  }
+
+  function colorToRGB(color: ArtRgb): string {
+    return `rgb(${color.r}, ${color.g}, ${color.b})`
+  }
+
+  const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
+
+  const centerColor = changeBrightness(color, 0.3)
+  const extColor = changeBrightness(color, 0.1)
+
+  const background = `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
+</script>
+
+<div class="background" style:background />
+
+<style>
+  .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+</style>

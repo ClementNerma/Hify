@@ -1,5 +1,4 @@
 <script lang="ts">
-  import './Template.css'
   import '../../navigable/navigation.css'
 
   import { useLocation, navigate } from 'svelte-navigator'
@@ -17,7 +16,6 @@
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
-  import GradientBackground from '../../molecules/GradientBackground/GradientBackground.svelte'
 
   const location = useLocation()
 
@@ -60,7 +58,7 @@
   })
 </script>
 
-<GradientBackground />
+<div class="background" />
 
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>
@@ -87,3 +85,31 @@
     </NavigableList>
   </NavigableWithHandlers>
 </NavigablePage>
+
+<style>
+  :global(html) {
+    height: 100%;
+    font-size: 12px;
+  }
+
+  :global(body) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: rgb(230, 230, 230);
+    overflow: auto;
+  }
+
+  .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -9999;
+
+    background: linear-gradient(to bottom, rgb(10, 38, 89) 0%, rgb(8, 4, 45) 80%);
+  }
+</style>

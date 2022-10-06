@@ -5,21 +5,14 @@
   import { setupDistractionFreeListener } from '../../stores/distraction-free'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import { distractionFreeMode } from '../../stores/distraction-free'
-  import { onMount, onDestroy } from 'svelte'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import { KeyPressHandling } from '../../navigable/input-manager'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
-  import { get, writable } from 'svelte/store'
-  import {
-    black,
-    changeBrightness,
-    resetBackgroundGradient,
-    setRadialGradient,
-    setUniColor,
-  } from '../../molecules/GradientBackground/GradientBackground.svelte'
+  import { writable } from 'svelte/store'
   import { AudioTrackFragment } from '../../graphql/generated'
   import Emoji from '../../navigable/ui/atoms/Emoji/Emoji.svelte'
+  import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
@@ -41,14 +34,6 @@
     return KeyPressHandling.Propagate
   }
 
-  onMount(() => {
-    if (!get(currentTrack)) {
-      setUniColor(black)
-    }
-  })
-
-  onDestroy(() => resetBackgroundGradient())
-
   const newTrackDisplay = writable<{ timeout: number; track: AudioTrackFragment } | null>(null)
 
   currentTrack.subscribe((track) => {
@@ -63,13 +48,6 @@
 
       return
     }
-
-    const color = track.metadata.tags.album.art?.dominantColor ?? black
-
-    setRadialGradient({
-      centerColor: changeBrightness(color, 0.3),
-      exteriorColor: changeBrightness(color, 0.1),
-    })
 
     if ($distractionFreeMode) {
       newTrackDisplay.update((data) => {
@@ -90,6 +68,8 @@
   const COVER_SIZE = 250
   const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 </script>
+
+<NowPlayingPageBackground track={$currentTrack || null} />
 
 {#if !$currentTrack}
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
