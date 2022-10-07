@@ -41,7 +41,7 @@
 
     filter: brightness(0.8);
 
-    transition: filter linear 1s;
+    transition: filter linear 0.5s;
   }
 
   .background.dim {
