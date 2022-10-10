@@ -17,7 +17,7 @@
     // The color is computed so the perceived brightness (by the human eye) is always equal,
     //   no matter what the original color was. This works by darkening the color until
     //   it reaches a certain level of brightness (here, 10 on a scale of 100).
-    const centerColor = lowerBrightness(color, 50)
+    const centerColor = lowerBrightness(color, 33)
 
     // And this is the external color which will go on the side
     // The radial gradient goes from the color above (at its center)
