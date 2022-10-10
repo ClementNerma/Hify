@@ -1,26 +1,28 @@
 <script lang="ts">
+  import { lowerBrightness, multiplyBrightness } from '../../globals/colors'
   import { ArtRgb, AudioTrackFragment } from '../../graphql/generated'
 
   export let track: AudioTrackFragment | null
   export let dim = false
-
-  function changeBrightness(color: ArtRgb, times: number): ArtRgb {
-    return {
-      r: Math.round(color.r * times),
-      g: Math.round(color.g * times),
-      b: Math.round(color.b * times),
-    }
-  }
 
   function colorToRGB(color: ArtRgb): string {
     return `rgb(${color.r}, ${color.g}, ${color.b})`
   }
 
   function computeBackground(track: AudioTrackFragment): string {
+    // Here we take the album cover's dominant color (defaulting to black)
     const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
 
-    const centerColor = changeBrightness(color, 0.9)
-    const extColor = changeBrightness(color, 0.4)
+    // Then we darken it a little to create a radial gradient around the cover
+    const centerColor = multiplyBrightness(color, 0.9)
+
+    // And this is the external color which will go on the side
+    // The radial gradient goes from the color above (at its center)
+    //   up to this color, at the exterior.
+    // It is computed so the perceived brightness (by the human eye) is always equal,
+    //   no matter what the original color was. This works by darkening the color until
+    //   it reaches a certain level of brightness (here, 10 on a scale of 100).
+    const extColor = lowerBrightness(color, 10)
 
     return `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
   }
