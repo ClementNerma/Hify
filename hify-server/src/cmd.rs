@@ -8,11 +8,8 @@ pub struct Command {
     #[clap(help = "Path to the directory containing the audio files")]
     pub music_dir: PathBuf,
 
-    #[clap(short, long, help = "Path to the index file (JSON)")]
-    pub index_file: PathBuf,
-
-    #[clap(short, long, help = "Path to the user data file (JSON)")]
-    pub user_data_file: PathBuf,
+    #[clap(short, long, help = "Path to the user data directory")]
+    pub data_dir: Option<PathBuf>,
 
     #[clap(long, help = "Force to rebuild index from scratch")]
     pub rebuild_index: bool,

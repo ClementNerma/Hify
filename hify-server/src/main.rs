@@ -9,6 +9,8 @@ mod library;
 mod userdata;
 mod utils;
 
+use std::fs;
+
 use anyhow::{bail, Context, Result};
 use clap::StructOpt;
 
@@ -23,8 +25,7 @@ async fn inner_main() -> Result<()> {
     #[deny(unused_variables)]
     let cmd::Command {
         music_dir,
-        index_file,
-        user_data_file,
+        data_dir,
         rebuild_index,
         update_index,
         rebuild_arts,
@@ -35,6 +36,20 @@ async fn inner_main() -> Result<()> {
     if !music_dir.is_dir() {
         bail!("Music path is not a directory");
     }
+
+    let data_dir = match data_dir {
+        Some(data_dir) => data_dir,
+        None => dirs::config_dir()
+            .context("Failed to get path to the user's configuration directory")?
+            .join("hify"),
+    };
+
+    if !data_dir.exists() {
+        fs::create_dir(&data_dir).context("Failed to create the data directory")?;
+    }
+
+    let index_file = data_dir.join("index.json");
+    let user_data_file = data_dir.join("userdata.json");
 
     if index_file.is_dir() {
         bail!("Index file must not be a directory");
