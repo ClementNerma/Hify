@@ -69,7 +69,7 @@
   <div class="container">
     <NavigableList>
       <div class="header">
-        <ImgLoader art={album.art} quick let:src>
+        <ImgLoader art={album.art} let:src>
           <img class="art" width={192} height={192} {src} alt="" />
         </ImgLoader>
 

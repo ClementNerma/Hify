@@ -16,7 +16,7 @@
 </script>
 
 <div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
-  <ImgLoader {art} quick let:src>
+  <ImgLoader {art} let:src>
     <img class="cover" class:rounded width={boxSize} height={boxSize} {src} alt="" />
   </ImgLoader>
 

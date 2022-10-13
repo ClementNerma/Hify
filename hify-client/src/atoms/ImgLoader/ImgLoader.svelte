@@ -10,7 +10,6 @@
   import { ProgressiveImgFragment } from '../../graphql/generated'
 
   export let art: ProgressiveImgFragment | null | undefined
-  export const quick: boolean | null = null
 </script>
 
 {#if art}
