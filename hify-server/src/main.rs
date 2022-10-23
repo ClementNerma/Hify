@@ -39,7 +39,7 @@ async fn inner_main() -> Result<()> {
 
     let data_dir = match data_dir {
         Some(data_dir) => data_dir,
-        None => dirs::config_dir()
+        None => dirs::data_dir()
             .context("Failed to get path to the user's configuration directory")?
             .join("hify"),
     };
