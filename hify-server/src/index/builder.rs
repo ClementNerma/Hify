@@ -78,19 +78,38 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     log(started, &format!("Found {} files.", files_mtime.len()));
     log(started, "Extracting audio metadata...");
 
+    // Run analysis tool on all new and modified files
     let analyzed = exiftool::run_on(files_mtime.keys().cloned().collect::<Vec<_>>().as_slice())?;
 
-    let mut tracks = from.tracks.into_values();
+    // Turn the analyzed files into tracks
+    let analyzed = analyzed
+        .into_iter()
+        .map(|(path, metadata)| {
+            Track::new(
+                path.strip_prefix(&dir)
+                    .expect("Internal error: track path couldn't be stripped of the base directory")
+                    .to_path_buf(),
+                *files_mtime.get(&path).unwrap(),
+                metadata,
+            )
+        })
+        .collect::<Vec<_>>();
 
-    tracks.extend(analyzed.into_iter().map(|(path, track_metadata)| {
-        Track::new(
-            path.strip_prefix(&dir)
-                .expect("Internal error: track path couldn't be stripped of the base directory")
-                .to_path_buf(),
-            *files_mtime.get(&path).unwrap(),
-            track_metadata,
-        )
-    }));
+    // Remove previous versions of analyzed files
+    let analyzed_ids = analyzed
+        .iter()
+        .map(|track| &track.id)
+        .collect::<HashSet<_>>();
+
+    let mut tracks = from
+        .tracks
+        .into_values()
+        .into_iter()
+        .filter(|track| !analyzed_ids.contains(&track.id))
+        .collect::<Vec<_>>();
+
+    // Add new (or modified) tracks
+    tracks.extend(analyzed);
 
     log(
         started,
