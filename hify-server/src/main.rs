@@ -12,7 +12,7 @@ mod utils;
 use std::fs;
 
 use anyhow::{bail, Context, Result};
-use clap::StructOpt;
+use clap::Parser;
 
 #[::rocket::main]
 async fn main() {
