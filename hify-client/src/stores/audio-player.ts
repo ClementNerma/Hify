@@ -12,25 +12,36 @@ const audioListeningDuration = writable<{ track: AudioTrackFragment; duration_s:
 export const readableAudioProgress = readonly(audioProgress)
 export const readableAudioPaused = readonly(audioPaused)
 
+function _newListeningSession(resetAs: AudioTrackFragment | null): void {
+  const prevDuration = get(audioListeningDuration)
+
+  if (prevDuration !== null) {
+    const { track, duration_s } = prevDuration
+
+    LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
+      logError('Failed to register listening duration', e),
+    )
+  }
+
+  const track = resetAs ?? prevDuration?.track
+
+  if (!track) {
+    throw new Error('No track to register in audio listening duration store')
+  }
+
+  audioListeningDuration.set({ track, duration_s: 0 })
+}
+
 export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => void, play = true) {
   audioPlayer.update((prev): HTMLAudioElement => {
     if (prev && !prev.paused) {
       prev.pause()
     }
 
-    const prevDuration = get(audioListeningDuration)
-
-    if (prevDuration !== null) {
-      const { track, duration_s } = prevDuration
-
-      LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
-        logError('Failed to play audio', e),
-      )
-    }
-
     audioPaused.set(false)
     audioProgress.set(0)
-    audioListeningDuration.set({ track, duration_s: 0 })
+
+    _newListeningSession(track)
 
     logInfo(`Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
 
@@ -118,6 +129,8 @@ export function replayTrack() {
 }
 
 export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
+  _newListeningSession(null)
+
   const player = get(audioPlayer)
 
   if (!player) {
