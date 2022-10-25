@@ -1,4 +1,4 @@
-query PlayerTrackInfos($trackId: TrackID!) {
+query PlayerTrackInfos($trackId: String!) {
   track(id: $trackId) {
     ...AudioTrack
   }

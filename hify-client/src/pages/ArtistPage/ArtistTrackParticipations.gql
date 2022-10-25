@@ -1,4 +1,4 @@
-query ArtistTrackParticipations($artistId: ArtistID!, $pagination: PaginationInput!) {
+query ArtistTrackParticipations($artistId: String!, $pagination: PaginationInput!) {
   artist(id: $artistId) {
     trackParticipations(pagination: $pagination) {
       nodes {
