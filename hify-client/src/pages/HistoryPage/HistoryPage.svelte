@@ -40,7 +40,7 @@
 {:then _}
   <h2>History</h2>
 
-  <Grid columns={7}>
+  <Grid columns={7} lazyLoader={feedMore}>
     {#each tracks as track, i}
       {@const tags = track.metadata.tags}
 
