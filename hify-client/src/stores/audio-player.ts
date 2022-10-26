@@ -129,8 +129,6 @@ export function replayTrack() {
 }
 
 export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
-  _newListeningSession(null)
-
   const player = get(audioPlayer)
 
   if (!player) {
@@ -140,6 +138,8 @@ export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
 
     return
   }
+
+  _newListeningSession(null)
 
   logInfo('Stopped audio playback')
 
