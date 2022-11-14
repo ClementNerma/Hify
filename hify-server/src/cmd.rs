@@ -20,15 +20,15 @@ pub struct Command {
     #[clap(
         long,
         help = "Force to rebuild arts index from scratch",
-        conflicts_with = "rebuild-index"
+        conflicts_with = "rebuild_index"
     )]
     pub rebuild_arts: bool,
 
     #[clap(
         long,
         help = "Rebuild the cache",
-        conflicts_with = "update-index",
-        conflicts_with = "rebuild-index"
+        conflicts_with = "update_index",
+        conflicts_with = "rebuild_index"
     )]
     pub rebuild_cache: bool,
 
