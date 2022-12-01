@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::index::TrackID;
+use crate::index::{Index, TrackID};
 
 use super::{
     history::{History, OneListening},
@@ -60,11 +60,18 @@ impl UserDataCache {
         &self.dedup_history
     }
 
-    // pub fn listenings(&self) -> &HashMap<TrackID, u32> {
-    //     &self.listenings
-    // }
-
     pub fn listening_durations(&self) -> &HashMap<TrackID, u32> {
         &self.listening_durations
+    }
+
+    pub fn cleanup(&mut self, new_index: &Index) {
+        self.dedup_history
+            .retain(|listening| new_index.tracks.contains_key(&listening.track_id));
+
+        self.listenings
+            .retain(|track_id, _| new_index.tracks.contains_key(&track_id));
+
+        self.listening_durations
+            .retain(|track_id, _| new_index.tracks.contains_key(&track_id));
     }
 }

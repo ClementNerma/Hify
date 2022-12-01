@@ -7,6 +7,8 @@ pub use history::OneListening;
 
 use serde::{Deserialize, Serialize};
 
+use crate::index::Index;
+
 use self::{cache::UserDataCache, history::History};
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -43,10 +45,6 @@ impl UserDataWrapper {
         }
     }
 
-    // pub fn history(&self) -> &History {
-    //     &self.inner.history
-    // }
-
     pub fn cache(&self) -> &UserDataCache {
         &self.cache
     }
@@ -58,6 +56,13 @@ impl UserDataWrapper {
 
         self.cache.update_with(&entry);
         self.inner.history.push(entry);
+
+        (self.on_change)(&self.inner);
+    }
+
+    pub fn cleanup(&mut self, new_index: &Index) {
+        self.inner.history.cleanup(new_index);
+        self.cache.cleanup(new_index);
 
         (self.on_change)(&self.inner);
     }

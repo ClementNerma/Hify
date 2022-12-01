@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
-use crate::{index::TrackID, library::time::get_now};
+use crate::{
+    index::{Index, TrackID},
+    library::time::get_now,
+};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct History(Vec<OneListening>);
@@ -17,6 +20,11 @@ impl History {
 
     pub fn push(&mut self, entry: OneListening) {
         self.0.push(entry);
+    }
+
+    pub fn cleanup(&mut self, new_index: &Index) {
+        self.0
+            .retain(|track| new_index.tracks.contains_key(&track.track_id));
     }
 }
 

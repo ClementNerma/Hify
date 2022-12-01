@@ -21,6 +21,8 @@ impl MutationRoot {
 
         (ctx.save_index)(&index)?;
 
+        ctx.app_state.user_data.write().await.cleanup(&index);
+
         *ctx.app_state.index.write().await = index;
 
         Ok(true)

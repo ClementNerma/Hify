@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use rayon::prelude::{ParallelBridge, ParallelIterator};
+use rayon::prelude::{IntoParallelIterator, ParallelBridge, ParallelIterator};
 
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
@@ -107,6 +107,22 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         .into_iter()
         .filter(|track| !analyzed_ids.contains(&track.id))
         .collect::<Vec<_>>();
+
+    // Remove deleted tracks
+    let before_deletion_count = tracks.len();
+    tracks = tracks
+        .into_par_iter()
+        .filter(|track| dir.join(&track.relative_path).is_file())
+        .collect::<Vec<_>>();
+
+    let deleted_count = before_deletion_count - tracks.len();
+
+    if deleted_count > 0 {
+        log(
+            started,
+            &format!("Detected {deleted_count} deleted track(s)."),
+        );
+    }
 
     // Add new (or modified) tracks
     tracks.extend(analyzed);

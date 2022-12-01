@@ -48,8 +48,21 @@ async fn inner_main() -> Result<()> {
         fs::create_dir(&data_dir).context("Failed to create the data directory")?;
     }
 
-    let index_file = data_dir.join("index.json");
     let user_data_file = data_dir.join("userdata.json");
+    let index_file = data_dir.join("index.json");
+
+    let user_data = match user_data_file.is_file() {
+        true => utils::save::load_user_data(&user_data_file).context("Failed to load user data")?,
+        false => userdata::UserData::with_default_config(),
+    };
+
+    let mut user_data = userdata::UserDataWrapper::new(
+        user_data,
+        Box::new(move |user_data| {
+            // TODO: error handling
+            utils::save::save_user_data(&user_data_file, user_data).unwrap();
+        }),
+    );
 
     if index_file.is_dir() {
         bail!("Index file must not be a directory");
@@ -65,6 +78,8 @@ async fn inner_main() -> Result<()> {
 
                 index = index::build_index(music_dir, Some(index))
                     .context("Failed to rebuild index")?;
+
+                user_data.cleanup(&index);
             } else if rebuild_cache {
                 println!("> Rebuilding cache as requested...");
 
@@ -97,19 +112,6 @@ async fn inner_main() -> Result<()> {
             index
         }
     };
-
-    let user_data = match user_data_file.is_file() {
-        true => utils::save::load_user_data(&user_data_file).context("Failed to load user data")?,
-        false => userdata::UserData::with_default_config(),
-    };
-
-    let user_data = userdata::UserDataWrapper::new(
-        user_data,
-        Box::new(move |user_data| {
-            // TODO: error handling
-            utils::save::save_user_data(&user_data_file, user_data).unwrap();
-        }),
-    );
 
     if no_server {
         return Ok(());
