@@ -26,7 +26,7 @@ pub struct FeedParams {
     #[graphql(default = 80)]
     min_rating: u8,
 
-    #[graphql(default = 50)]
+    #[graphql(default = 25)]
     max_items: usize,
 }
 
