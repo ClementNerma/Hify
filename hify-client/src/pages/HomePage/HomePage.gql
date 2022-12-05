@@ -4,17 +4,21 @@ query HomePage($input: FeedParams!) {
       ...AudioTrack
     }
 
-    popularTracks {
+    periodicallyPopularTracks {
       ...AudioTrack
     }
 
-    popularAlbums {
-      ...AlbumCard
-    }
+    # popularTracks {
+    #   ...AudioTrack
+    # }
 
-    popularArtists {
-      ...ArtistCard
-    }
+    # popularAlbums {
+    #   ...AlbumCard
+    # }
+
+    # popularArtists {
+    #   ...ArtistCard
+    # }
 
     randomGreatAlbums {
       ...AlbumCard

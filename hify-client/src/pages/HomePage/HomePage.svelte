@@ -21,26 +21,26 @@
 
 {#await feed}
   <h1>Loading...</h1>
-{:then { lastListenedTo, popularTracks, popularAlbums, popularArtists, randomGreatAlbums, randomGreatArtists }}
+{:then { lastListenedTo, periodicallyPopularTracks, randomGreatAlbums, randomGreatArtists }}
   <h2>Welcome!</h2>
 
   <MixButton mixParams={{}} />
 
-  <h3>Tracks you like to listen to:</h3>
+  <h3>Tracks you currently like to listen to:</h3>
 
-  <TracksRow tracks={popularTracks} />
+  <TracksRow tracks={periodicallyPopularTracks} />
 
   <h3>Last songs you listened to:</h3>
 
   <TracksRow tracks={lastListenedTo} />
 
-  <h3>Albums you like to listen to:</h3>
+  <!-- <h3>Albums you like to listen to:</h3>
 
   <AlbumsRow albums={popularAlbums} />
 
   <h3>Artists you like to listen to:</h3>
 
-  <ArtistsRow artists={popularArtists} />
+  <ArtistsRow artists={popularArtists} /> -->
 
   <h3>Random great albums:</h3>
 

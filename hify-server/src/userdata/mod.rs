@@ -49,6 +49,10 @@ impl UserDataWrapper {
         &self.cache
     }
 
+    pub fn history(&self) -> &History {
+        &self.inner.history
+    }
+
     pub fn log_listening(&mut self, entry: OneListening) {
         if entry.duration_s < self.inner.config.listening_duration_thresold {
             return;
