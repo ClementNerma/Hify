@@ -42,13 +42,13 @@
 
   <ArtistsRow artists={popularArtists} /> -->
 
-  <h3>Random great albums:</h3>
+  <!-- <h3>Random great albums:</h3>
 
   <AlbumsRow albums={randomGreatAlbums} />
 
   <h3>Random great artists:</h3>
 
-  <ArtistsRow artists={randomGreatArtists} />
+  <ArtistsRow artists={randomGreatArtists} /> -->
 
   <h3>Tools</h3>
 
