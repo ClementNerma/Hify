@@ -7,12 +7,13 @@
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import { ROUTES } from '../../routes'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const genres = AsyncGenresPage({ variables: {} }).then((res) => res.data.genres)
 </script>
 
 {#await genres}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then genres}
   <h2>List of all genres ({genres.length}) and number of albums:</h2>
 

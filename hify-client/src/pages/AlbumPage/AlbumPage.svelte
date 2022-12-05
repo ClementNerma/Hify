@@ -18,6 +18,7 @@
   import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { humanReadableDuration } from '../../stores/audio-player'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   export let albumId: string
 
@@ -61,7 +62,7 @@
 </script>
 
 {#await album}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then album}
   {@const filteredTracks = filterTracks(album.tracks, onlyShowGreatSongs)}
   {@const { totalDuration, discs } = getAlbumInfos(filteredTracks)}

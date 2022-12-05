@@ -3,6 +3,7 @@
 
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5
@@ -31,7 +32,7 @@
 </script>
 
 {#await feedMore()}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then _}
   <Grid columns={ALBUMS_PER_LINE} lazyLoader={feedMore}>
     {#each albums as album}

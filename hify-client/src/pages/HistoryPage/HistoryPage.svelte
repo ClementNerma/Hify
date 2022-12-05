@@ -7,6 +7,7 @@
   import { ROUTES } from '../../routes'
   import { playTrackFromNewQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const TRACKS_PER_LINE = 7
   const LINES_PER_PAGE = 5
@@ -36,7 +37,7 @@
 </script>
 
 {#await feedMore()}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then _}
   <h2>History</h2>
 

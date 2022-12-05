@@ -4,6 +4,7 @@
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import Button from '../../navigable/ui/atoms/Button/Button.svelte'
   import TrackCard from '../../molecules/TrackCard/TrackCard.svelte'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   export let artistId: string
 
@@ -41,7 +42,7 @@
 </script>
 
 {#await feedMore()}
-  <h3>Loading...</h3>
+  <LoadingIndicator />
 {:then lastPageInfo}
   {#if tracks.length !== 0}
     <h3>Tracks from other artists' albums ({tracks.length})</h3>

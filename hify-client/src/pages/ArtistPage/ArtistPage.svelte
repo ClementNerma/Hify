@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
   import MixButton from '../../atoms/MixButton/MixButton.svelte'
   import { AsyncArtistPage } from '../../graphql/generated'
 
@@ -13,7 +14,7 @@
 </script>
 
 {#await artist}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then artist}
   {#if !artist}
     <h2>Artist was not found!</h2>

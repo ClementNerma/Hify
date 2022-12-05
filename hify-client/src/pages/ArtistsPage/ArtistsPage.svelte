@@ -3,6 +3,7 @@
 
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import ArtistCard from '../../molecules/ArtistCard/ArtistCard.svelte'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const ARTISTS_PER_LINE = 6
   const LINES_PER_PAGE = 5
@@ -31,7 +32,7 @@
 </script>
 
 {#await feedMore()}
-  <h2>Loading...</h2>
+  <LoadingIndicator />
 {:then _}
   <Grid columns={ARTISTS_PER_LINE} lazyLoader={feedMore}>
     {#each artists as artist}

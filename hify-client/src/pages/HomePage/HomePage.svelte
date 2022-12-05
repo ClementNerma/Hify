@@ -9,6 +9,7 @@
   import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
   import { ROUTES } from '../../routes'
   import IndexUpdater from './IndexUpdater.svelte'
+  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const feed = AsyncHomePage({
     variables: {
@@ -20,7 +21,7 @@
 </script>
 
 {#await feed}
-  <h1>Loading...</h1>
+  <LoadingIndicator />
 {:then { lastListenedTo, periodicallyPopularTracks, randomGreatAlbums, randomGreatArtists }}
   <h2>Welcome!</h2>
 
