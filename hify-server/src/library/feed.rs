@@ -23,14 +23,21 @@ pub struct Feed {
 
 #[derive(InputObject)]
 pub struct FeedParams {
-    min_rating: Option<f64>,
-    max_items: Option<u8>,
+    #[graphql(default = 80)]
+    min_rating: u8,
+
+    #[graphql(default = 50)]
+    max_items: usize,
 }
 
-pub fn generate_feed(index: &Index, user_data: &UserDataWrapper, params: FeedParams) -> Feed {
-    let min_rating = params.min_rating.unwrap_or(80.0);
-    let max_items = usize::from(params.max_items.unwrap_or(50));
-
+pub fn generate_feed(
+    index: &Index,
+    user_data: &UserDataWrapper,
+    FeedParams {
+        min_rating,
+        max_items,
+    }: FeedParams,
+) -> Feed {
     let last_listened_to = user_data
         .cache()
         .dedup_history()
@@ -93,12 +100,12 @@ fn get_popular_tracks(user_data: &UserDataWrapper) -> impl Iterator<Item = &Trac
 fn get_random_great<T, U>(
     mean_scores: &HashMap<T, f64>,
     mapper: impl Fn(&T) -> U,
-    min_rating: f64,
+    min_rating: u8,
     max_items: usize,
 ) -> Vec<U> {
     let mut great: Vec<_> = mean_scores
         .iter()
-        .filter(|(_, mean_score)| **mean_score >= min_rating)
+        .filter(|(_, mean_score)| **mean_score >= min_rating.into())
         .map(|(id, _)| id)
         .take(max_items)
         .map(mapper)
