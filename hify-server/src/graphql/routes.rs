@@ -16,12 +16,12 @@ pub async fn graphql_preflight_handler() -> Status {
 
 #[rocket::get("/?<query..>")]
 async fn graphql_query(schema: &State<AppSchema>, query: GraphQLQuery) -> GraphQLResponse {
-    query.execute(schema).await
+    query.execute(schema.inner()).await
 }
 
 #[rocket::post("/", data = "<request>", format = "application/json")]
 async fn graphql_request(schema: &State<AppSchema>, request: GraphQLRequest) -> GraphQLResponse {
-    request.execute(schema).await
+    request.execute(schema.inner()).await
 }
 
 pub fn get_graphql_routes() -> Vec<Route> {
