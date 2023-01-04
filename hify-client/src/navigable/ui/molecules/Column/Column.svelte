@@ -1,14 +1,17 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import NavigableList from '../../../headless/NavigableList/NavigableList.svelte'
   import { RequestFocus } from '../../../navigation'
 
-  let _requestFocus: RequestFocus
+  let requestFocus: RequestFocus
 
-  export const requestFocus = () => _requestFocus()
+  export let getRequestFocus: (requestFocus: RequestFocus) => void
+
+  onMount(() => getRequestFocus(requestFocus))
 </script>
 
 <div class="column">
-  <NavigableList bind:requestFocus={_requestFocus}>
+  <NavigableList bind:requestFocus>
     <slot />
   </NavigableList>
 </div>

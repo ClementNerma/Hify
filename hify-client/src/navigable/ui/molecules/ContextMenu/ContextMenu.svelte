@@ -79,12 +79,17 @@
   })
 
   let requestFocus: RequestFocus
+
+  const getRequestFocus = (rf: RequestFocus) => {
+    requestFocus = rf
+  }
 </script>
 
 {#if $contextMenuStore && $contextMenuStore.options.length > 0}
   <NavigableWithHandlers onBack={closeContextMenu}>
     <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
-      <Column bind:requestFocus>
+      <!-- Bindings don't always work here for some reason so we use a basic callback system instead -->
+      <Column {getRequestFocus}>
         {#each $contextMenuStore.options as { label, onPress }}
           <SimpleNavigableItem
             onPress={() => {
