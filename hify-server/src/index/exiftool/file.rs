@@ -1,4 +1,7 @@
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
+use once_cell::sync::Lazy;
+use pomsky_macro::pomsky;
+use regex::Regex;
 use serde::Deserialize;
 
 use crate::index::{AudioFormat, TrackMetadata};
@@ -20,7 +23,7 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
     Ok(TrackMetadata {
         format,
         size: analyzed.FileSize,
-        duration: analyzed.Duration.round() as u32,
+        duration: parse_exiftool_duration(&analyzed.Duration)?,
         tags: parse_exiftool_tags(analyzed.tags)?,
     })
 }
@@ -29,9 +32,64 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
 #[allow(non_snake_case)]
 pub struct ExifToolFile {
     FileType: String,
-    Duration: f64,
+    Duration: ExifToolDuration,
     FileSize: u64,
 
     #[serde(flatten)]
     tags: ExifToolFileTags,
 }
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum ExifToolDuration {
+    Seconds(f64),
+    Raw(String),
+}
+
+fn parse_exiftool_duration(duration: &ExifToolDuration) -> Result<u32> {
+    match duration {
+        ExifToolDuration::Seconds(secs) => Ok(secs.ceil() as u32),
+        ExifToolDuration::Raw(raw) => {
+            let captured = PARSE_EXIF_TOOL_DURATION
+                .captures(raw)
+                .with_context(|| format!("Unknown duration provided by ExifTool: {raw}"))?;
+
+            let hours = captured
+                .name("hours")
+                .unwrap()
+                .as_str()
+                .parse::<u32>()
+                .unwrap();
+
+            let minutes = captured
+                .name("minutes")
+                .unwrap()
+                .as_str()
+                .parse::<u32>()
+                .unwrap();
+
+            let seconds = captured
+                .name("seconds")
+                .unwrap()
+                .as_str()
+                .parse::<u32>()
+                .unwrap();
+
+            let rest = captured
+                .name("rest")
+                .unwrap()
+                .as_str()
+                .parse::<u128>()
+                .unwrap();
+
+            Ok(hours * 3600 + minutes * 60 + seconds + if rest > 0 { 1 } else { 0 })
+        }
+    }
+}
+
+static PARSE_EXIF_TOOL_DURATION: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(pomsky!(
+        Start :hours([digit]{2,}) ':' :minutes([digit]{2}) ':' :seconds([digit]{2}) '.' :rest([digit]+) End
+    ))
+    .unwrap()
+});
