@@ -76,7 +76,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
             let current = progress.load(Ordering::Acquire) + 1;
             progress.store(current, Ordering::Release);
 
-            if current % 10 == 0 || current == files_count - 1 {
+            if current % 10 == 0 || current == files_count {
                 display_progress(
                     started.elapsed().as_secs(),
                     current,
