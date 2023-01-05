@@ -13,29 +13,18 @@ use super::{
 };
 
 #[rocket::get("/art/<id>")]
-pub async fn album_art(
-    ctx: &State<AppState>,
-    id: String,
-) -> FaillibleResponse<(ContentType, File)> {
+pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<(ContentType, File)> {
     let id = ArtID::decode(&id).map_err(|_| {
         rest_server_error(Status::BadRequest, "Invalid art ID provided".to_string())
     })?;
 
     let index = ctx.index.read().await;
-    let album_art = index.arts.get(&id).cloned().ok_or_else(|| {
-        rest_server_error(
-            Status::NotFound,
-            "Provided album cover was not found".to_string(),
-        )
+    let art = index.arts.get(&id).cloned().ok_or_else(|| {
+        rest_server_error(Status::NotFound, "Provided art was not found".to_string())
     })?;
 
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art
-        .relative_path
-        .extension()
-        .unwrap()
-        .to_str()
-        .unwrap();
+    let ext = art.relative_path.extension().unwrap().to_str().unwrap();
 
     let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
         rest_server_error(
@@ -45,7 +34,7 @@ pub async fn album_art(
         )
     })?;
 
-    let file = File::open(index.from.join(&album_art.relative_path))
+    let file = File::open(index.from.join(&art.relative_path))
         .await
         .map_err(|err| {
             rest_server_error(
