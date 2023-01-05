@@ -43,7 +43,9 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         rating: tags
             .Rating
-            .map(|rating| Ok(Some(rating as u8)))
+            .map(|rating| rating as u8)
+            .or(tags.RatingPercent)
+            .map(|rating| Ok(Some(rating)))
             .or_else(|| tags.Popularimeter.map(parse_popularimeter))
             .transpose()?
             .flatten(),
@@ -167,6 +169,9 @@ pub struct ExifToolFileTags {
 
     #[serde(default)]
     Rating: Option<f64>,
+
+    #[serde(default)]
+    RatingPercent: Option<u8>,
 
     #[serde(default, deserialize_with = "ensure_string")]
     ReleaseTime: Option<String>,
