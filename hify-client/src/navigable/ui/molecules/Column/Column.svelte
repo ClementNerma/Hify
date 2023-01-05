@@ -5,9 +5,9 @@
 
   let requestFocus: RequestFocus
 
-  export let getRequestFocus: (requestFocus: RequestFocus) => void
+  export let getRequestFocus: ((requestFocus: RequestFocus) => void) | null
 
-  onMount(() => getRequestFocus(requestFocus))
+  onMount(() => getRequestFocus?.(requestFocus))
 </script>
 
 <div class="column">
