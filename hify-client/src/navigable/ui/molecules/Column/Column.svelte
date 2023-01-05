@@ -5,7 +5,7 @@
 
   let requestFocus: RequestFocus
 
-  export let getRequestFocus: ((requestFocus: RequestFocus) => void) | null
+  export let getRequestFocus: ((requestFocus: RequestFocus) => void) | null = null
 
   onMount(() => getRequestFocus?.(requestFocus))
 </script>
