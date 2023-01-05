@@ -24,6 +24,7 @@
   handleInput((key, long) => {
     switch (key) {
       case 'MediaPlayPause':
+      case 'p':
         if (!long) {
           toggleAudioPlayback()
         } else {
@@ -33,6 +34,7 @@
         break
 
       case 'MediaRewind':
+      case 'r':
         if (!long) {
           setPlayingAudioProgressRelative(-10)
         } else {
@@ -42,6 +44,7 @@
         break
 
       case 'MediaFastForward':
+      case 'f':
         if (!long) {
           setPlayingAudioProgressRelative(+10)
         } else {
