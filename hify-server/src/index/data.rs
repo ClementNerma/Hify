@@ -295,6 +295,7 @@ pub enum AudioFormat {
     AAC,
     OGG,
     M4A,
+    OPUS,
 }
 
 /// The release date of a track

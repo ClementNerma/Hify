@@ -13,6 +13,7 @@ pub fn process_analyzed_file(analyzed: ExifToolFile) -> Result<TrackMetadata> {
         "AAC" => AudioFormat::AAC,
         "OGG" => AudioFormat::OGG,
         "M4A" => AudioFormat::M4A,
+        "OPUS" => AudioFormat::OPUS,
         codec_name => bail!("Unknown codec name: {codec_name}"),
     };
 

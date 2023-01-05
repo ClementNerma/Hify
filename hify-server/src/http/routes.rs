@@ -141,6 +141,7 @@ pub async fn stream<'a>(
         AudioFormat::AAC => ContentType::AAC,
         AudioFormat::OGG => ContentType::OGG,
         AudioFormat::M4A => ContentType::MP4,
+        AudioFormat::OPUS => ContentType::OGG,
     };
 
     Ok((mime_type, stream))

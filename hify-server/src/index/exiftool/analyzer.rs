@@ -38,7 +38,7 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
 
     matches!(
         audio_ext.as_str(),
-        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a"
+        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a" | "opus"
     )
 }
 
