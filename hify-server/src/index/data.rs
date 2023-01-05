@@ -269,11 +269,13 @@ impl TrackTags {
     }
 
     pub fn get_album_artists_infos(&self) -> impl Iterator<Item = ArtistInfos> + '_ {
+        // NOTE: Hack-like, required as many tracks do not have the "album artists" information
         let artists = if !self.album_artists.is_empty() {
             &self.album_artists
         } else {
             &self.artists
         };
+
         artists.iter().cloned().map(ArtistInfos::new)
     }
 

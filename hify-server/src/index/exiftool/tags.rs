@@ -14,7 +14,8 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
         composers: tags.Composer.map(parse_array_tag).unwrap_or_default(),
         album: tags.Album.context("Missing 'album' tag")?,
         album_artists: tags
-            .Albumartist
+            .AlbumArtist
+            .or(tags.Albumartist)
             .or(tags.Band)
             .map(parse_array_tag)
             .unwrap_or_default(),
@@ -133,6 +134,9 @@ fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
 pub struct ExifToolFileTags {
     #[serde(default, deserialize_with = "ensure_string")]
     Album: Option<String>,
+
+    #[serde(default, deserialize_with = "ensure_string")]
+    AlbumArtist: Option<String>,
 
     #[serde(default, deserialize_with = "ensure_string")]
     Albumartist: Option<String>,
