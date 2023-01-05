@@ -41,14 +41,15 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
 
-        rating: tags
-            .Rating
-            .map(|rating| rating as u8)
-            .or(tags.RatingPercent)
-            .map(|rating| Ok(Some(rating)))
-            .or_else(|| tags.Popularimeter.map(parse_popularimeter))
-            .transpose()?
-            .flatten(),
+        rating: if let Some(rating) = tags.Rating {
+            Some(rating as u8)
+        } else if let Some(rating) = tags.RatingPercent {
+            Some(rating)
+        } else if let Some(popularimeter) = tags.Popularimeter {
+            parse_popularimeter(&popularimeter)?
+        } else {
+            None
+        },
     };
 
     if tags.artists.is_empty() && tags.album_artists.is_empty() {
