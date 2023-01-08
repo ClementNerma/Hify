@@ -52,10 +52,15 @@ export class NavigableGrid<P = NoProp> extends NavigableContainer<NavigableGridP
       case NavigationDirection.Down: {
         const rowIndex = Math.floor(itemIndex / this.props.columns)
 
+        // Default to 3 means that when we enter one of the grid's last three lines,
+        // lazy loading will be triggered. This avoids sluggish response by lazy loading
+        // early, before the user is actually at the end of the grid.
+        const distanceBeforeLazyLoading = this._props.distanceBeforeLazyLoading ?? 3
+
         // Required to trigger lazy loader when either:
         // * We navigate to the last row from the above one
         // * We navigate to the last row from below
-        if (rowIndex >= rows.length - 1 - (this._props.distanceBeforeLazyLoading ?? 3)) {
+        if (rowIndex >= rows.length - 1 - distanceBeforeLazyLoading) {
           this._lazyLoading(items)
         }
 
