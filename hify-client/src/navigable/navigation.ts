@@ -58,11 +58,11 @@ export abstract class NavigableCommon<P = NoProp> {
 				throw new Error('Invalid page construction token provided!')
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			// rome-ignore lint/suspicious/noExplicitAny: required here
 			this.parent = undefined as any
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			// rome-ignore lint/suspicious/noExplicitAny: required here
 			this.identity = undefined as any
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			// rome-ignore lint/suspicious/noExplicitAny: required here
 			this.page = undefined as any
 
 			return
@@ -174,10 +174,10 @@ export abstract class NavigableItem<P = NoProp> extends NavigableCommon<P> {
 		const el = this.underlyingElement()
 
 		if (el.constructor.name !== HTMLNavigableItemWrapperElement.name) {
-			throw new Error("Item's underlying element is not an " + HTMLNavigableItemWrapperElement.name)
+			throw new Error(`Item's underlying element is not an ${HTMLNavigableItemWrapperElement.name}`)
 		}
 
-		if (!el.children.length || !(el.children[0] instanceof HTMLElement)) {
+		if (!(el.children.length && el.children[0] instanceof HTMLElement)) {
 			return console.warn('Failed to scroll to element has it does not have a valid child element')
 		}
 
@@ -285,7 +285,7 @@ class NavigablePage extends NavigableContainer {
 
 export function getParentNavigable(item?: true): NavigableContainer<unknown> {
 	if (item) {
-		if (Boolean(getContext(NAVIGABLE_ITEM_DETECTION_CTX))) {
+		if (getContext(NAVIGABLE_ITEM_DETECTION_CTX)) {
 			throw new Error('Cannot use a navigable inside an item')
 		}
 
@@ -298,7 +298,7 @@ export function getParentNavigable(item?: true): NavigableContainer<unknown> {
 		throw new Error('No parent navigable found in the current context')
 	}
 
-	if (!(nav instanceof NavigableContainer) && !(nav instanceof NavigablePage)) {
+	if (!(nav instanceof NavigableContainer || nav instanceof NavigablePage)) {
 		throw new Error('Context does not contain a navigable value')
 	}
 
@@ -436,7 +436,7 @@ function generateNavigableId(): string {
 	let out = ''
 
 	for (let i = 0; i < 16; i++) {
-		if (i > 0 && i % 4 == 0) {
+		if (i > 0 && i % 4 === 0) {
 			out += '-'
 		}
 

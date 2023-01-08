@@ -56,7 +56,7 @@ export function setupDistractionFreeListener(
 			return
 		}
 
-		if (!ignoreKeys || !ignoreKeys.includes(key)) {
+		if (!ignoreKeys?.includes(key)) {
 			resetDistractionFreeMode()
 		}
 	})

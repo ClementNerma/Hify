@@ -79,7 +79,7 @@ export function playPreviousTrackOrRewind(): void {
 
 			if (newPosition !== null) {
 				startAudioPlayer(tracks[newPosition], playNextTrack)
-				logInfo('Playing previous track at position: ' + newPosition.toString())
+				logInfo(`Playing previous track at position: ${newPosition.toString()}`)
 			} else {
 				logInfo('No previous track to play')
 			}
@@ -106,7 +106,7 @@ export function playNextTrack(): void {
 
 		if (newPosition !== null) {
 			startAudioPlayer(tracks[newPosition], playNextTrack)
-			logInfo('Playing next track at position: ' + newPosition.toString())
+			logInfo(`Playing next track at position: ${newPosition.toString()}`)
 		} else {
 			logInfo('No more track to play')
 		}

@@ -28,14 +28,11 @@ export const logDebug = (message: string) => log(LogLevel.Debug, message)
 export const logInfo = (message: string) => log(LogLevel.Info, message)
 export const logWarn = (message: string) => log(LogLevel.Warn, message)
 export const logError = (message: string, error?: unknown) =>
-	log(
-		LogLevel.Error,
-		Boolean(error) ? `${message} |> ${error instanceof Error ? error.message : '<unknown error>'}` : message,
-	)
+	log(LogLevel.Error, error ? `${message} |> ${error instanceof Error ? error.message : '<unknown error>'}` : message)
 export const logFatal = (message: string, error?: unknown): never => {
 	logError(message, error)
 
-	if (Boolean(error)) {
+	if (error) {
 		console.error(error)
 	}
 

@@ -3,8 +3,14 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
-    }
+      "recommended": true,
+      "performance": {
+        "noDelete": "off"
+      }
+    },
+    "ignore": [
+      "src/graphql"
+    ]
   },
   "formatter": {
     "lineWidth": 120
