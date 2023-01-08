@@ -9,11 +9,13 @@
 
   export let columns: Props<NavigableGrid>['columns']
   export let lazyLoader: Props<NavigableGrid>['lazyLoader'] = undefined
+  export let distanceBeforeLazyLoading: Props<NavigableGrid>['distanceBeforeLazyLoading'] = undefined
 
   const gridProps = (): Props<NavigableGrid> => ({
     hasFocusPriority,
     columns,
     lazyLoader,
+    distanceBeforeLazyLoading,
   })
 
   const grid = new NavigableGrid(getParentNavigable(), gridProps())

@@ -55,7 +55,7 @@ export class NavigableGrid<P = NoProp> extends NavigableContainer<NavigableGridP
         // Required to trigger lazy loader when either:
         // * We navigate to the last row from the above one
         // * We navigate to the last row from below
-        if (rowIndex >= rows.length - 2) {
+        if (rowIndex >= rows.length - 1 - (this._props.distanceBeforeLazyLoading ?? 2)) {
           this._lazyLoading(items)
         }
 
@@ -141,4 +141,5 @@ export class NavigableGrid<P = NoProp> extends NavigableContainer<NavigableGridP
 type NavigableGridProps = {
   columns: number
   lazyLoader?: () => void
+  distanceBeforeLazyLoading?: number
 }

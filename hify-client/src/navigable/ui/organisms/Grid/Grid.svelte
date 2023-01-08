@@ -5,12 +5,13 @@
 
   export let columns: Props<Nav>['columns']
   export let lazyLoader: Props<Nav>['lazyLoader'] = undefined
+  export let distanceBeforeLazyLoading: Props<Nav>['distanceBeforeLazyLoading'] = undefined
 
   const columnsSize = new Array(columns).fill(`${100 / columns}%`).join(' ')
 </script>
 
 <div class="container" style="--columns-size: {columnsSize}">
-  <NavigableGrid {columns} {lazyLoader}>
+  <NavigableGrid {columns} {lazyLoader} {distanceBeforeLazyLoading}>
     <slot />
   </NavigableGrid>
 </div>
