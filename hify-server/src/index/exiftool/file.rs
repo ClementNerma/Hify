@@ -82,7 +82,7 @@ fn parse_exiftool_duration(duration: &ExifToolDuration) -> Result<u32> {
                 .parse::<u128>()
                 .unwrap();
 
-            Ok(hours * 3600 + minutes * 60 + seconds + if rest > 0 { 1 } else { 0 })
+            Ok(hours * 3600 + minutes * 60 + seconds + u32::from(rest > 0))
         }
     }
 }

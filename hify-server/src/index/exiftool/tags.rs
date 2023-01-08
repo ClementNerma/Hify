@@ -46,7 +46,7 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
         } else if let Some(rating) = tags.RatingPercent {
             Some(rating)
         } else if let Some(popularimeter) = tags.Popularimeter {
-            parse_popularimeter(&popularimeter)?
+            parse_popularimeter(popularimeter)?
         } else {
             None
         },

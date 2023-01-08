@@ -132,7 +132,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Collected {} tracks, generating cache...", tracks.len()),
     );
 
-    let tracks = SortedMap::from_vec(tracks, |track| track.id.clone());
+    let tracks = SortedMap::from_vec(tracks, |track| track.id);
 
     let cache = build_index_cache(&tracks);
 

@@ -69,9 +69,9 @@ impl UserDataCache {
             .retain(|listening| new_index.tracks.contains_key(&listening.track_id));
 
         self.listenings
-            .retain(|track_id, _| new_index.tracks.contains_key(&track_id));
+            .retain(|track_id, _| new_index.tracks.contains_key(track_id));
 
         self.listening_durations
-            .retain(|track_id, _| new_index.tracks.contains_key(&track_id));
+            .retain(|track_id, _| new_index.tracks.contains_key(track_id));
     }
 }

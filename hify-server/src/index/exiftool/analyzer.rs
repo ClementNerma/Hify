@@ -64,7 +64,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
         .par_iter()
         .map(|file| {
             let output = Command::new("exiftool")
-                .args(&["-n", "-json"])
+                .args(["-n", "-json"])
                 .arg(file)
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())

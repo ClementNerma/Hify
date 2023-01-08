@@ -104,7 +104,7 @@ pub fn raw_paginate<C: CursorType + Send + Sync, T, U: OutputType>(
 
     // Compute index of the first element to retrieve, considering the direction
     let start_at = match direction {
-        Direction::After => index + if cursor.is_some() { 1 } else { 0 },
+        Direction::After => index + usize::from(cursor.is_some()),
         Direction::Before => {
             if index >= count {
                 index - count
