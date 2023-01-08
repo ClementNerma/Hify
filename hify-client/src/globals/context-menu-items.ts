@@ -3,7 +3,7 @@ import { ContextMenuOption } from '../navigable/ui/molecules/ContextMenu/Context
 import { ROUTES } from '../routes'
 
 export const ctxMenuOptions = {
-  goToAlbum(albumId: string): ContextMenuOption {
-    return { label: 'Go to album', onPress: () => navigate(ROUTES.album(albumId)) }
-  },
+	goToAlbum(albumId: string): ContextMenuOption {
+		return { label: 'Go to album', onPress: () => navigate(ROUTES.album(albumId)) }
+	},
 }

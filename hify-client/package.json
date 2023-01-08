@@ -16,7 +16,7 @@
     "build": "run-s check compile",
     "serve": "sirv dist",
     "codegen": "graphql-codegen --config codegen.yml",
-    "prelint": "npm run format"
+    "format": "rome format ./src --write"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.16.1",

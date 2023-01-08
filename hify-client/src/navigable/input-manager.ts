@@ -1,35 +1,35 @@
 export const REMAPPED_KEYS: Record<string, string> = {
-  F4: 'Escape',
+	F4: 'Escape',
 }
 
 export function handleInput(handler: InputHandler): void {
-  inputHandlers.push(handler)
+	inputHandlers.push(handler)
 }
 
 export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
-  console.debug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
+	console.debug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
 
-  if (Object.prototype.hasOwnProperty.call(REMAPPED_KEYS, key)) {
-    key = REMAPPED_KEYS[key]
-  }
+	if (Object.prototype.hasOwnProperty.call(REMAPPED_KEYS, key)) {
+		key = REMAPPED_KEYS[key]
+	}
 
-  for (const handler of inputHandlers) {
-    if (handler(key, long) === KeyPressHandling.Intercepted) {
-      return
-    }
-  }
+	for (const handler of inputHandlers) {
+		if (handler(key, long) === KeyPressHandling.Intercepted) {
+			return
+		}
+	}
 }
 
 export function registerLongPressableKeys(...keys: string[]): void {
-  for (const key of keys) {
-    watchLongPressForKeys.add(key)
-  }
+	for (const key of keys) {
+		watchLongPressForKeys.add(key)
+	}
 
-  for (const [key, remapped] of Object.entries(REMAPPED_KEYS)) {
-    if (keys.includes(key)) {
-      watchLongPressForKeys.add(remapped)
-    }
-  }
+	for (const [key, remapped] of Object.entries(REMAPPED_KEYS)) {
+		if (keys.includes(key)) {
+			watchLongPressForKeys.add(remapped)
+		}
+	}
 }
 
 export const LONG_PRESS_THRESOLD_MS = 250
@@ -44,76 +44,76 @@ const pendingKeyCodes: Record<string, RegisteredKeyPress> = {}
 const triggeredKeyEvent = new Set<string>()
 
 type RegisteredKeyPress = {
-  at: Date
-  timeout: number
+	at: Date
+	timeout: number
 }
 
 export enum KeyPressType {
-  Simple,
-  Long,
+	Simple,
+	Long,
 }
 
 export enum KeyPressHandling {
-  Intercepted,
-  Propagate,
+	Intercepted,
+	Propagate,
 }
 
 document.body.addEventListener('keydown', (e) => {
-  if (e.ctrlKey || e.shiftKey || e.altKey) {
-    return
-  }
+	if (e.ctrlKey || e.shiftKey || e.altKey) {
+		return
+	}
 
-  // Allow to open developer tools
-  if (e.key === 'F12') {
-    return
-  }
+	// Allow to open developer tools
+	if (e.key === 'F12') {
+		return
+	}
 
-  e.preventDefault()
-  e.stopImmediatePropagation()
+	e.preventDefault()
+	e.stopImmediatePropagation()
 
-  if (!watchLongPressForKeys.has(e.key)) {
-    dispatchKeyPress(e.key, false)
-    return false
-  }
+	if (!watchLongPressForKeys.has(e.key)) {
+		dispatchKeyPress(e.key, false)
+		return false
+	}
 
-  // Holding a key down will fire a repeated series of 'keydown' events, so we take care of ignoring them
-  if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    return false
-  }
+	// Holding a key down will fire a repeated series of 'keydown' events, so we take care of ignoring them
+	if (Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
+		return false
+	}
 
-  pendingKeyCodes[e.key] = {
-    at: new Date(),
-    timeout: window.setTimeout(() => {
-      triggeredKeyEvent.add(e.key)
-      dispatchKeyPress(e.key, true)
-    }, LONG_PRESS_THRESOLD_MS),
-  }
+	pendingKeyCodes[e.key] = {
+		at: new Date(),
+		timeout: window.setTimeout(() => {
+			triggeredKeyEvent.add(e.key)
+			dispatchKeyPress(e.key, true)
+		}, LONG_PRESS_THRESOLD_MS),
+	}
 
-  return false
+	return false
 })
 
 document.body.addEventListener('keyup', (e) => {
-  if (e.ctrlKey || e.shiftKey || e.altKey) {
-    return
-  }
+	if (e.ctrlKey || e.shiftKey || e.altKey) {
+		return
+	}
 
-  // Happens when key has been pressed long enough for a long press
-  if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
-    return
-  }
+	// Happens when key has been pressed long enough for a long press
+	if (!Object.prototype.hasOwnProperty.call(pendingKeyCodes, e.key)) {
+		return
+	}
 
-  if (!watchLongPressForKeys.has(e.key)) {
-    return
-  }
+	if (!watchLongPressForKeys.has(e.key)) {
+		return
+	}
 
-  if (triggeredKeyEvent.has(e.key)) {
-    triggeredKeyEvent.delete(e.key)
-    delete pendingKeyCodes[e.key]
-    return
-  }
+	if (triggeredKeyEvent.has(e.key)) {
+		triggeredKeyEvent.delete(e.key)
+		delete pendingKeyCodes[e.key]
+		return
+	}
 
-  clearTimeout(pendingKeyCodes[e.key].timeout)
+	clearTimeout(pendingKeyCodes[e.key].timeout)
 
-  dispatchKeyPress(e.key, false)
-  delete pendingKeyCodes[e.key]
+	dispatchKeyPress(e.key, false)
+	delete pendingKeyCodes[e.key]
 })

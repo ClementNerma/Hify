@@ -1,5 +1,5 @@
 declare const hifyAndroidInjectedObject: {
-  updateAppUrl(): void
+	updateAppUrl(): void
 }
 
 export const hifyInterface = 'hifyAndroidInjectedObject' in window ? hifyAndroidInjectedObject : null

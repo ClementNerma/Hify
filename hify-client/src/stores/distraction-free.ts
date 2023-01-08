@@ -8,72 +8,72 @@ const _distractionFreeMode = writable(false)
 export const distractionFreeMode = readonly(_distractionFreeMode)
 
 export function setupDistractionFreeListener(
-  delay: number,
-  ignoreKeys?: string[],
-  interceptTurningOn?: () => boolean,
+	delay: number,
+	ignoreKeys?: string[],
+	interceptTurningOn?: () => boolean,
 ): (enabled: boolean) => void {
-  function restartDistractionFreeTimeout() {
-    if (destroyed) {
-      return
-    }
+	function restartDistractionFreeTimeout() {
+		if (destroyed) {
+			return
+		}
 
-    if (distractionModeTimeout !== null) {
-      clearTimeout(distractionModeTimeout)
-    }
+		if (distractionModeTimeout !== null) {
+			clearTimeout(distractionModeTimeout)
+		}
 
-    distractionModeTimeout = window.setTimeout(() => {
-      if (interceptTurningOn?.() !== false) {
-        _distractionFreeMode.set(true)
-      }
-    }, delay)
-  }
+		distractionModeTimeout = window.setTimeout(() => {
+			if (interceptTurningOn?.() !== false) {
+				_distractionFreeMode.set(true)
+			}
+		}, delay)
+	}
 
-  function resetDistractionFreeMode(): void {
-    if (destroyed) {
-      return
-    }
+	function resetDistractionFreeMode(): void {
+		if (destroyed) {
+			return
+		}
 
-    _distractionFreeMode.set(false)
-    restartDistractionFreeTimeout()
-  }
+		_distractionFreeMode.set(false)
+		restartDistractionFreeTimeout()
+	}
 
-  function externallySetDistractionFreeMode(value: boolean): void {
-    if (destroyed) {
-      return
-    }
+	function externallySetDistractionFreeMode(value: boolean): void {
+		if (destroyed) {
+			return
+		}
 
-    if (value) {
-      _distractionFreeMode.set(true)
-    } else {
-      resetDistractionFreeMode()
-    }
-  }
+		if (value) {
+			_distractionFreeMode.set(true)
+		} else {
+			resetDistractionFreeMode()
+		}
+	}
 
-  let destroyed = false
+	let destroyed = false
 
-  handleInput((key) => {
-    if (destroyed) {
-      return
-    }
+	handleInput((key) => {
+		if (destroyed) {
+			return
+		}
 
-    if (!ignoreKeys || !ignoreKeys.includes(key)) {
-      resetDistractionFreeMode()
-    }
-  })
+		if (!ignoreKeys || !ignoreKeys.includes(key)) {
+			resetDistractionFreeMode()
+		}
+	})
 
-  let distractionModeTimeout: number | null = null
-  restartDistractionFreeTimeout()
+	let distractionModeTimeout: number | null = null
+	restartDistractionFreeTimeout()
 
-  onDestroy(() => {
-    destroyed = true
+	onDestroy(() => {
+		destroyed = true
 
-    if (distractionModeTimeout !== null) {
-      clearTimeout(distractionModeTimeout)
-    }
+		if (distractionModeTimeout !== null) {
+			clearTimeout(distractionModeTimeout)
+		}
 
-    _distractionFreeMode.set(false)
-    resetDistractionFreeMode()
-  })
+		_distractionFreeMode.set(false)
+		resetDistractionFreeMode()
+	})
 
-  return externallySetDistractionFreeMode
+	return externallySetDistractionFreeMode
 }
