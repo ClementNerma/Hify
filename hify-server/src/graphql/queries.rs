@@ -147,7 +147,7 @@ impl QueryRoot {
         limit: usize,
     ) -> Result<IndexSearchResults> {
         let index = graphql_index!(ctx);
-        let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
+        let mut search_cache = graphql_ctx_member!(ctx, app_state.search_cache, write);
 
         Ok(search_index(&index, &mut search_cache, &input, limit))
     }

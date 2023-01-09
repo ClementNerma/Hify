@@ -19,21 +19,21 @@ impl GraphQLContext {
 #[macro_export]
 macro_rules! graphql_index {
     ($ctx_var: ident) => {
-        $crate::graphql_ctx_member!($ctx_var, index, read)
+        $crate::graphql_ctx_member!($ctx_var, app_state.index, read)
     };
 }
 
 #[macro_export]
 macro_rules! graphql_user_data {
     ($ctx_var: ident) => {
-        graphql_ctx_member!($ctx_var, user_data, read)
+        graphql_ctx_member!($ctx_var, app_state.user_data, read)
     };
 }
 
 #[macro_export]
 macro_rules! graphql_ctx_member {
-    ($ctx_var: ident, $member: ident, $mode: ident) => {{
+    ($ctx_var: ident, $($member: ident).+, $mode: ident) => {{
         let ctx = $ctx_var.data::<$crate::graphql::GraphQLContext>().unwrap();
-        ctx.app_state.$member.$mode().await
+        ctx.$($member).+.$mode().await
     }};
 }
