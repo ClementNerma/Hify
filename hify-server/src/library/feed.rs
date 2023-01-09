@@ -10,9 +10,8 @@ use time::Duration;
 use crate::{
     index::{AlbumInfos, ArtistInfos, Index, Track, TrackID},
     userdata::UserDataWrapper,
+    utils::time::get_now,
 };
-
-use super::time::get_now;
 
 #[derive(SimpleObject)]
 pub struct Feed {

@@ -3,7 +3,7 @@ use time::OffsetDateTime;
 
 use crate::{
     index::{Index, TrackID},
-    library::time::get_now,
+    utils::time::get_now,
 };
 
 #[derive(Clone, Serialize, Deserialize)]
