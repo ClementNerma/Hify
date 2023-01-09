@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { navigate } from 'svelte-navigator'
-  import Button from '../../navigable/ui/atoms/Button/Button.svelte'
-  import MixButton from '../../atoms/MixButton/MixButton.svelte'
-  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
-  import { AsyncHomePage } from '../../graphql/generated'
-  import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
-  import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
-  import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
-  import { ROUTES } from '../../routes'
-  import IndexUpdater from './IndexUpdater.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { navigate } from "svelte-navigator";
+  import Button from "../../navigable/ui/atoms/Button/Button.svelte";
+  import MixButton from "../../atoms/MixButton/MixButton.svelte";
+  import Row from "../../navigable/ui/molecules/Row/Row.svelte";
+  import { AsyncHomePage } from "../../graphql/generated";
+  import AlbumsRow from "../../molecules/AlbumsRow/AlbumsRow.svelte";
+  import ArtistsRow from "../../molecules/ArtistsRow/ArtistsRow.svelte";
+  import TracksRow from "../../molecules/TracksRow/TracksRow.svelte";
+  import { ROUTES } from "../../routes";
+  import IndexUpdater from "./IndexUpdater.svelte";
+  import LoadingIndicator from "../../atoms/LoadingIndicator/LoadingIndicator.svelte";
 
   const feed = AsyncHomePage({
     variables: {
       input: {},
     },
 
-    fetchPolicy: 'no-cache',
-  }).then((res) => res.data.generateFeed)
+    fetchPolicy: "no-cache",
+  }).then((res) => res.data.generateFeed);
 </script>
 
 {#await feed}
@@ -55,7 +55,9 @@
 
   <Row>
     <IndexUpdater />
-    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight>👷 Go the developper's tools page</Button>
+    <Button onPress={() => navigate(ROUTES.devTools)} fullHeight
+      >👷 Devtools</Button
+    >
   </Row>
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
