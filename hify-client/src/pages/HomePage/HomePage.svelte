@@ -4,8 +4,6 @@
   import MixButton from "../../atoms/MixButton/MixButton.svelte";
   import Row from "../../navigable/ui/molecules/Row/Row.svelte";
   import { AsyncHomePage } from "../../graphql/generated";
-  import AlbumsRow from "../../molecules/AlbumsRow/AlbumsRow.svelte";
-  import ArtistsRow from "../../molecules/ArtistsRow/ArtistsRow.svelte";
   import TracksRow from "../../molecules/TracksRow/TracksRow.svelte";
   import { ROUTES } from "../../routes";
   import IndexUpdater from "./IndexUpdater.svelte";
