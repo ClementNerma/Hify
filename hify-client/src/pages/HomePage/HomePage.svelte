@@ -8,6 +8,7 @@
   import { ROUTES } from "../../routes";
   import IndexUpdater from "./IndexUpdater.svelte";
   import LoadingIndicator from "../../atoms/LoadingIndicator/LoadingIndicator.svelte";
+  import StatsBox from "../../molecules/StatsBox/StatsBox.svelte";
 
   const feed = AsyncHomePage({
     variables: {
@@ -16,6 +17,8 @@
 
     fetchPolicy: "no-cache",
   }).then((res) => res.data.generateFeed);
+
+  let statsBox = false;
 </script>
 
 {#await feed}
@@ -56,7 +59,18 @@
     <Button onPress={() => navigate(ROUTES.devTools)} fullHeight
       >👷 Devtools</Button
     >
+    <Button
+      onPress={() => {
+        statsBox = true;
+      }}>Show me some stats</Button
+    >
   </Row>
+
+  {#if statsBox}
+    <Row>
+      <StatsBox />
+    </Row>
+  {/if}
 {:catch e}
   <h1>Failed to load homepage: {e.message}</h1>
 {/await}
