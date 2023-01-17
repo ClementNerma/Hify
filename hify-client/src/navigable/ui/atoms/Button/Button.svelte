@@ -8,12 +8,14 @@
   export let fullHeight = false
 
   export let hasFocusPriority: Props<Nav>['hasFocusPriority'] = null
+  export let onLongPress: Props<Nav>['onLongPress'] = undefined
   export let onFocus: Props<Nav>['onFocus'] = undefined
   export let onUnfocus: Props<Nav>['onFocus'] = undefined
 </script>
 
 <SimpleNavigableItem
   {onPress}
+  {onLongPress}
   {disabled}
   noPadding
   notRounded
