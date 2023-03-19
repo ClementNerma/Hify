@@ -1,6 +1,8 @@
 /// Heavily inspired by https://github.com/Raincal/blurhash-rs
+use std::borrow::Cow;
+
 use anyhow::{bail, Result};
-use image::DynamicImage;
+use image::{DynamicImage, EncodableLayout};
 
 // Default components to produce for blurhash
 pub static DEFAULT_BLURHASH_COMPONENTS_X: u32 = 3;
@@ -12,12 +14,26 @@ pub fn generate_blurhash(
     components_x: u32,
     components_y: u32,
 ) -> Result<String> {
+    // Get the image as RGB bytes
+    let bytes = match img {
+        // RGB-8 image
+        DynamicImage::ImageRgb8(img) => Cow::Borrowed(img.as_bytes()),
+
+        // Non-RGB-8 image (e.g.: RGB8 + alpha, RGB16, etc.)
+        _ => Cow::Owned(
+            img.to_rgb8()
+                .as_bytes()
+                // TODO: optimize?
+                .to_vec(),
+        ),
+    };
+
     encode(
         components_x,
         components_y,
         img.width(),
         img.height(),
-        img.as_bytes(),
+        bytes.as_ref(),
     )
 }
 
