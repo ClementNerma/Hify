@@ -4,9 +4,9 @@ use std::borrow::Cow;
 use anyhow::{bail, Result};
 use image::{DynamicImage, EncodableLayout};
 
-// Default components to produce for blurhash
-pub static DEFAULT_BLURHASH_COMPONENTS_X: u32 = 3;
-pub static DEFAULT_BLURHASH_COMPONENTS_Y: u32 = 3;
+// Maximum components to produce for blurhash
+pub static MAX_BLURHASH_COMPONENTS_X: u32 = 3;
+pub static MAX_BLURHASH_COMPONENTS_Y: u32 = 3;
 
 /// Calculates the blurhash for the provided image
 pub fn generate_blurhash(
