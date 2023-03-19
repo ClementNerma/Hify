@@ -165,4 +165,8 @@ export function humanReadableDuration(seconds: number): string {
 	return `${hoursPrefix}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
 }
 
-document.addEventListener('visibilitychange', () => stopAudioPlayer(true, true))
+document.addEventListener('visibilitychange', () => {
+	if (document.visibilityState === 'hidden') {
+		stopAudioPlayer(true, true)
+	}
+})
