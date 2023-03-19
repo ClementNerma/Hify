@@ -141,10 +141,11 @@ export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
 
 	_newListeningSession(null)
 
-	logInfo('Stopped audio playback')
-
 	if (!player.paused) {
+		logInfo('Stopped audio playback')
 		player.pause()
+	} else {
+		logInfo('Tried to stop audio playback, but it was already paused')
 	}
 
 	if (!justPause) {
