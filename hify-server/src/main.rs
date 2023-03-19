@@ -9,12 +9,15 @@ mod library;
 mod userdata;
 mod utils;
 
-use std::fs;
+use std::{
+    fs,
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 
-#[::rocket::main]
+#[tokio::main]
 async fn main() {
     if let Err(err) = inner_main().await {
         eprintln!("An error occurred:\n{err:?}");
@@ -122,7 +125,11 @@ async fn inner_main() -> Result<()> {
 
     println!("> Launching server...");
 
-    let server = http::launch(
+    // TODO: make it configurable
+    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 8893));
+
+    http::launch(
+        &addr,
         index,
         user_data,
         Box::new(move |index| {
@@ -130,9 +137,5 @@ async fn inner_main() -> Result<()> {
         }),
     )
     .await
-    .context("Failed to launch HTTP server")?;
-
-    server.shutdown().await;
-
-    Ok(())
+    .context("Failed to launch HTTP server")
 }

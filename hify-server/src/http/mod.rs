@@ -1,5 +1,4 @@
-mod cache;
-mod cors;
+mod graphql;
 mod routes;
 mod server;
 mod state;

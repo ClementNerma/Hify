@@ -1,153 +1,132 @@
-use rocket::{
-    http::{ContentType, Status},
-    tokio::fs::File,
-    State,
-};
-use rocket_seek_stream::SeekStream;
+use axum::{body::StreamBody, extract::Path, http::StatusCode, response::IntoResponse, Extension};
+use tokio::fs::File;
+use tokio_util::io::ReaderStream;
 
-use crate::index::{ArtID, ArtTarget, ArtistID, AudioFormat, TrackID};
+use crate::index::{ArtID, ArtTarget, ArtistID, TrackID};
 
-use super::{
-    server::{rest_server_error, FaillibleResponse},
-    AppState,
-};
+use super::AppState;
 
-#[rocket::get("/art/<id>")]
-pub async fn art(ctx: &State<AppState>, id: String) -> FaillibleResponse<(ContentType, File)> {
-    let id = ArtID::decode(&id).map_err(|_| {
-        rest_server_error(Status::BadRequest, "Invalid art ID provided".to_string())
-    })?;
+pub async fn art(
+    Extension(state): Extension<AppState>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
+    let id =
+        ArtID::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid art ID provided"))?;
 
-    let index = ctx.index.read().await;
-    let art = index.arts.get(&id).cloned().ok_or_else(|| {
-        rest_server_error(Status::NotFound, "Provided art was not found".to_string())
-    })?;
+    let index = state.index.read().await;
+
+    let art = index
+        .arts
+        .get(&id)
+        .ok_or((StatusCode::NOT_FOUND, "Provided art was not found"))?;
 
     // Cannot fail given we only look for art files with specific file extensions
     let ext = art.relative_path.extension().unwrap().to_str().unwrap();
 
-    let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
-        rest_server_error(
-            Status::InternalServerError,
-            "Internal error: Rocket did not return a valid MIME-TYPE for an art file extension"
-                .to_string(),
-        )
-    })?;
+    let mime_type = mime_guess::from_ext(ext).first_raw().ok_or((
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "Internal error: failed to determine MIME type for art file",
+    ))?;
 
     let file = File::open(index.from.join(&art.relative_path))
         .await
-        .map_err(|err| {
-            rest_server_error(
-                Status::InternalServerError,
-                format!("Failed to open art file: {err}"),
+        .map_err(|_| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal error: failed to open the art file",
             )
         })?;
 
-    Ok((mime_type, file))
+    let body = StreamBody::new(ReaderStream::new(file));
+
+    Ok(([("Content-Type", mime_type)], body))
 }
 
-#[rocket::get("/art/artist/<id>")]
 pub async fn artist_art(
-    ctx: &State<AppState>,
-    id: String,
-) -> FaillibleResponse<(ContentType, File)> {
+    Extension(state): Extension<AppState>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
     let id = ArtistID::decode(&id)
-        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
+        .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid artist ID provided"))?;
 
-    let index = ctx.index.read().await;
+    let index = state.index.read().await;
 
-    let artist_first_album_id = index
+    let artist_albums = index
         .cache
         .artists_albums
         .get(&id)
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Provided artist ID was not found".to_string(),
-            )
-        })?
-        .keys()
-        .next()
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Provided artist does not have any album to generate an art image from".to_string(),
-            )
-        })?;
+        .ok_or((StatusCode::NOT_FOUND, "Provided artist was not found"))?;
+
+    let artist_first_album_id = artist_albums.keys().next().ok_or((
+        StatusCode::NOT_FOUND,
+        "Provided artist does not have any album to generate art from",
+    ))?;
 
     let album_art = index
         .arts
         .get(&ArtTarget::AlbumCover(*artist_first_album_id).to_id())
-        .ok_or_else(|| {
-            rest_server_error(
-                Status::NotFound,
-                "Artist's first album does not have an art image".to_string(),
+        .ok_or((
+            StatusCode::NOT_FOUND,
+            "Artist's first album does not have a cover art",
+        ))?;
+
+    // TODO: improve artist arts
+    let art = album_art;
+
+    // Cannot fail given we only look for art files with specific file extensions
+    let ext = art.relative_path.extension().unwrap().to_str().unwrap();
+
+    let mime_type = mime_guess::from_ext(ext).first_raw().ok_or((
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "Internal error: failed to determine MIME type for art file",
+    ))?;
+
+    let file = File::open(index.from.join(&art.relative_path))
+        .await
+        .map_err(|_| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal error: failed to open the art file",
             )
         })?;
 
+    let body = StreamBody::new(ReaderStream::new(file));
+
+    Ok(([("Content-Type", mime_type)], body))
+}
+
+pub async fn stream(
+    Extension(state): Extension<AppState>,
+    Path(id): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
+    let id =
+        TrackID::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid track ID provided"))?;
+
+    let index = state.index.read().await;
+
+    let track = index
+        .tracks
+        .get(&id)
+        .ok_or((StatusCode::NOT_FOUND, "Provided track was not found"))?;
+
     // Cannot fail given we only look for art files with specific file extensions
-    let ext = album_art
-        .relative_path
-        .extension()
-        .unwrap()
-        .to_str()
-        .unwrap();
+    let ext = track.relative_path.extension().unwrap().to_str().unwrap();
 
-    let mime_type = ContentType::from_extension(ext).ok_or_else(|| {
-        rest_server_error(
-            Status::InternalServerError,
-            "Internal error: Rocket did not return a valid MIME-TYPE for an art file extension"
-                .to_string(),
-        )
-    })?;
+    let mime_type = mime_guess::from_ext(ext).first_raw().ok_or((
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "Internal error: failed to determine MIME type for the track's file",
+    ))?;
 
-    let file = File::open(&album_art.relative_path).await.map_err(|err| {
-        rest_server_error(
-            Status::InternalServerError,
-            format!("Failed to open art file: {err}"),
-        )
-    })?;
+    let file = File::open(index.from.join(&track.relative_path))
+        .await
+        .map_err(|_| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal error: failed to open the track's file",
+            )
+        })?;
 
-    Ok((mime_type, file))
-}
+    let body = StreamBody::new(ReaderStream::new(file));
 
-#[rocket::get("/stream/<id>")]
-pub async fn stream<'a>(
-    ctx: &State<AppState>,
-    id: String,
-) -> FaillibleResponse<(ContentType, SeekStream<'a>)> {
-    let id = TrackID::decode(&id)
-        .map_err(|_| rest_server_error(Status::BadRequest, "Invalid ID provided".to_string()))?;
-
-    let index = ctx.index.read().await;
-    let track = index.tracks.get(&id).ok_or_else(|| {
-        rest_server_error(
-            Status::NotFound,
-            "Provided track ID was not found".to_string(),
-        )
-    })?;
-
-    let stream = SeekStream::from_path(index.from.join(&track.relative_path)).map_err(|err| {
-        rest_server_error(
-            Status::InternalServerError,
-            format!("Failed to open seek stream for track file: {}", err),
-        )
-    })?;
-
-    let mime_type = match track.metadata.format {
-        AudioFormat::MP3 => ContentType::MPEG,
-        AudioFormat::FLAC => ContentType::FLAC,
-        AudioFormat::WAV => ContentType::WAV,
-        AudioFormat::AAC => ContentType::AAC,
-        AudioFormat::OGG => ContentType::OGG,
-        AudioFormat::M4A => ContentType::MP4,
-        AudioFormat::OPUS => ContentType::OGG,
-    };
-
-    Ok((mime_type, stream))
-}
-
-#[rocket::get("/exit")]
-pub fn exit() {
-    std::process::exit(0)
+    Ok(([("Content-Type", mime_type)], body))
 }

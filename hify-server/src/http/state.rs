@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rocket::tokio::sync::RwLock;
+use tokio::sync::RwLock;
 
 use crate::{
     index::{Index, SearchCache},

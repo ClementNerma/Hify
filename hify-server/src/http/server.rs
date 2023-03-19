@@ -1,48 +1,50 @@
-use rocket::Rocket;
-use rocket::{http::Status, Ignite};
-use serde::Serialize;
+use std::net::SocketAddr;
 
-use rocket::response::status;
+use anyhow::Result;
+use axum::{routing::get, Extension, Router, Server};
+use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use super::{
-    cache::CachingStrategy,
-    cors::CORS,
-    routes::{art, artist_art, exit, stream},
+    routes::{art, artist_art, stream},
     AppState,
 };
-use crate::graphql::{get_graphql_routes, get_graphql_schema, SaveIndexFn};
+use crate::{
+    graphql::{get_graphql_schema, SaveIndexFn},
+    http::graphql::{graphiql, graphql_handler},
+};
 use crate::{index::Index, userdata::UserDataWrapper};
 
-pub static GRAPHQL_MOUNTPOINT: &str = "/graphql";
+pub static GRAPHQL_ENDPOINT: &str = "/graphql";
 
 pub async fn launch(
+    address: &SocketAddr,
     index: Index,
     user_data: UserDataWrapper,
     save_index: SaveIndexFn,
-) -> Result<Rocket<Ignite>, rocket::Error> {
+) -> Result<()> {
+    // TODO: improve this
+    let cors = CorsLayer::new()
+        .allow_methods(AllowMethods::any())
+        .allow_origin(AllowOrigin::any())
+        .allow_headers(AllowHeaders::any());
+
     let app_state = AppState::new(index, user_data);
 
-    Rocket::build()
-        .attach(CORS)
-        .attach(CachingStrategy)
-        .manage(get_graphql_schema(app_state.clone(), save_index))
-        .manage(app_state)
-        .mount(GRAPHQL_MOUNTPOINT, get_graphql_routes())
-        .mount("/", rocket::routes![art, artist_art, stream, exit])
-        .launch()
-        .await
-}
+    let graphql_schema = get_graphql_schema(app_state.clone(), save_index);
 
-pub fn rest_server_error(status: Status, message: String) -> status::Custom<String> {
-    status::Custom(
-        status,
-        serde_json::to_string(&ServerError { message }).unwrap(),
-    )
-}
+    let app = Router::new()
+        // Define all routes
+        .route(GRAPHQL_ENDPOINT, get(graphiql).post(graphql_handler))
+        .route("/art/:id", get(art))
+        .route("/art/artist/:id", get(artist_art))
+        .route("/stream/:id", get(stream))
+        // Define extensions
+        .layer(Extension(app_state))
+        .layer(Extension(graphql_schema))
+        // Define middlewares
+        .layer(cors);
 
-#[derive(Serialize)]
-struct ServerError {
-    message: String,
-}
+    Server::bind(address).serve(app.into_make_service()).await?;
 
-pub type FaillibleResponse<T> = Result<T, status::Custom<String>>;
+    Ok(())
+}
