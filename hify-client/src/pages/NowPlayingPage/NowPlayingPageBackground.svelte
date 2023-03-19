@@ -41,7 +41,7 @@
     bottom: 0;
     z-index: -1;
 
-    filter: brightness(0.8);
+    filter: brightness(0.5);
 
     transition: filter linear 0.5s;
   }
