@@ -15,7 +15,7 @@
     "start": "run-p watch:* dev",
     "build": "run-s check compile",
     "serve": "sirv dist",
-    "codegen": "graphql-codegen --config codegen.yml",
+    "gql": "graphql-codegen --config codegen.yml",
     "format": "rome format ./src --write",
     "lint": "rome check ./src"
   },
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
+    "blurhash-wasm": "^0.2.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "svelte": "^3.57.0",

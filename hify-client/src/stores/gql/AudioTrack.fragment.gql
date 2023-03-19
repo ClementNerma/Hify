@@ -15,13 +15,9 @@ fragment AudioTrack on Track {
 
         year
 
-        art {
-          dominantColor {
-            r
-            g
-            b
-          }
-        }
+        # art {
+        #   blurhash
+        # }
       }
       disc
       trackNo

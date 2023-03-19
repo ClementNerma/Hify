@@ -1,36 +1,36 @@
 <script lang="ts">
-  import { lowerBrightness, multiplyBrightness } from '../../globals/colors'
-  import { ArtRgb, AudioTrackFragment } from '../../graphql/generated'
+  import { createBlurHashImageSrc } from "../../globals/blurhash-decoder";
+  import { AudioTrackFragment } from "../../graphql/generated";
 
-  export let track: AudioTrackFragment | null
-  export let dim = false
+  export let track: AudioTrackFragment | null;
+  export let dim = false;
 
-  function colorToRGB(color: ArtRgb): string {
-    return `rgb(${color.r}, ${color.g}, ${color.b})`
+  function computeBackground(): string {
+    if (!track) {
+      return "black";
+    }
+
+    const { art } = track?.metadata.tags.album;
+
+    if (!art) {
+      return "black";
+    }
+
+    const blurHashSrc = createBlurHashImageSrc(
+      art,
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    return `url("${blurHashSrc}")`;
   }
 
-  function computeBackground(track: AudioTrackFragment): string {
-    // Here we take the album cover's dominant color (defaulting to black)
-    const color = track?.metadata.tags.album.art?.dominantColor ?? { r: 0, g: 0, b: 0 }
-
-    // Then we darken it a little to create a radial gradient around the cover
-    // The color is computed so the perceived brightness (by the human eye) is always equal,
-    //   no matter what the original color was. This works by darkening the color until
-    //   it reaches a certain level of brightness (here, 10 on a scale of 100).
-    const centerColor = lowerBrightness(color, 20)
-
-    // And this is the external color which will go on the side
-    // The radial gradient goes from the color above (at its center)
-    //   up to this color, at the exterior.
-    const extColor = lowerBrightness(color, 10)
-
-    return `radial-gradient(circle, ${colorToRGB(centerColor)} 0%, ${colorToRGB(extColor)} 100%)`
-  }
-
-  $: background = track ? computeBackground(track) : 'black'
+  let background = computeBackground();
 </script>
 
 <div class="background" style:background class:dim />
+
+<svelte:window on:resize={() => (background = computeBackground())} />
 
 <style>
   .background {

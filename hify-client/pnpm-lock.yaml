@@ -8,6 +8,7 @@ specifiers:
   '@graphql-codegen/typescript': 3.0.2
   '@graphql-codegen/typescript-operations': 3.0.2
   '@sveltejs/vite-plugin-svelte': ^2.0.3
+  blurhash-wasm: ^0.2.0
   cross-env: ^7.0.3
   dotenv: ^16.0.3
   graphql: ^16.6.0
@@ -26,6 +27,7 @@ specifiers:
 
 dependencies:
   '@apollo/client': 3.7.10_graphql@16.6.0
+  blurhash-wasm: 0.2.0
   graphql: 16.6.0
   graphql-tag: 2.12.6_graphql@16.6.0
   svelte: 3.57.0
@@ -2273,6 +2275,10 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
     dev: true
+
+  /blurhash-wasm/0.2.0:
+    resolution: {integrity: sha512-d/jOMANMlth4VNQRs3Xr/bDj7K3S2/QuRvrwC3QldeOTX9/5MLHUn2+JQV11Ja2J4/kY+HbRJOCGCy9T4BBvJw==}
+    dev: false
 
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
