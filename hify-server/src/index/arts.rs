@@ -16,6 +16,7 @@ use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use crate::utils::progress::display_progress;
 
 use super::{
+    blurhash::{generate_blurhash, DEFAULT_BLURHASH_COMPONENTS_X, DEFAULT_BLURHASH_COMPONENTS_Y},
     AlbumID, AlbumInfos, Art, ArtID, ArtRgb, ArtTarget, ArtistID, IndexCache, SortedMap, Track,
     TrackID,
 };
@@ -176,7 +177,12 @@ fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art
         width: img.width(),
         height: img.height(),
 
-        // blurhash,
+        blurhash: generate_blurhash(
+            &img,
+            DEFAULT_BLURHASH_COMPONENTS_X,
+            DEFAULT_BLURHASH_COMPONENTS_Y,
+        )?,
+
         dominant_color: get_dominant_color(&img)?,
     })
 }

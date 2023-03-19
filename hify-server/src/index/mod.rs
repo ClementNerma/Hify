@@ -1,4 +1,5 @@
 mod arts;
+mod blurhash;
 mod builder;
 mod cache;
 mod data;
