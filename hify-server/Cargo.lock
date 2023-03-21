@@ -782,7 +782,6 @@ dependencies = [
  "image",
  "mime_guess",
  "once_cell",
- "pomsky",
  "pomsky-macro",
  "rand",
  "rayon",
