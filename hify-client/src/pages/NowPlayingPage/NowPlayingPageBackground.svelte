@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { createBlurHashImageSrc } from "../../globals/blurhash-decoder";
+  import { getArtUri } from "../../globals/rest-api";
   import { AudioTrackFragment } from "../../graphql/generated";
 
   export let track: AudioTrackFragment | null;
   export let dim = false;
 
-  function computeBackground(track: AudioTrackFragment | null): string {
+  function computeBackgroundImage(track: AudioTrackFragment | null): string {
     if (!track) {
       return "black";
     }
@@ -16,21 +16,13 @@
       return "black";
     }
 
-    const blurHashSrc = createBlurHashImageSrc(
-      art,
-      window.innerWidth,
-      window.innerHeight
-    );
-
-    return `url("${blurHashSrc}")`;
+    return `url("${getArtUri(art.id)}")`;
   }
 
-  $: background = computeBackground(track);
+  $: background = computeBackgroundImage(track);
 </script>
 
-<div class="background" style:background class:dim />
-
-<svelte:window on:resize={() => (background = computeBackground(track))} />
+<div class="background" style="--background: {background};" class:dim />
 
 <style>
   .background {
@@ -41,12 +33,17 @@
     bottom: 0;
     z-index: -1;
 
-    filter: brightness(0.5);
+    background: var(--background);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    filter: blur(10px) brightness(0.5);
 
     transition: filter linear 0.5s;
   }
 
   .background.dim {
-    filter: brightness(0.3);
+    filter: blur(10px) brightness(0.3);
   }
 </style>
