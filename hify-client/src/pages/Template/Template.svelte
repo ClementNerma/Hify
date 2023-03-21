@@ -16,6 +16,7 @@
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
+    import Background from '../../organisms/Background/Background.svelte';
 
   const location = useLocation()
 
@@ -61,7 +62,7 @@
   })
 </script>
 
-<div class="background" />
+<div class="background"></div>
 
 <NavigablePage>
   <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>
@@ -111,7 +112,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: -9999;
+    z-index: -3;
 
     background: linear-gradient(to bottom, rgb(10, 38, 89) 0%, rgb(8, 4, 45) 80%);
   }
