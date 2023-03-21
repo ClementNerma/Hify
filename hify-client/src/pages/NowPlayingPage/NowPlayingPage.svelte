@@ -151,7 +151,7 @@
     -o-object-fit: contain;
     object-fit: contain;
 
-    transition: opacity 0.5s;
+    transition: opacity 0.3s;
 
     filter: drop-shadow(0 0 1rem rgb(77, 77, 77));
   }
