@@ -11,8 +11,8 @@
   $: backdropFilter = `blur(10px) brightness(${dim ? 0.3 : 0.5})`
 </script>
 
-<div class="background" style:background></div>
-<div class="filter" style:backdrop-filter={backdropFilter}></div>
+<div class="background" style="--background: {background}"></div>
+<div class="filter" style="--backdrop-filter: {backdropFilter}"></div>
 
 <style>
     .background {
@@ -25,6 +25,7 @@
 
         z-index: -2;
 
+        background: var(--background);
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -39,5 +40,7 @@
         bottom: 0;
 
         z-index: -1;
+
+        backdrop-filter: var(--backdrop-filter);
     }
 </style>
