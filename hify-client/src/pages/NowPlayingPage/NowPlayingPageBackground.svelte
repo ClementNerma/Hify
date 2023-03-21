@@ -7,7 +7,7 @@
 
   $: art = track?.metadata.tags.album?.art
   $: background = art ? `url("${getArtUri(art.id)}")` : 'transparent'
-  $: backdropFilter = `blur(10px) brightness(${dim ? 0.3 : 0.4})`
+  $: backdropFilter = `blur(20px) brightness(${dim ? 0.3 : 0.4})`
 </script>
 
 <div class="background" style="--background: {background}"></div>
