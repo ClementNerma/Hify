@@ -119,15 +119,11 @@ pub async fn stream(
         .ok_or((StatusCode::NOT_FOUND, "Provided track was not found"))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
-    let served = ServeFile::new(
-        index
-            .from
-            .join(&format!("{}a", track.relative_path.display())),
-    )
-    .oneshot(req)
-    .await
-    // We can unwrap as the Err() variant is Infallible
-    .unwrap();
+    let served = ServeFile::new(index.from.join(&track.relative_path))
+        .oneshot(req)
+        .await
+        // We can unwrap as the Err() variant is Infallible
+        .unwrap();
 
     Ok(served)
 }
