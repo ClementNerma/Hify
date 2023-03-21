@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-graphql = { default-features = false, features = ["graphiql"], version = "5.0.6" }
 anyhow = "1.0.70"
-async-graphql = "5.0.6"
 async-graphql-axum = "5.0.6"
 axum = "0.6.11"
 clap = { version = "4.1.11", features = ["derive"] }
