@@ -5,7 +5,7 @@
   export let track: AudioTrackFragment | null;
   export let dim = false;
 
-  function computeBackground(): string {
+  function computeBackground(track: AudioTrackFragment | null): string {
     if (!track) {
       return "black";
     }
@@ -25,12 +25,12 @@
     return `url("${blurHashSrc}")`;
   }
 
-  let background = computeBackground();
+  $: background = computeBackground(track);
 </script>
 
 <div class="background" style:background class:dim />
 
-<svelte:window on:resize={() => (background = computeBackground())} />
+<svelte:window on:resize={() => (background = computeBackground(track))} />
 
 <style>
   .background {
