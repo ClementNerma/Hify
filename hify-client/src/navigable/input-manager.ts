@@ -1,3 +1,5 @@
+import { logDebug } from '../stores/debugger'
+
 export const REMAPPED_KEYS: Record<string, string> = {
 	F4: 'Escape',
 }
@@ -59,6 +61,8 @@ export enum KeyPressHandling {
 }
 
 document.body.addEventListener('keydown', (e) => {
+	logDebug(`Key down: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
+
 	if (e.ctrlKey || e.shiftKey || e.altKey) {
 		return
 	}
@@ -93,6 +97,8 @@ document.body.addEventListener('keydown', (e) => {
 })
 
 document.body.addEventListener('keyup', (e) => {
+	logDebug(`Key up: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
+
 	if (e.ctrlKey || e.shiftKey || e.altKey) {
 		return
 	}
