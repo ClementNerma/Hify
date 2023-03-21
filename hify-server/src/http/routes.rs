@@ -1,6 +1,14 @@
-use axum::{body::StreamBody, extract::Path, http::StatusCode, response::IntoResponse, Extension};
+use axum::{
+    body::{Body, StreamBody},
+    extract::Path,
+    http::{Request, StatusCode},
+    response::IntoResponse,
+    Extension,
+};
 use tokio::fs::File;
 use tokio_util::io::ReaderStream;
+use tower::ServiceExt;
+use tower_http::services::ServeFile;
 
 use crate::index::{ArtID, ArtTarget, ArtistID, TrackID};
 
@@ -98,6 +106,7 @@ pub async fn artist_art(
 pub async fn stream(
     Extension(state): Extension<AppState>,
     Path(id): Path<String>,
+    req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
     let id =
         TrackID::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid track ID provided"))?;
@@ -109,24 +118,9 @@ pub async fn stream(
         .get(&id)
         .ok_or((StatusCode::NOT_FOUND, "Provided track was not found"))?;
 
-    // Cannot fail given we only look for art files with specific file extensions
-    let ext = track.relative_path.extension().unwrap().to_str().unwrap();
-
-    let mime_type = mime_guess::from_ext(ext).first_raw().ok_or((
-        StatusCode::INTERNAL_SERVER_ERROR,
-        "Internal error: failed to determine MIME type for the track's file",
-    ))?;
-
-    let file = File::open(index.from.join(&track.relative_path))
+    // TODO: implement the "oneshot" myself and remove the "tower" dependency?
+    Ok(ServeFile::new(index.from.join(&track.relative_path))
+        .oneshot(req)
         .await
-        .map_err(|_| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Internal error: failed to open the track's file",
-            )
-        })?;
-
-    let body = StreamBody::new(ReaderStream::new(file));
-
-    Ok(([("Content-Type", mime_type)], body))
+        .unwrap())
 }
