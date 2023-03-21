@@ -38,12 +38,12 @@
     background-repeat: no-repeat;
     background-size: cover;
 
-    filter: blur(10px) brightness(0.5);
+    filter: blur(20px) brightness(0.4);
 
     transition: filter linear 0.5s;
   }
 
   .background.dim {
-    filter: blur(10px) brightness(0.3);
+    filter: blur(20px) brightness(0.3);
   }
 </style>
