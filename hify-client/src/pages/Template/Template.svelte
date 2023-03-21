@@ -16,7 +16,6 @@
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
-    import Background from '../../organisms/Background/Background.svelte';
 
   const location = useLocation()
 
