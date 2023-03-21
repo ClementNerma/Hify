@@ -104,7 +104,7 @@ export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 
 	const prevTime = player.currentTime
 
-	player.currentTime += relativeSeconds
+	player.currentTime = player.currentTime + relativeSeconds
 
 	logDebug(
 		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (from time: ${prevTime}s)`,
