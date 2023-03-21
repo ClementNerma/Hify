@@ -1,14 +1,13 @@
 <script lang="ts">
   import { getArtUri } from "../../globals/rest-api";
   import { AudioTrackFragment } from "../../graphql/generated";
-  import { globalBackground } from "../../organisms/Background/Background.svelte";
 
   export let track: AudioTrackFragment | null;
   export let dim = false;
 
   $: art = track?.metadata.tags.album?.art
   $: background = art ? `url("${getArtUri(art.id)}")` : 'transparent'
-  $: backdropFilter = `blur(10px) brightness(${dim ? 0.3 : 0.5})`
+  $: backdropFilter = `blur(10px) brightness(${dim ? 0.3 : 0.4})`
 </script>
 
 <div class="background" style="--background: {background}"></div>
