@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 #![forbid(unused_must_use)]
+#![forbid(unused_crate_dependencies)]
 
 mod cmd;
 mod graphql;
