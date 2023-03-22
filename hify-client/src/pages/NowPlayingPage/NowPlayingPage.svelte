@@ -152,8 +152,6 @@
     object-fit: contain;
 
     transition: opacity 0.3s;
-
-    filter: drop-shadow(0 0 0.5em rgb(77, 77, 77));
   }
 
   .album-art.darkened {
