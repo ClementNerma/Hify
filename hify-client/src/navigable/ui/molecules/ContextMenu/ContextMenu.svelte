@@ -120,7 +120,6 @@
     border-radius: 5px;
 
     box-shadow: 2px 2px 5px lightgray;
-    opacity: 0.9;
     
     z-index: 10;
   }
