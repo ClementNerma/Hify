@@ -6,7 +6,7 @@
   export let art: ProgressiveImgFragment | null | undefined
 
   export let title: string
-  export let subtitle: string
+  export let subtitle: string | null = null
 
   export let onPress: () => void
   export let onLongPress: (() => void) | undefined = undefined

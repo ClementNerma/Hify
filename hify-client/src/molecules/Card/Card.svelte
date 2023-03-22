@@ -5,7 +5,7 @@
   export let art: ProgressiveImgFragment | null | undefined
 
   export let title: string
-  export let subtitle: string | null
+  export let subtitle: string | null = null
 
   export let boxSize = 120
   export let rounded = false
@@ -46,7 +46,7 @@
 
   .subtitle {
     font-size: 0.9rem;
-    font-style: italic;
+    /* font-style: italic; */
   }
 
   /* TODO: remove experimental stuff */

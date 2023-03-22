@@ -47,7 +47,6 @@
 
       <InteractiveCard
         title={tags.title}
-        subtitle={tags.album.name}
         art={tags.album.art}
         onPress={bind(i, (i) => {
           playTrackFromNewQueue(tracks, i)
@@ -57,6 +56,7 @@
           showContextMenu([{ label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) }]),
         )}
       />
+      <!-- subtitle={tags.album.name} -->
     {/each}
   </Grid>
 {:catch e}
