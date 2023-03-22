@@ -112,11 +112,16 @@
     position: fixed;
     top: var(--ctx-top);
     left: var(--ctx-left);
-    display: inline-block;
+    
     background-color: lightgray;
     color: black;
+    
     border: 1px solid black;
     border-radius: 5px;
+
+    box-shadow: 2px 2px 5px lightgray;
+    opacity: 0.9;
+    
     z-index: 10;
   }
 
