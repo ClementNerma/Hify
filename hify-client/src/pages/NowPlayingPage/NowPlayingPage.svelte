@@ -65,7 +65,6 @@
     }
   })
 
-  const COVER_SIZE = 250
   const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 </script>
 
@@ -78,8 +77,6 @@
     <img
       class="album-art"
       class:darkened={!$distractionFreeMode}
-      width={$distractionFreeMode ? '' : COVER_SIZE}
-      height={$distractionFreeMode ? '' : COVER_SIZE}
       {src}
       alt=""
     />
