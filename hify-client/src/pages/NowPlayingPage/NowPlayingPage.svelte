@@ -153,7 +153,7 @@
 
     transition: opacity 0.3s;
 
-    filter: drop-shadow(0 0 0.3em rgb(33, 33, 33));
+    filter: drop-shadow(0 0 0.5em rgb(44, 44, 44));
   }
 
   .album-art.darkened {
