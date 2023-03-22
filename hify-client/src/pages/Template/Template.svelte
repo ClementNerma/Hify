@@ -113,6 +113,6 @@
     bottom: 0;
     z-index: -3;
 
-    background: linear-gradient(to bottom, rgb(10, 38, 89) 0%, rgb(8, 4, 45) 80%);
+    background: linear-gradient(to bottom, #363636 0%, #080808 33%);
   }
 </style>
