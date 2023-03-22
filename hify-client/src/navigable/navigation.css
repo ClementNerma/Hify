@@ -5,8 +5,7 @@ navigable-container-wrapper {
 navigable-item-wrapper.focusedOrMouseHover> :first-child,
 navigable-item-wrapper:hover> :first-child {
   outline: none;
-  color: black;
-  background-color: white;
+  text-decoration: underline;
   cursor: pointer;
 }
 
