@@ -116,6 +116,7 @@
     background-color: lightgray;
     color: black;
     border: 1px solid black;
+    border-radius: 5px;
     z-index: 10;
   }
 
