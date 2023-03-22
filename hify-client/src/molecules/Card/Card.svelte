@@ -40,12 +40,13 @@
     border-radius: 50%;
   }
 
-  .title {
+  /* .title {
     font-weight: bold;
-  }
+  } */
 
   .subtitle {
     font-size: 0.9rem;
+    font-style: italic;
   }
 
   /* TODO: remove experimental stuff */
