@@ -44,6 +44,8 @@ pub async fn launch(
         // Define middlewares
         .layer(cors);
 
+    println!("> Server is being launched on {address}");
+
     Server::bind(address).serve(app.into_make_service()).await?;
 
     Ok(())

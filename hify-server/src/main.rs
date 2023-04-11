@@ -10,10 +10,7 @@ mod library;
 mod userdata;
 mod utils;
 
-use std::{
-    fs,
-    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
-};
+use std::{fs, net::SocketAddr};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
@@ -127,7 +124,7 @@ async fn inner_main() -> Result<()> {
     println!("> Launching server...");
 
     // TODO: make it configurable
-    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 8893));
+    let addr = "0.0.0.0:8894".parse::<SocketAddr>().unwrap();
 
     http::launch(
         &addr,
