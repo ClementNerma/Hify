@@ -124,7 +124,7 @@ async fn inner_main() -> Result<()> {
     println!("> Launching server...");
 
     // TODO: make it configurable
-    let addr = "0.0.0.0:8894".parse::<SocketAddr>().unwrap();
+    let addr = "0.0.0.0:8893".parse::<SocketAddr>().unwrap();
 
     http::launch(
         &addr,
