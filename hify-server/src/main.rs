@@ -93,7 +93,9 @@ async fn inner_main() -> Result<()> {
                     .context("Failed to save index file with rebuilt cache")?;
             }
 
-            if fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)? {
+            if music_dir.exists() != index.from.exists()
+                || fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)?
+            {
                 bail!(
                     "Provided music directory is {} but current index references {}",
                     music_dir.display(),
