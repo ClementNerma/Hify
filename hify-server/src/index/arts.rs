@@ -128,7 +128,7 @@ fn find_album_art(
 
     let track_path = base_dir.join(&tracks.get(first_track_id).unwrap().relative_path);
 
-    for dir in track_path.ancestors() {
+    for dir in track_path.ancestors().skip(1) {
         let items: Vec<_> = fs::read_dir(dir)
             .context("Failed to read directory during art discovery")?
             .collect::<Result<_, _>>()
