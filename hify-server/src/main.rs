@@ -93,6 +93,14 @@ async fn inner_main() -> Result<()> {
                     .context("Failed to save index file with rebuilt cache")?;
             }
 
+            if fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)? {
+                bail!(
+                    "Provided music directory is {} but current index references {}",
+                    music_dir.display(),
+                    index.from.display()
+                );
+            }
+
             if rebuild_arts {
                 println!("> Rebuilding arts as requested...");
 
@@ -117,14 +125,6 @@ async fn inner_main() -> Result<()> {
             index
         }
     };
-
-    if fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)? {
-        bail!(
-            "Provided music directory is {} but current index references {}",
-            music_dir.display(),
-            index.from.display()
-        );
-    }
 
     if no_server {
         return Ok(());
