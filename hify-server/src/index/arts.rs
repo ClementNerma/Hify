@@ -130,7 +130,12 @@ fn find_album_art(
 
     for dir in track_path.ancestors().skip(1) {
         let items: Vec<_> = fs::read_dir(dir)
-            .context("Failed to read directory during art discovery")?
+            .with_context(|| {
+                format!(
+                    "Failed to read directory during art discovery: {}",
+                    dir.display()
+                )
+            })?
             .collect::<Result<_, _>>()
             .context("Failed during art discovery")?;
 
