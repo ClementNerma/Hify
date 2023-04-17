@@ -77,7 +77,7 @@ async fn inner_main() -> Result<()> {
             if update_index {
                 println!("> Updating index as requested...");
 
-                index = index::build_index(music_dir, Some(index))
+                index = index::build_index(music_dir.clone(), Some(index))
                     .context("Failed to rebuild index")?;
 
                 utils::save::save_index(&index_file, &index)
@@ -109,13 +109,22 @@ async fn inner_main() -> Result<()> {
 
         false => {
             println!("> Generating index...");
-            let index = index::build_index(music_dir, None).context("Failed to build index")?;
+            let index =
+                index::build_index(music_dir.clone(), None).context("Failed to build index")?;
             utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
             println!("> Index saved on disk.");
 
             index
         }
     };
+
+    if fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)? {
+        bail!(
+            "Provided music directory is {} but current index references {}",
+            music_dir.display(),
+            index.from.display()
+        );
+    }
 
     if no_server {
         return Ok(());
