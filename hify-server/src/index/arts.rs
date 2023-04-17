@@ -1,6 +1,7 @@
 use std::{
     collections::HashMap,
-    path::{Path, PathBuf},
+    fs,
+    path::Path,
     sync::{
         atomic::{AtomicU64, AtomicUsize, Ordering},
         Mutex,
@@ -17,8 +18,8 @@ use super::{
     AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,
 };
 
-static COVER_FILENAMES: &[&str] = &["cover", "Cover", "folder", "Folder"];
-static COVER_EXTENSIONS: &[&str] = &["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"];
+static COVER_FILENAMES: &[&str] = &["cover", "folder"];
+static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
 
 pub fn generate_artist_art(
     artist_id: ArtistID,
@@ -128,22 +129,26 @@ fn find_album_art(
     let track_path = base_dir.join(&tracks.get(first_track_id).unwrap().relative_path);
 
     for dir in track_path.ancestors() {
+        let items: Vec<_> = fs::read_dir(dir)
+            .context("Failed to read directory during art discovery")?
+            .collect::<Result<_, _>>()
+            .context("Failed during art discovery")?;
+
         for filename in COVER_FILENAMES {
             for extension in COVER_EXTENSIONS {
-                let mut art_file = PathBuf::new();
-                art_file.set_file_name(filename);
-                art_file.set_extension(extension);
+                let first_match = items.iter().find(|item| {
+                    item.file_name().to_string_lossy().to_ascii_lowercase()
+                        == format!("{filename}.{extension}")
+                });
 
-                let mut art_path = dir.to_path_buf();
-                art_path.push(art_file);
-
-                if art_path.is_file() {
-                    let art = make_album_art(&art_path, base_dir, album_id).with_context(|| {
-                        format!(
-                            "Failed to make art for album cover at: {}",
-                            art_path.to_string_lossy()
-                        )
-                    })?;
+                if let Some(item) = first_match {
+                    let art =
+                        make_album_art(&item.path(), base_dir, album_id).with_context(|| {
+                            format!(
+                                "Failed to make art for album cover at: {}",
+                                item.path().to_string_lossy()
+                            )
+                        })?;
 
                     return Ok(Some(art));
                 }
