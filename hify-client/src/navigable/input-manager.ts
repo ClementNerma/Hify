@@ -67,6 +67,8 @@ function shouldNotInterceptKey(e: KeyboardEvent) {
 		|| e.key.match(/^[a-zA-Z0-9_\-\+\s]$/)
 		// Allow to open developer tools
 		|| e.key === 'F12'
+		// Allow to remove a character
+		|| e.key === 'Backspace'
 }
 
 document.body.addEventListener('keydown', (e) => {
