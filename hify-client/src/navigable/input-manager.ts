@@ -60,15 +60,19 @@ export enum KeyPressHandling {
 	Propagate,
 }
 
+/** Determine if the key should NOT be intercepted */
+function shouldNotInterceptKey(e: KeyboardEvent) {
+	return e.ctrlKey || e.shiftKey || e.altKey
+		// Allow to input normal characters
+		|| e.key.match(/^[a-zA-Z0-9_\-\+\s]$/)
+		// Allow to open developer tools
+		|| e.key === 'F12'
+}
+
 document.body.addEventListener('keydown', (e) => {
 	logDebug(`Key down: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
 
-	if (e.ctrlKey || e.shiftKey || e.altKey) {
-		return
-	}
-
-	// Allow to open developer tools
-	if (e.key === 'F12') {
+	if (shouldNotInterceptKey(e)) {
 		return
 	}
 
@@ -99,7 +103,7 @@ document.body.addEventListener('keydown', (e) => {
 document.body.addEventListener('keyup', (e) => {
 	logDebug(`Key up: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
 
-	if (e.ctrlKey || e.shiftKey || e.altKey) {
+	if (shouldNotInterceptKey(e)) {
 		return
 	}
 
