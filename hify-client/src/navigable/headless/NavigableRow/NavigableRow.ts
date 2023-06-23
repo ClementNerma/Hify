@@ -55,7 +55,7 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 
 		switch (from) {
 			case NavigationComingFrom.Above:
-			case NavigationComingFrom.Below:
+			case NavigationComingFrom.Below: {
 				const prio = this.getFocusPriority()
 
 				if (prio) {
@@ -64,6 +64,7 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 
 				tries = items
 				break
+			}
 
 			case NavigationComingFrom.Left:
 				tries = items

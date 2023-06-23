@@ -6,6 +6,13 @@
       "recommended": true,
       "performance": {
         "noDelete": "off"
+      },
+      "correctness": {
+        "noVoidTypeReturn": "off"
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "useEnumInitializers": "off"
       }
     },
     "ignore": [

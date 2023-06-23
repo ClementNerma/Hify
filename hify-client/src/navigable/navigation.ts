@@ -92,7 +92,7 @@ export abstract class NavigableCommon<P = NoProp> {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-	interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void {}
+	interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void { }
 }
 
 export abstract class NavigableContainer<P = NoProp> extends NavigableCommon<P> {
@@ -357,7 +357,7 @@ function visitNavigableChildren(
 
 			let i = 0
 
-			for (;;) {
+			for (; ;) {
 				next = next.nextSibling
 				i += 1
 
@@ -403,7 +403,7 @@ function visitNavigableChildren(
 
 	let curr: Node | null = startFrom
 
-	for (;;) {
+	for (; ;) {
 		curr = curr.nextSibling
 
 		if (curr === null) {
@@ -494,7 +494,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 		case 'ArrowUp':
 		case 'ArrowLeft':
 		case 'ArrowRight':
-		case 'ArrowDown':
+		case 'ArrowDown': {
 			if (currentJustFocused) {
 				next = current
 				break
@@ -514,9 +514,10 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 				: current.parent.navigate(current, direction)
 
 			break
+		}
 
 		case 'Enter':
-		case 'Escape':
+		case 'Escape': {
 			const events: { [key in typeof key]: NavigationAction } = {
 				Enter: long ? NavigationAction.LongPress : NavigationAction.Press,
 				Escape: long ? NavigationAction.LongBack : NavigationAction.Back,
@@ -546,6 +547,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 			}
 
 			break
+		}
 
 		case 'Home':
 			next = current.parent.navigateToFirstItemDown(NavigationComingFrom.Above)
@@ -639,7 +641,7 @@ type NavState = {
 
 const navState = writable<NavState | null>(null)
 
-export class HTMLNavigableItemWrapperElement extends HTMLElement {}
+export class HTMLNavigableItemWrapperElement extends HTMLElement { }
 
 export const ITEM_WRAPPER_ELEMENT_TAG_NAME = 'navigable-item-wrapper'
 
