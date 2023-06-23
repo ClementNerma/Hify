@@ -4,21 +4,21 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-async-graphql = { default-features = false, features = ["graphiql"], version = "5.0.7" }
-anyhow = "1.0.70"
-async-graphql-axum = "5.0.7"
-axum = "0.6.16"
-clap = { version = "4.2.4", features = ["derive"] }
-dirs = "5.0.0"
-once_cell = "1.17.1"
+async-graphql = { default-features = false, features = ["graphiql"], version = "5.0.10" }
+anyhow = "1.0.71"
+async-graphql-axum = "5.0.10"
+axum = "0.6.18"
+clap = { version = "4.3.5", features = ["derive"] }
+dirs = "5.0.1"
+once_cell = "1.18.0"
 pomsky-macro = "0.10.0"
 rand = "0.8.5"
 rayon = "1.7.0"
-regex = "1.8.1"
-serde = { version = "1.0.160", features = ["derive"] }
-serde_json = "1.0.96"
-time = { version = "0.3.20", features = ["local-offset", "std", "serde"] }
-tokio = { version = "1.27.0", features = ["macros", "rt-multi-thread", "fs"] }
+regex = "1.8.4"
+serde = { version = "1.0.164", features = ["derive"] }
+serde_json = "1.0.97"
+time = { version = "0.3.22", features = ["local-offset", "std", "serde"] }
+tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread", "fs"] }
 tower = { version = "0.4.13", features = ["util"] }
-tower-http = { version = "0.4.0", features = ["cors", "fs"] }
+tower-http = { version = "0.4.1", features = ["cors", "fs"] }
 walkdir = "2.3.3"
