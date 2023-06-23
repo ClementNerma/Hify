@@ -26,7 +26,7 @@ macro_rules! graphql_index {
 #[macro_export]
 macro_rules! graphql_user_data {
     ($ctx_var: ident) => {
-        graphql_ctx_member!($ctx_var, app_state.user_data, read)
+        $crate::graphql_ctx_member!($ctx_var, app_state.user_data, read)
     };
 }
 

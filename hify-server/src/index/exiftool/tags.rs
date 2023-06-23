@@ -1,11 +1,11 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
 use serde::{de::Error, Deserialize, Deserializer};
 use serde_json::Value;
 
-use crate::index::{TrackDate, TrackTags};
+use crate::index::{Rating, TrackDate, TrackTags};
 
 pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
     let tags = TrackTags {
@@ -41,15 +41,21 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
 
-        rating: if let Some(rating) = tags.Rating {
-            Some(rating as u8)
-        } else if let Some(rating) = tags.RatingPercent {
-            Some(rating)
-        } else if let Some(popularimeter) = tags.Popularimeter {
-            parse_popularimeter(popularimeter)?
-        } else {
-            None
-        },
+        rating: tags
+            .Popularimeter
+            .map(parse_popularimeter)
+            .transpose()?
+            .flatten()
+            .map(|rating| rating as f64 * 25.6)
+            .or(tags.Rating)
+            .or_else(|| tags.RatingPercent.map(|rating| rating as f64 * 2.56))
+            .map(|rating| {
+                Rating::parse((rating / 10.0) as u8).map_err(|()| {
+                    anyhow!(
+                "Invalid rating found in file: expected a value between 0 and 100, got {rating}")
+                })
+            })
+            .transpose()?,
     };
 
     if tags.artists.is_empty() && tags.album_artists.is_empty() {
@@ -105,16 +111,16 @@ fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
 
     match captured.name("score").unwrap().as_str() {
         "0" => Ok(None),
-        "1" => Ok(Some(20)),
-        "13" => Ok(Some(10)),
-        "54" => Ok(Some(30)),
-        "64" => Ok(Some(40)),
-        "118" => Ok(Some(50)),
-        "128" => Ok(Some(60)),
-        "186" => Ok(Some(70)),
-        "196" => Ok(Some(80)),
-        "242" => Ok(Some(90)),
-        "255" => Ok(Some(100)),
+        "1" => Ok(Some(2)),
+        "13" => Ok(Some(1)),
+        "54" => Ok(Some(3)),
+        "64" => Ok(Some(4)),
+        "118" => Ok(Some(5)),
+        "128" => Ok(Some(6)),
+        "186" => Ok(Some(7)),
+        "196" => Ok(Some(8)),
+        "242" => Ok(Some(9)),
+        "255" => Ok(Some(10)),
         score => bail!(
             "Failed to parse score in 'Popularimeter' tag: invalid value {}",
             score

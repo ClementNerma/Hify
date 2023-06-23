@@ -2,12 +2,14 @@ mod cache;
 mod config;
 mod history;
 
+use std::collections::HashMap;
+
 pub use config::UserDataConfig;
 pub use history::OneListening;
 
 use serde::{Deserialize, Serialize};
 
-use crate::index::Index;
+use crate::index::{Index, Rating, TrackID};
 
 use self::{cache::UserDataCache, history::History};
 
@@ -15,6 +17,7 @@ use self::{cache::UserDataCache, history::History};
 pub struct UserData {
     config: UserDataConfig,
     history: History,
+    track_ratings: HashMap<TrackID, Rating>,
 }
 
 impl UserData {
@@ -22,6 +25,7 @@ impl UserData {
         Self {
             config,
             history: History::new(),
+            track_ratings: HashMap::new(),
         }
     }
 
@@ -51,6 +55,20 @@ impl UserDataWrapper {
 
     pub fn history(&self) -> &History {
         &self.inner.history
+    }
+
+    pub fn track_ratings(&self) -> &HashMap<TrackID, Rating> {
+        &self.inner.track_ratings
+    }
+
+    pub fn set_track_rating(&mut self, track_id: TrackID, rating: Rating) {
+        self.inner.track_ratings.insert(track_id, rating);
+
+        (self.on_change)(&self.inner);
+    }
+
+    pub fn remove_track_rating(&mut self, track_id: &TrackID) {
+        self.inner.track_ratings.remove(track_id);
     }
 
     pub fn log_listening(&mut self, entry: OneListening) {

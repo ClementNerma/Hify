@@ -3,10 +3,10 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
-    graphql_index,
+    graphql_index, graphql_user_data,
     index::{
-        AlbumID, AlbumInfos, Art, ArtTarget, ArtistID, ArtistInfos, GenreID, GenreInfos, SortedMap,
-        Track, TrackID, TrackTags,
+        AlbumID, AlbumInfos, Art, ArtTarget, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating,
+        SortedMap, Track, TrackID, TrackTags,
     },
 };
 
@@ -25,6 +25,13 @@ pub struct IndexInfos {
 impl Track {
     async fn id(&self) -> TrackID {
         self.id
+    }
+
+    async fn user_ratings(&self, ctx: &Context<'_>) -> Option<Rating> {
+        graphql_user_data!(ctx)
+            .track_ratings()
+            .get(&self.id)
+            .copied()
     }
 }
 

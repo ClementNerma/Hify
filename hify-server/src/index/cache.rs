@@ -163,7 +163,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             let rated_tracks: Vec<_> = album_tracks
                 .iter()
                 .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating as f64)
+                .map(|rating| rating.value() as f64)
                 .collect();
 
             if rated_tracks.is_empty() {
@@ -181,7 +181,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             let rated_tracks: Vec<_> = artist_tracks
                 .iter()
                 .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating as f64)
+                .map(|rating| rating.value() as f64)
                 .collect();
 
             if rated_tracks.is_empty() {
@@ -200,7 +200,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
                 .keys()
                 .flat_map(|album_id| albums_tracks.get(album_id).unwrap())
                 .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating as f64)
+                .map(|rating| rating.value() as f64)
                 .collect();
 
             if rated_tracks.is_empty() {

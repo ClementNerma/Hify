@@ -2,7 +2,8 @@ use async_graphql::{Context, Object};
 
 use super::GraphQLContext;
 use crate::{
-    index::{build_index, Index, TrackID},
+    graphql_ctx_member,
+    index::{build_index, Index, Rating, TrackID},
     userdata::OneListening,
 };
 
@@ -34,9 +35,15 @@ impl MutationRoot {
     }
 
     async fn log_listening(&self, ctx: &Context<'_>, track_id: TrackID, duration_s: u32) -> bool {
-        let ctx = ctx.data::<GraphQLContext>().unwrap();
-        let mut user_data = ctx.app_state.user_data.write().await;
-        user_data.log_listening(OneListening::new_now(track_id, duration_s));
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .log_listening(OneListening::new_now(track_id, duration_s));
+
+        true
+    }
+
+    async fn set_track_rating(&self, ctx: &Context<'_>, track_id: TrackID, rating: Rating) -> bool {
+        graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, rating);
+
         true
     }
 }

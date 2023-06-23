@@ -6,7 +6,7 @@ use std::{
     time::SystemTime,
 };
 
-use async_graphql::{Enum, SimpleObject};
+use async_graphql::{Enum, InputValueError, InputValueResult, Scalar, ScalarType, SimpleObject};
 use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
@@ -255,8 +255,8 @@ pub struct TrackTags {
     #[graphql(skip)]
     pub genres: Vec<String>,
 
-    /// The track's rating, from 0 to 100
-    pub rating: Option<u8>,
+    /// The track's rating
+    pub rating: Option<Rating>,
 }
 
 impl TrackTags {
@@ -309,6 +309,87 @@ pub struct TrackDate {
 
     /// Day, starting from 1
     pub day: Option<u8>,
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Rating {
+    Zero = 0,
+    One = 1,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+    Nine = 9,
+    Ten = 10,
+}
+
+impl Rating {
+    pub fn parse(value: u8) -> Result<Self, ()> {
+        match value {
+            0 => Ok(Self::Zero),
+            1 => Ok(Self::One),
+            2 => Ok(Self::Two),
+            3 => Ok(Self::Three),
+            4 => Ok(Self::Four),
+            5 => Ok(Self::Five),
+            6 => Ok(Self::Six),
+            7 => Ok(Self::Seven),
+            8 => Ok(Self::Eight),
+            9 => Ok(Self::Nine),
+            10 => Ok(Self::Ten),
+            _ => Err(()),
+        }
+    }
+
+    pub fn value(&self) -> u8 {
+        match self {
+            Rating::Zero => 0,
+            Rating::One => 1,
+            Rating::Two => 2,
+            Rating::Three => 3,
+            Rating::Four => 4,
+            Rating::Five => 5,
+            Rating::Six => 6,
+            Rating::Seven => 7,
+            Rating::Eight => 8,
+            Rating::Nine => 9,
+            Rating::Ten => 10,
+        }
+    }
+}
+
+#[Scalar]
+impl ScalarType for Rating {
+    fn parse(value: async_graphql::Value) -> InputValueResult<Self> {
+        match value {
+            async_graphql::Value::Number(num) => {
+                let num = num.as_u64().ok_or_else(|| {
+                    InputValueError::custom("Rating should be an integer (between 0 and 10)")
+                })?;
+
+                let num = u8::try_from(num).map_err(|_| {
+                    InputValueError::custom(
+                        "Rating should be an 8-bit integer (and between 0 and 10)",
+                    )
+                })?;
+
+                Rating::parse(num).map_err(|()| {
+                    InputValueError::custom("Rating should be a integer between 0 and 10")
+                })
+            }
+
+            _ => Err(InputValueError::custom(
+                "Rating should be a number (integer between 0 and 10)",
+            )),
+        }
+    }
+
+    fn to_value(&self) -> async_graphql::Value {
+        async_graphql::Value::Number(self.value().into())
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, SimpleObject)]
