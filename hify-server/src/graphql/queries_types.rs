@@ -27,7 +27,7 @@ impl Track {
         self.id
     }
 
-    async fn user_ratings(&self, ctx: &Context<'_>) -> Option<Rating> {
+    async fn app_only_rating(&self, ctx: &Context<'_>) -> Option<Rating> {
         graphql_user_data!(ctx)
             .track_ratings()
             .get(&self.id)
