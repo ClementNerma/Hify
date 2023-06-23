@@ -1,5 +1,6 @@
 fragment AudioTrack on Track {
   id
+  appOnlyRating
   metadata {
     format
     duration

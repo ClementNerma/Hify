@@ -140,14 +140,15 @@
             <tbody>
               {#each disc.tracks as track, i (track.id)}
                 {@const tags = track.metadata.tags}
+                {@const rating = track.appOnlyRating ?? tags.rating}
 
                 <NavigableTrack tracks={filteredTracks} goToAlbumOption={false} display="transparent" {track}>
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>
                     <td class="rating">
-                      {#if tags.rating}
-                        <TrackRating rating={tags.rating} />
+                      {#if rating}
+                        <TrackRating rating={rating} />
                       {/if}
                     </td>
                     <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
