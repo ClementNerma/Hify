@@ -59,6 +59,11 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let files = build_files_list(&dir).context("Failed to build files list")?;
 
+    log(
+        started,
+        &format!("Found a total of {} audio files.", files.len()),
+    );
+
     let files_mtime = files
         .into_iter()
         .filter(|(path, _)| exiftool::is_audio_file(path))
@@ -75,7 +80,11 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         })
         .collect::<BTreeMap<_, _>>();
 
-    log(started, &format!("Found {} files.", files_mtime.len()));
+    log(
+        started,
+        &format!("Found {} new or modified files.", files_mtime.len()),
+    );
+
     log(started, "Extracting audio metadata...");
 
     // Run analysis tool on all new and modified files
