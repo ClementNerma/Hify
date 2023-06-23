@@ -50,7 +50,7 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
             .or(tags.Rating)
             .or_else(|| tags.RatingPercent.map(|rating| rating as f64 * 2.56))
             .map(|rating| {
-                Rating::parse((rating / 10.0) as u8).map_err(|()| {
+                Rating::parse((rating / 10.0).round() as u8).map_err(|()| {
                     anyhow!(
                 "Invalid rating found in file: expected a value between 0 and 100, got {rating}")
                 })
