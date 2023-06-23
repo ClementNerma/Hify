@@ -21,8 +21,13 @@ impl MutationRoot {
 
         (ctx.save_index)(&index)?;
 
+        // Clear the serach cache
+        ctx.app_state.search_cache.write().await.clear();
+
+        // Cleanup user data (delete dangling data from removed tracks)
         ctx.app_state.user_data.write().await.cleanup(&index);
 
+        // Update the index
         *ctx.app_state.index.write().await = index;
 
         Ok(true)

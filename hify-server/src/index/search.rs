@@ -204,6 +204,10 @@ impl SearchCache {
             })
             .map(|(min_key, _)| min_key)
     }
+
+    pub fn clear(&mut self) {
+        self.content.clear();
+    }
 }
 
 pub struct SearchCacheEntry {
