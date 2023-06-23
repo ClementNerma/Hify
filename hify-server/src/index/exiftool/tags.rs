@@ -41,19 +41,23 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
 
         genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
 
-        rating: tags
+        rating:
+            // Popularimeter parsing gives us a value between 0 and 10...
+        tags
             .Popularimeter
             .map(parse_popularimeter)
             .transpose()?
             .flatten()
-            .map(|rating| rating as f64 * 25.6)
-            .or(tags.Rating)
-            .or_else(|| tags.RatingPercent.map(|rating| rating as f64 * 2.56))
+            // ...Rating gives us a value between 0 and 256...
+            .or_else(|| tags.Rating.map(|rating| (rating / 25.6).round() as u8))
+            // ...RatingPercent gives us a value between 0 and 100...
+            .or_else(|| tags.RatingPercent.map(|rating| (rating as f64 / 10.0).round() as u8))
+            // ...after normalizing all these to an u8 between 0 and 10, we can parse it as a rating
             .map(|rating| {
-                Rating::parse((rating / 10.0).round() as u8).map_err(|()| {
+                Rating::parse(rating).map_err(|()| {
                     anyhow!(
-                "Invalid rating found in file: expected a value between 0 and 100, got {rating}")
-                })
+                        "Invalid rating found in file: expected a value between 0 and 10, got {rating}")
+                    })
             })
             .transpose()?,
     };
