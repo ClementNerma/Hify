@@ -47,6 +47,6 @@
     "svelte-navigator": "^3.2.2"
   },
   "volta": {
-    "node": "19.8.1"
+    "node": "20.3.1"
   }
 }
