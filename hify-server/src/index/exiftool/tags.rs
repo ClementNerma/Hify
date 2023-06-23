@@ -48,8 +48,8 @@ pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
             .map(parse_popularimeter)
             .transpose()?
             .flatten()
-            // ...Rating gives us a value between 0 and 256...
-            .or_else(|| tags.Rating.map(|rating| (rating / 25.6).round() as u8))
+            // ...Rating gives us a value between 0 and 100...
+            .or_else(|| tags.Rating.map(|rating| (rating / 10.0).round() as u8))
             // ...RatingPercent gives us a value between 0 and 100...
             .or_else(|| tags.RatingPercent.map(|rating| (rating as f64 / 10.0).round() as u8))
             // ...after normalizing all these to an u8 between 0 and 10, we can parse it as a rating
