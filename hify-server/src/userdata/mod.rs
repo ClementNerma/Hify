@@ -61,14 +61,18 @@ impl UserDataWrapper {
         &self.inner.track_ratings
     }
 
-    pub fn set_track_rating(&mut self, track_id: TrackID, rating: Rating) {
-        self.inner.track_ratings.insert(track_id, rating);
+    pub fn set_track_rating(&mut self, track_id: TrackID, rating: Option<Rating>) {
+        match rating {
+            Some(rating) => {
+                self.inner.track_ratings.insert(track_id, rating);
+            }
+
+            None => {
+                self.inner.track_ratings.remove(&track_id);
+            }
+        }
 
         (self.on_change)(&self.inner);
-    }
-
-    pub fn remove_track_rating(&mut self, track_id: &TrackID) {
-        self.inner.track_ratings.remove(track_id);
     }
 
     pub fn log_listening(&mut self, entry: OneListening) {
