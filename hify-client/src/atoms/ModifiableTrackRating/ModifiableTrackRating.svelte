@@ -15,7 +15,7 @@
     let failed: boolean;
 
     $: {
-        initialRating = track.appOnlyRating ?? track.metadata.tags.rating ?? 0;
+        initialRating = track.computedRating ?? 0;
         current = initialRating;
         updating = false;
         failed = false;
@@ -43,7 +43,7 @@
 
         // Not ideal but required because re-fetching the whole tracks list
         // would be both complex and inefficient
-        track.appOnlyRating = updatingWith;
+        track.computedRating = updatingWith;
     }
 
     function setRatingRelative(rel: number) {

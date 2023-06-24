@@ -1,6 +1,7 @@
 fragment AudioTrack on Track {
   id
-  appOnlyRating
+  computedRating
+  # appOnlyRating
   metadata {
     format
     duration
@@ -22,7 +23,7 @@ fragment AudioTrack on Track {
       }
       disc
       trackNo
-      rating
+      # rating
       genres {
         id
         name

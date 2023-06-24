@@ -19,7 +19,7 @@ export function formatDate({ day, month, year }: NonNullable<AudioTrackFragment[
 }
 
 export function hasMinimumRating(track: AudioTrackFragment, min: number): boolean {
-	const rating = track.appOnlyRating ?? track.metadata.tags.rating
+	const rating = track.computedRating
 	return rating !== null && rating !== undefined && rating >= min
 }
 
