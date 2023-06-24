@@ -313,7 +313,6 @@ pub struct TrackDate {
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rating {
-    Zero = 0,
     One = 1,
     Two = 2,
     Three = 3,
@@ -329,7 +328,6 @@ pub enum Rating {
 impl Rating {
     pub fn parse(value: u8) -> Result<Self, ()> {
         match value {
-            0 => Ok(Self::Zero),
             1 => Ok(Self::One),
             2 => Ok(Self::Two),
             3 => Ok(Self::Three),
@@ -346,7 +344,6 @@ impl Rating {
 
     pub fn value(&self) -> u8 {
         match self {
-            Rating::Zero => 0,
             Rating::One => 1,
             Rating::Two => 2,
             Rating::Three => 3,
