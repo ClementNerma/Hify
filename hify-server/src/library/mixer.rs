@@ -27,7 +27,7 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
         .tracks
         .values()
         .filter(|track| match track.metadata.tags.rating {
-            None => min_rating == Rating::Zero,
+            None => false,
             Some(rating) => rating >= min_rating,
         })
         .filter(|track| match &from_artist {
