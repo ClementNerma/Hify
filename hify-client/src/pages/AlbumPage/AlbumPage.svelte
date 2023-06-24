@@ -55,7 +55,7 @@
   })
 
   function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
-    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 80)) : tracks
+    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 8)) : tracks
   }
 
   let onlyShowGreatSongs = false
