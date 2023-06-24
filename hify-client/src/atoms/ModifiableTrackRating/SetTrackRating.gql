@@ -1,0 +1,3 @@
+mutation SetTrackRating($trackId: String!, $rating: Rating!) {
+    setTrackRating(trackId: $trackId, rating: $rating)
+}

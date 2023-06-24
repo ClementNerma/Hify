@@ -17,7 +17,8 @@
   import ProgressRange from '../../navigable/ui/atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import Column from '../../navigable/ui/molecules/Column/Column.svelte'
+  import Column from '../../navigable/ui/molecules/Column/Column.svelte'  
+  import ModifiableTrackRating from '../../atoms/ModifiableTrackRating/ModifiableTrackRating.svelte';
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false
@@ -50,6 +51,8 @@
                 <div class="track-info">🎤 {artist.name}</div>
               </SimpleNavigableItem>
             {/each}
+
+            <ModifiableTrackRating track={currentTrack} />
           </NavigableRow>
         </div>
 
