@@ -1,53 +1,65 @@
 <script lang="ts">
-    import { AudioTrackFragment, SetTrackRating } from "../../graphql/generated";
+    import {
+        AudioTrackFragment,
+        RemoveTrackRating,
+        SetTrackRating,
+    } from "../../graphql/generated";
     import SimpleNavigableItem from "../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte";
-    import { bind } from "../../globals/utils";
 
-    export let track: AudioTrackFragment
-    
-    let initialRating: number | null
+    export let track: AudioTrackFragment;
 
-    let current: number | null
-    let updating: boolean
-    let failed: boolean
+    let initialRating: number;
+
+    let current: number;
+    let updating: boolean;
+    let failed: boolean;
 
     $: {
-        initialRating = track.appOnlyRating ?? track.metadata.tags.rating
-        current = initialRating
-        updating = false
-        failed = false
+        initialRating = track.appOnlyRating ?? track.metadata.tags.rating ?? 0;
+        current = initialRating;
+        updating = false;
+        failed = false;
     }
 
     async function update() {
-        const updatingWith = current
+        const updatingWith = current;
 
-        updating = true
+        updating = true;
 
-        const done = await SetTrackRating({ variables: { trackId: track.id, rating: updatingWith } })
+        const done =
+            updatingWith > 0
+                ? await SetTrackRating({
+                      variables: { trackId: track.id, rating: updatingWith },
+                  })
+                : await RemoveTrackRating({
+                      variables: { trackId: track.id },
+                  });
 
-        updating = false
+        updating = false;
 
-        failed = !!done.errors
-        current = updatingWith
-        initialRating = updatingWith
+        failed = !!done.errors;
+        current = updatingWith;
+        initialRating = updatingWith;
 
         // Not ideal but required because re-fetching the whole tracks list
         // would be both complex and inefficient
-        track.appOnlyRating = updatingWith
+        track.appOnlyRating = updatingWith;
     }
 
-    function setRating(newRating: number) {
-        current = newRating
-        failed = false
+    function setRatingRelative(rel: number) {
+        current += rel;
+        failed = false;
     }
 </script>
 
 <SimpleNavigableItem
-    onLeft={current === null ? undefined : current >= 2 ? bind(current, (current) => setRating(current - 2)) : undefined}
-    onRight={current === null ? () => setRating(2) : current <= 8 ? bind(current, (current) => setRating(current + 2)) : undefined}
-    onPress={() => { update() }}
+    onLeft={current >= 2 ? () => setRatingRelative(-2) : undefined}
+    onRight={current <= 8 ? () => setRatingRelative(+2) : undefined}
+    onPress={() => {
+        update();
+    }}
 >
-    <div class:changed={current !== initialRating} class:updating class:failed={failed}>
+    <div class:changed={current !== initialRating} class:updating class:failed>
         {#each [2, 4, 6, 8, 10] as value}
             {#if current !== null && current >= value}
                 &starf;
