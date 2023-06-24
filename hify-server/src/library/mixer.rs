@@ -26,10 +26,7 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
     let mut tracks: Vec<_> = index
         .tracks
         .values()
-        .filter(|track| match track.metadata.tags.rating {
-            None => false,
-            Some(rating) => rating >= min_rating,
-        })
+        .filter(|track| track.metadata.tags.rating.unwrap_or(Rating::Zero) >= min_rating)
         .filter(|track| match &from_artist {
             Some(artist_id) => index
                 .cache
