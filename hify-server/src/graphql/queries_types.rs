@@ -33,6 +33,14 @@ impl Track {
             .get(&self.id)
             .copied()
     }
+
+    async fn computed_rating(&self, ctx: &Context<'_>) -> Option<Rating> {
+        graphql_user_data!(ctx)
+            .track_ratings()
+            .get(&self.id)
+            .copied()
+            .or(self.metadata.tags.rating)
+    }
 }
 
 #[ComplexObject]
