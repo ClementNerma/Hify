@@ -4,15 +4,14 @@ import wasm from 'vite-plugin-wasm'
 import topLevelAwait from 'vite-plugin-top-level-await'
 import dotenv from 'dotenv'
 
-export default ({ mode }) => {  
+export default ({ mode }) => {
   dotenv.config({ path: `./.env.${mode}` })
 
   return defineConfig({
     plugins: [svelte(), wasm(), topLevelAwait()],
 
-    /*server: {
-      port: process.env['VITE_PORT'] ?? 8892,
-      host: !!process.env['VITE_HOST']
-    }*/
+    server: {
+      port: 8892
+    }
   })
 }
