@@ -41,13 +41,15 @@ impl MutationRoot {
         true
     }
 
-    async fn set_track_rating(
-        &self,
-        ctx: &Context<'_>,
-        track_id: TrackID,
-        rating: Option<Rating>,
-    ) -> bool {
-        graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, rating);
+    async fn set_track_rating(&self, ctx: &Context<'_>, track_id: TrackID, rating: Rating) -> bool {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .set_track_rating(track_id, Some(rating));
+
+        true
+    }
+
+    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
+        graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, None);
 
         true
     }
