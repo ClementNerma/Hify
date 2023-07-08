@@ -17,6 +17,7 @@
         <QueueGalleryTrack
           isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
           position={$readablePlayQueue.tracks.indexOf(track)}
+          totalTracks={$readablePlayQueue.tracks.length}
           columns={COLUMNS}
           {track}
         />

@@ -3,14 +3,15 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
+  import { moveTrackPositionInQueue, playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
+  import { ContextMenuOption, showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment
   export let position: number
+  export let totalTracks: number
   export let isCurrent: boolean
   export let columns: number
 
@@ -24,9 +25,23 @@
     wasCurrent = isCurrent
   })
 
-  $: contextMenuOptions = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)].concat(
-    isCurrent ? [] : [{ label: 'Remove from queue', onPress: () => removeFromQueue(position) }],
-  )
+  function computeContextMenuOptions(): ContextMenuOption[] {
+    const options = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)]
+
+    if (!isCurrent) {
+      options.push({ label: 'Remove from queue', onPress() { removeFromQueue(position) } })
+    }
+
+    if (position > 0) {
+      options.push({ label: 'Move left', onPress() { moveTrackPositionInQueue(position, position - 1) } })
+    }
+
+    if (position < totalTracks - 1) {
+      options.push({ label: 'Move right', onPress() { moveTrackPositionInQueue(position, position + 1) } })
+    }
+
+    return options
+  }
 
   let wrapper: HTMLDivElement
 </script>
@@ -34,7 +49,7 @@
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
   <SimpleNavigableItem
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
-    onLongPress={() => showContextMenu(contextMenuOptions)}
+    onLongPress={() => showContextMenu(computeContextMenuOptions())}
     hasFocusPriority={isCurrent}
     fullHeight
   >

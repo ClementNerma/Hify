@@ -1,5 +1,5 @@
 import { derived, get, writable } from 'svelte/store'
-import { readonly } from '../globals/utils'
+import { readonly, swapInArray } from '../globals/utils'
 import { AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo, logWarn } from './debugger'
@@ -125,9 +125,9 @@ export function queueAsNext(list: AudioTrackFragment[]): void {
 				position === null
 					? list.map(makeQueuedTrack)
 					: tracks
-							.slice(0, position + 1)
-							.concat(list.map(makeQueuedTrack))
-							.concat(tracks.slice(position + 1)),
+						.slice(0, position + 1)
+						.concat(list.map(makeQueuedTrack))
+						.concat(tracks.slice(position + 1)),
 		}
 	})
 }
@@ -149,6 +149,27 @@ export function removeFromQueue(index: number): void {
 		return {
 			position: position === null ? null : index < position ? position - 1 : position,
 			tracks: tracks.slice(0, index).concat(tracks.slice(index + 1)),
+		}
+	})
+}
+
+export function moveTrackPositionInQueue(index: number, newIndex: number): void {
+	logInfo(`Moving track n°${index + 1} to position ${newIndex + 1} in queue`)
+
+	playQueue.update(({ position, tracks }) => {
+		if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
+			logWarn('Cannot move track in  queue as the provided position does not exist')
+			return { position, tracks }
+		}
+
+		if (!Object.prototype.hasOwnProperty.call(tracks, newIndex)) {
+			logWarn('Cannot move track in queue as the provided target position does not exist')
+			return { position, tracks }
+		}
+
+		return {
+			tracks: swapInArray(tracks, index, newIndex),
+			position: newIndex,
 		}
 	})
 }

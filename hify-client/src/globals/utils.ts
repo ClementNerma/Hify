@@ -52,3 +52,16 @@ export function shuffle<T>(array: T[]): T[] {
 export function readonly<T>(store: Writable<T>): Readable<T> {
 	return derived(store, (_) => _)
 }
+
+export function swapInArray<T>(array: T[], index: number, newIndex: number): T[] {
+	if (!Object.hasOwn(array, index) || !Object.hasOwn(array, newIndex)) {
+		throw new Error('Invalid indexes provided')
+	}
+
+	const newArray = [...array]
+	const toMove = newArray[index]
+	newArray[index] = newArray[newIndex]
+	newArray[newIndex] = toMove
+
+	return newArray
+}
