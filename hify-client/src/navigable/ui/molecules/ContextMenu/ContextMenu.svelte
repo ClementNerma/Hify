@@ -22,7 +22,7 @@
 
   function getBoundingClientRect(el: HTMLElement): DOMRect | null {
     let rect = el.getBoundingClientRect()
-    const children = [...el.children]
+    const children = Array.from(el.children)
 
     while (
       rect.top === 0 &&
