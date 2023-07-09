@@ -3,7 +3,7 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { moveTrackPositionInQueue, playTrackFromCurrentQueue, removeFromQueue } from '../../stores/play-queue'
+  import { moveTrackPositionInQueue, playTrackFromCurrentQueue, queueAsNext, removeFromQueue } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
@@ -39,6 +39,8 @@
     if (position < totalTracks - 1) {
       options.push({ label: 'Move right', onPress() { moveTrackPositionInQueue(position, position + 1) } })
     }
+
+    options.push({ label: 'Play after current track', onPress() { queueAsNext([track]) } })
 
     return options
   }
