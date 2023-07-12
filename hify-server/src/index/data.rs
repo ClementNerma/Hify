@@ -162,7 +162,7 @@ pub struct Track {
 
     /// File's creation time
     #[graphql(skip)]
-    pub ctime: SystemTime,
+    pub ctime: Option<SystemTime>,
 
     /// File's modification time when it was analyzed
     /// Used to determine if the track changed since the last update

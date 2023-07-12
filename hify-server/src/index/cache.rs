@@ -215,12 +215,13 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
     let mut most_recent_albums = albums_infos.keys().cloned().collect::<Vec<_>>();
 
     most_recent_albums.sort_by_key(|album_id| {
-        tracks
+        let most_recent_track = tracks
             .values()
             .filter(|track| albums_tracks.get(album_id).unwrap().contains(&track.id))
-            .max_by_key(|track| track.ctime)
-            .unwrap()
-            .mtime
+            .max_by_key(|track| track.ctime.unwrap_or(track.mtime))
+            .unwrap();
+
+        most_recent_track.ctime.unwrap_or(most_recent_track.mtime)
     });
 
     IndexCache {

@@ -242,7 +242,7 @@ pub fn refetch_file_times(index: &mut Index) -> Result<()> {
 
 #[derive(Clone, Copy)]
 pub struct FileTimes {
-    pub ctime: SystemTime,
+    pub ctime: Option<SystemTime>,
     pub mtime: SystemTime,
 }
 
@@ -283,9 +283,7 @@ fn get_file_times(path: &Path) -> Result<FileTimes> {
         .metadata()
         .context("Failed to get the file's metadata")?;
 
-    let ctime = metadata
-        .created()
-        .context("Failed to get the file's creation time")?;
+    let ctime = metadata.created().ok();
 
     let mtime = metadata
         .modified()
