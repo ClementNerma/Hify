@@ -1,7 +1,7 @@
 use std::{
     collections::{hash_map::Keys, HashMap},
     hash::Hash,
-    slice::Iter,
+    slice::{Iter, IterMut},
 };
 
 use async_graphql::{connection::CursorType, OutputType};
@@ -72,6 +72,14 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     pub fn values(&self) -> Iter<V> {
         self.values.iter()
     }
+
+    pub fn values_mut(&mut self) -> IterMut<V> {
+        self.values.iter_mut()
+    }
+
+    // pub fn entries(&self) -> impl Iterator<Item = (&K, &V)> {
+    //     self.indexes.keys().zip(self.values.iter())
+    // }
 
     pub fn into_values(self) -> Vec<V> {
         self.values

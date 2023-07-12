@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
 
-use super::sorted_map::SortedMap;
+use super::{builder::FileTimes, sorted_map::SortedMap};
 
 /// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
@@ -78,7 +78,7 @@ pub struct IndexCache {
     pub no_genre_tracks: HashSet<TrackID>,
 
     /// Album IDs sorted by their most recent track file's timestamp
-    pub albums_addition_order: Vec<AlbumID>,
+    pub most_recent_albums: Vec<AlbumID>,
 }
 
 /// Album infos, identifying an album
@@ -160,6 +160,10 @@ pub struct Track {
     /// Track's audio metadata
     pub metadata: TrackMetadata,
 
+    /// File's creation time
+    #[graphql(skip)]
+    pub ctime: SystemTime,
+
     /// File's modification time when it was analyzed
     /// Used to determine if the track changed since the last update
     #[graphql(skip)]
@@ -167,11 +171,16 @@ pub struct Track {
 }
 
 impl Track {
-    pub fn new(path: PathBuf, mtime: SystemTime, metadata: TrackMetadata) -> Self {
+    pub fn new(
+        path: PathBuf,
+        FileTimes { ctime, mtime }: FileTimes,
+        metadata: TrackMetadata,
+    ) -> Self {
         Self {
             id: TrackID(Self::compute_raw_id(&path)),
             relative_path: path,
             metadata,
+            ctime,
             mtime,
         }
     }

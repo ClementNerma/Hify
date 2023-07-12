@@ -51,7 +51,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             genres_tracks: HashMap::new(),
             no_genre_tracks: HashSet::new(),
 
-            albums_addition_order: vec![],
+            most_recent_albums: vec![],
         },
     });
 
@@ -66,10 +66,10 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Found a total of {} audio files.", files.len()),
     );
 
-    let files_mtime = files
+    let file_times = files
         .into_iter()
         .filter(|(path, _)| exiftool::is_audio_file(path))
-        .filter(|(path, mtime)| {
+        .filter(|(path, times)| {
             match from
                 .cache
                 .tracks_files_mtime
@@ -77,20 +77,20 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
                     "Internal error: audio file path couldn't be stripped of the base directory",
                 )) {
                 None => true,
-                Some(old_mtime) => old_mtime != mtime,
+                Some(old_mtime) => old_mtime != &times.mtime,
             }
         })
         .collect::<BTreeMap<_, _>>();
 
     log(
         started,
-        &format!("Found {} new or modified files.", files_mtime.len()),
+        &format!("Found {} new or modified files.", file_times.len()),
     );
 
     log(started, "Extracting audio metadata...");
 
     // Run analysis tool on all new and modified files
-    let analyzed = exiftool::run_on(files_mtime.keys().cloned().collect::<Vec<_>>().as_slice())?;
+    let analyzed = exiftool::run_on(file_times.keys().cloned().collect::<Vec<_>>().as_slice())?;
 
     // Turn the analyzed files into tracks
     let analyzed = analyzed
@@ -100,7 +100,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
                 path.strip_prefix(&dir)
                     .expect("Internal error: track path couldn't be stripped of the base directory")
                     .to_path_buf(),
-                *files_mtime.get(&path).unwrap(),
+                *file_times.get(&path).unwrap(),
                 metadata,
             )
         })
@@ -229,7 +229,24 @@ pub fn rebuild_arts(index: &mut Index) {
     );
 }
 
-fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {
+pub fn refetch_file_times(index: &mut Index) -> Result<()> {
+    for track in index.tracks.values_mut() {
+        let FileTimes { ctime, mtime } = get_file_times(&index.from.join(&track.relative_path))?;
+
+        track.ctime = ctime;
+        track.mtime = mtime;
+    }
+
+    Ok(())
+}
+
+#[derive(Clone, Copy)]
+pub struct FileTimes {
+    pub ctime: SystemTime,
+    pub mtime: SystemTime,
+}
+
+fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
     WalkDir::new(from)
         .min_depth(1)
         .into_iter()
@@ -248,15 +265,10 @@ fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {
                 );
             }
 
-            let metadata = item
-                .metadata()
-                .context("Failed to get the file's metadata")?;
-
-            let mtime = metadata
-                .modified()
-                .context("Failed to get file's modification time")?;
-
-            return Ok(Some((item.path().to_path_buf(), mtime)));
+            return Ok(Some((
+                item.path().to_path_buf(),
+                get_file_times(item.path())?,
+            )));
         })
         .filter_map(|entry| match entry {
             Ok(Some(entry)) => Some(Ok(entry)),
@@ -264,4 +276,20 @@ fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, SystemTime>> {
             Err(err) => Some(Err(err)),
         })
         .collect()
+}
+
+fn get_file_times(path: &Path) -> Result<FileTimes> {
+    let metadata = path
+        .metadata()
+        .context("Failed to get the file's metadata")?;
+
+    let ctime = metadata
+        .created()
+        .context("Failed to get the file's creation time")?;
+
+    let mtime = metadata
+        .modified()
+        .context("Failed to get the file's modification time")?;
+
+    Ok(FileTimes { ctime, mtime })
 }

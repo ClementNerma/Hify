@@ -212,13 +212,13 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         })
         .collect();
 
-    let mut albums_addition_order = albums_infos.keys().cloned().collect::<Vec<_>>();
+    let mut most_recent_albums = albums_infos.keys().cloned().collect::<Vec<_>>();
 
-    albums_addition_order.sort_by_key(|album_id| {
+    most_recent_albums.sort_by_key(|album_id| {
         tracks
             .values()
             .filter(|track| albums_tracks.get(album_id).unwrap().contains(&track.id))
-            .max_by_key(|track| track.mtime)
+            .max_by_key(|track| track.ctime)
             .unwrap()
             .mtime
     });
@@ -247,6 +247,6 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         genres_tracks,
         no_genre_tracks,
 
-        albums_addition_order,
+        most_recent_albums,
     }
 }

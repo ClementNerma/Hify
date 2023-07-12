@@ -123,7 +123,7 @@ pub fn generate_feed(
 
     let most_recent_albums = index
         .cache
-        .albums_addition_order
+        .most_recent_albums
         .iter()
         .rev()
         .take(max_items)

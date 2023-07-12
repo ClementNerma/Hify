@@ -32,6 +32,15 @@ pub struct Command {
     )]
     pub rebuild_cache: bool,
 
+    #[clap(
+        long,
+        help = "Fetch file times from filesystem",
+        conflicts_with = "update_index",
+        conflicts_with = "rebuild_index",
+        conflicts_with = "rebuild_cache"
+    )]
+    pub refetch_file_times: bool,
+
     #[clap(long, help = "Don't start the server")]
     pub no_server: bool,
 }

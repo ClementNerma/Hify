@@ -31,6 +31,7 @@ async fn inner_main() -> Result<()> {
         update_index,
         rebuild_arts,
         rebuild_cache,
+        refetch_file_times,
         no_server,
     } = cmd::Command::parse();
 
@@ -84,6 +85,15 @@ async fn inner_main() -> Result<()> {
                     .context("Failed to save index file with rebuilt cache")?;
 
                 user_data.cleanup(&index);
+            } else if refetch_file_times {
+                println!("> Re-fetching file times...");
+                index::refetch_file_times(&mut index)?;
+
+                println!("> Rebuilding cache...");
+                index::rebuild_cache(&mut index);
+
+                utils::save::save_index(&index_file, &index)
+                    .context("Failed to save index file with rebuilt cache")?;
             } else if rebuild_cache {
                 println!("> Rebuilding cache as requested...");
 
