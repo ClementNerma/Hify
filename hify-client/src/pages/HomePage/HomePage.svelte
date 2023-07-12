@@ -10,6 +10,7 @@
   import LoadingIndicator from "../../atoms/LoadingIndicator/LoadingIndicator.svelte";
   import StatsBox from "../../molecules/StatsBox/StatsBox.svelte";
   import Centered from "../../atoms/Centered/Centered.svelte";
+    import AlbumsRow from "../../molecules/AlbumsRow/AlbumsRow.svelte";
 
   const feed = AsyncHomePage({
     variables: {
@@ -24,7 +25,7 @@
 
 {#await feed}
   <LoadingIndicator />
-{:then { lastListenedTo, periodicallyPopularTracks, randomGreatAlbums, randomGreatArtists }}
+{:then { lastListenedTo, periodicallyPopularTracks, mostRecentAlbums }}
   <Centered>
     <h2>Welcome!</h2>
 
@@ -42,6 +43,12 @@
   </Centered>
 
   <TracksRow tracks={lastListenedTo} />
+
+  <Centered>
+    <h3>Last albums to collection:</h3>
+  </Centered>
+
+  <AlbumsRow albums={mostRecentAlbums} />
 
   <!-- <h3>Albums you like to listen to:</h3>
 

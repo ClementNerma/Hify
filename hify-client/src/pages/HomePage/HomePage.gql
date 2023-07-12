@@ -8,6 +8,10 @@ query HomePage($input: FeedParams!) {
       ...AudioTrack
     }
 
+    mostRecentAlbums {
+      ...AlbumCard
+    }
+
     # popularTracks {
     #   ...AudioTrack
     # }
@@ -20,12 +24,12 @@ query HomePage($input: FeedParams!) {
     #   ...ArtistCard
     # }
 
-    randomGreatAlbums {
-      ...AlbumCard
-    }
+    # randomGreatAlbums {
+    #   ...AlbumCard
+    # }
 
-    randomGreatArtists {
-      ...ArtistCard
-    }
+    # randomGreatArtists {
+    #   ...ArtistCard
+    # }
   }
 }

@@ -76,6 +76,9 @@ pub struct IndexCache {
 
     /// List of tracks who don't have a genre
     pub no_genre_tracks: HashSet<TrackID>,
+
+    /// Album IDs sorted by their most recent track file's timestamp
+    pub albums_addition_order: Vec<AlbumID>,
 }
 
 /// Album infos, identifying an album

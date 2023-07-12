@@ -212,6 +212,17 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         })
         .collect();
 
+    let mut albums_addition_order = albums_infos.keys().cloned().collect::<Vec<_>>();
+
+    albums_addition_order.sort_by_key(|album_id| {
+        tracks
+            .values()
+            .filter(|track| albums_tracks.get(album_id).unwrap().contains(&track.id))
+            .max_by_key(|track| track.mtime)
+            .unwrap()
+            .mtime
+    });
+
     IndexCache {
         tracks_files_mtime,
         tracks_all_artists,
@@ -235,5 +246,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         genres_albums,
         genres_tracks,
         no_genre_tracks,
+
+        albums_addition_order,
     }
 }

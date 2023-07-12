@@ -50,6 +50,8 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             genres_albums: HashMap::new(),
             genres_tracks: HashMap::new(),
             no_genre_tracks: HashSet::new(),
+
+            albums_addition_order: vec![],
         },
     });
 

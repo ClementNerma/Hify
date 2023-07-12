@@ -24,6 +24,7 @@ pub struct Feed {
     periodically_popular_artists: Vec<ArtistInfos>,
     random_great_albums: Vec<AlbumInfos>,
     random_great_artists: Vec<ArtistInfos>,
+    most_recent_albums: Vec<AlbumInfos>,
 }
 
 #[derive(InputObject)]
@@ -120,6 +121,15 @@ pub fn generate_feed(
         max_items,
     );
 
+    let most_recent_albums = index
+        .cache
+        .albums_addition_order
+        .iter()
+        .rev()
+        .take(max_items)
+        .map(|album_id| index.cache.albums_infos.get(album_id).unwrap().clone())
+        .collect::<Vec<_>>();
+
     Feed {
         last_listened_to,
         popular_tracks,
@@ -130,6 +140,7 @@ pub fn generate_feed(
         periodically_popular_artists,
         random_great_albums,
         random_great_artists,
+        most_recent_albums,
     }
 }
 
