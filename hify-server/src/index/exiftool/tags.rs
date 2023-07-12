@@ -214,15 +214,7 @@ fn decode_value_as_string(value: Value) -> Result<Option<String>, String> {
     match value {
         // NOTE: Approx. but no way to do otherwise :(
         Value::Bool(bool) => Ok(Some(if bool { "True" } else { "False" }.to_string())),
-
-        Value::Number(num) => {
-            if num.is_u64() {
-                Ok(Some(num.to_string()))
-            } else {
-                Err(format!("Invalid number type (expected u64): {num}"))
-            }
-        }
-
+        Value::Number(num) => Ok(Some(num.to_string())),
         Value::String(str) => Ok(if !str.is_empty() { Some(str) } else { None }),
 
         Value::Array(values) => {
