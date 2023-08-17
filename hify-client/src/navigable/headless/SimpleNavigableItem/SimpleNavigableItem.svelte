@@ -12,6 +12,7 @@
   export let display: ItemDisplay = null
   export let marginRight = 0
   export let notRounded = false
+  export let lookalike = false
 
   export let justForStyle = false
 
@@ -88,6 +89,7 @@
   class:fullHeight
   class:noPadding
   class:notRounded
+  class:lookalike
   style="display: {translatedDisplay}; margin-right: {marginRight}px;"
 >
   <slot {item} requestFocus={() => item.requestFocus()} />
