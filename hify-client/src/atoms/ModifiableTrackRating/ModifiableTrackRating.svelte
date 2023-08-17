@@ -50,14 +50,17 @@
         current += rel;
         failed = false;
     }
+
+    function reset() {
+        current = initialRating
+    }
 </script>
 
 <SimpleNavigableItem
     onLeft={current >= 2 ? () => setRatingRelative(-2) : undefined}
     onRight={current <= 8 ? () => setRatingRelative(+2) : undefined}
-    onPress={() => {
-        update();
-    }}
+    onPress={() => void update()}
+    onFocus={reset}
 >
     <div class:changed={current !== initialRating} class:updating class:failed>
         {#each [2, 4, 6, 8, 10] as value}
