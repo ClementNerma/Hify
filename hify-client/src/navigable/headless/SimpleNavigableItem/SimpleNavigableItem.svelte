@@ -72,6 +72,8 @@
   $: translatedDisplay = display === 'transparent' ? 'contents' : display ?? 'inline-block'
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <navigable-item-wrapper
   data-navigable-item-id={!justForStyle ? item.id : ':just_for_style'}
   bind:this={wrapper}
