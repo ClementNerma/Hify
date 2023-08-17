@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{net::IpAddr, path::PathBuf};
 
 use clap::Parser;
 
@@ -41,6 +41,27 @@ pub struct Command {
     )]
     pub refetch_file_times: bool,
 
-    #[clap(long, help = "Don't start the server")]
+    #[clap(
+        short,
+        long,
+        help = "Address to listen on (default: 0.0.0.0)",
+        default_value = "0.0.0.0"
+    )]
+    pub addr: IpAddr,
+
+    #[clap(
+        short,
+        long,
+        help = "Port to listen on (default: 8893)",
+        default_value = "8893"
+    )]
+    pub port: u16,
+
+    #[clap(
+        long,
+        help = "Don't start the server",
+        conflicts_with = "addr",
+        conflicts_with = "port"
+    )]
     pub no_server: bool,
 }

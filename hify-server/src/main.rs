@@ -32,6 +32,8 @@ async fn inner_main() -> Result<()> {
         rebuild_arts,
         rebuild_cache,
         refetch_file_times,
+        addr,
+        port,
         no_server,
     } = cmd::Command::parse();
 
@@ -144,11 +146,8 @@ async fn inner_main() -> Result<()> {
 
     println!("> Launching server...");
 
-    // TODO: make it configurable
-    let addr = "0.0.0.0:8893".parse::<SocketAddr>().unwrap();
-
     http::launch(
-        &addr,
+        &SocketAddr::from((addr, port)),
         index,
         user_data,
         Box::new(move |index| {
