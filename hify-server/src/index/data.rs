@@ -459,7 +459,7 @@ macro_rules! define_id_type {
             }
         }
 
-        $crate::define_scalar_string! { $typename }
+        $crate::define_scalar_string!($typename);
     };
 
     ($($typename: ident),+) => {
