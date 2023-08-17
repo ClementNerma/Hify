@@ -86,7 +86,7 @@
     >
     <Button
       onPress={() => {
-        statsBox = true;
+        statsBox = !statsBox;
       }}>Show me some stats</Button
     >
   </Row>
