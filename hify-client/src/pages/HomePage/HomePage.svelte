@@ -10,16 +10,25 @@
   import LoadingIndicator from "../../atoms/LoadingIndicator/LoadingIndicator.svelte";
   import StatsBox from "../../molecules/StatsBox/StatsBox.svelte";
   import Centered from "../../atoms/Centered/Centered.svelte";
-    import AlbumsRow from "../../molecules/AlbumsRow/AlbumsRow.svelte";
+  import AlbumsRow from "../../molecules/AlbumsRow/AlbumsRow.svelte";
 
-  const feed = AsyncHomePage({
-    variables: {
-      input: {},
-    },
+  async function fetchFeed() {
+    const res = await AsyncHomePage({
+      variables: {
+        input: {},
+      },
 
-    fetchPolicy: "no-cache",
-  }).then((res) => res.data.generateFeed);
+      fetchPolicy: "no-cache",
+    })
+    
+    return res.data.generateFeed
+  }
 
+  function onUpdated() {
+    feed = fetchFeed()
+  }
+
+  let feed = fetchFeed();
   let statsBox = false;
 </script>
 
@@ -71,7 +80,7 @@
   </Centered>
 
   <Row>
-    <IndexUpdater />
+    <IndexUpdater {onUpdated} />
     <Button onPress={() => navigate(ROUTES.devTools)} fullHeight
       >👷 Devtools</Button
     >

@@ -2,6 +2,8 @@
   import Button from '../../navigable/ui/atoms/Button/Button.svelte'
   import { IndexUpdater } from '../../graphql/generated'
 
+  export let onUpdated: (() => void) | null = null
+
   function updateIndex() {
     isUpdating = true
     updateResult = null
@@ -9,6 +11,7 @@
     IndexUpdater({ variables: {} })
       .then(() => {
         updateResult = { type: 'ok' }
+        onUpdated?.()
       })
       .catch((err) => {
         updateResult = { type: 'err', err }
