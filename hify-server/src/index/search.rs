@@ -1,6 +1,7 @@
 use std::{collections::HashMap, time::Instant};
 
 use async_graphql::SimpleObject;
+use log::debug;
 
 use super::{AlbumInfos, ArtistInfos, Index, Track};
 
@@ -23,7 +24,7 @@ pub fn search_index(
     if let Some(cached) = search_cache.content.get_mut(&words) {
         cached.last_usage = Instant::now();
 
-        println!("|> Served cached search results.");
+        debug!("|> Served cached search results.");
         return cached.results.clone();
     }
 
@@ -49,7 +50,7 @@ pub fn search_index(
 
         let fill_percent = search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
 
-        println!(
+        debug!(
             "|> Search cache now contains {} entries ({:.1}% of total capacity).",
             search_cache.content.len(),
             fill_percent

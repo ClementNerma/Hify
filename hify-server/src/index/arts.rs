@@ -10,9 +10,10 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use log::error;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::utils::progress::display_progress;
+use crate::utils::progress::{clear_progress, display_progress};
 
 use super::{
     AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,
@@ -82,7 +83,7 @@ pub fn find_albums_arts(
                 }
             }
 
-            eprintln!(
+            error!(
                 "Warning: no album art found for album '{}' by '{}'",
                 album.name,
                 album
@@ -97,13 +98,13 @@ pub fn find_albums_arts(
         })
         .collect::<Vec<_>>();
 
-    println!();
+    clear_progress();
 
     let errors = errors.lock().unwrap();
 
     if !errors.is_empty() {
         for (i, err) in errors.iter().enumerate() {
-            eprintln!(
+            error!(
                 "| Art error {} / {}: {}",
                 i + 1,
                 errors.len(),

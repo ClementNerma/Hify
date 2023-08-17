@@ -1,4 +1,5 @@
 mod graphql;
+mod logging;
 mod routes;
 mod server;
 mod state;

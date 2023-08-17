@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use log::info;
 use rayon::prelude::{IntoParallelIterator, ParallelBridge, ParallelIterator};
 
 use std::{
@@ -18,7 +19,7 @@ use super::{
 };
 
 pub fn log(time: Instant, message: &str) {
-    println!("[{: >4}s] {message}", time.elapsed().as_secs());
+    info!("[{: >4}s] {message}", time.elapsed().as_secs());
 }
 
 pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
@@ -169,7 +170,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
             .collect::<HashMap<_, _>>(),
     );
 
-    println!(
+    info!(
         "Generating artists' arts ({})...",
         cache.artists_infos.len()
     );

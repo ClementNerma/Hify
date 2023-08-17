@@ -1,10 +1,11 @@
 use std::{net::IpAddr, path::PathBuf};
 
 use clap::Parser;
+use log::LevelFilter;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
-pub struct Command {
+pub struct Args {
     #[clap(help = "Path to the directory containing the audio files")]
     pub music_dir: PathBuf,
 
@@ -64,4 +65,10 @@ pub struct Command {
         conflicts_with = "port"
     )]
     pub no_server: bool,
+
+    #[clap(short, long, help = "Logging level", default_value = "info")]
+    pub logging_level: LevelFilter,
+
+    #[clap(short, long, help = "Display timestamps in TTYs (disabled by default)")]
+    pub display_timestamps_in_tty: bool,
 }

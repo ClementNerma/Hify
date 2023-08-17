@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 #![forbid(unused_must_use)]
-#![forbid(unused_crate_dependencies)]
+#![warn(unused_crate_dependencies)]
 
 mod cmd;
 mod graphql;
@@ -14,17 +14,26 @@ use std::{fs, net::SocketAddr};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
+use log::{error, info};
+
+use crate::cmd::Args;
+
+use self::utils::logging::setup_logger;
 
 #[tokio::main]
 async fn main() {
-    if let Err(err) = inner_main().await {
-        eprintln!("An error occurred:\n{err:?}");
+    let args = Args::parse();
+
+    setup_logger(args.logging_level, args.display_timestamps_in_tty);
+
+    if let Err(err) = inner_main(args).await {
+        error!("An error occurred:\n{err:?}");
     }
 }
 
-async fn inner_main() -> Result<()> {
+async fn inner_main(args: Args) -> Result<()> {
     #[deny(unused_variables)]
-    let cmd::Command {
+    let Args {
         music_dir,
         data_dir,
         rebuild_index,
@@ -35,7 +44,11 @@ async fn inner_main() -> Result<()> {
         addr,
         port,
         no_server,
-    } = cmd::Command::parse();
+
+        // Options main() already took care of
+        logging_level: _,
+        display_timestamps_in_tty: _,
+    } = args;
 
     if !music_dir.is_dir() {
         bail!("Music path is not a directory");
@@ -74,11 +87,11 @@ async fn inner_main() -> Result<()> {
 
     let index = match index_file.is_file() && !rebuild_index {
         true => {
-            println!("> Loading index from disk...");
+            info!("> Loading index from disk...");
             let mut index = utils::save::load_index(&index_file).context("Failed to load index")?;
 
             if update_index {
-                println!("> Updating index as requested...");
+                info!("> Updating index as requested...");
 
                 index = index::build_index(music_dir.clone(), Some(index))
                     .context("Failed to rebuild index")?;
@@ -88,16 +101,16 @@ async fn inner_main() -> Result<()> {
 
                 user_data.cleanup(&index);
             } else if refetch_file_times {
-                println!("> Re-fetching file times...");
+                info!("> Re-fetching file times...");
                 index::refetch_file_times(&mut index)?;
 
-                println!("> Rebuilding cache...");
+                info!("> Rebuilding cache...");
                 index::rebuild_cache(&mut index);
 
                 utils::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
             } else if rebuild_cache {
-                println!("> Rebuilding cache as requested...");
+                info!("> Rebuilding cache as requested...");
 
                 index::rebuild_cache(&mut index);
 
@@ -116,7 +129,7 @@ async fn inner_main() -> Result<()> {
             }
 
             if rebuild_arts {
-                println!("> Rebuilding arts as requested...");
+                info!("> Rebuilding arts as requested...");
 
                 index::rebuild_arts(&mut index);
 
@@ -124,17 +137,17 @@ async fn inner_main() -> Result<()> {
                     .context("Failed to save index file with rebuilt arts")?;
             }
 
-            println!("> Done.");
+            info!("> Done.");
 
             index
         }
 
         false => {
-            println!("> Generating index...");
+            info!("> Generating index...");
             let index =
                 index::build_index(music_dir.clone(), None).context("Failed to build index")?;
             utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
-            println!("> Index saved on disk.");
+            info!("> Index saved on disk.");
 
             index
         }
@@ -144,7 +157,7 @@ async fn inner_main() -> Result<()> {
         return Ok(());
     }
 
-    println!("> Launching server...");
+    info!("> Launching server...");
 
     http::launch(
         &SocketAddr::from((addr, port)),

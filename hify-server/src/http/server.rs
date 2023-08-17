@@ -1,7 +1,8 @@
 use std::net::SocketAddr;
 
 use anyhow::Result;
-use axum::{routing::get, Extension, Router, Server};
+use axum::{middleware, routing::get, Extension, Router, Server};
+use log::info;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use super::{
@@ -10,7 +11,10 @@ use super::{
 };
 use crate::{
     graphql::{get_graphql_schema, SaveIndexFn},
-    http::graphql::{graphiql, graphql_handler},
+    http::{
+        graphql::{graphiql, graphql_handler},
+        logging::log_errors,
+    },
 };
 use crate::{index::Index, userdata::UserDataWrapper};
 
@@ -42,9 +46,10 @@ pub async fn launch(
         .layer(Extension(app_state))
         .layer(Extension(graphql_schema))
         // Define middlewares
-        .layer(cors);
+        .layer(cors)
+        .layer(middleware::from_fn(log_errors));
 
-    println!("> Server is being launched on {address}");
+    info!("> Server is being launched on {address}");
 
     Server::bind(address).serve(app.into_make_service()).await?;
 

@@ -9,10 +9,14 @@ use std::{
 };
 
 use anyhow::{anyhow, bail, Context, Result};
+use log::{error, info};
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::Deserialize;
 
-use crate::{index::TrackMetadata, utils::progress::display_progress};
+use crate::{
+    index::TrackMetadata,
+    utils::progress::{clear_progress, display_progress},
+};
 
 use super::file::{process_analyzed_file, ExifToolFile};
 
@@ -28,7 +32,7 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
         audio_ext.as_str(),
         "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
     ) {
-        eprintln!(
+        error!(
             "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
             path.to_string_lossy()
         );
@@ -46,11 +50,11 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     let started = Instant::now();
 
     if files.is_empty() {
-        println!("        Nothing to do!");
+        info!("Nothing to do!");
         return Ok(vec![]);
     }
 
-    print!("        Starting analysis...");
+    info!("Starting analysis...");
 
     let files_count = files.len();
 
@@ -123,7 +127,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
             match process_analyzed_file(analyzed) {
                 Ok(data) => successes.lock().unwrap().push((file.clone(), data)),
                 Err(err) => {
-                    eprintln!("Error in file '{}': {:?}", file.to_string_lossy(), err);
+                    error!("Error in file '{}': {:?}", file.to_string_lossy(), err);
                     errors.lock().unwrap().push((file, err));
                     errors_counter.store(
                         errors_counter.load(Ordering::Acquire) + 1,
@@ -136,7 +140,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
         })
         .collect::<Result<()>>()?;
 
-    println!();
+    clear_progress();
 
     let successes = successes.into_inner().unwrap();
     let errors = errors.into_inner().unwrap();
@@ -153,7 +157,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     }
 
     if !errors.is_empty() {
-        eprintln!(
+        error!(
             "Failed with the following errors:\n\n{}",
             errors
                 .iter()
