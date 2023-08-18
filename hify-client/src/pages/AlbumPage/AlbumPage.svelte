@@ -129,10 +129,11 @@
 
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
-            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight
-              ><Emoji>▶️</Emoji> Play next</Button
-            >
-            <Button onPress={() => playNewQueueFromBeginning(shuffle(filteredTracks))} fullHeight
+            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
+            <Button onPress={() => {
+              playNewQueueFromBeginning(shuffle(filteredTracks))
+              navigate(ROUTES.nowPlaying)
+            }} fullHeight
               ><Emoji>🔀</Emoji> Shuffle</Button
             >
           </Row>
