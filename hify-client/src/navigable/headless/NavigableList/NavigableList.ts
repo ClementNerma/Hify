@@ -7,7 +7,7 @@ import {
 	NoProp,
 } from '../../navigation'
 
-export class NavigableList<P = NoProp> extends NavigableContainer<P> {
+export class NavigableList<P = NoProp> extends NavigableContainer<NavigableListProps & P> {
 	navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
 		const items = this.children()
 
@@ -27,6 +27,10 @@ export class NavigableList<P = NoProp> extends NavigableContainer<P> {
 					}
 				}
 
+				if (this.props.trapped) {
+					return null
+				}
+
 				return this.parent.navigate(this, NavigationDirection.Up)
 
 			case NavigationDirection.Left:
@@ -42,6 +46,10 @@ export class NavigableList<P = NoProp> extends NavigableContainer<P> {
 					if (item) {
 						return item
 					}
+				}
+
+				if (this.props.trapped) {
+					return null
 				}
 
 				return this.parent.navigate(this, NavigationDirection.Down)
@@ -85,4 +93,8 @@ export class NavigableList<P = NoProp> extends NavigableContainer<P> {
 
 		return null
 	}
+}
+
+type NavigableListProps = {
+	trapped?: boolean
 }

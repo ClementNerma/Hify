@@ -6,12 +6,13 @@
   import { NavigableList } from './NavigableList'
 
   export let hasFocusPriority: Props<NavigableList>['hasFocusPriority'] = null
+  export let trapped: Props<NavigableList>['trapped'] = undefined
 
-  const list = new NavigableList(getParentNavigable(), { hasFocusPriority })
+  const list = new NavigableList(getParentNavigable(), { hasFocusPriority, trapped })
 
   setChildrenNavigable(list)
 
-  afterUpdate(() => list.updateProps({ hasFocusPriority }))
+  afterUpdate(() => list.updateProps({ hasFocusPriority, trapped }))
 
   export const requestFocus = () => list.requestFocus()
 </script>
