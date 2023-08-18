@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
 import { handleInput, KeyPressHandling, registerLongPressableKeys } from './input-manager'
+import { logWarn } from '../stores/debugger'
 
 export enum NavigationDirection {
 	Up,
@@ -206,6 +207,7 @@ class NavigablePage extends NavigableContainer {
 
 	constructor(
 		private readonly onRequestFocus: (item: NavigableItem<unknown>) => void,
+		private readonly onRequestUnfocus: () => void,
 		private readonly getFocusedItem: () => NavigableItem<unknown> | null,
 	) {
 		super(PAGE_CTR_TOKEN, { hasFocusPriority: null })
@@ -268,6 +270,16 @@ class NavigablePage extends NavigableContainer {
 		this.onRequestFocus(item)
 	}
 
+	unfocus(): void {
+		const focused = this.focusedItem()
+
+		if (focused === null) {
+			return logWarn('No item focused, cannot unfocus')
+		}
+
+		this.onRequestUnfocus()
+	}
+
 	focusedItem(): NavigableItem<unknown> | null {
 		const item = this.getFocusedItem()
 
@@ -310,7 +322,7 @@ export function setChildrenNavigable(nav: NavigableContainer) {
 }
 
 export function usePageNavigator(): NavigableContainer {
-	const page = new NavigablePage(_requestFocus, () => get(navState)?.focused ?? null)
+	const page = new NavigablePage(_requestFocus, _requestUnfocus, () => get(navState)?.focused ?? null)
 
 	navState.update((state) => {
 		state?.focused?.onUnfocus()
@@ -601,9 +613,13 @@ function _requestFocus(item: NavigableItem<unknown>): void {
 	)
 }
 
+function _requestUnfocus(): void {
+	navState.update(state => state ? _generateUpdatedNavState(state.focused, null, state.page) : state)
+}
+
 function _generateUpdatedNavState(
 	oldFocused: NavigableItem<unknown> | null,
-	newFocused: NavigableItem<unknown>,
+	newFocused: NavigableItem<unknown> | null,
 	page: NavigablePage,
 ): NavState {
 	// TODO: handle if oldFocused === newFocused
@@ -613,9 +629,11 @@ function _generateUpdatedNavState(
 		_propagateFocusChangeEvent(oldFocused, false)
 	}
 
-	newFocused.scrollTo()
-	newFocused.onFocus()
-	_propagateFocusChangeEvent(newFocused, true)
+	if (newFocused) {
+		newFocused.scrollTo()
+		newFocused.onFocus()
+		_propagateFocusChangeEvent(newFocused, true)
+	}
 
 	return { page, focused: newFocused }
 }

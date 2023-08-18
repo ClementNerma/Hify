@@ -67,8 +67,7 @@
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean
-  let mouseHover = false
-
+  
   $: translatedDisplay = display === 'transparent' ? 'contents' : display ?? 'inline-block'
 </script>
 
@@ -79,15 +78,9 @@
   bind:this={wrapper}
   on:click={() => onPress?.()}
   on:contextmenu|preventDefault={() => onLongPress?.()}
-  on:mouseenter={() => {
-    mouseHover = true
-  }}
-  on:mouseleave={() => {
-    mouseHover = false
-  }}
-  class:focusedOrMouseHover={focused || mouseHover}
+  on:mouseenter={() => item.requestFocus()}
+  on:mouseleave={() => item.page.unfocus()}
   class:focused
-  class:mouseHover
   class:fullHeight
   class:noPadding
   class:notRounded

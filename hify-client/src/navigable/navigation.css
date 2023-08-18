@@ -2,7 +2,7 @@ navigable-container-wrapper {
   display: 'contents';
 }
 
-navigable-item-wrapper:not(.lookalike).focusedOrMouseHover> :first-child,
+navigable-item-wrapper:not(.lookalike).focused> :first-child,
 navigable-item-wrapper:not(.lookalike):hover> :first-child {
   outline: none;
   /* color: black;
@@ -11,18 +11,18 @@ navigable-item-wrapper:not(.lookalike):hover> :first-child {
   cursor: pointer;
 }
 
-navigable-item-wrapper:not(.notRounded).focusedOrMouseHover> :first-child,
+navigable-item-wrapper:not(.notRounded).focused> :first-child,
 navigable-item-wrapper:not(.notRounded):hover> :first-child {
   border-radius: 5px;
 }
 
-navigable-item-wrapper:not(.notRounded).focusedOrMouseHover>tr:first-child>td:first-child,
+navigable-item-wrapper:not(.notRounded).focused>tr:first-child>td:first-child,
 navigable-item-wrapper:not(.notRounded):hover>tr:first-child>td:first-child {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 
-navigable-item-wrapper:not(.notRounded).focusedOrMouseHover>tr:first-child td:last-child,
+navigable-item-wrapper:not(.notRounded).focused>tr:first-child td:last-child,
 navigable-item-wrapper:not(.notRounded):hover>tr:first-child td:last-child {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
