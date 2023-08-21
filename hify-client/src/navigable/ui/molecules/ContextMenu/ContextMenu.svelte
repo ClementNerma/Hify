@@ -103,14 +103,16 @@
       <Column {getRequestFocus} trapped>
         {#each $contextMenuStore.options as { label, onPress }}
           <SimpleNavigableItem
+            let:focused
             onPress={() => {
               closeContextMenu()
               onPress()
             }}
+            unstyled
           >
-            <ItemStyleLayer>
+            <div class="option-container" class:focused>
               <div class="option">{label}</div>
-            </ItemStyleLayer>
+            </div>
           </SimpleNavigableItem>
         {/each}
       </Column>
@@ -132,6 +134,12 @@
     box-shadow: 2px 2px 5px rgb(60, 60, 60);
 
     z-index: 10;
+  }
+
+  .option-container:hover,
+  .option-container.focused {
+    background-color: darkgray;
+    text-decoration: none !important;
   }
 
   .option {
