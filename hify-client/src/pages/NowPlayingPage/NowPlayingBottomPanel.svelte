@@ -14,7 +14,7 @@
 
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
-  import ProgressRange from '../../navigable/ui/atoms/ProgressRange/ProgressRange.svelte'
+  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
   import Column from '../../navigable/ui/molecules/Column/Column.svelte'
