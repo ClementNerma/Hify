@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from '../../navigable/ui/atoms/Button/Button.svelte'
-  import Checkbox from '../../navigable/ui/atoms/Checkbox/Checkbox.svelte'
+  import Button from '../../atoms/Button/Button.svelte'
+  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { hifyInterface } from '../../globals/injected'
   import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'

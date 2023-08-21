@@ -11,7 +11,7 @@
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import { writable } from 'svelte/store'
   import { AudioTrackFragment } from '../../graphql/generated'
-  import Emoji from '../../navigable/ui/atoms/Emoji/Emoji.svelte'
+  import Emoji from '../../atoms/Emoji/Emoji.svelte'
   import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']

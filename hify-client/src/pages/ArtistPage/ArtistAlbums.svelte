@@ -3,7 +3,7 @@
 
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
-  import Button from '../../navigable/ui/atoms/Button/Button.svelte'
+  import Button from '../../atoms/Button/Button.svelte'
   import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   export let artistId: string

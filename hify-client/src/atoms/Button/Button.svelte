@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Props } from '../../../navigation'
-  import { SimpleNavigableItem as Nav } from '../../../headless/SimpleNavigableItem/SimpleNavigableItem'
-  import SimpleNavigableItem from '../../../headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { Props } from '../../navigable/navigation'
+  import { SimpleNavigableItem as Nav } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let onPress: () => void
   export let disabled = false

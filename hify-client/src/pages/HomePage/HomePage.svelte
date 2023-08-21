@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import Button from '../../navigable/ui/atoms/Button/Button.svelte'
+  import Button from '../../atoms/Button/Button.svelte'
   import MixButton from '../../atoms/MixButton/MixButton.svelte'
   import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { AsyncHomePage } from '../../graphql/generated'
