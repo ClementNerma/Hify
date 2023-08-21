@@ -4,7 +4,12 @@
 
 <script lang="ts">
   import { SimpleNavigableItem } from './SimpleNavigableItem'
-  import { getParentNavigable, HTMLNavigableItemWrapperElement, Props } from '../../navigation'
+  import {
+    getParentNavigable,
+    HTMLNavigableItemWrapperElement,
+    JUST_FOR_STYLE_ITEM_ID,
+    Props,
+  } from '../../navigation'
   import { afterUpdate } from 'svelte'
 
   export let fullHeight = false
@@ -74,7 +79,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <navigable-item-wrapper
-  data-navigable-item-id={!justForStyle ? item.id : ':just_for_style'}
+  data-navigable-item-id={!justForStyle ? item.id : JUST_FOR_STYLE_ITEM_ID}
   bind:this={wrapper}
   on:click={() => onPress?.()}
   on:contextmenu|preventDefault={() => onLongPress?.()}
