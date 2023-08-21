@@ -53,8 +53,11 @@
 
     const rect = getBoundingClientRect(focusedItem.underlyingElement())
 
-    ctxTop = rect ? (rect.top + rect.bottom) / 2 : 0
-    ctxLeft = rect ? (rect.left + rect.right) / 2 : 0
+    const top = rect ? (rect.top + rect.bottom) / 2 : 0
+    const left = rect ? (rect.left + rect.right) / 2 : 0
+    
+    ctxTop = top + ctxMenuHeight > window.innerHeight ? window.innerHeight - top : top
+    ctxLeft = left + ctxMenuWidth > window.innerWidth ? window.innerWidth - left : left
 
     prevFocusItem = focusedItem
 
@@ -80,6 +83,9 @@
 
   let requestFocus: RequestFocus
 
+  let ctxMenuWidth: number
+  let ctxMenuHeight: number
+
   const getRequestFocus = (rf: RequestFocus) => {
     requestFocus = rf
   }
@@ -87,7 +93,8 @@
 
 {#if $contextMenuStore && $contextMenuStore.options.length > 0}
   <NavigableWithHandlers onBack={closeContextMenu}>
-    <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;">
+    <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;" bind:clientWidth={ctxMenuWidth}
+    bind:clientHeight={ctxMenuHeight}>
       <!-- Bindings don't always work here for some reason so we use a basic callback system instead -->
       <Column {getRequestFocus} trapped>
         {#each $contextMenuStore.options as { label, onPress }}
