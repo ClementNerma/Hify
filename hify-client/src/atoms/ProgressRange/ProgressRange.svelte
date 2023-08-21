@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { SimpleNavigableItemProps } from '../../../headless/SimpleNavigableItem/SimpleNavigableItem'
-  import SimpleNavigableItem from '../../../headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { SimpleNavigableItemProps } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
   export let max: number
   export let value: number | null
