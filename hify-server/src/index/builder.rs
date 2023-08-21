@@ -62,6 +62,13 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let files = build_files_list(&dir).context("Failed to build files list")?;
 
+    log(started, &format!("Found a total of {} files.", files.len()));
+
+    let files = files
+        .into_iter()
+        .filter(|(path, _)| exiftool::is_audio_file(path))
+        .collect::<Vec<_>>();
+
     log(
         started,
         &format!("Found a total of {} audio files.", files.len()),
