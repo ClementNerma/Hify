@@ -92,7 +92,7 @@
   class:unstyled
   style="display: {translatedDisplay}; margin-right: {marginRight}px;"
 >
-  <slot {item} requestFocus={() => item.requestFocus()} />
+  <slot {item} requestFocus={() => item.requestFocus()} {focused} />
 </navigable-item-wrapper>
 
 <style>
