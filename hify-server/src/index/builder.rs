@@ -71,7 +71,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     log(
         started,
-        &format!("Found a total of {} audio files.", files.len()),
+        &format!("...of which {} are audio files.", files.len()),
     );
 
     let file_times = files
@@ -92,7 +92,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     log(
         started,
-        &format!("Found {} new or modified files.", file_times.len()),
+        &format!("...of which {} are new or modified.", file_times.len()),
     );
 
     log(started, "Extracting audio metadata...");
