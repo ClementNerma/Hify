@@ -56,8 +56,8 @@
     const top = rect ? (rect.top + rect.bottom) / 2 : 0
     const left = rect ? (rect.left + rect.right) / 2 : 0
 
-    ctxTop = top + ctxMenuHeight > window.innerHeight ? window.innerHeight - top : top
-    ctxLeft = left + ctxMenuWidth > window.innerWidth ? window.innerWidth - left : left
+    ctxTop = top + ctxMenuHeight > window.innerHeight ? window.innerHeight - ctxMenuHeight - 5 : top
+    ctxLeft = left + ctxMenuWidth > window.innerWidth ? window.innerWidth - ctxMenuWidth - 5 : left
 
     prevFocusItem = focusedItem
 
