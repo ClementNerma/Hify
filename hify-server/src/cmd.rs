@@ -9,7 +9,7 @@ pub struct Args {
     #[clap(help = "Path to the directory containing the audio files")]
     pub music_dir: PathBuf,
 
-    #[clap(short, long, help = "Path to the user data directory")]
+    #[clap(long, help = "Path to the user data directory")]
     pub data_dir: Option<PathBuf>,
 
     #[clap(long, help = "Force to rebuild index from scratch")]
