@@ -12,6 +12,7 @@ const audioListeningDuration = writable<{ track: AudioTrackFragment; duration_s:
 export const readableAudioProgress = readonly(audioProgress)
 export const readableAudioPaused = readonly(audioPaused)
 
+// TODO: log after the delay, don't way for a new listening session!
 function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 	const prevDuration = get(audioListeningDuration)
 
@@ -107,8 +108,7 @@ export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 	player.currentTime = player.currentTime + relativeSeconds
 
 	logDebug(
-		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (${prevTime}s => ${
-			player.currentTime
+		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (${prevTime}s => ${player.currentTime
 		}s)`,
 	)
 }
