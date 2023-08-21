@@ -53,7 +53,9 @@
           navigate(ROUTES.nowPlaying)
         })}
         onLongPress={bind(tags.album, (album) =>
-          showContextMenu([{ label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) }]),
+          showContextMenu([
+            { label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) },
+          ])
         )}
       />
       <!-- subtitle={tags.album.name} -->

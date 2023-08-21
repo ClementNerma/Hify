@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { AsyncGenerateStats } from "../../graphql/generated";
-  import SimpleNavigableItem from "../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte";
-  import { humanReadableDuration } from "../../stores/audio-player";
+  import { AsyncGenerateStats } from '../../graphql/generated'
+  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { humanReadableDuration } from '../../stores/audio-player'
 
   const statsReq = AsyncGenerateStats({
     variables: {},
-    fetchPolicy: "no-cache",
-  });
+    fetchPolicy: 'no-cache',
+  })
 
-  $: stats = statsReq.then((stats) => stats.data.generateStats);
+  $: stats = statsReq.then((stats) => stats.data.generateStats)
 </script>
 
 <SimpleNavigableItem lookalike>
@@ -38,8 +38,7 @@
       </tr>
       <tr>
         <td>Total listening duration</td>
-        <td><strong>{humanReadableDuration(stats.totalListeningTime)}</strong></td
-        >
+        <td><strong>{humanReadableDuration(stats.totalListeningTime)}</strong></td>
       </tr>
     </table>
   {/await}

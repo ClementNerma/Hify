@@ -31,7 +31,7 @@
       if (tabsFocusRequest.length) {
         tabsFocusRequest[0]()
       }
-    }),
+    })
   )
 
   let isFocused: boolean

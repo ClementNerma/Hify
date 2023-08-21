@@ -3,10 +3,18 @@
 
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { moveTrackPositionInQueue, playTrackFromCurrentQueue, queueAsNext, removeFromQueue } from '../../stores/play-queue'
+  import {
+    moveTrackPositionInQueue,
+    playTrackFromCurrentQueue,
+    queueAsNext,
+    removeFromQueue,
+  } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import { ContextMenuOption, showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
+  import {
+    ContextMenuOption,
+    showContextMenu,
+  } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment
@@ -29,18 +37,38 @@
     const options = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)]
 
     if (!isCurrent) {
-      options.push({ label: 'Remove from queue', onPress() { removeFromQueue(position) } })
+      options.push({
+        label: 'Remove from queue',
+        onPress() {
+          removeFromQueue(position)
+        },
+      })
     }
 
     if (position > 0) {
-      options.push({ label: 'Move left', onPress() { moveTrackPositionInQueue(position, position - 1) } })
+      options.push({
+        label: 'Move left',
+        onPress() {
+          moveTrackPositionInQueue(position, position - 1)
+        },
+      })
     }
 
     if (position < totalTracks - 1) {
-      options.push({ label: 'Move right', onPress() { moveTrackPositionInQueue(position, position + 1) } })
+      options.push({
+        label: 'Move right',
+        onPress() {
+          moveTrackPositionInQueue(position, position + 1)
+        },
+      })
     }
 
-    options.push({ label: 'Play after current track', onPress() { queueAsNext([track]) } })
+    options.push({
+      label: 'Play after current track',
+      onPress() {
+        queueAsNext([track])
+      },
+    })
 
     return options
   }
@@ -55,7 +83,12 @@
     hasFocusPriority={isCurrent}
     fullHeight
   >
-    <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
+    <Card
+      title={track.metadata.tags.title}
+      subtitle={null}
+      boxSize={80}
+      art={track.metadata.tags.album.art}
+    />
   </SimpleNavigableItem>
 </div>
 

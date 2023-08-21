@@ -8,10 +8,7 @@
 </script>
 
 <NavigableTrack {track} {tracks}>
-  <Card
-    title={track.metadata.tags.title}
-    art={track.metadata.tags.album.art}
-  />
+  <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} />
   <!-- subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
       .map((artist) => artist.name)
       .join(' / ')}`} -->

@@ -23,10 +23,12 @@
   export let albumId: string
 
   function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
-    const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
-      number: num.toString(),
-      tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
-    }))
+    const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map(
+      (num) => ({
+        number: num.toString(),
+        tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+      })
+    )
 
     const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
 
@@ -35,7 +37,9 @@
     }
 
     return {
-      totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
+      totalDuration: filteredTracks
+        .map((track) => track.metadata.duration)
+        .reduce((a, x) => a + x, 0),
       discs,
     }
   }
@@ -54,7 +58,10 @@
     return album
   })
 
-  function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
+  function filterTracks(
+    tracks: AudioTrackFragment[],
+    onlyShowGreatSongs: boolean
+  ): AudioTrackFragment[] {
     return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 8)) : tracks
   }
 
@@ -88,7 +95,9 @@
           <div class="artists">
             <NavigableRow>
               {#each album.albumArtists as albumArtist}
-                <SimpleNavigableItem onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}>
+                <SimpleNavigableItem
+                  onPress={bind(albumArtist.id, (id) => navigate(ROUTES.artist(id)))}
+                >
                   <span class="artist">
                     🎤 {albumArtist.name}
                   </span>
@@ -120,7 +129,9 @@
 
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
-            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
+            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight
+              ><Emoji>▶️</Emoji> Play next</Button
+            >
             <Button onPress={() => playNewQueueFromBeginning(shuffle(filteredTracks))} fullHeight
               ><Emoji>🔀</Emoji> Shuffle</Button
             >
@@ -141,7 +152,12 @@
               {#each disc.tracks as track, i (track.id)}
                 {@const tags = track.metadata.tags}
 
-                <NavigableTrack tracks={filteredTracks} goToAlbumOption={false} display="transparent" {track}>
+                <NavigableTrack
+                  tracks={filteredTracks}
+                  goToAlbumOption={false}
+                  display="transparent"
+                  {track}
+                >
                   <tr class:notFirst={i !== 0}>
                     <td class="trackno">{tags.trackNo}</td>
                     <td class="title">{tags.title}</td>

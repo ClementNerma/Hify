@@ -1,12 +1,11 @@
-
 <div class="centered">
-    <slot />
+  <slot />
 </div>
 
 <style>
-    .centered {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+  .centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 </style>

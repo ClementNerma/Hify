@@ -55,7 +55,7 @@
 
     const top = rect ? (rect.top + rect.bottom) / 2 : 0
     const left = rect ? (rect.left + rect.right) / 2 : 0
-    
+
     ctxTop = top + ctxMenuHeight > window.innerHeight ? window.innerHeight - top : top
     ctxLeft = left + ctxMenuWidth > window.innerWidth ? window.innerWidth - left : left
 
@@ -93,8 +93,12 @@
 
 {#if $contextMenuStore && $contextMenuStore.options.length > 0}
   <NavigableWithHandlers onBack={closeContextMenu}>
-    <div class="container" style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;" bind:clientWidth={ctxMenuWidth}
-    bind:clientHeight={ctxMenuHeight}>
+    <div
+      class="container"
+      style="--ctx-top: {ctxTop}px; --ctx-left: {ctxLeft}px;"
+      bind:clientWidth={ctxMenuWidth}
+      bind:clientHeight={ctxMenuHeight}
+    >
       <!-- Bindings don't always work here for some reason so we use a basic callback system instead -->
       <Column {getRequestFocus} trapped>
         {#each $contextMenuStore.options as { label, onPress }}
@@ -119,14 +123,14 @@
     position: fixed;
     top: var(--ctx-top);
     left: var(--ctx-left);
-    
+
     background-color: rgb(42, 42, 42);
     color: white;
 
     border: 1px solid rgb(78, 78, 78);
 
     box-shadow: 2px 2px 5px rgb(60, 60, 60);
-    
+
     z-index: 10;
   }
 

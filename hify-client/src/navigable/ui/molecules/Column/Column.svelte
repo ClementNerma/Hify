@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import NavigableList from '../../../headless/NavigableList/NavigableList.svelte'
-  import {NavigableList as NavigableListClass} from '../../../headless/NavigableList/NavigableList'
+  import { NavigableList as NavigableListClass } from '../../../headless/NavigableList/NavigableList'
   import { Props, RequestFocus } from '../../../navigation'
 
   let requestFocus: RequestFocus

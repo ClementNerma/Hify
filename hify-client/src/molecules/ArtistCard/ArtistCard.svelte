@@ -10,7 +10,10 @@
   export let artist: ArtistCardFragment
 
   $: contextMenuOptions = [
-    { label: 'Mix me some magic ✨', onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })) },
+    {
+      label: 'Mix me some magic ✨',
+      onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })),
+    },
   ]
 </script>
 

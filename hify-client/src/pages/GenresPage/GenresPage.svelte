@@ -23,7 +23,10 @@
         onPress={() => navigate(ROUTES.genre(genre.id))}
         onLongPress={() =>
           showContextMenu([
-            { label: 'Mix me some magic ✨', onPress: () => generateAndPlayMix({ fromGenre: genre.id }) },
+            {
+              label: 'Mix me some magic ✨',
+              onPress: () => generateAndPlayMix({ fromGenre: genre.id }),
+            },
           ])}
       >
         <ItemStyleLayer>

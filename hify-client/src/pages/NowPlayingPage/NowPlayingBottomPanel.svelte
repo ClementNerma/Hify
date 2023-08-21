@@ -17,8 +17,8 @@
   import ProgressRange from '../../navigable/ui/atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import Column from '../../navigable/ui/molecules/Column/Column.svelte'  
-  import ModifiableTrackRating from '../../atoms/ModifiableTrackRating/ModifiableTrackRating.svelte';
+  import Column from '../../navigable/ui/molecules/Column/Column.svelte'
+  import ModifiableTrackRating from '../../atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false
@@ -34,10 +34,14 @@
 
         <div class="track-infos">
           <NavigableRow>
-            <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
+            <SimpleNavigableItem
+              onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}
+            >
               <div class="track-info">🎵 {tags.title}</div>
             </SimpleNavigableItem>
-            <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
+            <SimpleNavigableItem
+              onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}
+            >
               <div class="track-info">💿 {album.name}</div>
             </SimpleNavigableItem>
             {#if tags.date}

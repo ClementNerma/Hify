@@ -16,7 +16,11 @@
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
-  const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
+  const setDistractionFree = setupDistractionFreeListener(
+    3000,
+    ignoredKeys,
+    () => $readableAudioPaused === false
+  )
 
   function onKeyPress(key: string): KeyPressHandling {
     const dfMode = $distractionFreeMode
@@ -74,12 +78,7 @@
   <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
 {:else}
   <ImgLoader art={$currentTrack.metadata.tags.album.art} let:src>
-    <img
-      class="album-art"
-      class:darkened={!$distractionFreeMode}
-      {src}
-      alt=""
-    />
+    <img class="album-art" class:darkened={!$distractionFreeMode} {src} alt="" />
   </ImgLoader>
 {/if}
 
