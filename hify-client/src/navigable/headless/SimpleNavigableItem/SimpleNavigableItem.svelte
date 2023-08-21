@@ -12,7 +12,7 @@
   export let display: ItemDisplay = null
   export let marginRight = 0
   export let notRounded = false
-  export let lookalike = false
+  export let unstyled = false
 
   export let justForStyle = false
 
@@ -67,7 +67,7 @@
 
   let wrapper: HTMLNavigableItemWrapperElement
   let focused: boolean
-  
+
   $: translatedDisplay = display === 'transparent' ? 'contents' : display ?? 'inline-block'
 </script>
 
@@ -84,7 +84,7 @@
   class:fullHeight
   class:noPadding
   class:notRounded
-  class:lookalike
+  class:unstyled
   style="display: {translatedDisplay}; margin-right: {marginRight}px;"
 >
   <slot {item} requestFocus={() => item.requestFocus()} />

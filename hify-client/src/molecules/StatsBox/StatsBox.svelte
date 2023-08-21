@@ -11,7 +11,7 @@
   $: stats = statsReq.then((stats) => stats.data.generateStats)
 </script>
 
-<SimpleNavigableItem lookalike>
+<SimpleNavigableItem unstyled>
   {#await stats}
     <strong>Loading...</strong>
   {:then stats}
