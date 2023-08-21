@@ -1,11 +1,7 @@
 use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
-    sync::{
-        atomic::{AtomicU64, AtomicUsize, Ordering},
-        Arc, Mutex,
-    },
-    time::Instant,
+    sync::Mutex,
 };
 
 use anyhow::{anyhow, bail, Context, Result};
@@ -13,10 +9,7 @@ use log::{error, info};
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 use serde::Deserialize;
 
-use crate::{
-    index::TrackMetadata,
-    utils::progress::{clear_progress, display_progress},
-};
+use crate::{index::TrackMetadata, utils::logging::files_progress_bar};
 
 use super::file::{process_analyzed_file, ExifToolFile};
 
@@ -47,8 +40,6 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
 }
 
 pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
-    let started = Instant::now();
-
     if files.is_empty() {
         info!("Nothing to do!");
         return Ok(vec![]);
@@ -56,13 +47,10 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
     info!("Starting analysis...");
 
-    let files_count = files.len();
-
     let successes = Mutex::new(vec![]);
     let errors = Mutex::new(vec![]);
-    let errors_counter = AtomicU64::new(0);
 
-    let progress = Arc::new(AtomicUsize::new(0));
+    let pb = files_progress_bar(files.len());
 
     files
         .par_iter()
@@ -77,17 +65,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
             let status = output.status;
 
-            let current = progress.load(Ordering::Acquire) + 1;
-            progress.store(current, Ordering::Release);
-
-            if current % 10 == 0 || current == files_count {
-                display_progress(
-                    started.elapsed().as_secs(),
-                    current,
-                    files_count,
-                    errors_counter.load(Ordering::Acquire),
-                );
-            }
+            pb.inc(1);
 
             if !status.success() {
                 bail!(
@@ -127,12 +105,8 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
             match process_analyzed_file(analyzed) {
                 Ok(data) => successes.lock().unwrap().push((file.clone(), data)),
                 Err(err) => {
-                    error!("Error in file '{}': {:?}", file.to_string_lossy(), err);
+                    pb.suspend(|| error!("Error in file '{}': {:?}", file.to_string_lossy(), err));
                     errors.lock().unwrap().push((file, err));
-                    errors_counter.store(
-                        errors_counter.load(Ordering::Acquire) + 1,
-                        Ordering::Release,
-                    );
                 }
             }
 
@@ -140,7 +114,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
         })
         .collect::<Result<()>>()?;
 
-    clear_progress();
+    pb.finish();
 
     let successes = successes.into_inner().unwrap();
     let errors = errors.into_inner().unwrap();
@@ -158,7 +132,7 @@ pub fn run_on(files: &[PathBuf]) -> Result<Vec<(PathBuf, TrackMetadata)>> {
 
     if !errors.is_empty() {
         error!(
-            "Failed with the following errors:\n\n{}",
+            "Failed with the following errors:\n{}",
             errors
                 .iter()
                 .map(|(success, err)| format!("* {}: {err:?}", success.to_string_lossy()))

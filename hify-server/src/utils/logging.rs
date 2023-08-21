@@ -1,5 +1,6 @@
 use std::io::IsTerminal;
 
+use indicatif::{ProgressBar, ProgressStyle};
 use log::LevelFilter;
 
 use once_cell::sync::Lazy;
@@ -16,4 +17,18 @@ pub fn setup_logger(logging_level: LevelFilter, display_timestamps_in_tty: bool)
     }
 
     builder.init();
+}
+
+pub fn files_progress_bar(len: usize) -> ProgressBar {
+    let style = ProgressStyle::with_template(
+        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
+    )
+    .unwrap();
+
+    let pb = ProgressBar::new(u64::try_from(len).unwrap()).with_style(style);
+
+    // Display the progress bar immediatly
+    pb.tick();
+
+    pb
 }

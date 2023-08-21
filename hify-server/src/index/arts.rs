@@ -3,17 +3,16 @@ use std::{
     fs,
     path::Path,
     sync::{
-        atomic::{AtomicU64, AtomicUsize, Ordering},
+        atomic::{AtomicUsize, Ordering},
         Mutex,
     },
-    time::Instant,
 };
 
 use anyhow::{Context, Result};
 use log::error;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::utils::progress::{clear_progress, display_progress};
+use crate::utils::logging::files_progress_bar;
 
 use super::{
     AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,
@@ -48,15 +47,11 @@ pub fn find_albums_arts(
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> Vec<Art> {
-    let started = Instant::now();
-
-    let total = albums.len();
     let done = AtomicUsize::new(0);
 
     let errors = Mutex::new(vec![]);
-    let errors_count = AtomicU64::new(0);
 
-    print!("        Starting...");
+    let pb = files_progress_bar(albums.len());
 
     let result = albums
         .par_iter()
@@ -66,39 +61,35 @@ pub fn find_albums_arts(
             let current = done.load(Ordering::Acquire) + 1;
             done.store(current, Ordering::Release);
 
-            display_progress(
-                started.elapsed().as_secs(),
-                current,
-                total,
-                errors_count.load(Ordering::Acquire),
-            );
+            pb.inc(1);
 
             match result {
                 Ok(None) => {}
                 Ok(Some(art)) => return Some(art),
                 Err(err) => {
                     errors.lock().unwrap().push(format!("{:?}", err));
-                    errors_count.store(errors_count.load(Ordering::Acquire) + 1, Ordering::Release);
                     return None;
                 }
             }
 
-            error!(
-                "Warning: no album art found for album '{}' by '{}'",
-                album.name,
-                album
-                    .album_artists
-                    .iter()
-                    .map(|artist| artist.name.clone())
-                    .collect::<Vec<_>>()
-                    .join(" / ")
-            );
+            pb.suspend(|| {
+                error!(
+                    "Warning: no album art found for album '{}' by '{}'",
+                    album.name,
+                    album
+                        .album_artists
+                        .iter()
+                        .map(|artist| artist.name.clone())
+                        .collect::<Vec<_>>()
+                        .join(" / ")
+                )
+            });
 
             None
         })
         .collect::<Vec<_>>();
 
-    clear_progress();
+    pb.finish();
 
     let errors = errors.lock().unwrap();
 

@@ -27,3 +27,4 @@ tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread", "fs"] }
 tower = { version = "0.4.13", features = ["util"] }
 tower-http = { version = "0.4.1", features = ["cors", "fs"] }
 walkdir = "2.3.3"
+indicatif = "0.17.6"
