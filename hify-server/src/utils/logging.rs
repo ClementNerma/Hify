@@ -20,10 +20,10 @@ pub fn setup_logger(logging_level: LevelFilter, display_timestamps_in_tty: bool)
 }
 
 pub fn files_progress_bar(len: usize) -> ProgressBar {
-    let style = ProgressStyle::with_template(
-        "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-    )
-    .unwrap();
+    let style = ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] [{bar:40.cyan/blue}] {pos:>7}/{len:7} {eta_precise} {msg}")
+        .expect("Invalid template provided for ProgressBar")
+        .progress_chars("##-");
 
     let pb = ProgressBar::new(u64::try_from(len).unwrap()).with_style(style);
 
