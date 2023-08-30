@@ -275,7 +275,7 @@ pub struct FileTimes {
 }
 
 async fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
-    let spinner = spinner("[{elapsed_precise}] Analyzed {pos} files");
+    let spinner = spinner("[{elapsed_precise}] Found {pos} files");
 
     let mut set: JoinSet<Result<Option<(PathBuf, FileTimes)>>> = JoinSet::new();
 
