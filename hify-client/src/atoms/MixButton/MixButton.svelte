@@ -13,7 +13,7 @@
     showContextMenu([
       {
         label: 'Only with the best rating <3',
-        onPress: () => generateAndPlayMix({ ...mixParams, minRating: 100 }),
+        onPress: () => generateAndPlayMix({ ...mixParams, minRating: 10 }),
       },
     ])}>Mix me some magic ✨</Button
 >
