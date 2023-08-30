@@ -72,7 +72,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     let files = files
         .into_iter()
         .filter(|(path, _)| metadata::is_audio_file(path))
-        .collect::<Vec<_>>();
+        .collect::<HashMap<_, _>>();
 
     log(
         started,
@@ -80,7 +80,8 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     );
 
     let file_times = files
-        .into_iter()
+        .iter()
+        .map(|(path, times)| (path.clone(), *times))
         .filter(|(path, _)| metadata::is_audio_file(path))
         .filter(|(path, times)| {
             match from
@@ -139,7 +140,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let mut tracks = tracks
         .into_iter()
-        .filter(|track| file_times.contains_key(&track.relative_path))
+        .filter(|track| files.contains_key(&track.relative_path))
         .collect::<Vec<_>>();
 
     let deleted_count = before_deletion_count - tracks.len();
