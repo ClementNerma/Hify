@@ -7,7 +7,7 @@ pub async fn log_errors<B>(request: Request<B>, next: Next<B>) -> Response {
 
     let res = next.run(request).await;
 
-    if !res.status().is_success() {
+    if !res.status().is_success() && !res.status().is_redirection() {
         error!(
             "{} {}",
             res.status().as_u16().to_string().bright_red(),
