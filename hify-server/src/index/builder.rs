@@ -67,7 +67,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         .await
         .context("Failed to build files list")?;
 
-    log(started, &format!("Found a total of {} files.", files.len()));
+    log(started, &format!("Found a total of {} files", files.len()));
 
     let files = files
         .into_iter()
