@@ -5,7 +5,7 @@ use log::{error, info};
 
 use crate::{
     index::{metadata::analyzer::analyze_file, TrackMetadata},
-    utils::logging::files_progress_bar,
+    utils::logging::progress_bar,
 };
 
 pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
@@ -42,7 +42,7 @@ pub async fn run_on(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>
 
     info!("Starting analysis...");
 
-    let pb = files_progress_bar(files.len());
+    let pb = progress_bar(files.len());
 
     let mut tasks = vec![];
 

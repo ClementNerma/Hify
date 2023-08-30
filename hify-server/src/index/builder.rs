@@ -1,13 +1,17 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use log::info;
-use rayon::prelude::{IntoParallelIterator, ParallelBridge, ParallelIterator};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+use tokio::task::JoinSet;
 
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
+    fs::Metadata,
     path::{Path, PathBuf},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use walkdir::WalkDir;
+
+use crate::utils::logging::spinner;
 
 use super::{
     arts::{find_albums_arts, generate_artist_art},
@@ -60,7 +64,9 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     log(started, "Looking for audio files...");
 
-    let files = build_files_list(&dir).context("Failed to build files list")?;
+    let files = build_files_list(&dir)
+        .await
+        .context("Failed to build files list")?;
 
     log(started, &format!("Found a total of {} files.", files.len()));
 
@@ -239,7 +245,18 @@ pub fn rebuild_arts(index: &mut Index) {
 
 pub fn refetch_file_times(index: &mut Index) -> Result<()> {
     for track in index.tracks.values_mut() {
-        let FileTimes { ctime, mtime } = get_file_times(&index.from.join(&track.relative_path))?;
+        let mt = index
+            .from
+            .join(&track.relative_path)
+            .metadata()
+            .with_context(|| {
+                format!(
+                    "Failed to get file metadata from track path: {}",
+                    track.relative_path.display()
+                )
+            })?;
+
+        let FileTimes { ctime, mtime } = get_file_times(&mt)?;
 
         track.ctime = ctime;
         track.mtime = mtime;
@@ -254,46 +271,46 @@ pub struct FileTimes {
     pub mtime: SystemTime,
 }
 
-fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
-    WalkDir::new(from)
-        .min_depth(1)
-        .into_iter()
-        .par_bridge()
-        .map(|item| {
-            let item = item.context("Failed to read directory entry")?;
+async fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
+    let spinner = spinner("Analyzed {pos} files");
 
-            if !item.path().is_file() {
+    let mut set: JoinSet<Result<Option<(PathBuf, FileTimes)>>> = JoinSet::new();
+
+    for item in WalkDir::new(from).min_depth(1) {
+        let spinner = spinner.clone();
+
+        set.spawn(async move {
+            let item = item.context("Failed to read directory entry")?;
+            let mt = item.metadata().with_context(|| {
+                format!("Failed to get metadata for path: {}", item.path().display())
+            })?;
+
+            if !mt.is_file() {
                 return Ok(None);
             }
 
-            if item.path().to_str().is_none() {
-                bail!(
-                    "Item does not have a valid UTF-8 path: {}",
-                    item.path().to_string_lossy()
-                );
-            }
+            spinner.inc(1);
+            Ok(Some((item.path().to_path_buf(), get_file_times(&mt)?)))
+        });
+    }
 
-            return Ok(Some((
-                item.path().to_path_buf(),
-                get_file_times(item.path())?,
-            )));
-        })
-        .filter_map(|entry| match entry {
-            Ok(Some(entry)) => Some(Ok(entry)),
-            Ok(None) => None,
-            Err(err) => Some(Err(err)),
-        })
-        .collect()
+    let mut files = HashMap::new();
+
+    while let Some(res) = set.join_next().await {
+        if let Some((path, times)) = res?? {
+            files.insert(path, times);
+        }
+    }
+
+    spinner.finish();
+
+    Ok(files)
 }
 
-fn get_file_times(path: &Path) -> Result<FileTimes> {
-    let metadata = path
-        .metadata()
-        .context("Failed to get the file's metadata")?;
+fn get_file_times(mt: &Metadata) -> Result<FileTimes> {
+    let ctime = mt.created().ok();
 
-    let ctime = metadata.created().ok();
-
-    let mtime = metadata
+    let mtime = mt
         .modified()
         .context("Failed to get the file's modification time")?;
 

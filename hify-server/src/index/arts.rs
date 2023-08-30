@@ -12,7 +12,7 @@ use anyhow::{Context, Result};
 use log::error;
 use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::utils::logging::files_progress_bar;
+use crate::utils::logging::progress_bar;
 
 use super::{
     AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,
@@ -51,7 +51,7 @@ pub fn find_albums_arts(
 
     let errors = Mutex::new(vec![]);
 
-    let pb = files_progress_bar(albums.len());
+    let pb = progress_bar(albums.len());
 
     let result = albums
         .par_iter()
