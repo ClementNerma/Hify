@@ -2,7 +2,7 @@ mod arts;
 mod builder;
 mod cache;
 mod data;
-mod exiftool;
+mod metadata;
 mod search;
 mod sorted_map;
 

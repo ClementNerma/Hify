@@ -94,6 +94,7 @@ async fn inner_main(args: Args) -> Result<()> {
                 info!("> Updating index as requested...");
 
                 index = index::build_index(music_dir.clone(), Some(index))
+                    .await
                     .context("Failed to rebuild index")?;
 
                 utils::save::save_index(&index_file, &index)
@@ -144,8 +145,11 @@ async fn inner_main(args: Args) -> Result<()> {
 
         false => {
             info!("> Generating index...");
-            let index =
-                index::build_index(music_dir.clone(), None).context("Failed to build index")?;
+
+            let index = index::build_index(music_dir.clone(), None)
+                .await
+                .context("Failed to build index")?;
+
             utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
             info!("> Index saved on disk.");
 

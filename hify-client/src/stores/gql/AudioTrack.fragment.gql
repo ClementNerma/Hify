@@ -3,9 +3,9 @@ fragment AudioTrack on Track {
   computedRating
   # appOnlyRating
   metadata {
-    format
+    #codec
     duration
-    size
+    #fileSize
     tags {
       title
       artists {

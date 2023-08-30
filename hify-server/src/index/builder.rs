@@ -13,7 +13,7 @@ use super::{
     arts::{find_albums_arts, generate_artist_art},
     cache::build_index_cache,
     data::{Index, Track},
-    exiftool,
+    metadata,
     sorted_map::SortedMap,
     IndexCache,
 };
@@ -22,7 +22,7 @@ pub fn log(time: Instant, message: &str) {
     info!("[{: >4}s] {message}", time.elapsed().as_secs());
 }
 
-pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
+pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     let from = from.unwrap_or_else(|| Index {
         from: dir.clone(),
         fingerprint: String::new(),
@@ -66,7 +66,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let files = files
         .into_iter()
-        .filter(|(path, _)| exiftool::is_audio_file(path))
+        .filter(|(path, _)| metadata::is_audio_file(path))
         .collect::<Vec<_>>();
 
     log(
@@ -76,7 +76,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let file_times = files
         .into_iter()
-        .filter(|(path, _)| exiftool::is_audio_file(path))
+        .filter(|(path, _)| metadata::is_audio_file(path))
         .filter(|(path, times)| {
             match from
                 .cache
@@ -98,7 +98,7 @@ pub fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     log(started, "Extracting audio metadata...");
 
     // Run analysis tool on all new and modified files
-    let analyzed = exiftool::run_on(file_times.keys().cloned().collect::<Vec<_>>().as_slice())?;
+    let analyzed = metadata::run_on(file_times.keys().cloned().collect::<Vec<_>>()).await?;
 
     // Turn the analyzed files into tracks
     let analyzed = analyzed

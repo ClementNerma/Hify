@@ -29,7 +29,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
     for track in tracks.values() {
         tracks_files_mtime.insert(track.relative_path.clone(), track.mtime);
-        tracks_formats.insert(track.id, track.metadata.format);
+        tracks_formats.insert(track.id, track.metadata.codec);
 
         let tags = &track.metadata.tags;
 

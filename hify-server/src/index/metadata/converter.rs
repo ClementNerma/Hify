@@ -1,58 +1,81 @@
+use std::collections::HashMap;
+
 use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
-use serde::{de::Error, Deserialize, Deserializer};
-use serde_json::Value;
+use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
 
 use crate::index::{Rating, TrackDate, TrackTags};
 
-pub fn parse_exiftool_tags(tags: ExifToolFileTags) -> Result<TrackTags> {
+pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
+    let mut unrecognized_tags = HashMap::new();
+
+    // TODO: change to HashMap when StandardTagKey implements Hash
+    let mut standard_tags = vec![];
+
+    for tag in rev.tags() {
+        let Tag {
+            key,
+            std_key,
+            value,
+        } = tag;
+
+        match std_key {
+            Some(std_key) => {
+                standard_tags.push((*std_key, value));
+            }
+            None => {
+                if unrecognized_tags.insert(key, value).is_some() {
+                    bail!("Found duplicate definition for tag key: {key}");
+                }
+            }
+        }
+    }
+
+    let get_tag_str = |name: StandardTagKey| -> Result<Option<String>> {
+        let value = standard_tags
+            .iter()
+            .find_map(|(key, value)| if *key == name { Some(value) } else { None });
+
+        let value = value
+            .map(|value| {
+                decode_value_as_string(value)
+                    .with_context(|| format!("Failed to decode tag '{name:?}'"))
+            })
+            .transpose()?;
+
+        Ok(value.flatten())
+    };
+
     let tags = TrackTags {
-        title: tags.Title.context("Missing 'title' tag")?,
-        artists: tags.Artist.map(parse_array_tag).unwrap_or_default(),
-        composers: tags.Composer.map(parse_array_tag).unwrap_or_default(),
-        album: tags.Album.context("Missing 'album' tag")?,
-        album_artists: tags
-            .AlbumArtist
-            .or(tags.Albumartist)
-            .or(tags.Band)
+        title: get_tag_str(StandardTagKey::TrackTitle)?.context("Track title is missing")?,
+        artists: get_tag_str(StandardTagKey::Artist)?
             .map(parse_array_tag)
             .unwrap_or_default(),
-
-        disc: tags
-            .Discnumber
-            .or(tags.DiscNumber)
-            .or(tags.PartOfSet)
+        composers: get_tag_str(StandardTagKey::Composer)?
+            .map(parse_array_tag)
+            .unwrap_or_default(),
+        album: get_tag_str(StandardTagKey::Album)?.context("Album name is missing")?,
+        album_artists: get_tag_str(StandardTagKey::AlbumArtist)?
+            .map(parse_array_tag)
+            .unwrap_or_default(),
+        disc: get_tag_str(StandardTagKey::DiscNumber)?
             .map(|value| parse_set_number(&value, "disc number"))
             .transpose()?,
-
-        track_no: tags
-            .Track
-            .or(tags.TrackNumber)
+        track_no: get_tag_str(StandardTagKey::TrackNumber)?
             .map(|value| parse_set_number(&value, "track number"))
             .transpose()?,
-
-        date: tags
-            .Year
-            .or(tags.ReleaseTime)
+        date: get_tag_str(StandardTagKey::ReleaseDate)?
             .map(|date| parse_date(&date))
             .transpose()?,
-
-        genres: tags.Genre.map(parse_array_tag).unwrap_or_default(),
-
-        rating:
-            // Popularimeter parsing gives us a value between 0 and 10...
-        tags
-            .Popularimeter
+        genres: get_tag_str(StandardTagKey::Genre)?
+            .map(parse_array_tag)
+            .unwrap_or_default(),
+        rating: get_tag_str(StandardTagKey::Rating)?
             .map(parse_popularimeter)
             .transpose()?
             .flatten()
-            // ...Rating gives us a value between 0 and 100...
-            .or_else(|| tags.Rating.map(|rating| (rating / 10.0).round() as u8))
-            // ...RatingPercent gives us a value between 0 and 100...
-            .or_else(|| tags.RatingPercent.map(|rating| (rating as f64 / 10.0).round() as u8))
-            // ...after normalizing all these to an u8 between 0 and 10, we can parse it as a rating
             .map(|rating| {
                 Rating::parse(rating).map_err(|()| {
                     anyhow!(
@@ -109,6 +132,14 @@ fn parse_date(input: &str) -> Result<TrackDate> {
 fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
     let popm = popm.as_ref();
 
+    if let Ok(num) = popm.parse::<u8>() {
+        if num > 100 {
+            bail!("Found a rating higher than 100");
+        }
+
+        return Ok(Some(num / 10));
+    }
+
     let captured = PARSE_MUSICBEE_WMP_POPM
         .captures(popm)
         .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm))?;
@@ -142,101 +173,22 @@ fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
         .collect()
 }
 
-#[derive(Deserialize)]
-#[allow(non_snake_case)]
-pub struct ExifToolFileTags {
-    #[serde(default, deserialize_with = "ensure_string")]
-    Album: Option<String>,
+fn decode_value_as_string(value: &Value) -> Result<Option<String>> {
+    Ok(Some(match value {
+        Value::Binary(_) => bail!("Found unsupported tag data (binary)"),
+        Value::Boolean(_) => bail!("Found unsupported tag data (boolean)"),
+        Value::Flag => bail!("Found unsupported tag data (flag)"),
+        Value::Float(float) => float.to_string(),
+        Value::SignedInt(int) => int.to_string(),
+        Value::UnsignedInt(uint) => uint.to_string(),
+        Value::String(str) => {
+            if str.trim().is_empty() {
+                return Ok(None);
+            }
 
-    #[serde(default, deserialize_with = "ensure_string")]
-    AlbumArtist: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Albumartist: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Artist: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Band: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Composer: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Discnumber: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    DiscNumber: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Genre: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    PartOfSet: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Popularimeter: Option<String>,
-
-    #[serde(default)]
-    Rating: Option<f64>,
-
-    #[serde(default)]
-    RatingPercent: Option<u8>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    ReleaseTime: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Title: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Track: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    TrackNumber: Option<String>,
-
-    #[serde(default, deserialize_with = "ensure_string")]
-    Year: Option<String>,
-}
-
-fn ensure_string<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<String>, D::Error> {
-    let matched: Option<Value> = Deserialize::deserialize(deserializer)?;
-
-    Ok(matched
-        .map(decode_value_as_string)
-        .transpose()
-        .map_err(D::Error::custom)?
-        .flatten())
-}
-
-fn decode_value_as_string(value: Value) -> Result<Option<String>, String> {
-    match value {
-        // NOTE: Approx. but no way to do otherwise :(
-        Value::Bool(bool) => Ok(Some(if bool { "True" } else { "False" }.to_string())),
-        Value::Number(num) => Ok(Some(num.to_string())),
-        Value::String(str) => Ok(if !str.is_empty() { Some(str) } else { None }),
-
-        Value::Array(values) => {
-            let decoded = values
-                .into_iter()
-                .map(decode_value_as_string)
-                .filter_map(|decoded| match decoded {
-                    Ok(Some(decoded)) => Some(Ok(decoded)),
-                    Ok(None) => None,
-                    Err(err) => Some(Err(err)),
-                })
-                .collect::<Result<Vec<_>, String>>()?;
-
-            // NOTE: joined as ',' as this is the default separator used by ExifTool
-            Ok(Some(decoded.join(",")))
+            str.clone()
         }
-
-        invalid => Err(format!(
-            "Invalid value type (expected string or integer): {}",
-            invalid
-        )),
-    }
+    }))
 }
 
 static PARSE_TRACK_OR_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {

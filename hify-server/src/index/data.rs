@@ -216,10 +216,10 @@ impl Ord for Track {
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
 pub struct TrackMetadata {
     /// Audio file format
-    pub format: AudioFormat,
+    pub codec: AudioCodec,
 
     /// File size, in bytes
-    pub size: u64,
+    pub file_size: u64,
 
     /// Duration, in seconds
     pub duration: u32,
@@ -300,13 +300,12 @@ impl TrackTags {
 /// Other formats may be supported by the extraction tool, but not listed here as not supported by web browsers
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Enum)]
 #[allow(clippy::upper_case_acronyms)]
-pub enum AudioFormat {
+pub enum AudioCodec {
     MP3,
     FLAC,
     WAV,
     AAC,
-    OGG,
-    M4A,
+    VORBIS,
     OPUS,
 }
 
