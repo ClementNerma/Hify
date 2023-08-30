@@ -1,16 +1,8 @@
-use std::{
-    collections::HashMap,
-    fs,
-    path::Path,
-    sync::{
-        atomic::{AtomicUsize, Ordering},
-        Mutex,
-    },
-};
+use std::{collections::HashMap, path::Path, sync::Arc};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use log::error;
-use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
+use tokio::{fs, task::JoinSet};
 
 use crate::utils::logging::progress_bar;
 
@@ -41,73 +33,73 @@ pub fn generate_artist_art(
     })
 }
 
-pub fn find_albums_arts(
+pub async fn find_albums_arts(
     albums: &[&AlbumInfos],
     base_dir: &Path,
-    tracks: &SortedMap<TrackID, Track>,
-    cache: &IndexCache,
-) -> Vec<Art> {
-    let done = AtomicUsize::new(0);
-
-    let errors = Mutex::new(vec![]);
+    tracks: SortedMap<TrackID, Track>,
+    cache: IndexCache,
+) -> Result<Vec<Art>> {
+    let mut set = JoinSet::new();
+    let tracks = Arc::new(tracks);
+    let cache = Arc::new(cache);
 
     let pb = progress_bar(albums.len());
 
-    let result = albums
-        .par_iter()
-        .filter_map(|album| {
-            let result = find_album_art(album.get_id(), base_dir, tracks, cache);
+    for album in albums {
+        let base_dir = base_dir.to_path_buf();
+        let pb = pb.clone();
+        let tracks = Arc::clone(&tracks);
+        let cache = Arc::clone(&cache);
+        let album = AlbumInfos::clone(album);
 
-            let current = done.load(Ordering::Acquire) + 1;
-            done.store(current, Ordering::Release);
+        set.spawn(async move {
+            let result = find_album_art(album.get_id(), &base_dir, &tracks, &cache).await?;
+
+            if result.is_none() {
+                pb.suspend(|| {
+                    error!(
+                        "Warning: no album art found for album '{}' by '{}'",
+                        album.name,
+                        album
+                            .album_artists
+                            .iter()
+                            .map(|artist| artist.name.clone())
+                            .collect::<Vec<_>>()
+                            .join(" / ")
+                    );
+                });
+            }
 
             pb.inc(1);
 
-            match result {
-                Ok(None) => {}
-                Ok(Some(art)) => return Some(art),
-                Err(err) => {
-                    errors.lock().unwrap().push(format!("{:?}", err));
-                    return None;
-                }
-            }
-
-            pb.suspend(|| {
-                error!(
-                    "Warning: no album art found for album '{}' by '{}'",
-                    album.name,
-                    album
-                        .album_artists
-                        .iter()
-                        .map(|artist| artist.name.clone())
-                        .collect::<Vec<_>>()
-                        .join(" / ")
-                )
-            });
-
-            None
-        })
-        .collect::<Vec<_>>();
+            Ok::<_, anyhow::Error>(result)
+        });
+    }
 
     pb.finish();
 
-    let errors = errors.lock().unwrap();
+    let mut arts = vec![];
+    let mut errors = 0;
 
-    if !errors.is_empty() {
-        for (i, err) in errors.iter().enumerate() {
-            error!(
-                "| Art error {} / {}: {}",
-                i + 1,
-                errors.len(),
-                err.lines().collect::<Vec<_>>().join("\\n")
-            );
+    while let Some(res) = set.join_next().await {
+        match res? {
+            Ok(Some(art)) => arts.push(art),
+            Ok(None) => {}
+            Err(err) => {
+                error!("Error: {err}");
+                errors += 1;
+            }
         }
     }
 
-    result
+    if errors > 0 {
+        bail!("Encountered {errors} error(s)");
+    }
+
+    Ok(arts)
 }
 
-fn find_album_art(
+async fn find_album_art(
     album_id: AlbumID,
     base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
@@ -121,33 +113,34 @@ fn find_album_art(
     let track_path = base_dir.join(&tracks.get(first_track_id).unwrap().relative_path);
 
     for dir in track_path.ancestors().skip(1) {
-        let items: Vec<_> = fs::read_dir(dir)
-            .with_context(|| {
-                format!(
-                    "Failed to read directory during art discovery: {}",
-                    dir.display()
-                )
-            })?
-            .collect::<Result<_, _>>()
-            .context("Failed during art discovery")?;
+        let mut dir_iter = fs::read_dir(dir).await.with_context(|| {
+            format!(
+                "Failed to read directory during art discovery: {}",
+                dir.display()
+            )
+        })?;
 
-        for filename in COVER_FILENAMES {
-            for extension in COVER_EXTENSIONS {
-                let first_match = items.iter().find(|item| {
-                    item.file_name().to_string_lossy().to_ascii_lowercase()
+        loop {
+            let Some(item) = dir_iter.next_entry().await? else {
+                break;
+            };
+
+            for filename in COVER_FILENAMES {
+                for extension in COVER_EXTENSIONS {
+                    if item.file_name().to_string_lossy().to_ascii_lowercase()
                         == format!("{filename}.{extension}")
-                });
+                    {
+                        let art = make_album_art(&item.path(), base_dir, album_id).with_context(
+                            || {
+                                format!(
+                                    "Failed to make art for album cover at: {}",
+                                    item.path().to_string_lossy()
+                                )
+                            },
+                        )?;
 
-                if let Some(item) = first_match {
-                    let art =
-                        make_album_art(&item.path(), base_dir, album_id).with_context(|| {
-                            format!(
-                                "Failed to make art for album cover at: {}",
-                                item.path().to_string_lossy()
-                            )
-                        })?;
-
-                    return Ok(Some(art));
+                        return Ok(Some(art));
+                    }
                 }
             }
         }

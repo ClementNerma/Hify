@@ -172,7 +172,8 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Searching for new albums' ({}) arts...", new_albums.len()),
     );
 
-    let new_albums_arts = find_albums_arts(&new_albums, &dir, &tracks, &cache);
+    let new_albums_arts =
+        find_albums_arts(&new_albums, &dir, tracks.clone(), cache.clone()).await?;
 
     let mut arts = from.arts;
 
@@ -218,7 +219,7 @@ pub fn rebuild_cache(index: &mut Index) {
     index.cache = build_index_cache(&index.tracks);
 }
 
-pub fn rebuild_arts(index: &mut Index) {
+pub async fn rebuild_arts(index: &mut Index) -> Result<()> {
     let arts = find_albums_arts(
         index
             .cache
@@ -227,9 +228,10 @@ pub fn rebuild_arts(index: &mut Index) {
             .collect::<Vec<_>>()
             .as_slice(),
         &index.from,
-        &index.tracks,
-        &index.cache,
-    );
+        index.tracks.clone(),
+        index.cache.clone(),
+    )
+    .await?;
 
     index.arts = arts.into_iter().map(|art| (art.id, art)).collect();
     index.arts.extend(
@@ -241,6 +243,8 @@ pub fn rebuild_arts(index: &mut Index) {
             .map(|art| (art.id, art))
             .collect::<HashMap<_, _>>(),
     );
+
+    Ok(())
 }
 
 pub fn refetch_file_times(index: &mut Index) -> Result<()> {
@@ -302,7 +306,7 @@ async fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
         }
     }
 
-    spinner.finish();
+    spinner.finish_and_clear();
 
     Ok(files)
 }

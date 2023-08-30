@@ -11,7 +11,7 @@ pub fn setup_logger(logging_level: LevelFilter, display_timestamps_in_tty: bool)
     let mut builder = env_logger::builder();
 
     builder
-        .filter_module("symphonia", LevelFilter::Warn)
+        .filter_module("symphonia", LevelFilter::Error)
         .format_target(false)
         .filter_level(logging_level);
 
