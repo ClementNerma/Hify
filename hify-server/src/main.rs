@@ -18,13 +18,16 @@ use log::{error, info};
 
 use crate::cmd::Args;
 
-use self::utils::logging::setup_logger;
+use self::utils::{logging::setup_logger, time::OFFSET};
 
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
 
     setup_logger(args.logging_level, args.display_timestamps_in_tty);
+
+    // Trigger offset fetching
+    let _ = *OFFSET;
 
     if let Err(err) = inner_main(args).await {
         error!("An error occurred:\n{err:?}");
