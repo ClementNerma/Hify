@@ -140,7 +140,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let mut tracks = tracks
         .into_iter()
-        .filter(|track| files.contains_key(&track.relative_path))
+        .filter(|track| files.contains_key(&dir.join(&track.relative_path)))
         .collect::<Vec<_>>();
 
     let deleted_count = before_deletion_count - tracks.len();
