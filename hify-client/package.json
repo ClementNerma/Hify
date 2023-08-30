@@ -45,8 +45,5 @@
     "graphql-tag": "^2.12.6",
     "svelte": "^4.2.0",
     "svelte-navigator": "^3.2.2"
-  },
-  "volta": {
-    "node": "20.3.1"
   }
 }
