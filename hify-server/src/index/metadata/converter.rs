@@ -120,6 +120,9 @@ fn parse_date(input: &str) -> Result<TrackDate> {
 
 fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
     match popm.as_ref() {
+        // No rating
+        "0" => Ok(None),
+
         // Normal
         "10" => Ok(Some(1)),
         "20" => Ok(Some(2)),
@@ -133,8 +136,6 @@ fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
         "100" => Ok(Some(100)),
 
         // MusicBee
-        "0" => Ok(None),
-        "1" => Ok(Some(2)),
         "13" => Ok(Some(1)),
         "54" => Ok(Some(3)),
         "64" => Ok(Some(4)),
