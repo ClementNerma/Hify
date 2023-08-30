@@ -133,7 +133,7 @@ fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
         "70" => Ok(Some(7)),
         "80" => Ok(Some(8)),
         "90" => Ok(Some(9)),
-        "100" => Ok(Some(100)),
+        "100" => Ok(Some(10)),
 
         // MusicBee
         "13" => Ok(Some(1)),
