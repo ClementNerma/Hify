@@ -10,7 +10,7 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::utils::logging::{progress_bar, spinner};
+use crate::utils::logging::spinner;
 
 use super::{
     arts::{find_albums_arts, generate_artist_art},
@@ -137,7 +137,10 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     log(started, "Looking for deleted track(s)...");
 
-    let mut tracks = filter_out_deleted_tracks(tracks, &dir).await?;
+    let mut tracks = tracks
+        .into_iter()
+        .filter(|track| file_times.contains_key(&track.relative_path))
+        .collect::<Vec<_>>();
 
     let deleted_count = before_deletion_count - tracks.len();
 
@@ -318,46 +321,4 @@ fn get_file_times(mt: &Metadata) -> Result<FileTimes> {
         .context("Failed to get the file's modification time")?;
 
     Ok(FileTimes { ctime, mtime })
-}
-
-async fn filter_out_deleted_tracks(tracks: Vec<Track>, base_dir: &Path) -> Result<Vec<Track>> {
-    let pb = progress_bar(tracks.len());
-
-    let mut set: JoinSet<Result<Option<Track>>> = JoinSet::new();
-
-    for track in tracks {
-        let track = track.clone();
-        let base_dir = base_dir.to_path_buf();
-        let pb = pb.clone();
-
-        set.spawn(async move {
-            let mt = base_dir
-                .join(&track.relative_path)
-                .metadata()
-                .with_context(|| {
-                    format!(
-                        "Failed to get metadata for file at path: {}",
-                        track.relative_path.display()
-                    )
-                })?;
-
-            pb.inc(1);
-
-            if mt.is_file() {
-                Ok(Some(track))
-            } else {
-                Ok(None)
-            }
-        });
-    }
-
-    let mut out = vec![];
-
-    while let Some(res) = set.join_next().await {
-        if let Some(res) = res?? {
-            out.push(res);
-        }
-    }
-
-    Ok(out)
 }
