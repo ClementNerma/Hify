@@ -40,8 +40,6 @@ pub async fn run_on(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>
         return Ok(vec![]);
     }
 
-    info!("Starting analysis...");
-
     let pb = progress_bar(files.len());
 
     let mut tasks = vec![];
