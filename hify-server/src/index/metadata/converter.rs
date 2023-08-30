@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
@@ -9,27 +7,18 @@ use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
 use crate::index::{Rating, TrackDate, TrackTags};
 
 pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
-    let mut unrecognized_tags = HashMap::new();
-
     // TODO: change to HashMap when StandardTagKey implements Hash
     let mut standard_tags = vec![];
 
     for tag in rev.tags() {
         let Tag {
-            key,
+            key: _, // NOTE: can be duplicates
             std_key,
             value,
         } = tag;
 
-        match std_key {
-            Some(std_key) => {
-                standard_tags.push((*std_key, value));
-            }
-            None => {
-                if unrecognized_tags.insert(key, value).is_some() {
-                    bail!("Found duplicate definition for tag key: {key}");
-                }
-            }
+        if let Some(std_key) = std_key {
+            standard_tags.push((*std_key, value));
         }
     }
 
@@ -130,21 +119,20 @@ fn parse_date(input: &str) -> Result<TrackDate> {
 }
 
 fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
-    let popm = popm.as_ref();
+    match popm.as_ref() {
+        // Normal
+        "10" => Ok(Some(1)),
+        "20" => Ok(Some(2)),
+        "30" => Ok(Some(3)),
+        "40" => Ok(Some(4)),
+        "50" => Ok(Some(5)),
+        "60" => Ok(Some(6)),
+        "70" => Ok(Some(7)),
+        "80" => Ok(Some(8)),
+        "90" => Ok(Some(9)),
+        "100" => Ok(Some(100)),
 
-    if let Ok(num) = popm.parse::<u8>() {
-        if num > 100 {
-            bail!("Found a rating higher than 100");
-        }
-
-        return Ok(Some(num / 10));
-    }
-
-    let captured = PARSE_MUSICBEE_WMP_POPM
-        .captures(popm)
-        .with_context(|| format!("Failed to parse 'Popularimeter' value: {}", popm))?;
-
-    match captured.name("score").unwrap().as_str() {
+        // MusicBee
         "0" => Ok(None),
         "1" => Ok(Some(2)),
         "13" => Ok(Some(1)),
@@ -156,8 +144,10 @@ fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
         "196" => Ok(Some(8)),
         "242" => Ok(Some(9)),
         "255" => Ok(Some(10)),
+
+        // Unknown
         score => bail!(
-            "Failed to parse score in 'Popularimeter' tag: invalid value {}",
+            "Failed to parse rating tag: found invalid value '{}'",
             score
         ),
     }
@@ -205,9 +195,9 @@ static PARSE_TRACK_YEAR_OR_DATE_1: Lazy<Regex> = Lazy::new(|| {
     Regex::new(pomsky!(
         Start
             :year([digit]{4})
-            ['-' '\\' '.' ' ']
+            ['-' '/' '\\' '.' ' ']
             :month([digit]{2})
-            ['-' '\\' '.' ' ']
+            ['-' '/' '\\' '.' ' ']
             :day([digit]{2})
             ('T' ['0'-'9' ':' 'Z']+)?
         End
@@ -220,9 +210,9 @@ static PARSE_TRACK_YEAR_OR_DATE_2: Lazy<Regex> = Lazy::new(|| {
     Regex::new(pomsky!(
         Start
             :month([digit]{2})
-            ['-' '\\' '.' ' ']
+            ['-' '/' '\\' '.' ' ']
             :day([digit]{2})
-            ['-' '\\' '.' ' ']
+            ['-' '/' '\\' '.' ' ']
             :year([digit]{4})
             ('T' ['0'-'9' ':' 'Z']+)?
         End
@@ -239,9 +229,9 @@ static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-static PARSE_MUSICBEE_WMP_POPM: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(pomsky!(
-        Start ("MusicBee" | "Windows Media Player 9 Series") " " :score([digit]+) " 0" End
-    ))
-    .unwrap()
-});
+// static PARSE_MUSICBEE_WMP_POPM: Lazy<Regex> = Lazy::new(|| {
+//     Regex::new(pomsky!(
+//         Start ("MusicBee" | "Windows Media Player 9 Series") " " :score([digit]+) " 0" End
+//     ))
+//     .unwrap()
+// });
