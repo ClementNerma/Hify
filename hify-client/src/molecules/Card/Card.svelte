@@ -8,7 +8,7 @@
   export let subtitle: string | null = null
 
   export let boxSize = 120
-  export let rounded = false
+  export let circle = false
 
   // 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
   // It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
@@ -17,7 +17,7 @@
 
 <div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
   <ImgLoader {art} let:src>
-    <img class="cover" class:rounded width={boxSize} height={boxSize} {src} alt="" />
+    <img class="cover" class:circle width={boxSize} height={boxSize} {src} alt="" />
   </ImgLoader>
 
   <div class="title experimental-line-limiter">{title}</div>
@@ -36,7 +36,7 @@
     max-width: var(--width);
   }
 
-  .cover.rounded {
+  .cover.circle {
     border-radius: 50%;
   }
 

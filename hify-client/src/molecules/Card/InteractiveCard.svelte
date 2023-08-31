@@ -12,9 +12,9 @@
   export let onLongPress: (() => void) | undefined = undefined
 
   export let enforceMaxWidth: boolean | undefined = undefined
-  export let rounded: boolean | undefined = undefined
+  export let circle: boolean | undefined = undefined
 </script>
 
 <SimpleNavigableItem {onPress} {onLongPress}>
-  <Card {art} {title} {subtitle} {enforceMaxWidth} {rounded} />
+  <Card {art} {title} {subtitle} {enforceMaxWidth} {circle} />
 </SimpleNavigableItem>

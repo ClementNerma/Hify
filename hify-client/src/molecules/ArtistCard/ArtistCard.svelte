@@ -23,5 +23,5 @@
   onPress={bind(artist, (artist) => navigate(ROUTES.artist(artist.id)))}
   onLongPress={() => showContextMenu(contextMenuOptions)}
   art={artist.art}
-  rounded={true}
+  circle={true}
 />
