@@ -136,6 +136,10 @@ fn analyze_entire_file(
         // This should always be true since we previously ensured there was only one track in the audio file
         assert!(packet.track_id() == track_id);
 
+        // Gapless playback is not enabled, so these values should be zero
+        assert_eq!(packet.trim_start, 0);
+        assert_eq!(packet.trim_end, 0);
+
         // Add packet duration to the total
         raw_dur += packet.dur
     }
