@@ -134,11 +134,17 @@ export function replayTrack() {
 	setPlayingAudioProgress(0)
 }
 
-export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
+type StopAudioPlayerOptions = {
+	justPause?: boolean,
+	ignoreAlreadyPaused?: boolean,
+	ignoreNoPlayer?: boolean,
+}
+
+export function stopAudioPlayer({ justPause, ignoreAlreadyPaused, ignoreNoPlayer }: StopAudioPlayerOptions = {}) {
 	const player = get(audioPlayer)
 
 	if (!player) {
-		if (!ignoreNoPlayer) {
+		if (ignoreNoPlayer !== true) {
 			logWarn('Tried to stop audio playback while no audio is playing')
 		}
 
@@ -150,7 +156,7 @@ export function stopAudioPlayer(justPause = false, ignoreNoPlayer = false) {
 	if (!player.paused) {
 		logInfo('Stopped audio playback')
 		player.pause()
-	} else {
+	} else if (ignoreAlreadyPaused !== true) {
 		logInfo('Tried to stop audio playback, but it was already paused')
 	}
 
@@ -173,6 +179,10 @@ export function humanReadableDuration(seconds: number): string {
 
 document.addEventListener('visibilitychange', () => {
 	if (document.visibilityState === 'hidden') {
-		stopAudioPlayer(true, true)
+		stopAudioPlayer({
+			justPause: true,
+			ignoreAlreadyPaused: true,
+			ignoreNoPlayer: true,
+		})
 	}
 })
