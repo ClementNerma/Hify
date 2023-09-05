@@ -14,14 +14,21 @@
 
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
-  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
   import { ROUTES } from '../../routes'
   import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
   import Column from '../../navigable/ui/molecules/Column/Column.svelte'
   import ModifiableTrackRating from '../../atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
+  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
+  import TrackWaveForm from '../../atoms/TrackWaveForm/TrackWaveForm.svelte'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false
+
+  function toggleWaveForm() {
+    showWaveform = !showWaveform
+  }
+
+  let showWaveform = false
 </script>
 
 <div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!currentTrack}>
@@ -32,7 +39,16 @@
         {@const album = tags.album}
         {@const artists = tags.artists.length > 0 ? tags.artists : album.albumArtists}
 
-        <div class="track-infos">
+        {#if showWaveform}
+          <TrackWaveForm
+            track={currentTrack}
+            progress={($readableAudioProgress ?? 0) / currentTrack.metadata.duration}
+            width="100%"
+            height="50px"
+            />
+        {/if}
+
+        <div class="buttons">
           <NavigableRow>
             <SimpleNavigableItem
               onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}
@@ -55,6 +71,10 @@
                 <div class="track-info">🎤 {artist.name}</div>
               </SimpleNavigableItem>
             {/each}
+
+            <SimpleNavigableItem onPress={toggleWaveForm}>
+              <div class="track-action">∿ Waveform</div>
+            </SimpleNavigableItem>
 
             <ModifiableTrackRating track={currentTrack} />
           </NavigableRow>
@@ -124,14 +144,16 @@
     transition: bottom 0.3s;
   }
 
-  .track-infos {
+  .buttons {
     display: flex;
     flex-direction: row;
+    align-items: end;
     font-size: 1.2rem;
   }
 
-  .track-info {
+  .track-info, .track-action {
     padding: 5px;
+    align-self: stretch;
   }
 
   .progress-range,

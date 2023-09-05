@@ -18,6 +18,7 @@
   export let marginRight = 0
   export let notRounded = false
   export let unstyled = false
+  export let customStyle = ''
 
   export let justForStyle = false
 
@@ -90,7 +91,7 @@
   class:noPadding
   class:notRounded
   class:unstyled
-  style="display: {translatedDisplay}; margin-right: {marginRight}px;"
+  style="display: {translatedDisplay}; margin-right: {marginRight}px; {customStyle}"
 >
   <slot {item} requestFocus={() => item.requestFocus()} {focused} />
 </navigable-item-wrapper>

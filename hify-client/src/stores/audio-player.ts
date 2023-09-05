@@ -108,7 +108,8 @@ export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 	player.currentTime = player.currentTime + relativeSeconds
 
 	logDebug(
-		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (${prevTime}s => ${player.currentTime
+		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (${prevTime}s => ${
+			player.currentTime
 		}s)`,
 	)
 }
@@ -135,9 +136,9 @@ export function replayTrack() {
 }
 
 type StopAudioPlayerOptions = {
-	justPause?: boolean,
-	ignoreAlreadyPaused?: boolean,
-	ignoreNoPlayer?: boolean,
+	justPause?: boolean
+	ignoreAlreadyPaused?: boolean
+	ignoreNoPlayer?: boolean
 }
 
 export function stopAudioPlayer({ justPause, ignoreAlreadyPaused, ignoreNoPlayer }: StopAudioPlayerOptions = {}) {
