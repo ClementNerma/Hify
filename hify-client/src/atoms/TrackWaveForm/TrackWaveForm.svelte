@@ -1,11 +1,7 @@
 <script lang="ts">
   import { AudioTrackFragment } from '../../graphql/generated'
   import { SimpleNavigableItemProps } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
-  import {
-    drawComputedTrackWaveForm,
-    fetchAudioBuffer,
-    generateTrackWaveform,
-  } from '../../stores/waveform'
+  import { drawComputedTrackWaveForm, fetchAudioBuffer, generateTrackWaveform } from '../../stores/waveform'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { afterUpdate, beforeUpdate } from 'svelte'
 
@@ -32,9 +28,7 @@
 
   // Whenever the audio buffer changes, we generate thea new waveform
   $: waveForm = audioBuffer.then((data) =>
-    canvas?.offsetWidth
-      ? generateTrackWaveform(data.slice(0), Math.round(canvas.offsetWidth / 3))
-      : null
+    canvas?.offsetWidth ? generateTrackWaveform(data.slice(0), Math.round(canvas.offsetWidth / 3)) : null
   )
 
   // Whenever the wave form OR the progress changes, we draw it on the canvas
