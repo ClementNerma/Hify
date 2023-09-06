@@ -21,7 +21,7 @@
   {:else}
     <h2>Artist: {artist.name}</h2>
 
-    <MixButton mixParams={{ fromArtist: artistId }} />
+    <MixButton mixParams={{ minRating: 8, maxTracks: 100, fromArtist: artistId }} />
 
     <ArtistAlbums {artistId} />
 

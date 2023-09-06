@@ -6,13 +6,16 @@
   import InteractiveCard from '../Card/InteractiveCard.svelte'
   import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
+  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '../../constants'
 
   export let artist: ArtistCardFragment
 
   $: contextMenuOptions = [
     {
       label: 'Mix me some magic ✨',
-      onPress: bind(artist.id, (id) => generateAndPlayMix({ fromArtist: id })),
+      onPress: bind(artist.id, (id) =>
+        generateAndPlayMix({ minRating: MIN_GREAT_RATING, maxTracks: LARGE_MIX_TRACKS_QTY, fromArtist: id })
+      ),
     },
   ]
 </script>

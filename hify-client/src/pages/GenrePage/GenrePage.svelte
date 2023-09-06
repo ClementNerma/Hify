@@ -5,6 +5,7 @@
   import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
   import MixButton from '../../atoms/MixButton/MixButton.svelte'
   import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '../../constants'
 
   const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5
@@ -52,7 +53,7 @@
     <h2>Genre was not found!</h2>
   {:else}
     <h2>Genre: {genreName}</h2>
-    <MixButton mixParams={{ fromGenre: genreId }} />
+    <MixButton mixParams={{ minRating: MIN_GREAT_RATING, maxTracks: LARGE_MIX_TRACKS_QTY, fromGenre: genreId }} />
 
     <h3>List of albums</h3>
 

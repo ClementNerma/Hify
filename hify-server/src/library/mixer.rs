@@ -5,8 +5,8 @@ use crate::index::{ArtistID, GenreID, Index, Rating, Track};
 
 #[derive(InputObject)]
 pub struct MixParams {
+    max_tracks: usize,
     min_rating: Option<Rating>,
-    max_tracks: Option<u8>,
     from_artist: Option<ArtistID>,
     from_genre: Option<GenreID>,
 }
@@ -20,13 +20,13 @@ pub fn generate_mix(index: &Index, params: MixParams) -> Vec<Track> {
         from_genre,
     } = params;
 
-    let min_rating = min_rating.unwrap_or(Rating::Eight);
-    let max_tracks = usize::from(max_tracks.unwrap_or(200));
-
     let mut tracks: Vec<_> = index
         .tracks
         .values()
-        .filter(|track| track.metadata.tags.rating.unwrap_or(Rating::Zero) >= min_rating)
+        .filter(|track| match min_rating {
+            Some(min_rating) => track.metadata.tags.rating.unwrap_or(Rating::Zero) >= min_rating,
+            None => true,
+        })
         .filter(|track| match &from_artist {
             Some(artist_id) => index
                 .cache

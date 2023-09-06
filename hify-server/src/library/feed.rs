@@ -8,7 +8,7 @@ use rand::{seq::SliceRandom, thread_rng};
 use time::Duration;
 
 use crate::{
-    index::{AlbumInfos, ArtistInfos, Index, Track, TrackID},
+    index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
     userdata::UserDataWrapper,
     utils::time::get_now,
 };
@@ -29,12 +29,8 @@ pub struct Feed {
 
 #[derive(InputObject)]
 pub struct FeedParams {
-    #[graphql(default = 80)]
-    min_rating: u8,
-
-    #[graphql(default = 25)]
+    min_rating: Rating,
     max_items: usize,
-
     popularity_period: Option<PopularityPeriod>,
 }
 
@@ -190,12 +186,12 @@ fn get_periodically_popular_tracks(
 fn get_random_great<T, U>(
     mean_scores: &HashMap<T, f64>,
     mapper: impl Fn(&T) -> U,
-    min_rating: u8,
+    min_rating: Rating,
     max_items: usize,
 ) -> Vec<U> {
     let mut great: Vec<_> = mean_scores
         .iter()
-        .filter(|(_, mean_score)| **mean_score >= min_rating.into())
+        .filter(|(_, mean_score)| **mean_score >= min_rating.value().into())
         .map(|(id, _)| id)
         .take(max_items)
         .map(mapper)

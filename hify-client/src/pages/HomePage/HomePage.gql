@@ -1,5 +1,5 @@
-query HomePage($input: FeedParams!) {
-  generateFeed(input: $input) {
+query HomePage($randomItemsParams: FeedParams!) {
+  generateFeed(input: $randomItemsParams) {
     lastListenedTo {
       ...AudioTrack
     }

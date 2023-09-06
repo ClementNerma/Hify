@@ -8,6 +8,7 @@
   import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
   import { ROUTES } from '../../routes'
   import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '../../constants'
 
   const genres = AsyncGenresPage({ variables: {} }).then((res) => res.data.genres)
 </script>
@@ -25,7 +26,12 @@
           showContextMenu([
             {
               label: 'Mix me some magic ✨',
-              onPress: () => generateAndPlayMix({ fromGenre: genre.id }),
+              onPress: () =>
+                generateAndPlayMix({
+                  minRating: MIN_GREAT_RATING,
+                  maxTracks: LARGE_MIX_TRACKS_QTY,
+                  fromGenre: genre.id,
+                }),
             },
           ])}
       >

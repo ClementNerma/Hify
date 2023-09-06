@@ -11,11 +11,15 @@
   import StatsBox from '../../molecules/StatsBox/StatsBox.svelte'
   import Centered from '../../atoms/Centered/Centered.svelte'
   import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
+  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '../../constants'
 
   async function fetchFeed() {
     const res = await AsyncHomePage({
       variables: {
-        input: {},
+        randomItemsParams: {
+          minRating: 8,
+          maxItems: 25,
+        },
       },
 
       fetchPolicy: 'no-cache',
@@ -38,7 +42,7 @@
   <Centered>
     <h2>Welcome!</h2>
 
-    <MixButton mixParams={{}} />
+    <MixButton mixParams={{ minRating: MIN_GREAT_RATING, maxTracks: LARGE_MIX_TRACKS_QTY }} />
   </Centered>
 
   <Centered>
