@@ -4,6 +4,12 @@ import { logFatal } from './debugger'
 
 export async function fetchAudioBuffer(track: AudioTrackFragment): Promise<ArrayBuffer> {
 	const res = await fetch(getStreamUri(track.id))
+
+	if (!res.ok) {
+		const text = await res.text()
+		return logFatal(`Failed to fetch audio buffer (response is not OK): ${text}`)
+	}
+
 	return res.arrayBuffer()
 }
 
