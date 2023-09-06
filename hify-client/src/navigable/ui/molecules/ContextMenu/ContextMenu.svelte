@@ -108,7 +108,6 @@
               closeContextMenu()
               onPress()
             }}
-            unstyled
           >
             <div class="option-container" class:focused>
               <div class="option">{label}</div>
@@ -130,16 +129,15 @@
     color: white;
 
     border: 1px solid rgb(78, 78, 78);
+    border-radius: 5px;
 
     box-shadow: 2px 2px 5px rgb(60, 60, 60);
 
     z-index: 10;
   }
 
-  .option-container:hover,
   .option-container.focused {
     background-color: darkgray;
-    text-decoration: none !important;
   }
 
   .option {
