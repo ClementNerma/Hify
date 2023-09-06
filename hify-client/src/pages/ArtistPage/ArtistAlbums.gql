@@ -1,5 +1,6 @@
 query ArtistAlbums($artistId: String!, $pagination: PaginationInput!) {
   artist(id: $artistId) {
+    id # for cache
     albums(pagination: $pagination) {
       nodes {
         ...AlbumCard

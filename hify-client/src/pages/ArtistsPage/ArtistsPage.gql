@@ -1,5 +1,6 @@
 query ArtistsPage($pagination: PaginationInput!) {
   albumsArtists(pagination: $pagination) {
+    id # for cache
     nodes {
       ...ArtistCard
     }
