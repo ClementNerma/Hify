@@ -46,6 +46,7 @@
     transition: transform 0.25s;
     transform: scale(1.2);
     text-decoration: none !important;
+    z-index: 2;
   }
 
   /* .title {
