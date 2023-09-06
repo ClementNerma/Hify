@@ -16,7 +16,7 @@ use symphonia::core::{
 
 use crate::index::{AudioCodec, TrackMetadata};
 
-use super::converter::convert_symphonia_metadata;
+use super::adapter::convert_symphonia_metadata;
 
 pub fn analyze_file(path: PathBuf) -> Result<TrackMetadata> {
     let src = File::open(&path).context("Failed")?;
