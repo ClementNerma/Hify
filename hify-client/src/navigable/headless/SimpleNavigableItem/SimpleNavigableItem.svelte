@@ -4,12 +4,7 @@
 
 <script lang="ts">
   import { SimpleNavigableItem } from './SimpleNavigableItem'
-  import {
-    getParentNavigable,
-    HTMLNavigableItemWrapperElement,
-    JUST_FOR_STYLE_ITEM_ID,
-    Props,
-  } from '../../navigation'
+  import { getParentNavigable, HTMLNavigableItemWrapperElement, JUST_FOR_STYLE_ITEM_ID, Props } from '../../navigation'
   import { afterUpdate } from 'svelte'
 
   export let fullHeight = false
