@@ -7,9 +7,6 @@
   export let tracks: AudioTrackFragment[]
 </script>
 
-<NavigableTrack {track} {tracks}>
-  <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} />
-  <!-- subtitle={`${track.metadata.tags.album.name} - ${track.metadata.tags.artists
-      .map((artist) => artist.name)
-      .join(' / ')}`} -->
+<NavigableTrack {track} {tracks} let:focused>
+  <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} {focused} />
 </NavigableTrack>

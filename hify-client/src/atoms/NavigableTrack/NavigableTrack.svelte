@@ -21,6 +21,7 @@
 
 <SimpleNavigableItem
   let:item
+  let:focused
   onPress={play}
   onLongPress={() =>
     showContextMenu(
@@ -30,10 +31,10 @@
       ).concat([
         { label: 'Play next', onPress: () => queueAsNext([track]) },
         { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0) },
-      ]),
+      ])
     )}
   {display}
   fullHeight
 >
-  <slot {item} />
+  <slot {item} {focused} />
 </SimpleNavigableItem>

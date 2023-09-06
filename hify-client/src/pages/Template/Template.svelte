@@ -13,11 +13,7 @@
 
   import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import NavBar from '../../molecules/NavBar/NavBar.svelte'
-  import {
-    handleInput,
-    KeyPressHandling,
-    registerLongPressableKeys,
-  } from '../../navigable/input-manager'
+  import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
   import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
 
@@ -106,7 +102,7 @@
     right: 0;
     bottom: 0;
     color: rgb(230, 230, 230);
-    overflow: auto;
+    overflow: hidden;
   }
 
   .background {

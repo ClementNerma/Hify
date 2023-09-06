@@ -6,7 +6,7 @@
   export let tracks: AudioTrackFragment[]
 </script>
 
-<Row>
+<Row forCards>
   {#each tracks as track (track.id)}
     <!-- This <div> allows the inner item to reach full height -->
     <div>

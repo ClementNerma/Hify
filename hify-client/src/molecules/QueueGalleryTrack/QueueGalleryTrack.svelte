@@ -11,10 +11,7 @@
   } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
   import Card from '../Card/Card.svelte'
-  import {
-    ContextMenuOption,
-    showContextMenu,
-  } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
+  import { ContextMenuOption, showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '../../globals/context-menu-items'
 
   export let track: AudioTrackFragment
@@ -82,12 +79,14 @@
     onLongPress={() => showContextMenu(computeContextMenuOptions())}
     hasFocusPriority={isCurrent}
     fullHeight
+    let:focused
   >
     <Card
       title={track.metadata.tags.title}
       subtitle={null}
       boxSize={80}
       art={track.metadata.tags.album.art}
+      {focused}
     />
   </SimpleNavigableItem>
 </div>
