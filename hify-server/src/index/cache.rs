@@ -1,5 +1,7 @@
 use std::collections::{BTreeSet, HashMap, HashSet};
 
+use log::debug;
+
 use super::{
     AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, SortedMap, Track,
     TrackID,
@@ -7,6 +9,8 @@ use super::{
 
 // TODO: lots of optimization to perform here
 pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
+    debug!("Building index cache...");
+
     let mut tracks_files_mtime = HashMap::new();
 
     let mut tracks_formats = HashMap::new();
@@ -26,6 +30,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
     let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
     let mut genres_tracks = HashMap::<GenreID, Vec<TrackID>>::new();
     let mut no_genre_tracks = HashSet::new();
+
+    debug!("| Building tracks cache...");
 
     for track in tracks.values() {
         tracks_files_mtime.insert(track.relative_path.clone(), track.mtime);
@@ -103,6 +109,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         );
     }
 
+    debug!("| Building maps...");
+
     let artists_album_participations = artists_album_participations
         .into_iter()
         .map(|(k, v)| {
@@ -156,6 +164,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             )
         })
         .collect();
+
+    debug!("| Building statistics...");
 
     let albums_mean_score = albums_tracks
         .iter()
@@ -223,6 +233,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
         most_recent_track.ctime.unwrap_or(most_recent_track.mtime)
     });
+
+    debug!("| Done.");
 
     IndexCache {
         tracks_files_mtime,
