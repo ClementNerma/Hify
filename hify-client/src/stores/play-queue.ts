@@ -125,9 +125,9 @@ export function queueAsNext(list: AudioTrackFragment[]): void {
 				position === null
 					? list.map(makeQueuedTrack)
 					: tracks
-						.slice(0, position + 1)
-						.concat(list.map(makeQueuedTrack))
-						.concat(tracks.slice(position + 1)),
+							.slice(0, position + 1)
+							.concat(list.map(makeQueuedTrack))
+							.concat(tracks.slice(position + 1)),
 		}
 	})
 }

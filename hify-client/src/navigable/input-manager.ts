@@ -62,13 +62,17 @@ export enum KeyPressHandling {
 
 /** Determine if the key should NOT be intercepted */
 function shouldNotInterceptKey(e: KeyboardEvent) {
-	return e.ctrlKey || e.shiftKey || e.altKey
+	return (
+		e.ctrlKey ||
+		e.shiftKey ||
+		e.altKey ||
 		// Allow to input normal characters
-		|| e.key.match(/^[a-zA-Z0-9_\-\+\s]$/)
+		e.key.match(/^[a-zA-Z0-9_\-\+\s]$/) ||
 		// Allow to open developer tools
-		|| e.key === 'F12'
+		e.key === 'F12' ||
 		// Allow to remove a character
-		|| e.key === 'Backspace'
+		e.key === 'Backspace'
+	)
 }
 
 document.body.addEventListener('keydown', (e) => {

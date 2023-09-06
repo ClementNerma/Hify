@@ -93,7 +93,7 @@ export abstract class NavigableCommon<P = NoProp> {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-	interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void { }
+	interceptKeyPress(_key: string, _long: boolean): KeyPressHandling | void {}
 }
 
 export abstract class NavigableContainer<P = NoProp> extends NavigableCommon<P> {
@@ -369,7 +369,7 @@ function visitNavigableChildren(
 
 			let i = 0
 
-			for (; ;) {
+			for (;;) {
 				next = next.nextSibling
 				i += 1
 
@@ -415,7 +415,7 @@ function visitNavigableChildren(
 
 	let curr: Node | null = startFrom
 
-	for (; ;) {
+	for (;;) {
 		curr = curr.nextSibling
 
 		if (curr === null) {
@@ -614,7 +614,7 @@ function _requestFocus(item: NavigableItem<unknown>): void {
 }
 
 function _requestUnfocus(): void {
-	navState.update(state => state ? _generateUpdatedNavState(state.focused, null, state.page) : state)
+	navState.update((state) => (state ? _generateUpdatedNavState(state.focused, null, state.page) : state))
 }
 
 function _generateUpdatedNavState(
@@ -659,7 +659,7 @@ type NavState = {
 
 const navState = writable<NavState | null>(null)
 
-export class HTMLNavigableItemWrapperElement extends HTMLElement { }
+export class HTMLNavigableItemWrapperElement extends HTMLElement {}
 
 export const ITEM_WRAPPER_ELEMENT_TAG_NAME = 'navigable-item-wrapper'
 
