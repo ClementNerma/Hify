@@ -104,7 +104,8 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
     log(started, "Extracting audio metadata...");
 
     // Run analysis tool on all new and modified files
-    let analyzed = metadata::run_on(file_times.keys().cloned().collect::<Vec<_>>()).await?;
+    let analyzed =
+        metadata::analyze_audio_files(file_times.keys().cloned().collect::<Vec<_>>()).await?;
 
     // Turn the analyzed files into tracks
     let analyzed = analyzed

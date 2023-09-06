@@ -8,33 +8,7 @@ use crate::{
     utils::logging::progress_bar,
 };
 
-pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
-    let path = path.as_ref();
-
-    let audio_ext = match path.extension().and_then(|ext| ext.to_str()) {
-        Some(ext) => ext.to_ascii_lowercase(),
-        None => return false,
-    };
-
-    if matches!(
-        audio_ext.as_str(),
-        "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
-    ) {
-        error!(
-            "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
-            path.to_string_lossy()
-        );
-
-        return false;
-    }
-
-    matches!(
-        audio_ext.as_str(),
-        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a" | "opus"
-    )
-}
-
-pub async fn run_on(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>> {
+pub async fn analyze_audio_files(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     if files.is_empty() {
         info!("Nothing to do!");
         return Ok(vec![]);
@@ -84,4 +58,30 @@ pub async fn run_on(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>
     }
 
     Ok(successes)
+}
+
+pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
+    let path = path.as_ref();
+
+    let audio_ext = match path.extension().and_then(|ext| ext.to_str()) {
+        Some(ext) => ext.to_ascii_lowercase(),
+        None => return false,
+    };
+
+    if matches!(
+        audio_ext.as_str(),
+        "mpeg" | "mp4" | "alac" | "webm" | "aiff" | "dsf"
+    ) {
+        error!(
+            "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
+            path.to_string_lossy()
+        );
+
+        return false;
+    }
+
+    matches!(
+        audio_ext.as_str(),
+        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a" | "opus"
+    )
 }
