@@ -1,6 +1,6 @@
 import { getStreamUri } from '../globals/rest-api'
 import { AudioTrackFragment } from '../graphql/generated'
-import { logError } from './debugger'
+import { logFatal } from './debugger'
 
 export async function fetchAudioBuffer(track: AudioTrackFragment): Promise<ArrayBuffer> {
 	const res = await fetch(getStreamUri(track.id))
@@ -35,7 +35,7 @@ export function drawComputedTrackWaveForm(canvas: HTMLCanvasElement, normalizedD
 	const ctx = canvas.getContext('2d')
 
 	if (!ctx) {
-		return logError('Failed to get 2D drawing context from canvas')
+		return logFatal('Failed to get 2D drawing context from canvas')
 	}
 
 	ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)

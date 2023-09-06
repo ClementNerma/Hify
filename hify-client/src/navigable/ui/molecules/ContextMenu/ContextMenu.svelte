@@ -12,8 +12,8 @@
   import { contextMenuStore } from './ContextMenu'
   import SimpleNavigableItem from '../../../headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import Setter, { setterStore } from '../../../../atoms/Setter/Setter.svelte'
-  import { get, writable } from 'svelte/store'
-  import { logError, logFatal } from '../../../../stores/debugger'
+  import { get } from 'svelte/store'
+  import { logFatal } from '../../../../stores/debugger'
 
   const nav = getParentNavigable()
 
