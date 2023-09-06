@@ -8,10 +8,12 @@
   import { getParentNavigable, NavigableItem, RequestFocus } from '../../../navigation'
 
   import NavigableWithHandlers from '../../../headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import ItemStyleLayer from '../../../headless/SimpleNavigableItem/ItemStyleLayer.svelte'
   import Column from '../Column/Column.svelte'
   import { contextMenuStore } from './ContextMenu'
   import SimpleNavigableItem from '../../../headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import Setter, { setterStore } from '../../../../atoms/Setter/Setter.svelte'
+  import { get, writable } from 'svelte/store'
+  import { logError, logFatal } from '../../../../stores/debugger'
 
   const nav = getParentNavigable()
 
@@ -61,6 +63,7 @@
 
     prevFocusItem = focusedItem
 
+    const requestFocus = get(_requestFocus) ?? logFatal('Focus request handler is not available')
     requestFocus()
   })
 
@@ -81,14 +84,10 @@
     _singletonChecker = false
   })
 
-  let requestFocus: RequestFocus
+  let _requestFocus = setterStore<RequestFocus>()
 
   let ctxMenuWidth: number
   let ctxMenuHeight: number
-
-  const getRequestFocus = (rf: RequestFocus) => {
-    requestFocus = rf
-  }
 </script>
 
 {#if $contextMenuStore && $contextMenuStore.options.length > 0}
@@ -100,7 +99,8 @@
       bind:clientHeight={ctxMenuHeight}
     >
       <!-- Multi-level bindings are not supported so we use a basic callback system instead -->
-      <Column {getRequestFocus} trapped>
+      <Column trapped let:requestFocus>
+        <Setter value={requestFocus} writeTo={_requestFocus} />
         {#each $contextMenuStore.options as { label, onPress }}
           <SimpleNavigableItem
             let:focused

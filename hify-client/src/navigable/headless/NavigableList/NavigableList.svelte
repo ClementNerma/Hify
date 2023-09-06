@@ -13,10 +13,8 @@
   setChildrenNavigable(list)
 
   afterUpdate(() => list.updateProps({ hasFocusPriority, trapped }))
-
-  export const requestFocus = () => list.requestFocus()
 </script>
 
 <InternalNavWrapper navId={list.id}>
-  <slot nav={list} />
+  <slot nav={list} requestFocus={() => list.requestFocus()} />
 </InternalNavWrapper>
