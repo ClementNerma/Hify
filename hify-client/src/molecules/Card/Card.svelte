@@ -44,7 +44,7 @@
 
   .card.focused {
     transition: transform 0.25s;
-    transform: scale(1.2);
+    transform: scale(1.33);
     text-decoration: none !important;
     z-index: 2;
   }
