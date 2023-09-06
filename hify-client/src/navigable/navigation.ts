@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { handleInput, KeyPressHandling, registerLongPressableKeys } from './input-manager'
 import { logWarn } from '../stores/debugger'
+import { KeyPressHandling, handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
 	Up,

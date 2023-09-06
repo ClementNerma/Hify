@@ -1,6 +1,6 @@
 import { derived, get, writable } from 'svelte/store'
 import { readonly, swapInArray } from '../globals/utils'
-import { AudioTrackFragment, AsyncPlayQueue } from '../graphql/generated'
+import { AsyncPlayQueue, AudioTrackFragment } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo, logWarn } from './debugger'
 

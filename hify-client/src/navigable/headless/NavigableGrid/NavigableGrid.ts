@@ -1,9 +1,9 @@
 import {
 	Navigable,
+	NavigableContainer,
 	NavigableItem,
 	NavigationComingFrom,
 	NavigationDirection,
-	NavigableContainer,
 	NoProp,
 } from '../../navigation'
 

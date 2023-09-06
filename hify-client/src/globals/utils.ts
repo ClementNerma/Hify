@@ -1,4 +1,4 @@
-import { derived, Readable, Writable } from 'svelte/store'
+import { Readable, Writable, derived } from 'svelte/store'
 import { AudioTrackFragment } from '../graphql/generated'
 
 export function bind<T, U>(data: T, callback: (value: T) => U): () => U {
