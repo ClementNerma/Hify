@@ -115,7 +115,6 @@ async fn inner_main(args: Args) -> Result<()> {
                     .context("Failed to save index file with rebuilt cache")?;
             } else if rebuild_cache {
                 info!("> Rebuilding cache as requested...");
-
                 index::rebuild_cache(&mut index);
 
                 utils::save::save_index(&index_file, &index)

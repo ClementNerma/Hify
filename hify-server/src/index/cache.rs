@@ -167,6 +167,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
     debug!("| Building statistics...");
 
+    debug!("| > Albums' mean score...");
+
     let albums_mean_score = albums_tracks
         .iter()
         .filter_map(|(album_id, album_tracks)| {
@@ -185,6 +187,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         })
         .collect();
 
+    debug!("| > Artists' mean score...");
+
     let artists_mean_score = artists_tracks
         .iter()
         .filter_map(|(artist_id, artist_tracks)| {
@@ -202,6 +206,8 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             Some((*artist_id, mean))
         })
         .collect();
+
+    debug!("| > Album artists' mean score...");
 
     let albums_artists_mean_score = artists_albums
         .iter()
@@ -222,12 +228,16 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         })
         .collect();
 
+    debug!("| > Most recent albums...");
+
     let mut most_recent_albums = albums_infos.keys().cloned().collect::<Vec<_>>();
 
     most_recent_albums.sort_by_key(|album_id| {
-        let most_recent_track = tracks
-            .values()
-            .filter(|track| albums_tracks.get(album_id).unwrap().contains(&track.id))
+        let most_recent_track = albums_tracks
+            .get(album_id)
+            .unwrap()
+            .iter()
+            .map(|track_id| tracks.get(track_id).unwrap())
             .max_by_key(|track| track.ctime.unwrap_or(track.mtime))
             .unwrap();
 
