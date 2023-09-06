@@ -1,4 +1,9 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev'
+
+// Enable logging
+loadErrorMessages()
+loadDevMessages()
 
 export const API_SERVER_URL = `http://${location.hostname}:8893`
 
