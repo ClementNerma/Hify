@@ -15,6 +15,6 @@
   export let circle: boolean | undefined = undefined
 </script>
 
-<SimpleNavigableItem {onPress} {onLongPress} let:focused>
-  <Card {art} {title} {subtitle} {enforceMaxWidth} {circle} {focused} />
+<SimpleNavigableItem {onPress} {onLongPress}>
+  <Card {art} {title} {subtitle} {enforceMaxWidth} {circle} />
 </SimpleNavigableItem>

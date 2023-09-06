@@ -6,7 +6,7 @@
   export let albums: AlbumCardFragment[]
 </script>
 
-<Row forCards>
+<Row>
   {#each albums as album}
     <AlbumCard {album} />
   {/each}

@@ -81,13 +81,7 @@
     fullHeight
     let:focused
   >
-    <Card
-      title={track.metadata.tags.title}
-      subtitle={null}
-      boxSize={80}
-      art={track.metadata.tags.album.art}
-      {focused}
-    />
+    <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
   </SimpleNavigableItem>
 </div>
 

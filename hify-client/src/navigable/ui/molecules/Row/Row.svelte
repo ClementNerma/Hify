@@ -1,10 +1,10 @@
 <script lang="ts">
   import NavigableRow from '../../../headless/NavigableRow/NavigableRow.svelte'
 
-  export let forCards = false
+  // export let forCards = false
 </script>
 
-<div class="row" class:forCards>
+<div class="row">
   <NavigableRow>
     <slot />
   </NavigableRow>
@@ -17,8 +17,8 @@
     flex-direction: row;
   }
 
-  .forCards {
+  /* .forCards {
     padding: 100vh 5px !important;
     margin: -100vh 0;
-  }
+  } */
 </style>

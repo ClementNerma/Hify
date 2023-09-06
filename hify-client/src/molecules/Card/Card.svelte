@@ -6,7 +6,6 @@
 
   export let title: string
   export let subtitle: string | null = null
-  export let focused: boolean
 
   export let boxSize = 120
   export let circle = false
@@ -16,7 +15,7 @@
   export let enforceMaxWidth = false
 </script>
 
-<div class="card" class:enforceMaxWidth style="--width: {boxSize}px" class:focused>
+<div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
   <ImgLoader {art} let:src>
     <img class="cover" class:circle width={boxSize} height={boxSize} {src} alt="" />
   </ImgLoader>
@@ -42,12 +41,12 @@
     border-radius: 50%;
   }
 
-  .card.focused {
+  /* .card.focused {
     transition: transform 0.25s;
     transform: scale(1.33);
     text-decoration: none !important;
     z-index: 2;
-  }
+  } */
 
   /* .title {
     font-weight: bold;
