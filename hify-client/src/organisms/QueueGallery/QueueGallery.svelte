@@ -28,8 +28,9 @@
 
 <style>
   .queue-gallery {
+    padding: 7px 0;
     display: flex;
     flex-direction: row;
-    overflow-x: auto;
+    overflow: hidden;
   }
 </style>
