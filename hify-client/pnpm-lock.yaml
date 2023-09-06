@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@apollo/client':
-    specifier: ^3.8.1
-    version: 3.8.1(graphql@16.8.0)
+    specifier: ^3.8.3
+    version: 3.8.3(graphql@16.8.0)
   graphql:
     specifier: ^16.8.0
     version: 16.8.0
@@ -19,7 +19,7 @@ dependencies:
     version: 4.2.0
   svelte-navigator:
     specifier: ^3.2.2
-    version: 3.2.2(svelte@4.2.0)(typescript@5.1.6)
+    version: 3.2.2(svelte@4.2.0)(typescript@5.2.2)
 
 devDependencies:
   '@biomejs/biome':
@@ -62,14 +62,14 @@ devDependencies:
     specifier: ^2.0.2
     version: 2.0.2
   svelte-check:
-    specifier: ^3.5.0
-    version: 3.5.0(@babel/core@7.17.7)(svelte@4.2.0)
+    specifier: ^3.5.1
+    version: 3.5.1(@babel/core@7.17.7)(svelte@4.2.0)
   svelte-preprocess:
     specifier: ^5.0.4
-    version: 5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.1.6)
+    version: 5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.2.2)
   typescript:
-    specifier: ^5.1.6
-    version: 5.1.6
+    specifier: ^5.2.2
+    version: 5.2.2
   vite:
     specifier: ^4.4.9
     version: 4.4.9(@types/node@18.15.12)
@@ -89,8 +89,8 @@ packages:
       '@jridgewell/gen-mapping': 0.3.2
       '@jridgewell/trace-mapping': 0.3.18
 
-  /@apollo/client@3.8.1(graphql@16.8.0):
-    resolution: {integrity: sha512-JGGj/9bdoLEqzatRikDeN8etseY5qeFAY0vSAx/Pd0ePNsaflKzHx6V2NZ0NsGkInq+9IXXX3RLVDf0EotizMA==}
+  /@apollo/client@3.8.3(graphql@16.8.0):
+    resolution: {integrity: sha512-mK86JM6hCpMEBGDgdO9U8ZYS8r9lPjXE1tVGpJMdSFUsIcXpmEfHUAbbFpPtYmxn8Qa7XsYy0dwDaDhpf4UUPw==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-ws: ^5.5.5
@@ -2924,7 +2924,7 @@ packages:
     peerDependencies:
       graphql: ^16.0.1
     dependencies:
-      '@apollo/client': 3.8.1(graphql@16.8.0)
+      '@apollo/client': 3.8.3(graphql@16.8.0)
       '@graphql-codegen/plugin-helpers': 2.4.2(graphql@16.8.0)
       '@graphql-codegen/visitor-plugin-common': 2.7.4(graphql@16.8.0)
       camel-case: 4.1.2
@@ -4389,8 +4389,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /svelte-check@3.5.0(@babel/core@7.17.7)(svelte@4.2.0):
-    resolution: {integrity: sha512-KHujbn4k17xKYLmtCwv0sKKM7uiHTYcQvXnvrCcNU6a7hcszh99zFTIoiu/Sp/ewAw5aJmillJ1Cs8gKLmcX4A==}
+  /svelte-check@3.5.1(@babel/core@7.17.7)(svelte@4.2.0):
+    resolution: {integrity: sha512-+Zb4iHxAhdUtcUg/WJPRjlS1RJalIsWAe9Mz6G1zyznSs7dDkT7VUBdXc3q7Iwg49O/VrZgyJRvOJkjuBfKjFA==}
     hasBin: true
     peerDependencies:
       svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0
@@ -4402,8 +4402,8 @@ packages:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 4.2.0
-      svelte-preprocess: 5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.1.6)
-      typescript: 5.1.6
+      svelte-preprocess: 5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.2.2)
+      typescript: 5.2.2
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -4425,18 +4425,18 @@ packages:
       svelte: 4.2.0
     dev: true
 
-  /svelte-navigator@3.2.2(svelte@4.2.0)(typescript@5.1.6):
+  /svelte-navigator@3.2.2(svelte@4.2.0)(typescript@5.2.2):
     resolution: {integrity: sha512-Xio4ohLUG1nQJ+ENNbLphXXu9L189fnI1WGg+2Q3CIMPe8Jm2ipytKQthdBs8t0mN7p3Eb03SE9hq0xZAqwQNQ==}
     peerDependencies:
       svelte: 3.x
     dependencies:
       svelte: 4.2.0
-      svelte2tsx: 0.1.193(svelte@4.2.0)(typescript@5.1.6)
+      svelte2tsx: 0.1.193(svelte@4.2.0)(typescript@5.2.2)
     transitivePeerDependencies:
       - typescript
     dev: false
 
-  /svelte-preprocess@5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.1.6):
+  /svelte-preprocess@5.0.4(@babel/core@7.17.7)(svelte@4.2.0)(typescript@5.2.2):
     resolution: {integrity: sha512-ABia2QegosxOGsVlsSBJvoWeXy1wUKSfF7SWJdTjLAbx/Y3SrVevvvbFNQqrSJw89+lNSsM58SipmZJ5SRi5iw==}
     engines: {node: '>= 14.10.0'}
     requiresBuild: true
@@ -4481,10 +4481,10 @@ packages:
       sorcery: 0.11.0
       strip-indent: 3.0.0
       svelte: 4.2.0
-      typescript: 5.1.6
+      typescript: 5.2.2
     dev: true
 
-  /svelte2tsx@0.1.193(svelte@4.2.0)(typescript@5.1.6):
+  /svelte2tsx@0.1.193(svelte@4.2.0)(typescript@5.2.2):
     resolution: {integrity: sha512-vzy4YQNYDnoqp2iZPnJy7kpPAY6y121L0HKrSBjU/IWW7DQ6T7RMJed2VVHFmVYm0zAGYMDl9urPc6R4DDUyhg==}
     peerDependencies:
       svelte: ^3.24
@@ -4493,7 +4493,7 @@ packages:
       dedent-js: 1.0.1
       pascal-case: 3.1.2
       svelte: 4.2.0
-      typescript: 5.1.6
+      typescript: 5.2.2
     dev: false
 
   /svelte@4.2.0:
@@ -4592,8 +4592,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /typescript@5.1.6:
-    resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
+  /typescript@5.2.2:
+    resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
     engines: {node: '>=14.17'}
     hasBin: true
 
