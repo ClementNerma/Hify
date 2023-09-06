@@ -99,7 +99,7 @@
       bind:clientWidth={ctxMenuWidth}
       bind:clientHeight={ctxMenuHeight}
     >
-      <!-- Bindings don't always work here for some reason so we use a basic callback system instead -->
+      <!-- Multi-level bindings are not supported so we use a basic callback system instead -->
       <Column {getRequestFocus} trapped>
         {#each $contextMenuStore.options as { label, onPress }}
           <SimpleNavigableItem
