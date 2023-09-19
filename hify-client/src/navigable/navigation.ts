@@ -59,11 +59,11 @@ export abstract class NavigableCommon<P = NoProp> {
 				throw new Error('Invalid page construction token provided!')
 			}
 
-			// rome-ignore lint/suspicious/noExplicitAny: required here
+			// biome-ignore lint/suspicious/noExplicitAny: required here
 			this.parent = undefined as any
-			// rome-ignore lint/suspicious/noExplicitAny: required here
+			// biome-ignore lint/suspicious/noExplicitAny: required here
 			this.identity = undefined as any
-			// rome-ignore lint/suspicious/noExplicitAny: required here
+			// biome-ignore lint/suspicious/noExplicitAny: required here
 			this.page = undefined as any
 
 			return
