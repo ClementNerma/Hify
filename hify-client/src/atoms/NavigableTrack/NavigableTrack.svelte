@@ -6,7 +6,7 @@
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ItemDisplay } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
-  import { playTrackFromNewQueue, queueAsNext } from '../../stores/play-queue'
+  import { enqueue, playTrackFromNewQueue } from '../../stores/play-queue'
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
@@ -29,7 +29,8 @@
         ? [{ label: 'Go to album', onPress: () => navigate(ROUTES.album(track.metadata.tags.album.id)) }]
         : []
       ).concat([
-        { label: 'Play next', onPress: () => queueAsNext([track]) },
+        { label: 'Play next', onPress: () => enqueue([track], 'next') },
+        { label: 'Play last', onPress: () => enqueue([track], 'end') },
         { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0) },
       ])
     )}

@@ -14,11 +14,12 @@
   import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
   import Button from '../../atoms/Button/Button.svelte'
   import Emoji from '../../atoms/Emoji/Emoji.svelte'
-  import { playNewQueueFromBeginning, queueAsNext } from '../../stores/play-queue'
+  import { enqueue, playNewQueueFromBeginning } from '../../stores/play-queue'
   import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { humanReadableDuration } from '../../stores/audio-player'
   import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
   import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
 
   export let albumId: string
 
@@ -120,7 +121,18 @@
 
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
-            <Button onPress={() => queueAsNext(filteredTracks)} fullHeight><Emoji>▶️</Emoji> Play next</Button>
+            <Button
+              onPress={() => enqueue(filteredTracks, 'end')}
+              onLongPress={() =>
+                showContextMenu([
+                  {
+                    label: 'Queue as next',
+                    onPress: () => enqueue(filteredTracks, 'next'),
+                  },
+                ])}
+              fullHeight><Emoji>▶️</Emoji> Queue</Button
+            >
+
             <Button
               onPress={() => {
                 playNewQueueFromBeginning(shuffle(filteredTracks))

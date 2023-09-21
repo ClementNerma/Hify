@@ -115,19 +115,31 @@ export function playNextTrack(): void {
 	})
 }
 
-export function queueAsNext(list: AudioTrackFragment[]): void {
-	logInfo(`Queuing ${list.length} track(s) as next`)
+export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void {
+	logInfo(`Queuing ${list.length} tracks as ${where}`)
 
 	playQueue.update(({ position, tracks }) => {
-		return {
-			position,
-			tracks:
-				position === null
-					? list.map(makeQueuedTrack)
-					: tracks
-							.slice(0, position + 1)
-							.concat(list.map(makeQueuedTrack))
-							.concat(tracks.slice(position + 1)),
+		const toQueue = list.map(makeQueuedTrack)
+
+		if (position === null) {
+			return { position: null, tracks: toQueue }
+		}
+
+		switch (where) {
+			case 'next':
+				return {
+					position,
+					tracks: tracks
+						.slice(0, position + 1)
+						.concat(toQueue)
+						.concat(tracks.slice(position + 1)),
+				}
+
+			case 'end':
+				return {
+					position,
+					tracks: tracks.concat(toQueue),
+				}
 		}
 	})
 }

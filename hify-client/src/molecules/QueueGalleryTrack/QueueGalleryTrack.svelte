@@ -4,9 +4,9 @@
   import { AudioTrackFragment } from '../../graphql/generated'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import {
+    enqueue,
     moveTrackPositionInQueue,
     playTrackFromCurrentQueue,
-    queueAsNext,
     removeFromQueue,
   } from '../../stores/play-queue'
   import { bind } from '../../globals/utils'
@@ -63,7 +63,7 @@
     options.push({
       label: 'Play after current track',
       onPress() {
-        queueAsNext([track])
+        enqueue([track], 'next')
       },
     })
 
