@@ -1,9 +1,7 @@
 <script lang="ts">
   import { AudioTrackFragment } from '../../graphql/generated'
-  import { SimpleNavigableItemProps } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
   import { drawComputedTrackWaveForm, fetchAudioBuffer, generateTrackWaveform } from '../../stores/waveform'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { afterUpdate, beforeUpdate } from 'svelte'
+  import { beforeUpdate } from 'svelte'
 
   export let track: AudioTrackFragment
 

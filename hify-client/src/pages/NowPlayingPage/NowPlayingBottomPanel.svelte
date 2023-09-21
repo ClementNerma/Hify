@@ -45,19 +45,15 @@
             progress={($readableAudioProgress ?? 0) / currentTrack.metadata.duration}
             width="100%"
             height="50px"
-            />
+          />
         {/if}
 
         <div class="buttons">
           <NavigableRow>
-            <SimpleNavigableItem
-              onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}
-            >
+            <SimpleNavigableItem onPress={bind(tags, (tags) => void navigate(ROUTES.searchTerms(tags.title)))}>
               <div class="track-info">🎵 {tags.title}</div>
             </SimpleNavigableItem>
-            <SimpleNavigableItem
-              onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}
-            >
+            <SimpleNavigableItem onPress={bind(album, (album) => void navigate(ROUTES.album(album.id)))}>
               <div class="track-info">💿 {album.name}</div>
             </SimpleNavigableItem>
             {#if tags.date}
@@ -72,9 +68,11 @@
               </SimpleNavigableItem>
             {/each}
 
-            <SimpleNavigableItem onPress={toggleWaveForm}>
+            <!-- TODO: This works perfectly, but waiting for performance improvements
+                       before displaying it again -->
+            <!-- <SimpleNavigableItem onPress={toggleWaveForm}>
               <div class="track-action">∿ Waveform</div>
-            </SimpleNavigableItem>
+            </SimpleNavigableItem> -->
 
             <ModifiableTrackRating track={currentTrack} />
           </NavigableRow>
@@ -151,7 +149,8 @@
     font-size: 1.2rem;
   }
 
-  .track-info, .track-action {
+  .track-info,
+  .track-action {
     padding: 5px;
     align-self: stretch;
   }
