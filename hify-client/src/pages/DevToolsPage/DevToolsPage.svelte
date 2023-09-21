@@ -10,9 +10,7 @@
 
   let hideDebugLogs = true
 
-  $: slicedAppLogs = $appLogs
-    .slice(0, 100)
-    .filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
+  $: slicedAppLogs = $appLogs.filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
 </script>
 
 <h2>Developer Tools</h2>
@@ -21,9 +19,7 @@
   <Button onPress={() => location.reload()} fullHeight>Reload the application</Button>
   <Checkbox bind:checked={hideDebugLogs} fullHeight>Hide debug logs</Checkbox>
   {#if hifyInterface}
-    <Button onPress={bind(hifyInterface, (h) => h.updateAppUrl())} fullHeight
-      >🛠️ Change the application's URL</Button
-    >
+    <Button onPress={bind(hifyInterface, (h) => h.updateAppUrl())} fullHeight>🛠️ Change the application's URL</Button>
   {/if}
 </Row>
 
