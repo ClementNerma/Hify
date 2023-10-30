@@ -1,4 +1,6 @@
 import { derived, get, writable } from 'svelte/store'
+import { generateMix } from '../atoms/MixButton/MixGenerator'
+import { EXTEND_MIX_TRACKS_QTY } from '../constants'
 import { readonly, swapInArray } from '../globals/utils'
 import { AudioTrackFragment, MixParams } from '../graphql/generated'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
@@ -24,23 +26,38 @@ export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
 
+playQueue.subscribe(async ({ tracks, position, fromMixParams }) => {
+	const currentTracks: string[] = tracks.map((track) => track.id)
+
+	if (!fromMixParams || position === null || position <= tracks.length - 3) {
+		return
+	}
+
+	// Generate a new mix from the previous settings, but exclude the tracks that are already in the current queue
+	// to avoid getting duplicate tracks
+	const res = await generateMix(
+		{ ...fromMixParams, excludeTracks: (fromMixParams.excludeTracks ?? []).concat(currentTracks) },
+		EXTEND_MIX_TRACKS_QTY,
+	)
+
+	// Prepare new tracks for queuing
+	const nextTracks = res.data.generateMix.map(makeQueuedTrack)
+
+	// Update the queue
+	playQueue.update(({ tracks, position, fromMixParams }) => {
+		// If playlist has changed, don't modify it
+		if (tracks.length !== currentTracks.length || tracks.find((track, i) => currentTracks[i] !== track.id)) {
+			return { tracks, position, fromMixParams }
+		}
+
+		// Otherwise, append the new tracks!
+		return { tracks: tracks.concat(nextTracks), position, fromMixParams }
+	})
+})
+
 function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
 	return { ...track, idInQueue: Math.random().toString() }
 }
-
-// export async function playTrackFromFetchableQueue(tracksIds: string[], position: number): Promise<void> {
-// 	if (!tracksIds[position]) {
-// 		return logFatal('Provided track position does not exist in fetchable queue')
-// 	}
-
-// 	logInfo(`Fetching play queue for ${tracksIds.length} tracks...`)
-
-// 	const tracks = await AsyncPlayQueue({ variables: { tracksIds } })
-
-// 	logInfo(`Set new queue with ${tracks.data.selectTracks.length} tracks`)
-
-// 	return playTrackFromNewQueue(tracks.data.selectTracks, position)
-// }
 
 export function playNewQueueFromBeginning(tracks: AudioTrackFragment[], fromMixParams: MixParams | null): void {
 	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position: 0, fromMixParams })
