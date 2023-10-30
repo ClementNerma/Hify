@@ -53,7 +53,7 @@
     <h2>Genre was not found!</h2>
   {:else}
     <h2>Genre: {genreName}</h2>
-    <MixButton mixParams={{ minRating: MIN_GREAT_RATING, maxTracks: LARGE_MIX_TRACKS_QTY, fromGenre: genreId }} />
+    <MixButton mixParams={{ minRating: MIN_GREAT_RATING, fromGenres: [genreId] }} />
 
     <h3>List of albums</h3>
 

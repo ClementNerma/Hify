@@ -1,5 +1,5 @@
-query MixGenerator($input: MixParams!) {
-  generateMix(input: $input) {
+query MixGenerator($input: MixParams!, $maxTracks: Int!) {
+  generateMix(input: $input, maxTracks: $maxTracks) {
     ...AudioTrack
   }
 }

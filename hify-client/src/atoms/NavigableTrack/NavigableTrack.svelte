@@ -1,20 +1,22 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { AudioTrackFragment } from '../../graphql/generated'
+  import { AudioTrackFragment, MixParams } from '../../graphql/generated'
   import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
 
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ItemDisplay } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
   import { enqueue, playTrackFromNewQueue } from '../../stores/play-queue'
+  import { from } from '@apollo/client'
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
   export let goToAlbumOption = true
   export let display: ItemDisplay = null
+  export let fromMixParams: MixParams | null = null
 
   function play() {
-    playTrackFromNewQueue(tracks, tracks.indexOf(track))
+    playTrackFromNewQueue(tracks, tracks.indexOf(track), fromMixParams)
     navigate(ROUTES.nowPlaying)
   }
 </script>
@@ -31,7 +33,7 @@
       ).concat([
         { label: 'Play next', onPress: () => enqueue([track], 'next') },
         { label: 'Play last', onPress: () => enqueue([track], 'end') },
-        { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0) },
+        { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0, fromMixParams) },
       ])
     )}
   {display}

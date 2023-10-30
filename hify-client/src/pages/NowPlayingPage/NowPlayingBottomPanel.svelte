@@ -149,8 +149,7 @@
     font-size: 1.2rem;
   }
 
-  .track-info,
-  .track-action {
+  .track-info {
     padding: 5px;
     align-self: stretch;
   }

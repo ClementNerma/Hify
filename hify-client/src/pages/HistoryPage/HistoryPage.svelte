@@ -49,13 +49,11 @@
         title={tags.title}
         art={tags.album.art}
         onPress={bind(i, (i) => {
-          playTrackFromNewQueue(tracks, i)
+          playTrackFromNewQueue(tracks, i, null)
           navigate(ROUTES.nowPlaying)
         })}
         onLongPress={bind(tags.album, (album) =>
-          showContextMenu([
-            { label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) },
-          ])
+          showContextMenu([{ label: 'Go to album', onPress: () => navigate(ROUTES.album(album.id)) }])
         )}
       />
       <!-- subtitle={tags.album.name} -->
