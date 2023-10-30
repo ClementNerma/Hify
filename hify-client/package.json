@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
+    "preview": "vite preview",
     "compile": "cross-env NODE_ENV=production vite build",
     "check": "svelte-check --output=human --tsconfig ./tsconfig.json && tsc --noEmit",
     "watch:svelte": "svelte-check --output=human --watch",
