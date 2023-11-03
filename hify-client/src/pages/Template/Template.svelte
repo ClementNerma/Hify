@@ -75,9 +75,14 @@
               { label: 'Home', uri: ROUTES.home },
               { label: 'History', uri: ROUTES.history },
               { label: 'Now Playing', uri: ROUTES.nowPlaying },
-              { label: 'Albums', uri: ROUTES.albums },
-              { label: 'Artists', uri: ROUTES.artists },
-              { label: 'Genres', uri: ROUTES.genres },
+              {
+                label: 'Albums',
+                uri: ROUTES.albums,
+                subMenu: [
+                  { label: 'Artists', uri: ROUTES.artists },
+                  { label: 'Genres', uri: ROUTES.genres },
+                ],
+              },
               { label: 'Search', uri: ROUTES.search },
             ]}
           />

@@ -2,7 +2,10 @@
   export type Tab = {
     label: string
     uri: string
+    subMenu?: TabDropdownItem[]
   }
+
+  export type TabDropdownItem = Omit<Tab, 'subMenu'>
 </script>
 
 <script lang="ts">
@@ -13,6 +16,7 @@
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
   import { onMount } from 'svelte'
+  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
 
   const location = useLocation()
 
@@ -21,18 +25,21 @@
 
   onMount(() =>
     location.subscribe(() => {
-      for (let i = 0; i < tabs.length; i++) {
-        if ($location.pathname === tabs[i].uri) {
-          tabsFocusRequest[i]()
-          return
-        }
-      }
+      const index = tabs.findIndex((tab) => tab.uri === $location.pathname)
 
-      if (tabsFocusRequest.length) {
-        tabsFocusRequest[0]()
-      }
+      // Fallback to first tab if needed
+      tabsFocusRequest[index === -1 ? 0 : index]()
     })
   )
+
+  function showSubMenu(subMenu: TabDropdownItem[]) {
+    showContextMenu(
+      subMenu.map(({ label, uri }) => ({
+        label,
+        onPress: () => navigate(uri),
+      }))
+    )
+  }
 
   let isFocused: boolean
 </script>
@@ -42,6 +49,7 @@
     {#each tabs as tab, i}
       <SimpleNavigableItem
         onPress={() => navigate(tab.uri)}
+        onLongPress={() => tab.subMenu && showSubMenu(tab.subMenu)}
         hasFocusPriority={$location.pathname === tab.uri}
         onFocus={() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
@@ -53,7 +61,13 @@
         bind:requestFocus={tabsFocusRequest[i]}
       >
         <ItemStyleLayer>
-          <div class="tab">{tab.label}</div>
+          <div class="tab">
+            {tab.label}
+
+            {#if tab.subMenu}
+              <span class="dropdown">▽</span>
+            {/if}
+          </div>
         </ItemStyleLayer>
       </SimpleNavigableItem>
     {/each}
@@ -78,5 +92,9 @@
   .tab {
     padding: 0 25px;
     font-size: 1rem;
+  }
+
+  .dropdown {
+    font-size: 8px;
   }
 </style>
