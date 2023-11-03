@@ -5,6 +5,7 @@ mod queries;
 mod queries_types;
 mod state;
 
+use async_graphql::SimpleObject;
 pub use entrypoint::{get_graphql_schema, AppSchema};
 pub use pagination::Paginable;
 pub use state::{GraphQLContext, SaveIndexFn};
@@ -28,3 +29,10 @@ macro_rules! define_scalar_string {
         }
     };
 }
+
+#[derive(SimpleObject)]
+struct EmptyAnswer {
+    ok: bool,
+}
+
+const EMPTY_ANSWER: EmptyAnswer = EmptyAnswer { ok: true };

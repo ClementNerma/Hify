@@ -1,6 +1,6 @@
 use async_graphql::{Context, Object};
 
-use super::GraphQLContext;
+use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
 use crate::{
     graphql_ctx_member,
     index::{build_index, Index, Rating, TrackID},
@@ -12,7 +12,7 @@ pub struct MutationRoot;
 #[Object]
 
 impl MutationRoot {
-    async fn update_index(&self, ctx: &Context<'_>) -> Result<bool, String> {
+    async fn update_index(&self, ctx: &Context<'_>) -> Result<EmptyAnswer, String> {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
 
         let current = Index::clone(&*ctx.app_state.index.read().await);
@@ -32,27 +32,37 @@ impl MutationRoot {
         // Update the index
         *ctx.app_state.index.write().await = index;
 
-        Ok(true)
+        Ok(EMPTY_ANSWER)
     }
 
-    async fn log_listening(&self, ctx: &Context<'_>, track_id: TrackID, duration_s: u32) -> bool {
+    async fn log_listening(
+        &self,
+        ctx: &Context<'_>,
+        track_id: TrackID,
+        duration_s: u32,
+    ) -> EmptyAnswer {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .log_listening(OneListening::new_now(track_id, duration_s));
 
-        true
+        EMPTY_ANSWER
     }
 
-    async fn set_track_rating(&self, ctx: &Context<'_>, track_id: TrackID, rating: Rating) -> bool {
+    async fn set_track_rating(
+        &self,
+        ctx: &Context<'_>,
+        track_id: TrackID,
+        rating: Rating,
+    ) -> EmptyAnswer {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .set_track_rating(track_id, Some(rating));
 
-        true
+        EMPTY_ANSWER
     }
 
-    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> bool {
+    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> EmptyAnswer {
         graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, None);
 
-        true
+        EMPTY_ANSWER
     }
 
     async fn create_playlist(&self, ctx: &Context<'_>, name: String) -> PlaylistID {
@@ -65,9 +75,9 @@ impl MutationRoot {
         playlist_id: PlaylistID,
         track_id: TrackID,
         position: Option<usize>,
-    ) -> Result<bool, &'static str> {
+    ) -> Result<EmptyAnswer, &'static str> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .add_track_to_playlist(playlist_id, track_id, position)
-            .map(|()| true)
+            .map(|()| EMPTY_ANSWER)
     }
 }
