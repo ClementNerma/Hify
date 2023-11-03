@@ -147,36 +147,34 @@
       </div>
     </NavigableList>
 
-    <NavigableList>
-      {#each discs as disc (disc.number)}
-        {#if discs.length > 1}
-          <h2>Disc {disc.number}</h2>
-        {/if}
+    {#each discs as disc (disc.number)}
+      {#if discs.length > 1}
+        <h2>Disc {disc.number}</h2>
+      {/if}
 
-        <NavigableList>
-          <table>
-            <tbody>
-              {#each disc.tracks as track, i (track.id)}
-                {@const tags = track.metadata.tags}
+      <NavigableList>
+        <table>
+          <tbody>
+            {#each disc.tracks as track, i (track.id)}
+              {@const tags = track.metadata.tags}
 
-                <NavigableTrack tracks={filteredTracks} goToAlbumOption={false} display="transparent" {track}>
-                  <tr class:notFirst={i !== 0}>
-                    <td class="trackno">{tags.trackNo}</td>
-                    <td class="title">{tags.title}</td>
-                    <td class="rating">
-                      {#if track.computedRating}
-                        <TrackRating rating={track.computedRating} />
-                      {/if}
-                    </td>
-                    <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
-                  </tr>
-                </NavigableTrack>
-              {/each}
-            </tbody>
-          </table>
-        </NavigableList>
-      {/each}
-    </NavigableList>
+              <NavigableTrack tracks={filteredTracks} goToAlbumOption={false} display="transparent" {track}>
+                <tr class:notFirst={i !== 0}>
+                  <td class="trackno">{tags.trackNo}</td>
+                  <td class="title">{tags.title}</td>
+                  <td class="rating">
+                    {#if track.computedRating}
+                      <TrackRating rating={track.computedRating} />
+                    {/if}
+                  </td>
+                  <td class="duration">{humanReadableDuration(track.metadata.duration)}</td>
+                </tr>
+              </NavigableTrack>
+            {/each}
+          </tbody>
+        </table>
+      </NavigableList>
+    {/each}
   </div>
 {:catch e}
   <h2>Failed: {e.message}</h2>
