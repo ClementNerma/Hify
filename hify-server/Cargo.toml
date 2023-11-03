@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 async-graphql = { default-features = false, features = [
     "graphiql",
+    "time",
 ], version = "5.0.10" }
 anyhow = "1.0.71"
 async-graphql-axum = "5.0.10"

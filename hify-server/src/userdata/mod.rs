@@ -1,15 +1,19 @@
 mod cache;
 mod config;
 mod history;
+mod playlist;
 
 use std::collections::HashMap;
-
-pub use config::UserDataConfig;
-pub use history::OneListening;
 
 use serde::{Deserialize, Serialize};
 
 use crate::index::{Index, Rating, TrackID};
+
+pub use self::{
+    config::UserDataConfig,
+    history::OneListening,
+    playlist::{Playlist, PlaylistID},
+};
 
 use self::{cache::UserDataCache, history::History};
 
@@ -18,6 +22,7 @@ pub struct UserData {
     config: UserDataConfig,
     history: History,
     track_ratings: HashMap<TrackID, Rating>,
+    playlists: HashMap<PlaylistID, Playlist>,
 }
 
 impl UserData {
@@ -26,6 +31,7 @@ impl UserData {
             config,
             history: History::new(),
             track_ratings: HashMap::new(),
+            playlists: HashMap::new(),
         }
     }
 
@@ -61,6 +67,10 @@ impl UserDataWrapper {
         &self.inner.track_ratings
     }
 
+    pub fn playlists(&self) -> &HashMap<PlaylistID, Playlist> {
+        &self.inner.playlists
+    }
+
     pub fn set_track_rating(&mut self, track_id: TrackID, rating: Option<Rating>) {
         match rating {
             Some(rating) => {
@@ -86,9 +96,50 @@ impl UserDataWrapper {
         (self.on_change)(&self.inner);
     }
 
+    pub fn create_playlist(&mut self, name: String) -> PlaylistID {
+        let playlist = Playlist::new(name);
+        let playlist_id = playlist.id;
+
+        self.inner.playlists.insert(playlist.id, playlist);
+
+        (self.on_change)(&self.inner);
+
+        playlist_id
+    }
+
+    pub fn add_track_to_playlist(
+        &mut self,
+        playlist_id: PlaylistID,
+        track_id: TrackID,
+        position: Option<usize>,
+    ) -> Result<(), &'static str> {
+        let playlist = self
+            .inner
+            .playlists
+            .get_mut(&playlist_id)
+            .ok_or("Playlist was not found")?;
+
+        if matches!(position, Some(position) if position >= playlist.tracks.len()) {
+            return Err("Provided position is out-of-bounds");
+        }
+
+        match position {
+            Some(position) => playlist.tracks.insert(position, track_id),
+            None => playlist.tracks.push(track_id),
+        }
+
+        (self.on_change)(&self.inner);
+
+        Ok(())
+    }
+
     pub fn cleanup(&mut self, new_index: &Index) {
         self.inner.history.cleanup(new_index);
         self.cache.cleanup(new_index);
+
+        for playlist in self.inner.playlists.values_mut() {
+            playlist.cleanup(new_index);
+        }
 
         (self.on_change)(&self.inner);
     }

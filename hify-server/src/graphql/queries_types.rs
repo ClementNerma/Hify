@@ -6,8 +6,9 @@ use crate::{
     graphql_index, graphql_user_data,
     index::{
         AlbumID, AlbumInfos, Art, ArtTarget, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating,
-        SortedMap, Track, TrackID, TrackTags,
+        SortedMap, Track, TrackTags,
     },
+    userdata::Playlist,
 };
 
 use super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput};
@@ -23,10 +24,6 @@ pub struct IndexInfos {
 
 #[ComplexObject]
 impl Track {
-    async fn id(&self) -> TrackID {
-        self.id
-    }
-
     async fn app_only_rating(&self, ctx: &Context<'_>) -> Option<Rating> {
         graphql_user_data!(ctx)
             .track_ratings()
@@ -249,6 +246,24 @@ impl GenreInfos {
             .get(&self.get_id())
             .unwrap()
             .len()
+    }
+}
+
+#[ComplexObject]
+impl Playlist {
+    async fn tracks(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track> {
+        let index = graphql_index!(ctx);
+
+        paginate_mapped_slice(
+            pagination,
+            // TODO: optimize?
+            &self.tracks,
+            |track_id| index.tracks.get(track_id).unwrap().clone(),
+        )
     }
 }
 

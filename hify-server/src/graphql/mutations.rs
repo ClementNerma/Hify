@@ -4,7 +4,7 @@ use super::GraphQLContext;
 use crate::{
     graphql_ctx_member,
     index::{build_index, Index, Rating, TrackID},
-    userdata::OneListening,
+    userdata::{OneListening, PlaylistID},
 };
 
 pub struct MutationRoot;
@@ -53,5 +53,21 @@ impl MutationRoot {
         graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, None);
 
         true
+    }
+
+    async fn create_playlist(&self, ctx: &Context<'_>, name: String) -> PlaylistID {
+        graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name)
+    }
+
+    async fn add_track_to_playlist(
+        &self,
+        ctx: &Context<'_>,
+        playlist_id: PlaylistID,
+        track_id: TrackID,
+        position: Option<usize>,
+    ) -> Result<bool, &'static str> {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .add_track_to_playlist(playlist_id, track_id, position)
+            .map(|()| true)
     }
 }

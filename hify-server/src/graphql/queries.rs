@@ -13,6 +13,7 @@ use crate::{
         stats::{self, LibraryStats},
     },
     transparent_cursor_type,
+    userdata::PlaylistID,
 };
 
 use super::{
@@ -49,6 +50,21 @@ impl QueryRoot {
         paginate_mapped_slice(pagination, user_data.cache().dedup_history(), |entry| {
             index.tracks.get(&entry.track_id).unwrap().clone()
         })
+    }
+
+    async fn playlists(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, PlaylistID> {
+        let user_data = graphql_user_data!(ctx);
+
+        paginate_mapped_slice(
+            pagination,
+            // TODO: optimize?
+            user_data.playlists().keys().collect::<Vec<_>>().as_slice(),
+            |id| **id,
+        )
     }
 
     async fn albums(

@@ -150,7 +150,6 @@ define_id_type!(TrackID, AlbumID, ArtistID, GenreID, ArtID);
 #[graphql(complex)]
 pub struct Track {
     /// Track's identifier
-    #[graphql(skip)]
     pub id: TrackID,
 
     /// Path to the track's audio file
