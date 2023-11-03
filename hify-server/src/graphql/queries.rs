@@ -13,7 +13,7 @@ use crate::{
         stats::{self, LibraryStats},
     },
     transparent_cursor_type,
-    userdata::PlaylistID,
+    userdata::{Playlist, PlaylistID},
 };
 
 use super::{
@@ -56,15 +56,27 @@ impl QueryRoot {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Paginated<usize, PlaylistID> {
+    ) -> Paginated<usize, Playlist> {
         let user_data = graphql_user_data!(ctx);
 
         paginate_mapped_slice(
             pagination,
-            // TODO: optimize?
-            user_data.playlists().keys().collect::<Vec<_>>().as_slice(),
-            |id| **id,
+            // TODO: optimize!
+            &user_data.playlists().keys().collect::<Vec<_>>(),
+            |playlist_id| user_data.playlists().get(playlist_id).unwrap().clone(),
         )
+    }
+
+    async fn playlist(
+        &self,
+        ctx: &Context<'_>,
+        playlist_id: PlaylistID,
+    ) -> Result<Playlist, &'static str> {
+        graphql_user_data!(ctx)
+            .playlists()
+            .get(&playlist_id)
+            .cloned()
+            .ok_or("Provided playlist ID was not found")
     }
 
     async fn albums(

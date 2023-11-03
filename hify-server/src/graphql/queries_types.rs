@@ -265,6 +265,10 @@ impl Playlist {
             |track_id| index.tracks.get(track_id).unwrap().clone(),
         )
     }
+
+    async fn tracks_count(&self) -> usize {
+        self.tracks.len()
+    }
 }
 
 #[derive(SimpleObject)]
