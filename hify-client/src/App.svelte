@@ -20,6 +20,8 @@
   import DevToolsPage from './pages/DevToolsPage/DevToolsPage.svelte'
   import GenresPage from './pages/GenresPage/GenresPage.svelte'
   import GenrePage from './pages/GenrePage/GenrePage.svelte'
+  import PlaylistsPage from './pages/PlaylistsPage/PlaylistsPage.svelte'
+  import PlaylistPage from './pages/PlaylistPage/PlaylistPage.svelte'
 </script>
 
 <Router primary={false}>
@@ -40,6 +42,10 @@
       <GenresPage />
     </Route>
 
+    <Route path={ROUTES.playlists}>
+      <PlaylistsPage />
+    </Route>
+
     <Route path={ROUTES.album(':id')} let:params>
       <AlbumPage albumId={params['id']} />
     </Route>
@@ -50,6 +56,10 @@
 
     <Route path={ROUTES.genre(':id')} let:params>
       <GenrePage genreId={params['id']} />
+    </Route>
+
+    <Route path={ROUTES.playlist(':id')} let:params>
+      <PlaylistPage playlistId={params['id']} />
     </Route>
 
     <Route path={ROUTES.history}>

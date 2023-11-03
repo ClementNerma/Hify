@@ -1,0 +1,16 @@
+query PlaylistsPage($pagination: PaginationInput!) {
+    playlists(pagination: $pagination) {
+        nodes {
+            id
+            name
+            createdAt
+            lastUpdatedAt
+            tracksCount
+        }
+
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+}

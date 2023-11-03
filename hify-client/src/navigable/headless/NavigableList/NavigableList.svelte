@@ -7,12 +7,19 @@
 
   export let hasFocusPriority: Props<NavigableList>['hasFocusPriority'] = null
   export let trapped: Props<NavigableList>['trapped'] = undefined
+  export let lazyLoader: Props<NavigableList>['lazyLoader'] = undefined
+  export let distanceBeforeLazyLoading: Props<NavigableList>['distanceBeforeLazyLoading'] = undefined
 
-  const list = new NavigableList(getParentNavigable(), { hasFocusPriority, trapped })
+  const list = new NavigableList(getParentNavigable(), {
+    hasFocusPriority,
+    trapped,
+    lazyLoader,
+    distanceBeforeLazyLoading,
+  })
 
   setChildrenNavigable(list)
 
-  afterUpdate(() => list.updateProps({ hasFocusPriority, trapped }))
+  afterUpdate(() => list.updateProps({ hasFocusPriority, trapped, lazyLoader, distanceBeforeLazyLoading }))
 </script>
 
 <InternalNavWrapper navId={list.id}>

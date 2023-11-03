@@ -83,6 +83,7 @@
                   { label: 'Genres', uri: ROUTES.genres },
                 ],
               },
+              { label: 'Playlists', uri: ROUTES.playlists },
               { label: 'Search', uri: ROUTES.search },
             ]}
           />

@@ -1,0 +1,19 @@
+query PlaylistPage($playlistId: String!, $tracksPagination: PaginationInput!) {
+    playlist(playlistId: $playlistId) {
+        id
+        name
+        createdAt
+        lastUpdatedAt
+        tracksCount
+        tracks(pagination: $tracksPagination) {
+            nodes {
+                ...AudioTrack
+            }
+
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
