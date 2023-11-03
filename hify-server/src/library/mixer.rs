@@ -26,7 +26,7 @@ pub fn generate_mix(index: &Index, params: MixParams, max_tracks: usize) -> Vec<
         .tracks
         .values()
         .filter(|track| match exclude_tracks {
-            Some(ref exclude_tracks) => exclude_tracks.contains(&track.id),
+            Some(ref exclude_tracks) => !exclude_tracks.contains(&track.id),
             None => true,
         })
         .filter(|track| match min_rating {
