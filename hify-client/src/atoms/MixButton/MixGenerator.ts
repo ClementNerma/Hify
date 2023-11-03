@@ -1,4 +1,4 @@
-import { ApolloQueryResult } from '@apollo/client'
+import { ApolloQueryResult } from '@apollo/client/core'
 import { navigate } from 'svelte-navigator'
 import { LARGE_MIX_TRACKS_QTY } from '../../constants'
 import { AsyncMixGenerator, MixGeneratorQuery, MixParams } from '../../graphql/generated'

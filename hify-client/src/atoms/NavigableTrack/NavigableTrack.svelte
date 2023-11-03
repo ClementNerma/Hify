@@ -7,7 +7,6 @@
   import { ItemDisplay } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '../../routes'
   import { enqueue, playTrackFromNewQueue } from '../../stores/play-queue'
-  import { from } from '@apollo/client'
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
