@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Props } from '../../navigable/navigation'
+  import { Props, RequestFocus } from '../../navigable/navigation'
   import { SimpleNavigableItem as Nav } from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
@@ -11,6 +11,10 @@
   export let onLongPress: Props<Nav>['onLongPress'] = undefined
   export let onFocus: Props<Nav>['onFocus'] = undefined
   export let onUnfocus: Props<Nav>['onFocus'] = undefined
+
+  export const requestFocus: RequestFocus = () => _requestFocus()
+
+  let _requestFocus: RequestFocus
 </script>
 
 <SimpleNavigableItem
@@ -23,6 +27,7 @@
   {hasFocusPriority}
   {onFocus}
   {onUnfocus}
+  bind:requestFocus={_requestFocus}
 >
   <div class="button" class:fullHeight class:disabled>
     <slot />

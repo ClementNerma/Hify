@@ -2,11 +2,13 @@
   import { navigate } from 'svelte-navigator'
   import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
   import { bind } from '../../globals/utils'
-  import { AsyncPlaylistsPage, PlaylistsPageQuery } from '../../graphql/generated'
+  import { AsyncPlaylistsPage, CreatePlaylist, PlaylistsPageQuery } from '../../graphql/generated'
   import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
   import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
   import { ROUTES } from '../../routes'
+  import NewPlaylistModal from './NewPlaylistModal.svelte'
+  import Button from '../../atoms/Button/Button.svelte'
+  import { RequestFocus } from '../../navigable/navigation'
 
   const PLAYLIST_BULK = 50
 
@@ -33,6 +35,19 @@
   type PlaylistData = PlaylistsPageQuery['playlists']['nodes'][number]
 
   let playlists: PlaylistData[] = []
+  let isModalOpen = false
+
+  let requestFocus: RequestFocus
+
+  async function createPlaylist(name: string) {
+    const created = await CreatePlaylist({ variables: { name } })
+
+    if (created.errors) {
+      alert('Failed to create playlist:\n' + created.errors[0].message)
+    } else {
+      navigate(ROUTES.playlist(created.data!.createPlaylist))
+    }
+  }
 </script>
 
 {#await feedMore()}
@@ -40,28 +55,49 @@
 {:then _}
   <h2>Playlists</h2>
 
+  <Button
+    onPress={() => {
+      isModalOpen = true
+    }}
+    bind:requestFocus
+  >
+    New
+  </Button>
+
   <NavigableList lazyLoader={feedMore}>
     <table>
       <tbody>
         {#each playlists as playlist, i (playlist.id)}
-          <SimpleNavigableItem onPress={bind(playlist.id, (playlistId) => navigate(ROUTES.playlist(playlistId)))}>
-            <tr class:notFirst={i !== 0}>
-              <td class="title">
+          <tr class:notFirst={i !== 0}>
+            <td class="title">
+              <SimpleNavigableItem onPress={bind(playlist.id, (playlistId) => navigate(ROUTES.playlist(playlistId)))}>
                 <span>{playlist.name}</span>
-              </td>
-              <td class="tracks-count">
-                🎵
-                {playlist.tracksCount}
-                {playlist.tracksCount === 0 ? '(empty)' : playlist.tracksCount === 1 ? 'track' : 'tracks'}</td
-              >
-              <!-- <td class="created-at">{playlist.createdAt}</td> -->
-              <td class="last-updated-at">🕒 {new Date(playlist.lastUpdatedAt).toLocaleString()}</td>
-            </tr>
-          </SimpleNavigableItem>
+              </SimpleNavigableItem>
+            </td>
+            <td class="tracks-count">
+              🎵
+              {#if playlist.tracksCount === 0}
+                (empty)
+              {:else}
+                {playlist.tracksCount} track{playlist.tracksCount > 1 ? 's' : ''}
+              {/if}
+            </td>
+            <!-- <td class="created-at">{playlist.createdAt}</td> -->
+            <td class="last-updated-at">🕒 {new Date(playlist.lastUpdatedAt).toLocaleString()}</td>
+          </tr>
         {/each}
       </tbody>
     </table>
   </NavigableList>
+
+  <NewPlaylistModal
+    open={isModalOpen}
+    onSubmit={createPlaylist}
+    onClose={() => {
+      isModalOpen = false
+      requestFocus()
+    }}
+  />
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}
