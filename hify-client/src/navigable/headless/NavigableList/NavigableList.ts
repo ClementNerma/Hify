@@ -132,7 +132,7 @@ export class NavigableList<P = NoProp> extends NavigableContainer<NavigableListP
 	}
 }
 
-type NavigableListProps = {
+export type NavigableListProps = {
 	trapped?: boolean
 	lazyLoader?: () => void
 	distanceBeforeLazyLoading?: number

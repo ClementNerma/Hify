@@ -143,7 +143,7 @@ export class NavigableGrid<P = NoProp> extends NavigableContainer<NavigableGridP
 	}
 }
 
-type NavigableGridProps = {
+export type NavigableGridProps = {
 	columns: number
 	lazyLoader?: () => void
 	distanceBeforeLazyLoading?: number
