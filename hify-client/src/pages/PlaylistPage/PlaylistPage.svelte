@@ -42,7 +42,7 @@
   <LoadingIndicator />
 {:then playlist}
   <h2>{playlist.name}</h2>
-  <Checkbox bind:checked={gridView} />
+  <Checkbox bind:checked={gridView}>Enable grid view</Checkbox>
 
   {#if gridView}
     <PlaylistGridView {feedMore} {tracks} />
