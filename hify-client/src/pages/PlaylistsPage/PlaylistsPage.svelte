@@ -6,9 +6,10 @@
   import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '@root/routes'
-  import NewPlaylistModal from './NewPlaylistModal.svelte'
   import Button from '@atoms/Button/Button.svelte'
   import { RequestFocus } from '@navigable/navigation'
+  import Modal from '@molecules/Modal/Modal.svelte'
+  import Input from '@atoms/Input/Input.svelte'
 
   const PLAYLIST_BULK = 50
 
@@ -36,6 +37,7 @@
 
   let playlists: PlaylistData[] = []
   let isModalOpen = false
+  let newPlaylistName = ''
 
   let requestFocus: RequestFocus
 
@@ -59,7 +61,6 @@
     onPress={() => {
       isModalOpen = true
     }}
-    bind:requestFocus
   >
     New
   </Button>
@@ -90,14 +91,29 @@
     </table>
   </NavigableList>
 
-  <NewPlaylistModal
-    open={isModalOpen}
-    onSubmit={createPlaylist}
-    onClose={() => {
-      isModalOpen = false
-      requestFocus()
-    }}
-  />
+  <Modal
+    bind:open={isModalOpen}
+    buttons={[
+      {
+        label: 'Create',
+        onPress: () => {
+          createPlaylist(newPlaylistName)
+          return false
+        },
+      },
+      {
+        label: 'Cancel',
+        onPress: () => {
+          newPlaylistName = ''
+        },
+      },
+    ]}
+    onOpen={() => requestFocus()}
+  >
+    <h3>Create a new playlist:</h3>
+
+    <Input bind:requestFocus bind:value={newPlaylistName} />
+  </Modal>
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}
