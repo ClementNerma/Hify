@@ -10,9 +10,9 @@
 </script>
 
 <SimpleNavigableItem
+  bind:requestFocus
   onFocus={() => searchField.focus()}
   onUnfocus={() => searchField.blur()}
-  bind:requestFocus
   display="transparent"
   noPadding
   notRounded
