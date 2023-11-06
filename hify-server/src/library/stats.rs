@@ -23,8 +23,7 @@ pub fn generate_stats(index: &Index, user_data: &UserDataWrapper) -> LibraryStat
             .history()
             .entries()
             .iter()
-            .map(|entry| entry.duration_s)
-            .map(u64::from)
+            .map(|entry| u64::from(entry.duration_s))
             .sum(),
     }
 }
