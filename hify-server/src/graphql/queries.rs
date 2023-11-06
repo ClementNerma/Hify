@@ -139,17 +139,14 @@ impl QueryRoot {
         graphql_index!(ctx).cache.genre_infos.get(&id).cloned()
     }
 
-    // Slow Waiting for answers on https://github.com/async-graphql/async-graphql/issues/1090
-    // This will allow to use a `Paginated<TrackID, Track>` alongside the current `Paginated<usize, Track>`
-    //
-    // async fn tracks<'c>(
-    //     &self,
-    //     ctx: &Context<'_>,
-    //     pagination: PaginationInput,
-    // ) -> Paginated<TrackID, Track> {
-    //     let index = graphql_index!(ctx);
-    //     paginate(pagination, &index.tracks, |track: &Track| track.id.clone())
-    // }
+    async fn tracks<'c>(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<TrackID, Track> {
+        let index = graphql_index!(ctx);
+        paginate(pagination, &index.tracks, |track| track.id)
+    }
 
     async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<TrackID>) -> Result<Vec<Track>> {
         let index = graphql_index!(ctx);
