@@ -9,8 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::graphql::Paginable;
 
-/// An immutable map type that keeps the order of its element
-/// Also allows to get the ordered value list as well as the index from a key
+/// An immutable ordered map
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SortedMap<K: Eq + Hash, V: Ord> {
     values: Vec<V>,
@@ -18,33 +17,6 @@ pub struct SortedMap<K: Eq + Hash, V: Ord> {
 }
 
 impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
-    pub fn from_vec(mut values: Vec<V>, value_index: impl Fn(&V) -> K) -> Self {
-        values.sort();
-
-        let indexes = values
-            .iter()
-            .enumerate()
-            .map(|(i, value)| (value_index(value), i))
-            .collect();
-
-        Self { values, indexes }
-    }
-
-    pub fn from_hashmap(map: HashMap<K, V>) -> Self {
-        let mut entries: Vec<_> = map.into_iter().collect();
-        entries.sort_by(|(_, a), (_, b)| a.cmp(b));
-
-        let mut values = Vec::with_capacity(entries.len());
-        let mut indexes = HashMap::with_capacity(entries.len());
-
-        for (i, (key, value)) in entries.into_iter().enumerate() {
-            values.push(value);
-            indexes.insert(key, i);
-        }
-
-        Self { values, indexes }
-    }
-
     pub fn empty() -> Self {
         Self {
             values: vec![],
@@ -87,6 +59,23 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
 
     pub fn len(&self) -> usize {
         self.values.len()
+    }
+}
+
+impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for SortedMap<K, V> {
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        let mut entries: Vec<_> = iter.into_iter().collect();
+        entries.sort_by(|(_, a), (_, b)| a.cmp(b));
+
+        let mut values = Vec::with_capacity(entries.len());
+        let mut indexes = HashMap::with_capacity(entries.len());
+
+        for (i, (key, value)) in entries.into_iter().enumerate() {
+            values.push(value);
+            indexes.insert(key, i);
+        }
+
+        Self { values, indexes }
     }
 }
 

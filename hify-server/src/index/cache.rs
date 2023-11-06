@@ -116,7 +116,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         .map(|(k, v)| {
             (
                 k,
-                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+                v.into_iter().map(|album| (album.get_id(), album)).collect(),
             )
         })
         .collect();
@@ -126,7 +126,9 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         .map(|(k, v)| {
             (
                 k,
-                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+                v.into_iter()
+                    .map(|album| (album.get_id(), album))
+                    .collect::<SortedMap<_, _>>(),
             )
         })
         .collect::<HashMap<_, _>>();
@@ -160,7 +162,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         .map(|(k, v)| {
             (
                 k,
-                SortedMap::from_vec(v.into_iter().collect(), |album| album.get_id()),
+                v.into_iter().map(|album| (album.get_id(), album)).collect(),
             )
         })
         .collect();
@@ -261,10 +263,10 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         artists_mean_score,
         albums_artists_mean_score,
 
-        artists_infos: SortedMap::from_hashmap(artists_infos),
-        albums_artists_infos: SortedMap::from_hashmap(albums_artists_infos),
-        albums_infos: SortedMap::from_hashmap(albums_infos),
-        genre_infos: SortedMap::from_hashmap(genres_infos),
+        artists_infos: artists_infos.into_iter().collect(),
+        albums_artists_infos: albums_artists_infos.into_iter().collect(),
+        albums_infos: albums_infos.into_iter().collect(),
+        genre_infos: genres_infos.into_iter().collect(),
 
         genres_albums,
         genres_tracks,

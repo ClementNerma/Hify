@@ -161,7 +161,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Collected {} tracks, generating cache...", tracks.len()),
     );
 
-    let tracks = SortedMap::from_vec(tracks, |track| track.id);
+    let tracks = tracks.into_iter().map(|track| (track.id, track)).collect();
 
     let cache = build_index_cache(&tracks);
 
