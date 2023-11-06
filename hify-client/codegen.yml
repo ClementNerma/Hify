@@ -10,3 +10,4 @@ generates:
     config:
       clientPath: ../apollo-client
       asyncQuery: true
+      strictScalars: true
