@@ -1,5 +1,5 @@
 import { derived, get, writable } from 'svelte/store'
-import { generateMix } from '../atoms/MixButton/MixGenerator'
+import { generateMix } from '../components/atoms/MixButton/MixGenerator'
 import { EXTEND_MIX_TRACKS_QTY } from '../constants'
 import { readonly, swapInArray } from '../globals/utils'
 import { AudioTrackFragment, MixParams } from '../graphql/generated'

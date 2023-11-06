@@ -1,14 +1,14 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { bind } from '../../globals/utils'
-  import { AsyncPlaylistsPage, CreatePlaylist, PlaylistsPageQuery } from '../../graphql/generated'
-  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { ROUTES } from '../../routes'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { bind } from '@globals/utils'
+  import { AsyncPlaylistsPage, CreatePlaylist, PlaylistsPageQuery } from '@graphql/generated'
+  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { ROUTES } from '@root/routes'
   import NewPlaylistModal from './NewPlaylistModal.svelte'
-  import Button from '../../atoms/Button/Button.svelte'
-  import { RequestFocus } from '../../navigable/navigation'
+  import Button from '@atoms/Button/Button.svelte'
+  import { RequestFocus } from '@navigable/navigation'
 
   const PLAYLIST_BULK = 50
 

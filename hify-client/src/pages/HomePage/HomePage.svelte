@@ -1,17 +1,17 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import Button from '../../atoms/Button/Button.svelte'
-  import MixButton from '../../atoms/MixButton/MixButton.svelte'
-  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
-  import { AsyncHomePage } from '../../graphql/generated'
-  import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
-  import { ROUTES } from '../../routes'
+  import Button from '@atoms/Button/Button.svelte'
+  import MixButton from '@atoms/MixButton/MixButton.svelte'
+  import Row from '@navigable/ui/molecules/Row/Row.svelte'
+  import { AsyncHomePage } from '@graphql/generated'
+  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+  import { ROUTES } from '@root/routes'
   import IndexUpdater from './IndexUpdater.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import StatsBox from '../../molecules/StatsBox/StatsBox.svelte'
-  import Centered from '../../atoms/Centered/Centered.svelte'
-  import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
-  import { MIN_GREAT_RATING } from '../../constants'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import StatsBox from '@molecules/StatsBox/StatsBox.svelte'
+  import Centered from '@atoms/Centered/Centered.svelte'
+  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
+  import { MIN_GREAT_RATING } from '@root/constants'
 
   async function fetchFeed() {
     const res = await AsyncHomePage({

@@ -5,15 +5,15 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from 'svelte'
 
-  import { getParentNavigable, NavigableItem, RequestFocus } from '../../../navigation'
+  import { getParentNavigable, NavigableItem, RequestFocus } from '@navigable/navigation'
 
-  import NavigableWithHandlers from '../../../headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
   import Column from '../Column/Column.svelte'
   import { contextMenuStore } from './ContextMenu'
-  import SimpleNavigableItem from '../../../headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import Setter, { setterStore } from '../../../../atoms/Setter/Setter.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import Setter, { setterStore } from '@atoms/Setter/Setter.svelte'
   import { get } from 'svelte/store'
-  import { logFatal } from '../../../../stores/debugger'
+  import { logFatal } from '@stores/debugger'
 
   const nav = getParentNavigable()
 

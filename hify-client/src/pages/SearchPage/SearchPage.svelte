@@ -1,16 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { AsyncSearchPage, SearchPageQuery } from '../../graphql/generated'
+  import { AsyncSearchPage, SearchPageQuery } from '@graphql/generated'
 
-  import { logInfo } from '../../stores/debugger'
+  import { logInfo } from '@stores/debugger'
 
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  import { RequestFocus } from '../../navigable/navigation'
-  import TracksRow from '../../molecules/TracksRow/TracksRow.svelte'
-  import AlbumsRow from '../../molecules/AlbumsRow/AlbumsRow.svelte'
-  import ArtistsRow from '../../molecules/ArtistsRow/ArtistsRow.svelte'
+  import { RequestFocus } from '@navigable/navigation'
+  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
+  import ArtistsRow from '@molecules/ArtistsRow/ArtistsRow.svelte'
 
   export let searchTerms: string = ''
 

@@ -1,26 +1,22 @@
 <script lang="ts">
-  import { readableAudioPaused } from '../../stores/audio-player'
-  import { currentTrack } from '../../stores/play-queue'
+  import { readableAudioPaused } from '@stores/audio-player'
+  import { currentTrack } from '@stores/play-queue'
 
-  import { setupDistractionFreeListener } from '../../stores/distraction-free'
-  import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import { distractionFreeMode } from '../../stores/distraction-free'
+  import { setupDistractionFreeListener } from '@stores/distraction-free'
+  import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+  import { distractionFreeMode } from '@stores/distraction-free'
   import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
-  import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import { KeyPressHandling } from '../../navigable/input-manager'
-  import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
+  import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import { KeyPressHandling } from '@navigable/input-manager'
+  import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
   import { writable } from 'svelte/store'
-  import { AudioTrackFragment } from '../../graphql/generated'
-  import Emoji from '../../atoms/Emoji/Emoji.svelte'
+  import { AudioTrackFragment } from '@graphql/generated'
+  import Emoji from '@atoms/Emoji/Emoji.svelte'
   import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
   const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
-  const setDistractionFree = setupDistractionFreeListener(
-    3000,
-    ignoredKeys,
-    () => $readableAudioPaused === false
-  )
+  const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
 
   function onKeyPress(key: string): KeyPressHandling {
     const dfMode = $distractionFreeMode

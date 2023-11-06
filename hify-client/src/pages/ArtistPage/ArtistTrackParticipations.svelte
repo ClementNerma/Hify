@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { AsyncArtistTrackParticipations, AudioTrackFragment } from '../../graphql/generated'
+  import { AsyncArtistTrackParticipations, AudioTrackFragment } from '@graphql/generated'
 
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import Button from '../../atoms/Button/Button.svelte'
-  import TrackCard from '../../molecules/TrackCard/TrackCard.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+  import Button from '@atoms/Button/Button.svelte'
+  import TrackCard from '@molecules/TrackCard/TrackCard.svelte'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   export let artistId: string
 

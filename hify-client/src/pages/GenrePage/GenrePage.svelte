@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncGenrePage } from '../../graphql/generated'
+  import { AlbumCardFragment, AsyncGenrePage } from '@graphql/generated'
 
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
-  import MixButton from '../../atoms/MixButton/MixButton.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '../../constants'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+  import MixButton from '@atoms/MixButton/MixButton.svelte'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '@root/constants'
 
   const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5

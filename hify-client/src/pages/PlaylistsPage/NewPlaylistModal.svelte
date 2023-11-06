@@ -1,9 +1,9 @@
 <script lang="ts">
   import { beforeUpdate } from 'svelte'
-  import Button from '../../atoms/Button/Button.svelte'
-  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { RequestFocus } from '../../navigable/navigation'
+  import Button from '@atoms/Button/Button.svelte'
+  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import { RequestFocus } from '@navigable/navigation'
 
   export let open = false
   export let onSubmit: (name: string) => void

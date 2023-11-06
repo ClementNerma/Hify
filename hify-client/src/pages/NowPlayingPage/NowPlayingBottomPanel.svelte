@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { bind, formatDate } from '../../globals/utils'
+  import { bind, formatDate } from '@globals/utils'
 
   import {
     humanReadableDuration,
@@ -8,18 +8,18 @@
     readableAudioProgress,
     setPlayingAudioProgress,
     toggleAudioPlayback,
-  } from '../../stores/audio-player'
+  } from '@stores/audio-player'
 
-  import { AudioTrackFragment } from '../../graphql/generated'
+  import { AudioTrackFragment } from '@graphql/generated'
 
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
-  import { ROUTES } from '../../routes'
-  import QueueGallery from '../../organisms/QueueGallery/QueueGallery.svelte'
-  import Column from '../../navigable/ui/molecules/Column/Column.svelte'
-  import ModifiableTrackRating from '../../atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
-  import ProgressRange from '../../atoms/ProgressRange/ProgressRange.svelte'
-  import TrackWaveForm from '../../atoms/TrackWaveForm/TrackWaveForm.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+  import { ROUTES } from '@root/routes'
+  import QueueGallery from '@organisms/QueueGallery/QueueGallery.svelte'
+  import Column from '@navigable/ui/molecules/Column/Column.svelte'
+  import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
+  import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
+  import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false

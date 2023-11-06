@@ -1,4 +1,4 @@
-import { logDebug } from '../stores/debugger'
+import { logDebug } from '@stores/debugger'
 
 export const REMAPPED_KEYS: Record<string, string> = {
 	F4: 'Escape',

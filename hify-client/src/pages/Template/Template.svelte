@@ -1,21 +1,21 @@
 <script lang="ts">
-  import '../../navigable/navigation.css'
+  import '@navigable/navigation.css'
 
   import { useLocation, navigate } from 'svelte-navigator'
 
-  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '../../stores/audio-player'
-  import { playNextTrack, playPreviousTrackOrRewind } from '../../stores/play-queue'
+  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@stores/audio-player'
+  import { playNextTrack, playPreviousTrackOrRewind } from '@stores/play-queue'
 
-  import { ROUTES } from '../../routes'
+  import { ROUTES } from '@root/routes'
 
-  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
-  import NavigablePage from '../../navigable/headless/NavigablePage/NavigablePage.svelte'
+  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+  import NavigablePage from '@navigable/headless/NavigablePage/NavigablePage.svelte'
 
-  import NavigableWithHandlers from '../../navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import NavBar from '../../molecules/NavBar/NavBar.svelte'
-  import { handleInput, KeyPressHandling, registerLongPressableKeys } from '../../navigable/input-manager'
-  import DistractionFreeTogglable from '../../atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import ContextMenu from '../../navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
+  import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
+  import NavBar from '@molecules/NavBar/NavBar.svelte'
+  import { handleInput, KeyPressHandling, registerLongPressableKeys } from '@navigable/input-manager'
+  import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+  import ContextMenu from '@navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
 
   const location = useLocation()
 

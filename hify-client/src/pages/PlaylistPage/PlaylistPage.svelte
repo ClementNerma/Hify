@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { AsyncPlaylistPage, AudioTrackFragment } from '../../graphql/generated'
+  import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { AsyncPlaylistPage, AudioTrackFragment } from '@graphql/generated'
   import PlaylistGridView from './PlaylistGridView.svelte'
   import PlaylistListView from './PlaylistListView.svelte'
 

@@ -1,4 +1,4 @@
-import { API_SERVER_URL } from '../apollo-client'
+import { API_SERVER_URL } from '@root/apollo-client'
 
 export const getStreamUri = (trackId: string) => `${API_SERVER_URL}/stream/${trackId}`
 export const getArtUri = (artId: string) => `${API_SERVER_URL}/art/${artId}`

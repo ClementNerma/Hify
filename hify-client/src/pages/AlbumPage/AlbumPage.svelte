@@ -1,25 +1,25 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
 
-  import { ROUTES } from '../../routes'
-  import { AsyncAlbumPage, AudioTrackFragment } from '../../graphql/generated'
+  import { ROUTES } from '@root/routes'
+  import { AsyncAlbumPage, AudioTrackFragment } from '@graphql/generated'
 
-  import NavigableList from '../../navigable/headless/NavigableList/NavigableList.svelte'
-  import NavigableRow from '../../navigable/headless/NavigableRow/NavigableRow.svelte'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  import NavigableTrack from '../../atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '../../globals/utils'
-  import TrackRating from '../../atoms/TrackRating/TrackRating.svelte'
-  import Checkbox from '../../atoms/Checkbox/Checkbox.svelte'
-  import Button from '../../atoms/Button/Button.svelte'
-  import Emoji from '../../atoms/Emoji/Emoji.svelte'
-  import { enqueue, playNewQueueFromBeginning } from '../../stores/play-queue'
-  import Row from '../../navigable/ui/molecules/Row/Row.svelte'
-  import { humanReadableDuration } from '../../stores/audio-player'
-  import ImgLoader from '../../atoms/ImgLoader/ImgLoader.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
+  import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
+  import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '@globals/utils'
+  import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
+  import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
+  import Button from '@atoms/Button/Button.svelte'
+  import Emoji from '@atoms/Emoji/Emoji.svelte'
+  import { enqueue, playNewQueueFromBeginning } from '@stores/play-queue'
+  import Row from '@navigable/ui/molecules/Row/Row.svelte'
+  import { humanReadableDuration } from '@stores/audio-player'
+  import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 
   export let albumId: string
 

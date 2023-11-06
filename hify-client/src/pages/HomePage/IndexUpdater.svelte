@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from '../../atoms/Button/Button.svelte'
-  import { IndexUpdater } from '../../graphql/generated'
+  import Button from '@atoms/Button/Button.svelte'
+  import { IndexUpdater } from '@graphql/generated'
 
   export let onUpdated: (() => void) | null = null
 

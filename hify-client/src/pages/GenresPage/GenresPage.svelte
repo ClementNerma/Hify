@@ -1,14 +1,14 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { generateAndPlayMix } from '../../atoms/MixButton/MixGenerator'
-  import { AsyncGenresPage } from '../../graphql/generated'
-  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
-  import ItemStyleLayer from '../../navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
-  import SimpleNavigableItem from '../../navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import { ROUTES } from '../../routes'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { MIN_GREAT_RATING } from '../../constants'
+  import { generateAndPlayMix } from '@atoms/MixButton/MixGenerator'
+  import { AsyncGenresPage } from '@graphql/generated'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+  import ItemStyleLayer from '@navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
+  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+  import { ROUTES } from '@root/routes'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { MIN_GREAT_RATING } from '@root/constants'
 
   const genres = AsyncGenresPage({ variables: {} }).then((res) => res.data.genres)
 </script>

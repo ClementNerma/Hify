@@ -1,13 +1,13 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { AsyncHistoryPage, AudioTrackFragment } from '../../graphql/generated'
-  import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
-  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import { ROUTES } from '../../routes'
-  import { playTrackFromNewQueue } from '../../stores/play-queue'
-  import { bind } from '../../globals/utils'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import { AsyncHistoryPage, AudioTrackFragment } from '@graphql/generated'
+  import InteractiveCard from '@molecules/Card/InteractiveCard.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+  import { ROUTES } from '@root/routes'
+  import { playTrackFromNewQueue } from '@stores/play-queue'
+  import { bind } from '@globals/utils'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const TRACKS_PER_ROW = 7
   const LINES_PER_PAGE = 5

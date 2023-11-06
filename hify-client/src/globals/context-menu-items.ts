@@ -1,6 +1,6 @@
+import { ContextMenuOption } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { ROUTES } from '@root/routes'
 import { navigate } from 'svelte-navigator'
-import { ContextMenuOption } from '../navigable/ui/molecules/ContextMenu/ContextMenu'
-import { ROUTES } from '../routes'
 
 export const ctxMenuOptions = {
 	goToAlbum(albumId: string): ContextMenuOption {

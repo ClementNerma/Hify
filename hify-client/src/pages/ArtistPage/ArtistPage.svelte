@@ -1,7 +1,7 @@
 <script lang="ts">
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import MixButton from '../../atoms/MixButton/MixButton.svelte'
-  import { AsyncArtistPage } from '../../graphql/generated'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import MixButton from '@atoms/MixButton/MixButton.svelte'
+  import { AsyncArtistPage } from '@graphql/generated'
 
   import ArtistAlbums from './ArtistAlbums.svelte'
   import ArtistTrackParticipations from './ArtistTrackParticipations.svelte'

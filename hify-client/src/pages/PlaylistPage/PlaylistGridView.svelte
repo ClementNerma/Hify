@@ -1,14 +1,14 @@
 <script lang="ts">
-  import InteractiveCard from '../../molecules/Card/InteractiveCard.svelte'
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
+  import InteractiveCard from '@molecules/Card/InteractiveCard.svelte'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
   import { navigate } from 'svelte-navigator'
-  import { AsyncHistoryPage, AudioTrackFragment, PlaylistPageQuery } from '../../graphql/generated'
-  import { showContextMenu } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
-  import { ROUTES } from '../../routes'
-  import { playTrackFromNewQueue } from '../../stores/play-queue'
-  import { bind } from '../../globals/utils'
+  import { AudioTrackFragment } from '@graphql/generated'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+  import { ROUTES } from '@root/routes'
+  import { playTrackFromNewQueue } from '@stores/play-queue'
+  import { bind } from '@globals/utils'
 
-  import { NavigableGridProps } from '../../navigable/headless/NavigableGrid/NavigableGrid'
+  import { NavigableGridProps } from '@navigable/headless/NavigableGrid/NavigableGrid'
 
   const TRACKS_PER_LINE = 7
 

@@ -21,7 +21,19 @@
     "sourceMap": true,
 
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+
+    "paths": {
+      "@atoms/*": ["./src/components/atoms/*"],
+      "@molecules/*": ["./src/components/molecules/*"],
+      "@organisms/*": ["./src/components/organisms/*"],
+      "@globals/*": ["./src/globals/*"],
+      "@graphql/*": ["./src/graphql/*"],
+      "@navigable/*": ["./src/navigable/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@root/*": ["./src/*"]
+    }
   },
 
   "include": ["src"]

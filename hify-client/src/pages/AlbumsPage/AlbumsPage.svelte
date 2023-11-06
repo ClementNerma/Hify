@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncAlbumsPage } from '../../graphql/generated'
+  import { AlbumCardFragment, AsyncAlbumsPage } from '@graphql/generated'
 
-  import Grid from '../../navigable/ui/organisms/Grid/Grid.svelte'
-  import AlbumCard from '../../molecules/AlbumCard/AlbumCard.svelte'
-  import LoadingIndicator from '../../atoms/LoadingIndicator/LoadingIndicator.svelte'
+  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
 
   const ALBUMS_PER_LINE = 6
   const LINES_PER_PAGE = 5
