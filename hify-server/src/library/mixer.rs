@@ -22,37 +22,50 @@ pub fn generate_mix(index: &Index, params: MixParams, max_tracks: usize) -> Vec<
         exclude_tracks,
     } = params;
 
-    let mut tracks: Vec<_> = index
+    let mut tracks = index
         .tracks
         .values()
-        .filter(|track| match exclude_tracks {
-            Some(ref exclude_tracks) => !exclude_tracks.contains(&track.id),
-            None => true,
+        .filter(|track| {
+            if let Some(ref exclude_tracks) = exclude_tracks {
+                if exclude_tracks.contains(&track.id) {
+                    return false;
+                }
+            }
+
+            if let Some(min_rating) = min_rating {
+                if track.metadata.tags.rating.unwrap_or(Rating::Zero) < min_rating {
+                    return false;
+                }
+            }
+
+            if let Some(ref artist_ids) = from_artists {
+                if index
+                    .cache
+                    .tracks_all_artists
+                    .get(&track.id)
+                    .unwrap()
+                    .intersection(artist_ids)
+                    .next()
+                    .is_none()
+                {
+                    return false;
+                }
+            }
+
+            if let Some(ref genre_ids) = from_genres {
+                if !track
+                    .metadata
+                    .tags
+                    .get_genres_infos()
+                    .any(|genre| genre_ids.contains(&genre.get_id()))
+                {
+                    return false;
+                }
+            }
+
+            true
         })
-        .filter(|track| match min_rating {
-            Some(min_rating) => track.metadata.tags.rating.unwrap_or(Rating::Zero) >= min_rating,
-            None => true,
-        })
-        .filter(|track| match from_artists {
-            Some(ref artist_ids) => index
-                .cache
-                .tracks_all_artists
-                .get(&track.id)
-                .unwrap()
-                .intersection(artist_ids)
-                .next()
-                .is_some(),
-            None => true,
-        })
-        .filter(|track| match &from_genres {
-            Some(ref genre_ids) => track
-                .metadata
-                .tags
-                .get_genres_infos()
-                .any(|genre| genre_ids.contains(&genre.get_id())),
-            None => true,
-        })
-        .collect();
+        .collect::<Vec<_>>();
 
     tracks.shuffle(&mut thread_rng());
 
