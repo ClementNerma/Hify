@@ -60,8 +60,13 @@ impl UserDataWrapper {
         (self.on_change)(&self.inner);
     }
 
-    pub fn create_playlist(&mut self, name: String) -> PlaylistID {
-        let playlist = Playlist::new(name);
+    pub fn create_playlist(&mut self, name: String, tracks: Option<Vec<TrackID>>) -> PlaylistID {
+        let mut playlist = Playlist::new(name);
+
+        if let Some(tracks) = tracks {
+            playlist.tracks = tracks;
+        }
+
         let playlist_id = playlist.id;
 
         self.inner.playlists.insert(playlist.id, playlist);

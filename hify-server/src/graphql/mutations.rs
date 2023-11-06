@@ -65,8 +65,8 @@ impl MutationRoot {
         EMPTY_ANSWER
     }
 
-    async fn create_playlist(&self, ctx: &Context<'_>, name: String) -> PlaylistID {
-        graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name)
+    async fn create_playlist(&self, ctx: &Context<'_>, name: String, tracks: Option<Vec<TrackID>>) -> PlaylistID {
+        graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name, tracks)
     }
 
     async fn add_track_to_playlist(
