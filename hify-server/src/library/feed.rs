@@ -159,14 +159,14 @@ fn get_periodically_popular_tracks(
         PopularityPeriod::Yearly => Duration::DAY * 365, // Approx.
     };
 
-    let one_week_ago = get_now() - period;
+    let start_period = get_now() - period;
 
     let listenings = user_data
         .history()
         .entries()
         .iter()
         .rev()
-        .filter(|pred| pred.at >= one_week_ago);
+        .filter(|pred| pred.at >= start_period);
 
     for listening in listenings {
         match popular_tracks.entry(&listening.track_id) {
