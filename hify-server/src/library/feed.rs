@@ -105,14 +105,14 @@ pub fn generate_feed(
 
     let random_great_albums = get_random_great(
         &index.cache.albums_mean_score,
-        |album_id| index.cache.albums_infos.get(album_id).unwrap().clone(),
+        |album_id| index.cache.albums_infos.get(&album_id).unwrap().clone(),
         min_rating,
         max_items,
     );
 
     let random_great_artists = get_random_great(
         &index.cache.albums_artists_mean_score,
-        |artist_id| index.cache.artists_infos.get(artist_id).unwrap().clone(),
+        |artist_id| index.cache.artists_infos.get(&artist_id).unwrap().clone(),
         min_rating,
         max_items,
     );
@@ -183,19 +183,26 @@ fn get_periodically_popular_tracks(
     popular_tracks.into_iter().map(|(id, _)| id)
 }
 
-fn get_random_great<T, U>(
+fn get_random_great<T: Copy + Eq + Hash, U>(
     mean_scores: &HashMap<T, f64>,
-    mapper: impl Fn(&T) -> U,
+    mapper: impl Fn(T) -> U,
     min_rating: Rating,
     max_items: usize,
 ) -> Vec<U> {
-    let mut great: Vec<_> = mean_scores
-        .iter()
-        .filter(|(_, mean_score)| **mean_score >= min_rating.value().into())
-        .map(|(id, _)| id)
-        .take(max_items)
-        .map(mapper)
-        .collect();
+    let mut out = HashSet::with_capacity(max_items);
+    let min_rating = f64::from(min_rating.value());
+
+    for (item_id, mean_score) in mean_scores.iter() {
+        if *mean_score >= min_rating {
+            out.insert(*item_id);
+
+            if out.len() >= max_items {
+                break;
+            }
+        }
+    }
+
+    let mut great = out.into_iter().map(mapper).collect::<Vec<_>>();
 
     great.shuffle(&mut thread_rng());
     great
