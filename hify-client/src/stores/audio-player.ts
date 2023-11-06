@@ -12,25 +12,24 @@ const audioListeningDuration = writable<{ track: AudioTrackFragment; duration_s:
 export const readableAudioProgress = readonly(audioProgress)
 export const readableAudioPaused = readonly(audioPaused)
 
-// TODO: log after the delay, don't way for a new listening session!
 function _newListeningSession(resetAs: AudioTrackFragment | null): void {
-	const prevDuration = get(audioListeningDuration)
+	audioListeningDuration.update((prevDuration) => {
+		if (prevDuration !== null) {
+			const { track, duration_s } = prevDuration
 
-	if (prevDuration !== null) {
-		const { track, duration_s } = prevDuration
+			LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
+				logError('Failed to register listening duration', e),
+			)
+		}
 
-		LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
-			logError('Failed to register listening duration', e),
-		)
-	}
+		const track = resetAs ?? prevDuration?.track
 
-	const track = resetAs ?? prevDuration?.track
+		if (!track) {
+			throw new Error('No track to register in audio listening duration store')
+		}
 
-	if (!track) {
-		throw new Error('No track to register in audio listening duration store')
-	}
-
-	audioListeningDuration.set({ track, duration_s: 0 })
+		return { track, duration_s: 0 }
+	})
 }
 
 export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => void, play = true) {
