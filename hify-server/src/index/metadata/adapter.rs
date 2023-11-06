@@ -166,21 +166,23 @@ fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
 }
 
 fn decode_value_as_string(value: &Value) -> Result<Option<String>> {
-    Ok(Some(match value {
+    let decoded = match value {
         Value::Binary(_) => bail!("Found unsupported tag data (binary)"),
         Value::Boolean(_) => bail!("Found unsupported tag data (boolean)"),
         Value::Flag => bail!("Found unsupported tag data (flag)"),
-        Value::Float(float) => float.to_string(),
-        Value::SignedInt(int) => int.to_string(),
-        Value::UnsignedInt(uint) => uint.to_string(),
+        Value::Float(float) => Some(float.to_string()),
+        Value::SignedInt(int) => Some(int.to_string()),
+        Value::UnsignedInt(uint) => Some(uint.to_string()),
         Value::String(str) => {
             if str.trim().is_empty() {
-                return Ok(None);
+                None
+            } else {
+                Some(str.clone())
             }
-
-            str.clone()
         }
-    }))
+    };
+
+    Ok(decoded)
 }
 
 static PARSE_TRACK_OR_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
