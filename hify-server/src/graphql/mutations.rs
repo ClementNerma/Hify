@@ -80,4 +80,25 @@ impl MutationRoot {
             .add_track_to_playlist(playlist_id, track_id, position)
             .map(|()| EMPTY_ANSWER)
     }
+
+    async fn remove_track_from_playlist(
+        &self,
+        ctx: &Context<'_>,
+        playlist_id: PlaylistID,
+        position: usize,
+    ) -> Result<EmptyAnswer, &'static str> {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .remove_track_from_playlist(playlist_id, position)
+            .map(|()| EMPTY_ANSWER)
+    }
+
+    async fn delete_playlist(
+        &self,
+        ctx: &Context<'_>,
+        playlist_id: PlaylistID,
+    ) -> Result<EmptyAnswer, &'static str> {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .delete_playlist(playlist_id)
+            .map(|()| EMPTY_ANSWER)
+    }
 }

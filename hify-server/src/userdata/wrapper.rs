@@ -97,6 +97,39 @@ impl UserDataWrapper {
         Ok(())
     }
 
+    pub fn remove_track_from_playlist(
+        &mut self,
+        playlist_id: PlaylistID,
+        position: usize,
+    ) -> Result<(), &'static str> {
+        let playlist = self
+            .inner
+            .playlists
+            .get_mut(&playlist_id)
+            .ok_or("Playlist was not found")?;
+
+        if position >= playlist.tracks.len() {
+            return Err("Provided position is out-of-bounds");
+        }
+
+        playlist.tracks.remove(position);
+
+        (self.on_change)(&self.inner);
+
+        Ok(())
+    }
+
+    pub fn delete_playlist(&mut self, playlist_id: PlaylistID) -> Result<(), &'static str> {
+        self.inner
+            .playlists
+            .remove(&playlist_id)
+            .ok_or("Playlist was not found")?;
+
+        (self.on_change)(&self.inner);
+
+        Ok(())
+    }
+
     pub fn cleanup(&mut self, new_index: &Index) {
         self.inner.history.cleanup(new_index);
         self.cache.cleanup(new_index);
