@@ -1,5 +1,8 @@
 use async_graphql::{
-    connection::{Connection, CursorType, Edge},
+    connection::{
+        Connection, ConnectionNameType, CursorType, DefaultConnectionName, DefaultEdgeName, Edge,
+        EdgeNameType, EmptyFields, EnableNodesField,
+    },
     InputObject, OutputType, Result,
 };
 
@@ -18,15 +21,21 @@ pub struct PaginationInput {
 
 /// Result of a computed pagination process
 /// Can be returned directly from a GraphQL query
-pub type Paginated<C, T> = Result<Connection<C, T>>;
+pub type Paginated<C, T, N = DefaultConnectionName, E = DefaultEdgeName> =
+    Result<Connection<C, T, EmptyFields, EmptyFields, N, E, EnableNodesField>>;
 
 /// Compute a paginated result from a paginable container and a [`PaginationInput`]
 /// Requires an index cache to quickly avoid performing a full slice lookup
-pub fn paginate<C: CursorType + Send + Sync, T: OutputType + Clone>(
+pub fn paginate<
+    C: CursorType + Send + Sync,
+    T: OutputType + Clone,
+    N: ConnectionNameType,
+    E: EdgeNameType,
+>(
     pagination: PaginationInput,
     items: impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T) -> C,
-) -> Paginated<C, T> {
+) -> Paginated<C, T, N, E> {
     raw_paginate(
         pagination,
         items,
@@ -36,21 +45,27 @@ pub fn paginate<C: CursorType + Send + Sync, T: OutputType + Clone>(
 }
 
 /// Compute a paginated result from a list of mappable items and a [`PaginationInput`]
-pub fn paginate_mapped_slice<T, U: OutputType>(
+pub fn paginate_mapped_slice<T, U: OutputType, N: ConnectionNameType, E: EdgeNameType>(
     pagination: PaginationInput,
     items: &[T],
     mapper: impl Fn(&T) -> U,
-) -> Paginated<usize, U> {
+) -> Paginated<usize, U, N, E> {
     raw_paginate(pagination, items, |_, i| i, |item| mapper(item))
 }
 
 /// Compute raw pagination
-pub fn raw_paginate<C: CursorType + Send + Sync, T, U: OutputType>(
+pub fn raw_paginate<
+    C: CursorType + Send + Sync,
+    T,
+    U: OutputType,
+    N: ConnectionNameType,
+    E: EdgeNameType,
+>(
     pagination: PaginationInput,
     items: impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T, usize) -> C,
     mapper: impl Fn(&T) -> U,
-) -> Paginated<C, U> {
+) -> Paginated<C, U, N, E> {
     // Determine the starting cursor, the number of elements to get, as well as the direction from the pagination input
     let (cursor, count, direction) = match (
         pagination.after,
@@ -115,7 +130,8 @@ pub fn raw_paginate<C: CursorType + Send + Sync, T, U: OutputType>(
     };
 
     // Create a Relay value
-    let mut connection = Connection::<C, U>::new(start_at > 0, start_at + count < items.len());
+    let mut connection =
+        Connection::<C, U, _, _, N, E>::new(start_at > 0, start_at + count < items.len());
 
     // Compute the paginated results' edges lazily
     let edges = items
@@ -191,5 +207,31 @@ macro_rules! transparent_cursor_type {
     ($typename: ident, $($typenames: ident),+) => {
         transparent_cursor_type!{$typename}
         $(transparent_cursor_type!{$typenames})+
+    }
+}
+
+/// Create a [`ConnectionNameType`] to provide to paginate()
+#[macro_export]
+macro_rules! declare_gql_connection {
+    ($name: ident => $edge_name: ident) => {
+        pub struct $name;
+
+        impl async_graphql::connection::ConnectionNameType for $name {
+            fn type_name<T: async_graphql::OutputType>() -> String {
+                stringify!($name).to_owned()
+            }
+        }
+
+        pub struct $edge_name;
+
+        impl async_graphql::connection::EdgeNameType for $edge_name {
+            fn type_name<T: async_graphql::OutputType>() -> String {
+                stringify!($edge_name).to_owned()
+            }
+        }
+    };
+
+    ($($name: ident => $edge_name: ident),+) => {
+        $( $crate::declare_gql_connection!($name => $edge_name); )+
     }
 }

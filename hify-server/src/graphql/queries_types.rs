@@ -11,7 +11,10 @@ use crate::{
     userdata::Playlist,
 };
 
-use super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput};
+use super::{
+    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
+    queries::{TrackUsizeConnection, TrackUsizeEdge},
+};
 
 #[derive(SimpleObject)]
 pub struct IndexInfos {
@@ -189,7 +192,7 @@ impl ArtistInfos {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Paginated<usize, Track> {
+    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
         let index = graphql_index!(ctx);
 
         let track_ids = index
@@ -255,15 +258,12 @@ impl Playlist {
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
-    ) -> Paginated<usize, Track> {
+    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
         let index = graphql_index!(ctx);
 
-        paginate_mapped_slice(
-            pagination,
-            // TODO: optimize?
-            &self.tracks,
-            |track_id| index.tracks.get(track_id).unwrap().clone(),
-        )
+        paginate_mapped_slice(pagination, &self.tracks, |track_id| {
+            index.tracks.get(track_id).unwrap().clone()
+        })
     }
 
     async fn tracks_count(&self) -> usize {
