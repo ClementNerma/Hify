@@ -36,9 +36,9 @@ impl Playlist {
         }
     }
 
-    pub fn edit(&mut self, action: PlaylistTracksAction) -> Result<(), &'static str> {
+    pub fn edit(&mut self, action: PlaylistEditAction) -> Result<(), &'static str> {
         match action {
-            PlaylistTracksAction::Add(PlaylistAddTracks { tracks, position }) => {
+            PlaylistEditAction::Add(PlaylistAddTracks { tracks, position }) => {
                 if matches!(position, Some(position) if position > self.entries.len()) {
                     return Err("Provided position is out-of-bounds");
                 }
@@ -51,11 +51,11 @@ impl Playlist {
                 );
             }
 
-            PlaylistTracksAction::Remove(PlaylistRemoveTracks { entries }) => {
+            PlaylistEditAction::Remove(PlaylistRemoveTracks { entries }) => {
                 self.entries.retain(|entry| !entries.contains(&entry.id));
             }
 
-            PlaylistTracksAction::Move(PlaylistMoveTracks { entries, put_after }) => {
+            PlaylistEditAction::Move(PlaylistMoveTracks { entries, put_after }) => {
                 if entries.is_empty() {
                     return Err("Please provide at least one entry to move");
                 }
@@ -130,7 +130,7 @@ impl PlaylistEntry {
 define_id_type!(PlaylistID, PlaylistEntryID);
 
 #[derive(OneofObject)]
-pub enum PlaylistTracksAction {
+pub enum PlaylistEditAction {
     Add(PlaylistAddTracks),
     Remove(PlaylistRemoveTracks),
     Move(PlaylistMoveTracks),

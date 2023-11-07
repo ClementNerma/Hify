@@ -4,7 +4,7 @@ use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
 use crate::{
     graphql_ctx_member,
     index::{build_index, Index, Rating, TrackID},
-    userdata::{OneListening, PlaylistID, PlaylistTracksAction},
+    userdata::{OneListening, PlaylistEditAction, PlaylistID},
 };
 
 pub struct MutationRoot;
@@ -78,7 +78,7 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
-        action: PlaylistTracksAction,
+        action: PlaylistEditAction,
     ) -> Result<EmptyAnswer, &'static str> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .edit_playlist(playlist_id, action)

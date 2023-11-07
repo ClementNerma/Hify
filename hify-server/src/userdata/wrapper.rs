@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::index::{Index, Rating, TrackID};
 
 use super::{
-    cache::UserDataCache, history::History, playlist::PlaylistTracksAction, OneListening, Playlist,
+    cache::UserDataCache, history::History, playlist::PlaylistEditAction, OneListening, Playlist,
     PlaylistID, UserData,
 };
 
@@ -77,7 +77,7 @@ impl UserDataWrapper {
     pub fn edit_playlist(
         &mut self,
         playlist_id: PlaylistID,
-        action: PlaylistTracksAction,
+        action: PlaylistEditAction,
     ) -> Result<(), &'static str> {
         let playlist = self
             .inner
