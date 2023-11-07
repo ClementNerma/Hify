@@ -16,6 +16,7 @@
   import { handleInput, KeyPressHandling, registerLongPressableKeys } from '@navigable/input-manager'
   import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '@navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
+  import ErrorDialog from '../../components/molecules/ErrorDialog/ErrorDialog.svelte'
 
   const location = useLocation()
 
@@ -67,6 +68,7 @@
   <NavigableWithHandlers onBack={() => navigate(-1)} onLongBack={() => window.location.reload()}>
     <NavigableList>
       <ContextMenu />
+      <ErrorDialog />
 
       <DistractionFreeTogglable>
         <NavigableWithHandlers onLongPress={() => navigate(ROUTES.devTools)}>

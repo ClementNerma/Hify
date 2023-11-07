@@ -1,11 +1,12 @@
 <script lang="ts">
-  import NavigableRow from '../../../headless/NavigableRow/NavigableRow.svelte'
+  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+  import { NavigableRowProps } from '../../../headless/NavigableRow/NavigableRow'
 
-  // export let forCards = false
+  export let trapped: NavigableRowProps['trapped'] = undefined
 </script>
 
 <div class="row">
-  <NavigableRow>
+  <NavigableRow {trapped}>
     <slot />
   </NavigableRow>
 </div>
@@ -16,9 +17,4 @@
     display: flex;
     flex-direction: row;
   }
-
-  /* .forCards {
-    padding: 100vh 5px !important;
-    margin: -100vh 0;
-  } */
 </style>

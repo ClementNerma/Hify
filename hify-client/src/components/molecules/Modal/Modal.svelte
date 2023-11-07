@@ -9,7 +9,8 @@
   import Row from '@navigable/ui/molecules/Row/Row.svelte'
   import Button from '@atoms/Button/Button.svelte'
   import { afterUpdate } from 'svelte'
-  import { NavigableItem, getParentNavigable } from '@navigable/navigation'
+  import { NavigableItem, RequestFocus, getParentNavigable } from '@navigable/navigation'
+  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
 
   export let open = false
   export let buttons: ModalButton[]
@@ -25,7 +26,7 @@
     }
   }
 
-  let wasOpen = open
+  let wasOpen = false
 
   afterUpdate(() => {
     if (wasOpen !== open) {
@@ -33,25 +34,30 @@
 
       if (open) {
         prevFocusItem = nav.page.focusedItem()
+        buttonsRequestFocus[0]?.()
         onOpen?.()
       } else {
         prevFocusItem?.requestFocus()
       }
     }
   })
+
+  const buttonsRequestFocus: RequestFocus[] = new Array(buttons.length)
 </script>
 
 <div class="modal" class:open>
   <div class="modal-inner">
-    <slot {open} />
+    <NavigableList trapped>
+      <slot {open} />
 
-    <Row>
-      {#each buttons as button (button.label)}
-        <Button onPress={() => onButtonPress(button)}>
-          {button.label}
-        </Button>
-      {/each}
-    </Row>
+      <Row>
+        {#each buttons as button, i (button.label)}
+          <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)}>
+            {button.label}
+          </Button>
+        {/each}
+      </Row>
+    </NavigableList>
   </div>
 </div>
 
@@ -71,6 +77,12 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: lightgray;
+    color: black;
   }
 
   .modal:not(.open) {

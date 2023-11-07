@@ -7,7 +7,7 @@ import {
 	NoProp,
 } from '../../navigation'
 
-export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
+export class NavigableRow<P = NoProp> extends NavigableContainer<NavigableRowProps & P> {
 	navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null {
 		const items = this.children()
 
@@ -19,7 +19,8 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 
 		switch (direction) {
 			case NavigationDirection.Up:
-				return this.parent.navigate(this, NavigationDirection.Up)
+			case NavigationDirection.Down:
+				break
 
 			case NavigationDirection.Left:
 				for (const colItem of items.slice(0, colIndex).reverse()) {
@@ -30,7 +31,7 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 					}
 				}
 
-				return this.parent.navigate(this, NavigationDirection.Right)
+				break
 
 			case NavigationDirection.Right:
 				for (const colItem of items.slice(colIndex + 1)) {
@@ -41,11 +42,10 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 					}
 				}
 
-				return this.parent.navigate(this, NavigationDirection.Left)
-
-			case NavigationDirection.Down:
-				return this.parent.navigate(this, NavigationDirection.Down)
+				break
 		}
+
+		return this.props.trapped ? null : this.parent.navigate(this, NavigationDirection.Left)
 	}
 
 	override navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
@@ -85,4 +85,8 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<P> {
 
 		return null
 	}
+}
+
+export type NavigableRowProps = {
+	trapped?: boolean
 }

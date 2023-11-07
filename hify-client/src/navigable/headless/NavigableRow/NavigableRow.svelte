@@ -7,10 +7,12 @@
 
   export let hasFocusPriority: Props<NavigableRow>['hasFocusPriority'] = null
   export let onFocusChangeCallback: Props<NavigableRow>['onFocusChangeCallback'] | null = null
+  export let trapped: Props<NavigableRow>['trapped'] = undefined
 
   const rowProps = (): Props<NavigableRow> => ({
     hasFocusPriority,
     onFocusChangeCallback,
+    trapped,
   })
 
   const row = new NavigableRow(getParentNavigable(), rowProps())
