@@ -1,6 +1,7 @@
 mod cache;
 mod config;
 mod history;
+mod mix;
 mod playlist;
 mod wrapper;
 
@@ -13,6 +14,7 @@ use crate::index::{Rating, TrackID};
 pub use self::{
     config::UserDataConfig,
     history::OneListening,
+    mix::{Mix, MixID},
     playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistEntryID, PlaylistID},
     wrapper::UserDataWrapper,
 };
@@ -25,6 +27,7 @@ pub struct UserData {
     history: History,
     track_ratings: HashMap<TrackID, Rating>,
     playlists: HashMap<PlaylistID, Playlist>,
+    mixes: HashMap<MixID, Mix>,
 }
 
 impl UserData {
@@ -34,6 +37,7 @@ impl UserData {
             history: History::new(),
             track_ratings: HashMap::new(),
             playlists: HashMap::new(),
+            mixes: HashMap::new(),
         }
     }
 

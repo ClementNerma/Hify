@@ -2,9 +2,10 @@ use async_graphql::{Context, Object};
 
 use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
 use crate::{
-    graphql_ctx_member,
-    index::{build_index, Index, Rating, TrackID},
-    userdata::{OneListening, PlaylistEditAction, PlaylistID},
+    graphql_ctx_member, graphql_index, graphql_user_data,
+    index::{build_index, Index, Rating, Track, TrackID},
+    library::mixer::{self, MixParams},
+    userdata::{MixID, OneListening, PlaylistEditAction, PlaylistID},
 };
 
 pub struct MutationRoot;
@@ -93,5 +94,39 @@ impl MutationRoot {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .delete_playlist(playlist_id)
             .map(|()| EMPTY_ANSWER)
+    }
+
+    async fn generate_mix(
+        &self,
+        ctx: &Context<'_>,
+        input: MixParams,
+        max_tracks: usize,
+    ) -> Result<Vec<Track>, &'static str> {
+        let index = graphql_index!(ctx);
+
+        let mut mix = mixer::generate_mix(&index, &*graphql_user_data!(ctx), input)?;
+
+        let first_tracks = mix.next_tracks(max_tracks, |track_id| {
+            index.tracks.get(&track_id).unwrap().clone()
+        });
+
+        graphql_ctx_member!(ctx, app_state.user_data, write).register_mix(mix);
+
+        Ok(first_tracks)
+    }
+
+    async fn resume_mix(
+        &self,
+        ctx: &Context<'_>,
+        mix_id: MixID,
+        max_tracks: usize,
+    ) -> Result<Vec<Track>, &'static str> {
+        let index = graphql_index!(ctx);
+
+        graphql_ctx_member!(ctx, app_state.user_data, write).get_next_tracks_of_mix(
+            mix_id,
+            max_tracks,
+            |track_id| index.tracks.get(&track_id).unwrap().clone(),
+        )
     }
 }

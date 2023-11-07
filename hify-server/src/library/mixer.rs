@@ -1,145 +1,76 @@
 use std::collections::HashSet;
 
-use async_graphql::{Enum, InputObject, OneofObject};
+use async_graphql::{Enum, InputObject, OneofObject, SimpleObject, Union};
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
-    index::{ArtistID, GenreID, Index, Rating, Track, TrackID},
-    userdata::{PlaylistEntryID, PlaylistID, UserDataWrapper},
+    graphql::EmptyScalar,
+    index::{ArtistID, GenreID, Index, Rating},
+    userdata::{Mix, PlaylistID, UserDataWrapper},
 };
-
-#[derive(InputObject)]
-pub struct MixParams {
-    source: MixSource,
-    ordering: MixOrdering,
-    min_rating: Option<Rating>,
-    from_artists: Option<HashSet<ArtistID>>,
-    from_genres: Option<HashSet<GenreID>>,
-    already_listened_to: Option<HashSet<TrackID>>,
-}
-
-#[derive(Clone, OneofObject)]
-pub enum MixSource {
-    AllTracks(AllTracksSourceParams),
-    History(HistorySourceParams),
-    Playlist(PlaylistSourceParams),
-}
-
-#[derive(Clone, InputObject)]
-pub struct AllTracksSourceParams {
-    already_listened_to: HashSet<TrackID>,
-}
-
-#[derive(Clone, InputObject)]
-pub struct HistorySourceParams {
-    already_listened_to: HashSet<TrackID>,
-}
-
-#[derive(Clone, InputObject)]
-pub struct PlaylistSourceParams {
-    playlist_id: PlaylistID,
-    current_track: Option<PlaylistEntryID>,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Enum)]
-pub enum MixOrdering {
-    Random,
-    ListeningDuration,
-    LastListening,
-}
 
 pub fn generate_mix(
     index: &Index,
     user_data: &UserDataWrapper,
     params: MixParams,
-    max_tracks: usize,
-) -> Result<Vec<Track>, &'static str> {
+) -> Result<Mix, &'static str> {
     let MixParams {
         source,
         ordering,
         min_rating,
         from_artists,
         from_genres,
-        already_listened_to: exclude_tracks,
-    } = params;
+    } = &params;
 
-    let tracks: Box<dyn Iterator<Item = TrackID>> = match source {
-        MixSource::AllTracks(AllTracksSourceParams {
-            already_listened_to,
-        }) => Box::new(
-            index
-                .tracks
-                .values()
-                .map(|track| track.id)
-                .filter(move |track_id| !already_listened_to.contains(track_id)),
-        ),
+    let source_tracks: Vec<_> = match source {
+        MixSource::AllTracks(AllTracksSourceParams { void: _ }) => {
+            index.tracks.values().map(|track| track.id).collect()
+        }
 
-        MixSource::History(HistorySourceParams {
-            already_listened_to,
-        }) => Box::new(
-            user_data
-                .cache()
-                .dedup_history()
-                .iter()
-                .map(|entry| entry.track_id)
-                .filter(move |track_id| !already_listened_to.contains(track_id)),
-        ),
+        MixSource::History(HistorySourceParams { void: _ }) => user_data
+            .cache()
+            .dedup_history()
+            .iter()
+            .map(|entry| entry.track_id)
+            .collect(),
 
-        MixSource::Playlist(PlaylistSourceParams {
-            playlist_id,
-            current_track,
-        }) => {
+        MixSource::Playlist(PlaylistSourceParams { playlist_id }) => {
             let playlist = user_data
                 .playlists()
-                .get(&playlist_id)
+                .get(playlist_id)
                 .ok_or("Provided playlist ID was not found")?;
 
-            match current_track {
-                None => Box::new(playlist.entries.iter().map(|entry| entry.track_id)),
-
-                Some(current_track) => {
-                    let pos = playlist
-                        .entries
-                        .iter()
-                        .position(|entry| entry.id == current_track)
-                        .ok_or("Provided playlist entry ID was not found in the playlist")?;
-
-                    Box::new(
-                        playlist
-                            .entries
-                            .iter()
-                            .skip(pos + 1)
-                            .map(|entry| entry.track_id),
-                    )
-                }
-            }
+            playlist
+                .entries
+                .iter()
+                .map(|entry| entry.track_id)
+                .collect()
         }
     };
 
-    let mut tracks = tracks
-        .filter_map(|track_id| {
-            let track = index.tracks.get(&track_id).unwrap();
-
-            if let Some(ref exclude_tracks) = exclude_tracks {
-                if exclude_tracks.contains(&track.id) {
-                    return None;
-                }
-            }
+    let mut tracks = source_tracks
+        .into_iter()
+        .filter(|track_id| {
+            let track = index.tracks.get(track_id).unwrap();
 
             if let Some(min_rating) = min_rating {
-                if track.metadata.tags.rating.unwrap_or(Rating::Zero) < min_rating {
-                    return None;
+                if track.metadata.tags.rating.unwrap_or(Rating::Zero) < *min_rating {
+                    return false;
                 }
             }
 
             if let Some(ref artist_ids) = from_artists {
-                index
+                if index
                     .cache
                     .tracks_all_artists
                     .get(&track.id)
                     .unwrap()
                     .intersection(artist_ids)
-                    .next()?;
+                    .next()
+                    .is_none()
+                {
+                    return false;
+                }
             }
 
             if let Some(ref genre_ids) = from_genres {
@@ -149,11 +80,11 @@ pub fn generate_mix(
                     .get_genres_infos()
                     .any(|genre| genre_ids.contains(&genre.get_id()))
                 {
-                    return None;
+                    return false;
                 }
             }
 
-            Some(track.clone())
+            true
         })
         .collect::<Vec<_>>();
 
@@ -161,11 +92,11 @@ pub fn generate_mix(
         MixOrdering::Random => tracks.shuffle(&mut thread_rng()),
 
         MixOrdering::ListeningDuration => {
-            tracks.sort_by_key(|track| {
+            tracks.sort_by_key(|track_id| {
                 user_data
                     .cache()
                     .listening_durations()
-                    .get(&track.id)
+                    .get(track_id)
                     .unwrap_or(&0)
             });
 
@@ -173,10 +104,54 @@ pub fn generate_mix(
         }
 
         MixOrdering::LastListening => {
-            tracks.retain(|track| user_data.cache().last_listening().get(&track.id).is_some());
-            tracks.sort_by_key(|track| user_data.cache().last_listening().get(&track.id));
+            tracks.sort_by_key(|track_id| user_data.cache().last_listening().get(track_id));
         }
     }
 
-    Ok(tracks.into_iter().take(max_tracks).collect())
+    Ok(Mix::new(tracks))
+}
+
+#[derive(SimpleObject, InputObject)]
+#[graphql(input_name = "MixParamsInput")]
+pub struct MixParams {
+    source: MixSource,
+    ordering: MixOrdering,
+    min_rating: Option<Rating>,
+    from_artists: Option<HashSet<ArtistID>>,
+    from_genres: Option<HashSet<GenreID>>,
+}
+
+#[derive(Clone, OneofObject, Union)]
+#[graphql(input_name = "MixSourceInput")]
+pub enum MixSource {
+    AllTracks(AllTracksSourceParams),
+    History(HistorySourceParams),
+    Playlist(PlaylistSourceParams),
+}
+
+#[derive(Clone, SimpleObject, InputObject)]
+#[graphql(input_name = "AllTracksSourceParamsInput")]
+pub struct AllTracksSourceParams {
+    #[graphql(default)]
+    void: EmptyScalar,
+}
+
+#[derive(Clone, SimpleObject, InputObject)]
+#[graphql(input_name = "HistorySourceParamsInput")]
+pub struct HistorySourceParams {
+    #[graphql(default)]
+    void: EmptyScalar,
+}
+
+#[derive(Clone, SimpleObject, InputObject)]
+#[graphql(input_name = "PlaylistSourceParamsInput")]
+pub struct PlaylistSourceParams {
+    playlist_id: PlaylistID,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Enum)]
+pub enum MixOrdering {
+    Random,
+    ListeningDuration,
+    LastListening,
 }

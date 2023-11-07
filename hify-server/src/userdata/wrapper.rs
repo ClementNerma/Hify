@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::index::{Index, Rating, TrackID};
 
 use super::{
-    cache::UserDataCache, history::History, playlist::PlaylistEditAction, OneListening, Playlist,
-    PlaylistID, UserData,
+    cache::UserDataCache, history::History, playlist::PlaylistEditAction, Mix, MixID, OneListening,
+    Playlist, PlaylistID, UserData,
 };
 
 pub struct UserDataWrapper {
@@ -103,12 +103,41 @@ impl UserDataWrapper {
         Ok(())
     }
 
+    pub fn register_mix(&mut self, mix: Mix) {
+        self.inner.mixes.insert(mix.id(), mix);
+
+        (self.on_change)(&self.inner);
+    }
+
+    pub fn get_next_tracks_of_mix<T>(
+        &mut self,
+        mix_id: MixID,
+        max_tracks: usize,
+        mapper: impl Fn(TrackID) -> T,
+    ) -> Result<Vec<T>, &'static str> {
+        let mix = self
+            .inner
+            .mixes
+            .get_mut(&mix_id)
+            .ok_or("Mix was not found")?;
+
+        let tracks = mix.next_tracks(max_tracks, mapper);
+
+        (self.on_change)(&self.inner);
+
+        Ok(tracks)
+    }
+
     pub fn cleanup(&mut self, new_index: &Index) {
         self.inner.history.cleanup(new_index);
         self.cache.cleanup(new_index);
 
         for playlist in self.inner.playlists.values_mut() {
             playlist.cleanup(new_index);
+        }
+
+        for mix in self.inner.mixes.values_mut() {
+            mix.cleanup(new_index);
         }
 
         (self.on_change)(&self.inner);

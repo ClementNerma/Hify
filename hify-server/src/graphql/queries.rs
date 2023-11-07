@@ -9,7 +9,6 @@ use crate::{
     },
     library::{
         feed::{self, Feed, FeedParams},
-        mixer::{self, MixParams},
         stats::{self, LibraryStats},
     },
     transparent_cursor_type,
@@ -180,20 +179,6 @@ impl QueryRoot {
 
     async fn generate_feed(&self, ctx: &Context<'_>, input: FeedParams) -> Feed {
         feed::generate_feed(&*graphql_index!(ctx), &*graphql_user_data!(ctx), input)
-    }
-
-    async fn generate_mix(
-        &self,
-        ctx: &Context<'_>,
-        input: MixParams,
-        max_tracks: usize,
-    ) -> Result<Vec<Track>, &'static str> {
-        mixer::generate_mix(
-            &*graphql_index!(ctx),
-            &*graphql_user_data!(ctx),
-            input,
-            max_tracks,
-        )
     }
 
     async fn generate_stats(&self, ctx: &Context<'_>) -> LibraryStats {

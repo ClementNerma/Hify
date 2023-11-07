@@ -441,7 +441,7 @@ pub struct ArtRgb {
 #[macro_export]
 macro_rules! define_id_type {
     ($typename: ident) => {
-        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
         pub struct $typename(pub u64);
 
         impl $typename {
