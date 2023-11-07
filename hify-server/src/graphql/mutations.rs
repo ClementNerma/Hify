@@ -69,7 +69,7 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         name: String,
-        tracks: Option<Vec<TrackID>>,
+        tracks: Vec<TrackID>,
     ) -> PlaylistID {
         graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name, tracks)
     }

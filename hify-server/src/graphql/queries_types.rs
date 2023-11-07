@@ -8,7 +8,7 @@ use crate::{
         AlbumID, AlbumInfos, Art, ArtTarget, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating,
         SortedMap, Track, TrackTags,
     },
-    userdata::Playlist,
+    userdata::{Playlist, PlaylistEntry},
 };
 
 use super::{
@@ -254,20 +254,23 @@ impl GenreInfos {
 
 #[ComplexObject]
 impl Playlist {
-    async fn tracks(
-        &self,
-        ctx: &Context<'_>,
-        pagination: PaginationInput,
-    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
-        let index = graphql_index!(ctx);
-
-        paginate_mapped_slice(pagination, &self.tracks, |track_id| {
-            index.tracks.get(track_id).unwrap().clone()
-        })
+    async fn entries(&self, pagination: PaginationInput) -> Paginated<usize, PlaylistEntry> {
+        paginate_mapped_slice(pagination, &self.entries, |entry| *entry)
     }
 
-    async fn tracks_count(&self) -> usize {
-        self.tracks.len()
+    async fn entries_count(&self) -> usize {
+        self.entries.len()
+    }
+}
+
+#[ComplexObject]
+impl PlaylistEntry {
+    async fn track(&self, ctx: &Context<'_>) -> Track {
+        graphql_index!(ctx)
+            .tracks
+            .get(&self.track_id)
+            .unwrap()
+            .clone()
     }
 }
 
