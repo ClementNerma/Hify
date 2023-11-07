@@ -4,10 +4,10 @@ query PlaylistPage($playlistId: String!, $tracksPagination: PaginationInput!) {
         name
         createdAt
         lastUpdatedAt
-        tracksCount
-        tracks(pagination: $tracksPagination) {
+        entriesCount
+        entries(pagination: $tracksPagination) {
             nodes {
-                ...AudioTrack
+                ...PlaylistEntry
             }
 
             pageInfo {

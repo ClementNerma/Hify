@@ -42,7 +42,7 @@
   let requestFocus: RequestFocus
 
   async function createPlaylist(name: string) {
-    const created = await CreatePlaylist({ variables: { name } })
+    const created = await CreatePlaylist({ variables: { name, tracks: [] } })
 
     if (created.errors) {
       alert('Failed to create playlist:\n' + created.errors[0].message)
@@ -77,10 +77,10 @@
             </td>
             <td class="tracks-count">
               🎵
-              {#if playlist.tracksCount === 0}
+              {#if playlist.entriesCount === 0}
                 (empty)
               {:else}
-                {playlist.tracksCount} track{playlist.tracksCount > 1 ? 's' : ''}
+                {playlist.entriesCount} track{playlist.entriesCount > 1 ? 's' : ''}
               {/if}
             </td>
             <!-- <td class="created-at">{playlist.createdAt}</td> -->

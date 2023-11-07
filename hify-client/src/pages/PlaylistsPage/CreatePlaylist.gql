@@ -1,3 +1,3 @@
-mutation CreatePlaylist($name: String!) {
-    createPlaylist(name: $name)
+mutation CreatePlaylist($name: String!, $tracks: [String!]!) {
+    createPlaylist(name: $name, tracks: $tracks)
 }

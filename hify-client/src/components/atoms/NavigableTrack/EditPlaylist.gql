@@ -1,0 +1,3 @@
+mutation EditPlaylist($playlistId: String!, $action: PlaylistEditAction!) {
+    editPlaylist(playlistId: $playlistId, action: $action)
+}

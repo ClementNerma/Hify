@@ -5,7 +5,7 @@ query PlaylistsPage($pagination: PaginationInput!) {
             name
             createdAt
             lastUpdatedAt
-            tracksCount
+            entriesCount
         }
 
         pageInfo {

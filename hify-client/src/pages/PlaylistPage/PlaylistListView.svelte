@@ -1,5 +1,5 @@
 <script lang="ts">
-  import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
+  import NavigableTrack, { NavigableTrackInPlaylist } from '@atoms/NavigableTrack/NavigableTrack.svelte'
   import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
   import { AudioTrackFragment } from '@graphql/generated'
   import { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
@@ -7,6 +7,7 @@
   import { humanReadableDuration } from '@stores/audio-player'
 
   export let tracks: AudioTrackFragment[] = []
+  export let inPlaylist: Omit<NavigableTrackInPlaylist, 'trackEntry'> | null = null
   export let feedMore: NavigableListProps['lazyLoader']
 </script>
 
@@ -15,8 +16,9 @@
     <tbody>
       {#each tracks as track, i (track.id)}
         {@const tags = track.metadata.tags}
+        {@const trackInPlaylist = inPlaylist ? { ...inPlaylist, trackEntry: inPlaylist.allEntries[i] } : null}
 
-        <NavigableTrack {tracks} goToAlbumOption={false} display="transparent" {track}>
+        <NavigableTrack {track} {tracks} inPlaylist={trackInPlaylist} display="transparent">
           <tr class:notFirst={i !== 0}>
             <td class="trackno">{tags.trackNo}</td>
             <td class="title">🎵 {tags.title}</td>
