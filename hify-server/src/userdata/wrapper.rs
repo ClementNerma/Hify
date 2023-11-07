@@ -2,7 +2,10 @@ use std::collections::HashMap;
 
 use crate::index::{Index, Rating, TrackID};
 
-use super::{cache::UserDataCache, history::History, OneListening, Playlist, PlaylistID, UserData};
+use super::{
+    cache::UserDataCache, history::History, playlist::PlaylistTracksAction, OneListening, Playlist,
+    PlaylistID, UserData,
+};
 
 pub struct UserDataWrapper {
     inner: UserData,
@@ -76,11 +79,10 @@ impl UserDataWrapper {
         playlist_id
     }
 
-    pub fn add_track_to_playlist(
+    pub fn edit_playlist(
         &mut self,
         playlist_id: PlaylistID,
-        track_id: TrackID,
-        position: Option<usize>,
+        action: PlaylistTracksAction,
     ) -> Result<(), &'static str> {
         let playlist = self
             .inner
@@ -88,36 +90,7 @@ impl UserDataWrapper {
             .get_mut(&playlist_id)
             .ok_or("Playlist was not found")?;
 
-        if matches!(position, Some(position) if position >= playlist.tracks.len()) {
-            return Err("Provided position is out-of-bounds");
-        }
-
-        match position {
-            Some(position) => playlist.tracks.insert(position, track_id),
-            None => playlist.tracks.push(track_id),
-        }
-
-        (self.on_change)(&self.inner);
-
-        Ok(())
-    }
-
-    pub fn remove_track_from_playlist(
-        &mut self,
-        playlist_id: PlaylistID,
-        position: usize,
-    ) -> Result<(), &'static str> {
-        let playlist = self
-            .inner
-            .playlists
-            .get_mut(&playlist_id)
-            .ok_or("Playlist was not found")?;
-
-        if position >= playlist.tracks.len() {
-            return Err("Provided position is out-of-bounds");
-        }
-
-        playlist.tracks.remove(position);
+        playlist.edit(action)?;
 
         (self.on_change)(&self.inner);
 

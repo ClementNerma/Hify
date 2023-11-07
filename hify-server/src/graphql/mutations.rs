@@ -4,7 +4,7 @@ use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
 use crate::{
     graphql_ctx_member,
     index::{build_index, Index, Rating, TrackID},
-    userdata::{OneListening, PlaylistID},
+    userdata::{OneListening, PlaylistID, PlaylistTracksAction},
 };
 
 pub struct MutationRoot;
@@ -65,30 +65,23 @@ impl MutationRoot {
         EMPTY_ANSWER
     }
 
-    async fn create_playlist(&self, ctx: &Context<'_>, name: String, tracks: Option<Vec<TrackID>>) -> PlaylistID {
+    async fn create_playlist(
+        &self,
+        ctx: &Context<'_>,
+        name: String,
+        tracks: Option<Vec<TrackID>>,
+    ) -> PlaylistID {
         graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name, tracks)
     }
 
-    async fn add_track_to_playlist(
+    async fn edit_playlist(
         &self,
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
-        track_id: TrackID,
-        position: Option<usize>,
+        action: PlaylistTracksAction,
     ) -> Result<EmptyAnswer, &'static str> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
-            .add_track_to_playlist(playlist_id, track_id, position)
-            .map(|()| EMPTY_ANSWER)
-    }
-
-    async fn remove_track_from_playlist(
-        &self,
-        ctx: &Context<'_>,
-        playlist_id: PlaylistID,
-        position: usize,
-    ) -> Result<EmptyAnswer, &'static str> {
-        graphql_ctx_member!(ctx, app_state.user_data, write)
-            .remove_track_from_playlist(playlist_id, position)
+            .edit_playlist(playlist_id, action)
             .map(|()| EMPTY_ANSWER)
     }
 
