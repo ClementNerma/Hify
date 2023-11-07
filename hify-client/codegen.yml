@@ -11,3 +11,6 @@ generates:
       clientPath: ../apollo-client
       asyncQuery: true
       strictScalars: true
+      scalars:
+        DateTime: string
+        Rating: string
