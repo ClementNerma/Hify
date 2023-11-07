@@ -5,6 +5,7 @@ mod queries;
 mod queries_types;
 mod state;
 
+use async_graphql::Enum;
 pub use entrypoint::{get_graphql_schema, AppSchema};
 pub use pagination::Paginable;
 pub use state::{GraphQLContext, SaveIndexFn};
@@ -32,3 +33,8 @@ macro_rules! define_scalar_string {
 type EmptyAnswer = &'static str;
 
 const EMPTY_ANSWER: EmptyAnswer = "OK";
+
+#[derive(Enum, Clone, Copy, PartialEq, Eq)]
+pub enum EmptyInput {
+    Void,
+}

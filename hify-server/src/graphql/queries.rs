@@ -187,7 +187,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         input: MixParams,
         max_tracks: usize,
-    ) -> Vec<Track> {
+    ) -> Result<Vec<Track>, &'static str> {
         mixer::generate_mix(
             &*graphql_index!(ctx),
             &*graphql_user_data!(ctx),

@@ -112,7 +112,7 @@ impl Playlist {
 #[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
 #[graphql(complex)]
 pub struct PlaylistEntry {
-    id: PlaylistEntryID,
+    pub id: PlaylistEntryID,
 
     #[graphql(skip)]
     pub track_id: TrackID,

@@ -13,7 +13,7 @@ use crate::index::{Rating, TrackID};
 pub use self::{
     config::UserDataConfig,
     history::OneListening,
-    playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistID},
+    playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistEntryID, PlaylistID},
     wrapper::UserDataWrapper,
 };
 

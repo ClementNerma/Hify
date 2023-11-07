@@ -1,11 +1,11 @@
 use std::collections::HashSet;
 
-use async_graphql::{Enum, InputObject};
+use async_graphql::{Enum, InputObject, OneofObject};
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
     index::{ArtistID, GenreID, Index, Rating, Track, TrackID},
-    userdata::UserDataWrapper,
+    userdata::{PlaylistEntryID, PlaylistID, UserDataWrapper},
 };
 
 #[derive(InputObject)]
@@ -15,13 +15,30 @@ pub struct MixParams {
     min_rating: Option<Rating>,
     from_artists: Option<HashSet<ArtistID>>,
     from_genres: Option<HashSet<GenreID>>,
-    exclude_tracks: Option<HashSet<TrackID>>,
+    already_listened_to: Option<HashSet<TrackID>>,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Enum)]
+#[derive(Clone, OneofObject)]
 pub enum MixSource {
-    AllTracks,
-    History,
+    AllTracks(AllTracksSourceParams),
+    History(HistorySourceParams),
+    Playlist(PlaylistSourceParams),
+}
+
+#[derive(Clone, InputObject)]
+pub struct AllTracksSourceParams {
+    already_listened_to: HashSet<TrackID>,
+}
+
+#[derive(Clone, InputObject)]
+pub struct HistorySourceParams {
+    already_listened_to: HashSet<TrackID>,
+}
+
+#[derive(Clone, InputObject)]
+pub struct PlaylistSourceParams {
+    playlist_id: PlaylistID,
+    current_track: Option<PlaylistEntryID>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Enum)]
@@ -36,25 +53,67 @@ pub fn generate_mix(
     user_data: &UserDataWrapper,
     params: MixParams,
     max_tracks: usize,
-) -> Vec<Track> {
+) -> Result<Vec<Track>, &'static str> {
     let MixParams {
         source,
         ordering,
         min_rating,
         from_artists,
         from_genres,
-        exclude_tracks,
+        already_listened_to: exclude_tracks,
     } = params;
 
     let tracks: Box<dyn Iterator<Item = TrackID>> = match source {
-        MixSource::AllTracks => Box::new(index.tracks.values().map(|track| track.id)),
-        MixSource::History => Box::new(
+        MixSource::AllTracks(AllTracksSourceParams {
+            already_listened_to,
+        }) => Box::new(
+            index
+                .tracks
+                .values()
+                .map(|track| track.id)
+                .filter(move |track_id| !already_listened_to.contains(track_id)),
+        ),
+
+        MixSource::History(HistorySourceParams {
+            already_listened_to,
+        }) => Box::new(
             user_data
                 .cache()
                 .dedup_history()
                 .iter()
-                .map(|entry| entry.track_id),
+                .map(|entry| entry.track_id)
+                .filter(move |track_id| !already_listened_to.contains(track_id)),
         ),
+
+        MixSource::Playlist(PlaylistSourceParams {
+            playlist_id,
+            current_track,
+        }) => {
+            let playlist = user_data
+                .playlists()
+                .get(&playlist_id)
+                .ok_or("Provided playlist ID was not found")?;
+
+            match current_track {
+                None => Box::new(playlist.entries.iter().map(|entry| entry.track_id)),
+
+                Some(current_track) => {
+                    let pos = playlist
+                        .entries
+                        .iter()
+                        .position(|entry| entry.id == current_track)
+                        .ok_or("Provided playlist entry ID was not found in the playlist")?;
+
+                    Box::new(
+                        playlist
+                            .entries
+                            .iter()
+                            .skip(pos + 1)
+                            .map(|entry| entry.track_id),
+                    )
+                }
+            }
+        }
     };
 
     let mut tracks = tracks
@@ -119,5 +178,5 @@ pub fn generate_mix(
         }
     }
 
-    tracks.into_iter().take(max_tracks).collect()
+    Ok(tracks.into_iter().take(max_tracks).collect())
 }
