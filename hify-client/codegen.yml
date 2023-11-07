@@ -13,4 +13,4 @@ generates:
       strictScalars: true
       scalars:
         DateTime: string
-        Rating: string
+        Rating: number
