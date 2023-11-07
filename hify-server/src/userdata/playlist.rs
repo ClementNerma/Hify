@@ -55,18 +55,21 @@ impl Playlist {
                 self.entries.retain(|entry| !entries.contains(&entry.id));
             }
 
-            PlaylistTracksAction::Move(PlaylistMoveTracks { entries, move_at }) => {
-                if move_at >= self.entries.len() {
-                    return Err("Provided position is out-of-bounds");
-                }
-
-                if move_at + entries.len() > self.entries.len() {
-                    return Err("Provided position + length is out-of-bounds");
-                }
-
+            PlaylistTracksAction::Move(PlaylistMoveTracks { entries, put_after }) => {
                 if entries.is_empty() {
                     return Err("Please provide at least one entry to move");
                 }
+
+                let move_at = match put_after {
+                    None => 0,
+                    Some(put_after) => {
+                        self.entries
+                            .iter()
+                            .position(|entry| entry.id == put_after)
+                            .ok_or("Provided reference entry ID was not found in playlist")?
+                            + 1
+                    }
+                };
 
                 let positions = entries
                     .into_iter()
@@ -147,5 +150,5 @@ pub struct PlaylistRemoveTracks {
 #[derive(InputObject)]
 pub struct PlaylistMoveTracks {
     entries: Vec<PlaylistEntryID>,
-    move_at: usize,
+    put_after: Option<PlaylistEntryID>,
 }
