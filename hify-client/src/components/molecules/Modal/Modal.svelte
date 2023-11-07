@@ -9,10 +9,15 @@
   import Row from '@navigable/ui/molecules/Row/Row.svelte'
   import Button from '@atoms/Button/Button.svelte'
   import { afterUpdate } from 'svelte'
+  import { NavigableItem, getParentNavigable } from '@navigable/navigation'
 
   export let open = false
   export let buttons: ModalButton[]
   export let onOpen: (() => void) | null = null
+
+  const nav = getParentNavigable()
+
+  let prevFocusItem: NavigableItem<unknown> | null = null
 
   async function onButtonPress(button: ModalButton) {
     if ((await button.onPress()) !== false) {
@@ -27,7 +32,10 @@
       wasOpen = open
 
       if (open) {
+        prevFocusItem = nav.page.focusedItem()
         onOpen?.()
+      } else {
+        prevFocusItem?.requestFocus()
       }
     }
   })
