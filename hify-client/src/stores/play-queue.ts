@@ -1,15 +1,16 @@
+import { readonly, swapInArray } from '@globals/utils'
+import { AudioTrackFragment, GenerateMix, GetNextTracksOfMix, MixParams } from '@graphql/generated'
+import { navigate } from 'svelte-navigator'
 import { derived, get, writable } from 'svelte/store'
-import { generateMix } from '../components/atoms/MixButton/MixGenerator'
-import { EXTEND_MIX_TRACKS_QTY } from '../constants'
-import { readonly, swapInArray } from '../globals/utils'
-import { AudioTrackFragment, MixParams } from '../graphql/generated'
+import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'
+import { ROUTES } from '../routes'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
-import { logInfo, logWarn } from './debugger'
+import { logFatal, logInfo, logWarn } from './debugger'
 
 type PlayQueue = {
 	tracks: QueuedTrack[]
 	position: number | null
-	fromMixParams: MixParams | null
+	fromMixId: string | null
 }
 
 type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
@@ -17,7 +18,7 @@ type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
 const playQueue = writable<PlayQueue>({
 	tracks: [],
 	position: null,
-	fromMixParams: null,
+	fromMixId: null,
 })
 
 export const readablePlayQueue = readonly(playQueue)
@@ -26,32 +27,26 @@ export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
 
-playQueue.subscribe(async ({ tracks, position, fromMixParams }) => {
+playQueue.subscribe(async ({ tracks, position, fromMixId }) => {
 	const currentTracks: string[] = tracks.map((track) => track.id)
 
-	if (!fromMixParams || position === null || position <= tracks.length - 3) {
+	if (fromMixId === null || position === null || position <= tracks.length - 3) {
 		return
 	}
 
 	// Generate a new mix from the previous settings, but exclude the tracks that are already in the current queue
 	// to avoid getting duplicate tracks
-	const res = await generateMix(
-		{ ...fromMixParams, excludeTracks: (fromMixParams.excludeTracks ?? []).concat(currentTracks) },
-		EXTEND_MIX_TRACKS_QTY,
-	)
-
-	// Prepare new tracks for queuing
-	const nextTracks = res.data.generateMix.map(makeQueuedTrack)
+	const nextTracks = await getNextTracksOfMix(fromMixId)
 
 	// Update the queue
-	playQueue.update(({ tracks, position, fromMixParams }) => {
+	playQueue.update(({ tracks, position, fromMixId }) => {
 		// If playlist has changed, don't modify it
 		if (tracks.length !== currentTracks.length || tracks.find((track, i) => currentTracks[i] !== track.id)) {
-			return { tracks, position, fromMixParams }
+			return { tracks, position, fromMixId }
 		}
 
 		// Otherwise, append the new tracks!
-		return { tracks: tracks.concat(nextTracks), position, fromMixParams }
+		return { tracks: tracks.concat(nextTracks.map(makeQueuedTrack)), position, fromMixId }
 	})
 })
 
@@ -59,24 +54,20 @@ function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
 	return { ...track, idInQueue: Math.random().toString() }
 }
 
-export function playNewQueueFromBeginning(tracks: AudioTrackFragment[], fromMixParams: MixParams | null): void {
-	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position: 0, fromMixParams })
+export function playNewQueueFromBeginning(tracks: AudioTrackFragment[], fromMixId: string | null): void {
+	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position: 0, fromMixId })
 	startAudioPlayer(tracks[0], playNextTrack)
 }
 
-export function playTrackFromNewQueue(
-	tracks: AudioTrackFragment[],
-	position: number,
-	fromMixParams: MixParams | null,
-): void {
-	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position, fromMixParams })
+export function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number, fromMixId: string | null): void {
+	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position, fromMixId })
 	startAudioPlayer(tracks[position], playNextTrack)
 }
 
 export function playTrackFromCurrentQueue(position: number): void {
-	playQueue.update(({ tracks, fromMixParams }) => {
+	playQueue.update(({ tracks, fromMixId }) => {
 		startAudioPlayer(tracks[position], playNextTrack)
-		return { tracks, position, fromMixParams }
+		return { tracks, position, fromMixId }
 	})
 }
 
@@ -88,7 +79,7 @@ export function playPreviousTrackOrRewind(): void {
 	if (progress !== null && progress > PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS) {
 		replayTrack()
 	} else {
-		playQueue.update(({ tracks, position, fromMixParams }) => {
+		playQueue.update(({ tracks, position, fromMixId }) => {
 			let newPosition: number | null
 
 			if (position === null) {
@@ -107,7 +98,7 @@ export function playPreviousTrackOrRewind(): void {
 				logInfo('No previous track to play')
 			}
 
-			return { tracks, position: newPosition ?? position, fromMixParams }
+			return { tracks, position: newPosition ?? position, fromMixId }
 		})
 	}
 }
@@ -115,7 +106,7 @@ export function playPreviousTrackOrRewind(): void {
 export function playNextTrack(): void {
 	logInfo('Going to play next track...')
 
-	playQueue.update(({ tracks, position, fromMixParams }) => {
+	playQueue.update(({ tracks, position, fromMixId }) => {
 		let newPosition: number | null
 
 		if (position === null) {
@@ -134,18 +125,18 @@ export function playNextTrack(): void {
 			logInfo('No more track to play')
 		}
 
-		return { tracks, position: newPosition, fromMixParams }
+		return { tracks, position: newPosition, fromMixId }
 	})
 }
 
 export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void {
 	logInfo(`Queuing ${list.length} tracks as ${where}`)
 
-	playQueue.update(({ position, tracks, fromMixParams }) => {
+	playQueue.update(({ position, tracks, fromMixId }) => {
 		const toQueue = list.map(makeQueuedTrack)
 
 		if (position === null) {
-			return { position: null, tracks: toQueue, fromMixParams }
+			return { position: null, tracks: toQueue, fromMixId }
 		}
 
 		switch (where) {
@@ -156,14 +147,14 @@ export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void
 						.slice(0, position + 1)
 						.concat(toQueue)
 						.concat(tracks.slice(position + 1)),
-					fromMixParams,
+					fromMixId,
 				}
 
 			case 'end':
 				return {
 					position,
 					tracks: tracks.concat(toQueue),
-					fromMixParams,
+					fromMixId,
 				}
 		}
 	})
@@ -172,21 +163,21 @@ export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void
 export function removeFromQueue(index: number): void {
 	logInfo(`Removing track n°${index + 1} from queue`)
 
-	playQueue.update(({ position, tracks, fromMixParams }) => {
+	playQueue.update(({ position, tracks, fromMixId }) => {
 		if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
 			logWarn('Cannot remove track from queue as the provided position does not exist')
-			return { position, tracks, fromMixParams }
+			return { position, tracks, fromMixId }
 		}
 
 		if (index === position) {
 			logWarn('Cannot remove track from queue as it is the currently-playing track')
-			return { position, tracks, fromMixParams }
+			return { position, tracks, fromMixId }
 		}
 
 		return {
 			position: position === null ? null : index < position ? position - 1 : position,
 			tracks: tracks.slice(0, index).concat(tracks.slice(index + 1)),
-			fromMixParams,
+			fromMixId,
 		}
 	})
 }
@@ -194,19 +185,20 @@ export function removeFromQueue(index: number): void {
 export function moveTrackPositionInQueue(index: number, newIndex: number): void {
 	logInfo(`Moving track n°${index + 1} to position ${newIndex + 1} in queue`)
 
-	playQueue.update(({ position, tracks, fromMixParams }) => {
+	playQueue.update(({ position, tracks, fromMixId }) => {
 		if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
 			logWarn('Cannot move track in  queue as the provided position does not exist')
-			return { position, tracks, fromMixParams }
+			return { position, tracks, fromMixId }
 		}
 
 		if (!Object.prototype.hasOwnProperty.call(tracks, newIndex)) {
 			logWarn('Cannot move track in queue as the provided target position does not exist')
-			return { position, tracks, fromMixParams }
+			return { position, tracks, fromMixId }
 		}
 
 		return {
 			tracks: swapInArray(tracks, index, newIndex),
+			fromMixId,
 			position:
 				position === null
 					? null
@@ -217,7 +209,39 @@ export function moveTrackPositionInQueue(index: number, newIndex: number): void 
 					  (index === position + 1 && newIndex === position) // right track moved left, so move right
 					? position + 1
 					: position,
-			fromMixParams,
 		}
 	})
+}
+
+export async function generateAndPlayMix(params: MixParams): Promise<void> {
+	const mix = await GenerateMix({
+		variables: {
+			params,
+			maxTracks: LARGE_MIX_TRACKS_QTY,
+		},
+	})
+
+	if (!mix.data) {
+		return logFatal('Failed to generate mix')
+	}
+
+	const { mixId, firstTracks } = mix.data.generateMix
+
+	playNewQueueFromBeginning(firstTracks, mixId)
+	navigate(ROUTES.nowPlaying)
+}
+
+export async function getNextTracksOfMix(mixId: string): Promise<AudioTrackFragment[]> {
+	const mix = await GetNextTracksOfMix({
+		variables: {
+			mixId,
+			maxTracks: EXTEND_MIX_TRACKS_QTY,
+		},
+	})
+
+	if (!mix.data) {
+		return logFatal('Failed to resume mix')
+	}
+
+	return mix.data.getNextTracksOfMix
 }

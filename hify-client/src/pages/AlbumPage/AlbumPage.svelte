@@ -135,9 +135,7 @@
 
             <Button
               onPress={() => {
-                playNewQueueFromBeginning(shuffle(filteredTracks), {
-                  fromArtists: album.albumArtists.map((artist) => artist.id),
-                })
+                playNewQueueFromBeginning(shuffle(filteredTracks), null)
                 navigate(ROUTES.nowPlaying)
               }}
               fullHeight><Emoji>🔀</Emoji> Shuffle</Button

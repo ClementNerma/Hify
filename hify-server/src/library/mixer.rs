@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use async_graphql::{Enum, InputObject, OneofObject, SimpleObject, Union};
+use async_graphql::{Enum, InputObject, OneofObject};
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
@@ -23,11 +23,9 @@ pub fn generate_mix(
     } = &params;
 
     let source_tracks: Vec<_> = match source {
-        MixSource::AllTracks(AllTracksSourceParams { void: _ }) => {
-            index.tracks.values().map(|track| track.id).collect()
-        }
+        MixSource::AllTracks(EmptyScalar) => index.tracks.values().map(|track| track.id).collect(),
 
-        MixSource::History(HistorySourceParams { void: _ }) => user_data
+        MixSource::History(EmptyScalar) => user_data
             .cache()
             .dedup_history()
             .iter()
@@ -111,8 +109,7 @@ pub fn generate_mix(
     Ok(Mix::new(tracks))
 }
 
-#[derive(SimpleObject, InputObject)]
-#[graphql(input_name = "MixParamsInput")]
+#[derive(InputObject)]
 pub struct MixParams {
     source: MixSource,
     ordering: MixOrdering,
@@ -121,30 +118,14 @@ pub struct MixParams {
     from_genres: Option<HashSet<GenreID>>,
 }
 
-#[derive(Clone, OneofObject, Union)]
-#[graphql(input_name = "MixSourceInput")]
+#[derive(Clone, OneofObject)]
 pub enum MixSource {
-    AllTracks(AllTracksSourceParams),
-    History(HistorySourceParams),
+    AllTracks(EmptyScalar),
+    History(EmptyScalar),
     Playlist(PlaylistSourceParams),
 }
 
-#[derive(Clone, SimpleObject, InputObject)]
-#[graphql(input_name = "AllTracksSourceParamsInput")]
-pub struct AllTracksSourceParams {
-    #[graphql(default)]
-    void: EmptyScalar,
-}
-
-#[derive(Clone, SimpleObject, InputObject)]
-#[graphql(input_name = "HistorySourceParamsInput")]
-pub struct HistorySourceParams {
-    #[graphql(default)]
-    void: EmptyScalar,
-}
-
-#[derive(Clone, SimpleObject, InputObject)]
-#[graphql(input_name = "PlaylistSourceParamsInput")]
+#[derive(Clone, InputObject)]
 pub struct PlaylistSourceParams {
     playlist_id: PlaylistID,
 }

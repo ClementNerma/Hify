@@ -1,7 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { generateAndPlayMix } from '@atoms/MixButton/MixGenerator'
-  import { AsyncGenresPage } from '@graphql/generated'
+  import { AsyncGenresPage, MixOrdering } from '@graphql/generated'
   import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
   import ItemStyleLayer from '@navigable/headless/SimpleNavigableItem/ItemStyleLayer.svelte'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
@@ -9,6 +8,7 @@
   import { ROUTES } from '@root/routes'
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import { MIN_GREAT_RATING } from '@root/constants'
+  import { generateAndPlayMix } from '../../stores/play-queue'
 
   const genres = AsyncGenresPage({ variables: {} }).then((res) => res.data.genres)
 </script>
@@ -28,6 +28,8 @@
               label: 'Mix me some magic ✨',
               onPress: () =>
                 generateAndPlayMix({
+                  source: { allTracks: null },
+                  ordering: MixOrdering.Random,
                   minRating: MIN_GREAT_RATING,
                   fromGenres: [genre.id],
                 }),

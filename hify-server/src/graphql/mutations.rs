@@ -1,4 +1,4 @@
-use async_graphql::{Context, Object};
+use async_graphql::{Context, Object, SimpleObject};
 
 use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
 use crate::{
@@ -99,23 +99,28 @@ impl MutationRoot {
     async fn generate_mix(
         &self,
         ctx: &Context<'_>,
-        input: MixParams,
+        params: MixParams,
         max_tracks: usize,
-    ) -> Result<Vec<Track>, &'static str> {
+    ) -> Result<CreatedMix, &'static str> {
         let index = graphql_index!(ctx);
 
-        let mut mix = mixer::generate_mix(&index, &*graphql_user_data!(ctx), input)?;
+        let mut mix = mixer::generate_mix(&index, &*graphql_user_data!(ctx), params)?;
 
         let first_tracks = mix.next_tracks(max_tracks, |track_id| {
             index.tracks.get(&track_id).unwrap().clone()
         });
 
+        let mix_id = mix.id();
+
         graphql_ctx_member!(ctx, app_state.user_data, write).register_mix(mix);
 
-        Ok(first_tracks)
+        Ok(CreatedMix {
+            mix_id,
+            first_tracks,
+        })
     }
 
-    async fn resume_mix(
+    async fn get_next_tracks_of_mix(
         &self,
         ctx: &Context<'_>,
         mix_id: MixID,
@@ -129,4 +134,10 @@ impl MutationRoot {
             |track_id| index.tracks.get(&track_id).unwrap().clone(),
         )
     }
+}
+
+#[derive(SimpleObject)]
+pub struct CreatedMix {
+    mix_id: MixID,
+    first_tracks: Vec<Track>,
 }

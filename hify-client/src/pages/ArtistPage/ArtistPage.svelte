@@ -1,7 +1,7 @@
 <script lang="ts">
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import MixButton from '@atoms/MixButton/MixButton.svelte'
-  import { AsyncArtistPage } from '@graphql/generated'
+  import { AsyncArtistPage, MixOrdering } from '@graphql/generated'
 
   import ArtistAlbums from './ArtistAlbums.svelte'
   import ArtistTrackParticipations from './ArtistTrackParticipations.svelte'
@@ -21,7 +21,14 @@
   {:else}
     <h2>Artist: {artist.name}</h2>
 
-    <MixButton mixParams={{ minRating: 8, fromArtists: [artistId] }} />
+    <MixButton
+      mixParams={{
+        source: { allTracks: null },
+        ordering: MixOrdering.Random,
+        minRating: 8,
+        fromArtists: [artistId],
+      }}
+    />
 
     <ArtistAlbums {artistId} />
 

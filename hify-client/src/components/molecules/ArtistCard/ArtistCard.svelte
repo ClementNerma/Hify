@@ -1,19 +1,26 @@
 <script lang="ts">
   import { navigate } from 'svelte-navigator'
-  import { ArtistCardFragment } from '@graphql/generated'
+  import { ArtistCardFragment, MixOrdering } from '@graphql/generated'
   import { ROUTES } from '@root/routes'
   import { bind } from '@globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
   import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
-  import { generateAndPlayMix } from '@atoms/MixButton/MixGenerator'
   import { MIN_GREAT_RATING } from '@root/constants'
+  import { generateAndPlayMix } from '../../../stores/play-queue'
 
   export let artist: ArtistCardFragment
 
   $: contextMenuOptions = [
     {
       label: 'Mix me some magic ✨',
-      onPress: bind(artist.id, (id) => generateAndPlayMix({ minRating: MIN_GREAT_RATING, fromArtists: [id] })),
+      onPress: bind(artist.id, (id) =>
+        generateAndPlayMix({
+          source: { allTracks: null },
+          ordering: MixOrdering.Random,
+          minRating: MIN_GREAT_RATING,
+          fromArtists: [id],
+        })
+      ),
     },
   ]
 </script>

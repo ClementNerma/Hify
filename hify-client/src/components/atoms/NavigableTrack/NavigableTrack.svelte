@@ -21,10 +21,10 @@
   export let inPlaylist: NavigableTrackInPlaylist | null = null
   export let goToAlbumOption = true
   export let display: ItemDisplay = null
-  export let fromMixParams: MixParams | null = null
+  export let fromMixId: string | null = null
 
   function play() {
-    playTrackFromNewQueue(tracks, tracks.indexOf(track), fromMixParams)
+    playTrackFromNewQueue(tracks, tracks.indexOf(track), fromMixId)
     navigate(ROUTES.nowPlaying)
   }
 
@@ -88,7 +88,7 @@
     options.push(
       { label: 'Play next', onPress: () => enqueue([track], 'next') },
       { label: 'Play last', onPress: () => enqueue([track], 'end') },
-      { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0, fromMixParams) }
+      { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0, fromMixId) }
     )
 
     return options

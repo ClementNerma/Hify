@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncGenrePage } from '@graphql/generated'
+  import { AlbumCardFragment, AsyncGenrePage, MixOrdering } from '@graphql/generated'
 
   import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
   import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
@@ -53,7 +53,14 @@
     <h2>Genre was not found!</h2>
   {:else}
     <h2>Genre: {genreName}</h2>
-    <MixButton mixParams={{ minRating: MIN_GREAT_RATING, fromGenres: [genreId] }} />
+    <MixButton
+      mixParams={{
+        source: { allTracks: null },
+        ordering: MixOrdering.Random,
+        minRating: MIN_GREAT_RATING,
+        fromGenres: [genreId],
+      }}
+    />
 
     <h3>List of albums</h3>
 

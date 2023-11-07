@@ -3,7 +3,7 @@
   import Button from '@atoms/Button/Button.svelte'
   import MixButton from '@atoms/MixButton/MixButton.svelte'
   import Row from '@navigable/ui/molecules/Row/Row.svelte'
-  import { AsyncHomePage } from '@graphql/generated'
+  import { AsyncHomePage, MixOrdering } from '@graphql/generated'
   import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
   import { ROUTES } from '@root/routes'
   import IndexUpdater from './IndexUpdater.svelte'
@@ -42,7 +42,13 @@
   <Centered>
     <h2>Welcome!</h2>
 
-    <MixButton mixParams={{ minRating: MIN_GREAT_RATING }} />
+    <MixButton
+      mixParams={{
+        source: { allTracks: null },
+        ordering: MixOrdering.Random,
+        minRating: MIN_GREAT_RATING,
+      }}
+    />
   </Centered>
 
   <Centered>
