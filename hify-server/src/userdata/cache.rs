@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 use crate::index::{Index, TrackID};
 
@@ -15,6 +16,7 @@ pub struct UserDataCache {
     dedup_history: Vec<OneListening>,
     listenings: HashMap<TrackID, u32>,
     listening_durations: HashMap<TrackID, u32>,
+    last_listening: HashMap<TrackID, OffsetDateTime>,
 }
 
 impl UserDataCache {
@@ -23,6 +25,7 @@ impl UserDataCache {
             config,
             listenings: HashMap::new(),
             listening_durations: HashMap::new(),
+            last_listening: HashMap::new(),
             dedup_history: vec![],
         };
 
@@ -53,6 +56,7 @@ impl UserDataCache {
             }
         }
 
+        self.last_listening.insert(entry.track_id, entry.at);
         self.dedup_history.insert(0, *entry);
     }
 
@@ -64,6 +68,10 @@ impl UserDataCache {
         &self.listening_durations
     }
 
+    pub fn last_listening(&self) -> &HashMap<TrackID, OffsetDateTime> {
+        &self.last_listening
+    }
+
     pub fn cleanup(&mut self, new_index: &Index) {
         self.dedup_history
             .retain(|listening| new_index.tracks.contains_key(&listening.track_id));
@@ -72,6 +80,9 @@ impl UserDataCache {
             .retain(|track_id, _| new_index.tracks.contains_key(track_id));
 
         self.listening_durations
+            .retain(|track_id, _| new_index.tracks.contains_key(track_id));
+
+        self.last_listening
             .retain(|track_id, _| new_index.tracks.contains_key(track_id));
     }
 }

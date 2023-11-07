@@ -188,7 +188,12 @@ impl QueryRoot {
         input: MixParams,
         max_tracks: usize,
     ) -> Vec<Track> {
-        mixer::generate_mix(&*graphql_index!(ctx), input, max_tracks)
+        mixer::generate_mix(
+            &*graphql_index!(ctx),
+            &*graphql_user_data!(ctx),
+            input,
+            max_tracks,
+        )
     }
 
     async fn generate_stats(&self, ctx: &Context<'_>) -> LibraryStats {
