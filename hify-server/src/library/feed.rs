@@ -8,9 +8,9 @@ use rand::{seq::SliceRandom, thread_rng};
 use time::Duration;
 
 use crate::{
+    helpers::time::get_now,
     index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
     userdata::UserDataWrapper,
-    utils::time::get_now,
 };
 
 #[derive(SimpleObject)]

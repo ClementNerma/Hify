@@ -7,8 +7,8 @@ use time::OffsetDateTime;
 
 use crate::{
     define_id_type,
+    helpers::time::get_now,
     index::{Index, TrackID},
-    utils::time::get_now,
 };
 
 #[derive(Clone, Serialize, Deserialize, SimpleObject)]

@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use log::error;
 use tokio::{fs, task::JoinSet};
 
-use crate::utils::logging::progress_bar;
+use crate::helpers::logging::progress_bar;
 
 use super::{
     AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,

@@ -10,7 +10,7 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::utils::logging::spinner;
+use crate::helpers::logging::spinner;
 
 use super::{
     arts::{find_albums_arts, generate_artist_art},

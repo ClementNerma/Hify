@@ -4,11 +4,11 @@
 
 mod cmd;
 mod graphql;
+mod helpers;
 mod http;
 mod index;
 mod library;
 mod userdata;
-mod utils;
 
 use std::{fs, net::SocketAddr};
 
@@ -18,7 +18,7 @@ use log::{error, info};
 
 use crate::cmd::Args;
 
-use self::utils::{logging::setup_logger, time::OFFSET};
+use self::helpers::{logging::setup_logger, time::OFFSET};
 
 #[tokio::main]
 async fn main() {
@@ -72,7 +72,9 @@ async fn inner_main(args: Args) -> Result<()> {
     let index_file = data_dir.join("index.json");
 
     let user_data = match user_data_file.is_file() {
-        true => utils::save::load_user_data(&user_data_file).context("Failed to load user data")?,
+        true => {
+            helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
+        }
         false => userdata::UserData::with_default_config(),
     };
 
@@ -80,7 +82,7 @@ async fn inner_main(args: Args) -> Result<()> {
         user_data,
         Box::new(move |user_data| {
             // TODO: error handling
-            utils::save::save_user_data(&user_data_file, user_data).unwrap();
+            helpers::save::save_user_data(&user_data_file, user_data).unwrap();
         }),
     );
 
@@ -91,7 +93,8 @@ async fn inner_main(args: Args) -> Result<()> {
     let index = match index_file.is_file() && !rebuild_index {
         true => {
             info!("> Loading index from disk...");
-            let mut index = utils::save::load_index(&index_file).context("Failed to load index")?;
+            let mut index =
+                helpers::save::load_index(&index_file).context("Failed to load index")?;
 
             if update_index {
                 info!("> Updating index as requested...");
@@ -100,7 +103,7 @@ async fn inner_main(args: Args) -> Result<()> {
                     .await
                     .context("Failed to rebuild index")?;
 
-                utils::save::save_index(&index_file, &index)
+                helpers::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
 
                 user_data.cleanup(&index);
@@ -111,13 +114,13 @@ async fn inner_main(args: Args) -> Result<()> {
                 info!("> Rebuilding cache...");
                 index::rebuild_cache(&mut index);
 
-                utils::save::save_index(&index_file, &index)
+                helpers::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
             } else if rebuild_cache {
                 info!("> Rebuilding cache as requested...");
                 index::rebuild_cache(&mut index);
 
-                utils::save::save_index(&index_file, &index)
+                helpers::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt cache")?;
             }
 
@@ -136,7 +139,7 @@ async fn inner_main(args: Args) -> Result<()> {
 
                 index::rebuild_arts(&mut index).await?;
 
-                utils::save::save_index(&index_file, &index)
+                helpers::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt arts")?;
             }
 
@@ -152,7 +155,7 @@ async fn inner_main(args: Args) -> Result<()> {
                 .await
                 .context("Failed to build index")?;
 
-            utils::save::save_index(&index_file, &index).context("Failed to save index file")?;
+            helpers::save::save_index(&index_file, &index).context("Failed to save index file")?;
             info!("> Index saved on disk.");
 
             index
@@ -170,7 +173,7 @@ async fn inner_main(args: Args) -> Result<()> {
         index,
         user_data,
         Box::new(move |index| {
-            utils::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
+            helpers::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
         }),
     )
     .await

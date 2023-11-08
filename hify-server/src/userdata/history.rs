@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 
 use crate::{
+    helpers::time::get_now,
     index::{Index, TrackID},
-    utils::time::get_now,
 };
 
 #[derive(Clone, Serialize, Deserialize)]
