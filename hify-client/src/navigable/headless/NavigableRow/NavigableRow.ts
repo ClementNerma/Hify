@@ -45,7 +45,7 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<NavigableRowPro
 				break
 		}
 
-		return this.props.trapped ? null : this.parent.navigate(this, NavigationDirection.Left)
+		return this.props.trapped ? null : this.parent.navigate(this, direction)
 	}
 
 	override navigateToFirstItemDown(from: NavigationComingFrom): NavigableItem<unknown> | null {
