@@ -28,7 +28,7 @@ impl History {
     }
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct OneListening {
     pub at: OffsetDateTime,
     pub track_id: TrackID,

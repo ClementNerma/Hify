@@ -2,6 +2,7 @@
 #![forbid(unused_must_use)]
 #![warn(unused_crate_dependencies)]
 
+mod check;
 mod cmd;
 mod graphql;
 mod helpers;
@@ -16,7 +17,7 @@ use anyhow::{bail, Context, Result};
 use clap::Parser;
 use log::{error, info};
 
-use crate::cmd::Args;
+use crate::{check::check_correctness, cmd::Args};
 
 use self::helpers::{logging::setup_logger, time::OFFSET};
 
@@ -161,6 +162,19 @@ async fn inner_main(args: Args) -> Result<()> {
             index
         }
     };
+
+    info!("> Checking data correctness...");
+
+    if let Err(errors) = check_correctness(&index, &user_data) {
+        for err in &errors {
+            error!("{err}\n");
+        }
+
+        bail!(
+            "Correctness checking failed with {} error(s).",
+            errors.len()
+        );
+    }
 
     if no_server {
         return Ok(());

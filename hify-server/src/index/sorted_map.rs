@@ -49,9 +49,9 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
         self.values.iter_mut()
     }
 
-    // pub fn entries(&self) -> impl Iterator<Item = (&K, &V)> {
-    //     self.indexes.keys().zip(self.values.iter())
-    // }
+    pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
+        self.indexes.keys().map(|key| (key, self.get(key).unwrap()))
+    }
 
     pub fn into_values(self) -> Vec<V> {
         self.values
