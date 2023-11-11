@@ -40,12 +40,15 @@ pub struct EmptyScalar;
 impl ScalarType for EmptyScalar {
     fn parse(value: Value) -> InputValueResult<Self> {
         match value {
-            Value::Null => Ok(Self),
+            Value::String(ref string) => match string.as_str() {
+                "-" => Ok(Self),
+                _ => Err(InputValueError::expected_type(value)),
+            },
             _ => Err(InputValueError::expected_type(value)),
         }
     }
 
     fn to_value(&self) -> Value {
-        Value::Null
+        Value::String("-".to_owned())
     }
 }
