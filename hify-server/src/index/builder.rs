@@ -181,6 +181,8 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
 
     let mut arts = from.arts;
 
+    arts.retain(|_, art| art.still_applies_for(&cache));
+
     arts.extend(
         new_albums_arts
             .into_iter()

@@ -417,6 +417,15 @@ pub struct Art {
     // pub dominant_color: Option<ArtRgb>,
 }
 
+impl Art {
+    pub fn still_applies_for(&self, index_cache: &IndexCache) -> bool {
+        match &self.target {
+            ArtTarget::AlbumCover(album_id) => index_cache.albums_infos.contains_key(album_id),
+            ArtTarget::Artist(artist_id) => index_cache.artists_infos.contains_key(artist_id),
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum ArtTarget {
     AlbumCover(AlbumID),
