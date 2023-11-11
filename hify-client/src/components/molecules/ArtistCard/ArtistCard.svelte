@@ -15,7 +15,7 @@
       label: 'Mix me some magic ✨',
       onPress: bind(artist.id, (id) =>
         generateAndPlayMix({
-          source: { allTracks: null },
+          source: { allTracks: '-' },
           ordering: MixOrdering.Random,
           minRating: MIN_GREAT_RATING,
           fromArtists: [id],

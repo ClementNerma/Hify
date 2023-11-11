@@ -14,4 +14,4 @@ generates:
       scalars:
         DateTime: string
         Rating: number
-        Empty: 'null'
+        Empty: string

@@ -23,7 +23,7 @@
 
     <MixButton
       mixParams={{
-        source: { allTracks: null },
+        source: { allTracks: '-' },
         ordering: MixOrdering.Random,
         minRating: 8,
         fromArtists: [artistId],

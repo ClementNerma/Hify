@@ -55,7 +55,7 @@
     <h2>Genre: {genreName}</h2>
     <MixButton
       mixParams={{
-        source: { allTracks: null },
+        source: { allTracks: '-' },
         ordering: MixOrdering.Random,
         minRating: MIN_GREAT_RATING,
         fromGenres: [genreId],
