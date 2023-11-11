@@ -20,15 +20,15 @@ function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 			LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
 				logError('Failed to register listening duration', e),
 			)
+
+			return { track: resetAs ?? track, duration_s: 0 }
 		}
 
-		const track = resetAs ?? prevDuration?.track
-
-		if (!track) {
-			throw new Error('No track to register in audio listening duration store')
+		if (!resetAs) {
+			throw new Error('Got no track to reset as in duration watcher')
 		}
 
-		return { track, duration_s: 0 }
+		return { track: resetAs, duration_s: 0 }
 	})
 }
 
@@ -59,9 +59,9 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 			if (currentTime !== lastTimeUpdate) {
 				audioProgress.set(currentTime)
 
-				// Don't increase listening duration in case of jump (>= 5s elapsed)
+				// Don't increase listening duration in case of jump
 				// Also don't increase when going back
-				if (currentTime < lastTimeUpdate + 5 && currentTime > lastTimeUpdate) {
+				if (currentTime < lastTimeUpdate + 3 && currentTime > lastTimeUpdate) {
 					audioListeningDuration.update((d) =>
 						d !== null
 							? { track: d.track, duration_s: d.duration_s + 1 }
