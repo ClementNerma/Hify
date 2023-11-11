@@ -12,8 +12,15 @@ export type ErrorDialogContent = {
 	details: string | null
 }
 
-export function showErrorDialog(error: ErrorDialogContent) {
-	_errors.update((list) => [...list, error])
+export function showErrorDialog(title: string, message: string, details?: string | null) {
+	_errors.update((list) => [
+		...list,
+		{
+			title,
+			message,
+			details: details ?? null,
+		},
+	])
 }
 
 export function popError() {

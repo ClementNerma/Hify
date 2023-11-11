@@ -2,7 +2,7 @@
   import { navigate } from 'svelte-navigator'
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import { bind } from '@globals/utils'
-  import { AsyncPlaylistsPage, CreatePlaylist, PlaylistsPageQuery } from '@graphql/generated'
+  import { AsyncPlaylistsPage, CreatePlaylist, DeletePlaylist, PlaylistsPageQuery } from '@graphql/generated'
   import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '@root/routes'
@@ -10,6 +10,7 @@
   import { RequestFocus } from '@navigable/navigation'
   import Modal from '@molecules/Modal/Modal.svelte'
   import Input from '@atoms/Input/Input.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 
   const PLAYLIST_BULK = 50
 
@@ -36,20 +37,12 @@
   type PlaylistData = PlaylistsPageQuery['playlists']['nodes'][number]
 
   let playlists: PlaylistData[] = []
-  let isModalOpen = false
+  let isPlaylistCreationModalOpen = false
+  let isPlaylistDeletionModalOpen = false
+  let deletionModalForPlaylistId: string | null = null
   let newPlaylistName = ''
 
   let requestFocus: RequestFocus
-
-  async function createPlaylist(name: string) {
-    const created = await CreatePlaylist({ variables: { name, tracks: [] } })
-
-    if (created.errors) {
-      alert('Failed to create playlist:\n' + created.errors[0].message)
-    } else {
-      navigate(ROUTES.playlist(created.data!.createPlaylist))
-    }
-  }
 </script>
 
 {#await feedMore()}
@@ -59,7 +52,7 @@
 
   <Button
     onPress={() => {
-      isModalOpen = true
+      isPlaylistCreationModalOpen = true
     }}
   >
     New
@@ -71,7 +64,20 @@
         {#each playlists as playlist, i (playlist.id)}
           <tr class:notFirst={i !== 0}>
             <td class="title">
-              <SimpleNavigableItem onPress={bind(playlist.id, (playlistId) => navigate(ROUTES.playlist(playlistId)))}>
+              <SimpleNavigableItem
+                onPress={bind(playlist.id, (playlistId) => navigate(ROUTES.playlist(playlistId)))}
+                onLongPress={bind(playlist.id, (playlistId) =>
+                  showContextMenu([
+                    {
+                      label: 'Delete',
+                      onPress: () => {
+                        deletionModalForPlaylistId = playlistId
+                        isPlaylistDeletionModalOpen = true
+                      },
+                    },
+                  ])
+                )}
+              >
                 <span>{playlist.name}</span>
               </SimpleNavigableItem>
             </td>
@@ -92,13 +98,16 @@
   </NavigableList>
 
   <Modal
-    bind:open={isModalOpen}
+    bind:open={isPlaylistCreationModalOpen}
     buttons={[
       {
         label: 'Create',
-        onPress: () => {
-          createPlaylist(newPlaylistName)
-          return false
+        onPress: async () => {
+          const { data } = await CreatePlaylist({ variables: { name: newPlaylistName, tracks: [] } })
+
+          if (data) {
+            navigate(ROUTES.playlist(data.createPlaylist))
+          }
         },
       },
       {
@@ -113,6 +122,32 @@
     <h3>Create a new playlist:</h3>
 
     <Input bind:requestFocus bind:value={newPlaylistName} />
+  </Modal>
+
+  <Modal
+    bind:open={isPlaylistDeletionModalOpen}
+    buttons={[
+      {
+        label: 'Delete forever',
+        onPress: async () => {
+          if (deletionModalForPlaylistId !== null) {
+            await DeletePlaylist({ variables: { playlistId: deletionModalForPlaylistId } })
+          }
+
+          // TODO: refetch list from beginning
+        },
+      },
+      {
+        label: 'Cancel',
+        onPress: () => {
+          deletionModalForPlaylistId = null
+        },
+      },
+    ]}
+  >
+    <h3>Do you really want to delete the playlist?</h3>
+
+    <strong>This action cannot be undone.</strong>
   </Modal>
 {:catch e}
   <h2>Failed: {e.message}</h2>

@@ -20,10 +20,20 @@
 
   let prevFocusItem: NavigableItem<unknown> | null = null
 
+  let loading = false
+
   async function onButtonPress(button: ModalButton) {
+    if (loading) {
+      return
+    }
+
+    loading = true
+
     if ((await button.onPress()) !== false) {
       open = false
     }
+
+    loading = false
   }
 
   let wasOpen = false
@@ -52,8 +62,12 @@
 
       <Row>
         {#each buttons as button, i (button.label)}
-          <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)}>
-            {button.label}
+          <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
+            {#if loading && focused}
+              <em>Loading...</em>
+            {:else}
+              {button.label}
+            {/if}
           </Button>
         {/each}
       </Row>

@@ -28,9 +28,10 @@
   {onFocus}
   {onUnfocus}
   bind:requestFocus={_requestFocus}
+  let:focused
 >
   <div class="button" class:fullHeight class:disabled>
-    <slot />
+    <slot {focused} />
   </div>
 </SimpleNavigableItem>
 
