@@ -55,27 +55,29 @@
   const buttonsRequestFocus: RequestFocus[] = new Array(buttons.length)
 </script>
 
-<div class="modal" class:open>
-  <div class="modal-inner">
-    <NavigableList trapped>
-      <slot {open} />
+{#if open}
+  <div class="modal" class:open>
+    <div class="modal-inner">
+      <NavigableList trapped>
+        <slot {open} />
 
-      <div class="buttons">
-        <Row>
-          {#each buttons as button, i (button.label)}
-            <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
-              {#if loading && focused}
-                <em>Loading...</em>
-              {:else}
-                {button.label}
-              {/if}
-            </Button>
-          {/each}
-        </Row>
-      </div>
-    </NavigableList>
+        <div class="buttons">
+          <Row>
+            {#each buttons as button, i (button.label)}
+              <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
+                {#if loading && focused}
+                  <em>Loading...</em>
+                {:else}
+                  {button.label}
+                {/if}
+              </Button>
+            {/each}
+          </Row>
+        </div>
+      </NavigableList>
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
   .modal {
@@ -103,9 +105,5 @@
 
   .buttons {
     margin-top: 15px;
-  }
-
-  .modal:not(.open) {
-    display: none;
   }
 </style>
