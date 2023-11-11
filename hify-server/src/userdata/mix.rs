@@ -35,7 +35,10 @@ impl Mix {
 
     pub fn next_tracks<T>(&mut self, max_tracks: usize, mapper: impl Fn(TrackID) -> T) -> Vec<T> {
         self.last_use = get_now();
-        self.selection.drain(..max_tracks).map(mapper).collect()
+        self.selection
+            .drain(..max_tracks.min(self.selection.len()))
+            .map(mapper)
+            .collect()
     }
 
     pub fn cleanup(&mut self, new_index: &Index) {
