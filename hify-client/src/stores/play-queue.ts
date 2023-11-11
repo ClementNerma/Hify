@@ -1,5 +1,6 @@
 import { readonly, swapInArray } from '@globals/utils'
 import { AudioTrackFragment, GenerateMix, GetNextTracksOfMix, MixParams } from '@graphql/generated'
+import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
 import { navigate } from 'svelte-navigator'
 import { derived, get, writable } from 'svelte/store'
 import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'
@@ -55,11 +56,14 @@ function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
 }
 
 export function playNewQueueFromBeginning(tracks: AudioTrackFragment[], fromMixId: string | null): void {
-	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position: 0, fromMixId })
-	startAudioPlayer(tracks[0], playNextTrack)
+	playTrackFromNewQueue(tracks, 0, fromMixId)
 }
 
 export function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number, fromMixId: string | null): void {
+	if (tracks.length === 0) {
+		return showErrorDialog('Empty queue', 'Cannot play queue as it contains no track')
+	}
+
 	playQueue.set({ tracks: tracks.map(makeQueuedTrack), position, fromMixId })
 	startAudioPlayer(tracks[position], playNextTrack)
 }
