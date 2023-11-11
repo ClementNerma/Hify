@@ -34,7 +34,21 @@ export default new ApolloClient({
 		new HttpLink({ uri: `${API_SERVER_URL}/graphql` }),
 	]),
 
-	cache: new InMemoryCache({
-		resultCaching: false,
-	}),
+	cache: new InMemoryCache(),
+
+	// Disable caching entirely
+	// This is HIGHGLY discouraged normally, but is actually relevant here
+	// as we don't have a good way to make children components trigger
+	// a data refetch from their parent
+	defaultOptions: {
+		query: {
+			fetchPolicy: 'no-cache',
+		},
+		watchQuery: {
+			fetchPolicy: 'no-cache',
+		},
+		mutate: {
+			fetchPolicy: 'no-cache',
+		},
+	},
 })
