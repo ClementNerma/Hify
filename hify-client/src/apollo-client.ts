@@ -11,19 +11,14 @@ export const API_SERVER_URL = `http://${location.hostname}:8893`
 
 const errorHandler = onError(({ graphQLErrors, networkError }) => {
 	if (networkError) {
-		showErrorDialog({
-			title: 'GraphQL - Network Error',
-			message: networkError.message,
-			details: null,
-		})
+		showErrorDialog('GraphQL - Network Error', networkError.message)
 	}
 
 	if (graphQLErrors) {
-		showErrorDialog({
-			title: 'GraphQL - API Error',
-			message: `Encountered the following error(s): ${graphQLErrors.map((err) => `* ${err.message}`).join('\n')}`,
-			details: null,
-		})
+		showErrorDialog(
+			'GraphQL - API Error',
+			`Encountered the following error(s): ${graphQLErrors.map((err) => `* ${err.message}`).join('\n')}`,
+		)
 	}
 })
 
