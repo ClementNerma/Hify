@@ -60,17 +60,19 @@
     <NavigableList trapped>
       <slot {open} />
 
-      <Row>
-        {#each buttons as button, i (button.label)}
-          <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
-            {#if loading && focused}
-              <em>Loading...</em>
-            {:else}
-              {button.label}
-            {/if}
-          </Button>
-        {/each}
-      </Row>
+      <div class="buttons">
+        <Row>
+          {#each buttons as button, i (button.label)}
+            <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
+              {#if loading && focused}
+                <em>Loading...</em>
+              {:else}
+                {button.label}
+              {/if}
+            </Button>
+          {/each}
+        </Row>
+      </div>
     </NavigableList>
   </div>
 </div>
@@ -97,6 +99,10 @@
     border-radius: 5px;
     background-color: lightgray;
     color: black;
+  }
+
+  .buttons {
+    margin-top: 15px;
   }
 
   .modal:not(.open) {
