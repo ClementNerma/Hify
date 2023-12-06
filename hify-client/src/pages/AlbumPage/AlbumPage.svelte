@@ -122,15 +122,15 @@
           <Row>
             <Checkbox bind:checked={onlyShowGreatSongs} fullHeight>Only show great songs</Checkbox>
             <Button
-              onPress={() => enqueue(filteredTracks, 'end')}
+              onPress={() => enqueue(filteredTracks, 'next')}
               onLongPress={() =>
                 showContextMenu([
                   {
-                    label: 'Queue as next',
-                    onPress: () => enqueue(filteredTracks, 'next'),
+                    label: 'Queue at the end',
+                    onPress: () => enqueue(filteredTracks, 'end'),
                   },
                 ])}
-              fullHeight><Emoji>▶️</Emoji> Queue</Button
+              fullHeight><Emoji>▶️</Emoji> Play next</Button
             >
 
             <Button
