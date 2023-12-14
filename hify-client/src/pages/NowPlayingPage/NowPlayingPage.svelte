@@ -71,7 +71,7 @@
 <NowPlayingPageBackground track={$currentTrack || null} dim={!$distractionFreeMode} />
 
 {#if !$currentTrack}
-  <h2 class="no-playing">Nothing currently playing or queue is loading</h2>
+  <h2 class="no-playing">Nothing currently</h2>
 {:else}
   <ImgLoader art={$currentTrack.metadata.tags.album.art} let:src>
     <img class="album-art" class:darkened={!$distractionFreeMode} {src} alt="" />
