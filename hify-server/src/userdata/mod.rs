@@ -15,7 +15,7 @@ pub use self::{
     config::UserDataConfig,
     history::OneListening,
     mix::{Mix, MixID},
-    playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistEntryID, PlaylistID},
+    playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistID},
     wrapper::UserDataWrapper,
 };
 

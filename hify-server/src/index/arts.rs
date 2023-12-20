@@ -108,7 +108,7 @@ async fn find_album_art(
     let album_tracks_ids = cache.albums_tracks.get(&album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
-    let first_track_id = album_tracks_ids.get(0).unwrap();
+    let first_track_id = album_tracks_ids.first().unwrap();
 
     let track_path = base_dir.join(&tracks.get(first_track_id).unwrap().relative_path);
 
