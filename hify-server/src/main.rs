@@ -25,10 +25,14 @@ use self::helpers::{logging::setup_logger, time::OFFSET};
 async fn main() {
     let args = Args::parse();
 
-    setup_logger(args.logging_level, args.display_timestamps_in_tty);
-
     // Trigger offset fetching
     let _ = *OFFSET;
+
+    setup_logger(args.logging_level, args.display_timestamps_in_tty);
+
+    if OFFSET.is_none() {
+        error!("Failed to determine local offset, falling back to UTC.");
+    }
 
     if let Err(err) = inner_main(args).await {
         error!("An error occurred:\n{err:?}");
