@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { afterUpdate } from 'svelte'
-
   import { AudioTrackFragment } from '@graphql/generated'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { enqueue, moveTrackPositionInQueue, playTrackFromCurrentQueue, removeFromQueue } from '@stores/play-queue'
@@ -8,7 +6,8 @@
   import Card from '@molecules/Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '@globals/context-menu-items'
-  import { RequestFocus } from '@navigable/navigation'
+  import { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
+  import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 
   export let track: AudioTrackFragment
   export let position: number
@@ -16,16 +15,8 @@
   export let isCurrent: boolean
   export let columns: number
   export let onNavigate: (newPosition: number) => void
-
-  // let wasCurrent = isCurrent
-  //
-  // afterUpdate(() => {
-  //   if (!wasCurrent && isCurrent) {
-  //     wrapper.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
-  //   }
-  //
-  //   wasCurrent = isCurrent
-  // })
+  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
+  export let hasFocusPriority: NavigableCommonProps['hasFocusPriority'] = null
 
   function computeContextMenuOptions(): ContextMenuOption[] {
     const options = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)]
@@ -75,14 +66,15 @@
 
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
   <SimpleNavigableItem
+    {onFocus}
+    {hasFocusPriority}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
     onLongPress={() => showContextMenu(computeContextMenuOptions())}
-    hasFocusPriority={isCurrent}
     fullHeight
-    onLeft={() => onNavigate(Math.max(position - 1, 0))}
-    onRight={() => {
+    onLeft={bind(position, (position) => onNavigate(Math.max(position - 1, 0)))}
+    onRight={bind(position, (position) => {
       onNavigate(Math.min(position + 1, totalTracks - 1))
-    }}
+    })}
     bind:requestFocus={_requestFocus}
   >
     <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />

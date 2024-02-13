@@ -5,49 +5,56 @@
   import { Props, RequestFocus } from '@navigable/navigation'
   import { queuePosition, readablePlayQueue } from '@stores/play-queue'
   import { afterUpdate } from 'svelte'
+  import { bind } from '@globals/utils'
 
   const COLUMNS = 7
 
   export let onFocusChangeCallback: Props<Nav>['onFocusChangeCallback'] = null
 
-  let selected = 0
-  let prevSelected = 0
+  let selected: string | null = null
+  let prevSelected: string | null = null
 
-  $: firstDisplayedTrack = Math.max(selected - Math.round((COLUMNS - 1) / 2), 0)
+  $: selectedTrackPosition = $readablePlayQueue.tracks.findIndex((track) => track.idInQueue === selected)
+  $: firstVisibleTrack = Math.max(selectedTrackPosition - Math.round((COLUMNS - 1) / 2), 0)
+  $: visibleTracks = $readablePlayQueue.tracks.slice(firstVisibleTrack, firstVisibleTrack + COLUMNS)
 
-  const requestFocusByPosition: Record<number, RequestFocus> = {}
+  const requestFocusByIdInQueue: Record<string, RequestFocus> = {}
 
   afterUpdate(() => {
+    if (selected === null) {
+      return
+    }
+
     if (selected !== prevSelected) {
       prevSelected = selected
-      requestFocusByPosition[selected]?.()
+      requestFocusByIdInQueue[selected]()
     }
   })
 </script>
 
-{#if $readablePlayQueue}
-  {@const tracks = $readablePlayQueue.tracks.slice(firstDisplayedTrack, firstDisplayedTrack + COLUMNS)}
+<NavigableRow {onFocusChangeCallback}>
+  <div class="queue-gallery">
+    {#each visibleTracks as track (track.idInQueue)}
+      {@const position = $readablePlayQueue.tracks.indexOf(track)}
 
-  <NavigableRow {onFocusChangeCallback}>
-    <div class="queue-gallery">
-      {#each tracks as track (track.idInQueue)}
-        {@const position = $readablePlayQueue.tracks.indexOf(track)}
-
-        <QueueGalleryTrack
-          {position}
-          isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
-          totalTracks={$readablePlayQueue.tracks.length}
-          onNavigate={(newPos) => {
-            selected = newPos
-          }}
-          columns={COLUMNS}
-          bind:requestFocus={requestFocusByPosition[position]}
-          {track}
-        />
-      {/each}
-    </div>
-  </NavigableRow>
-{/if}
+      <QueueGalleryTrack
+        {position}
+        isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
+        totalTracks={$readablePlayQueue.tracks.length}
+        columns={COLUMNS}
+        hasFocusPriority={selected === track.idInQueue}
+        onNavigate={(newPos) => {
+          selected = $readablePlayQueue.tracks[newPos].idInQueue
+        }}
+        onFocus={bind(track, (track) => {
+          selected = track.idInQueue
+        })}
+        bind:requestFocus={requestFocusByIdInQueue[track.idInQueue]}
+        {track}
+      />
+    {/each}
+  </div>
+</NavigableRow>
 
 <style>
   .queue-gallery {

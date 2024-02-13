@@ -79,6 +79,7 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<NavigableRowPro
 			const item = child.navigateToFirstItemDown(from)
 
 			if (item) {
+				console.log([item.id])
 				return item
 			}
 		}

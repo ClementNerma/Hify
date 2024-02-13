@@ -493,7 +493,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 
 	const current = __current
 
-	for (const item of _getItemChain(current)) {
+	for (const item of _getItemParents(current)) {
 		if (item.interceptKeyPress(key, long) === KeyPressHandling.Intercepted) {
 			return
 		}
@@ -543,7 +543,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 
 			next = null
 
-			for (const nav of _getItemChain(current)) {
+			for (const nav of _getItemParents(current)) {
 				if (!nav.canHandleAction(event)) {
 					continue
 				}
@@ -577,7 +577,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 	}
 }
 
-function _getItemChain(item: NavigableItem<unknown>): Navigable[] {
+function _getItemParents(item: NavigableItem<unknown>): Navigable[] {
 	const out: Navigable[] = [item]
 
 	let current: NavigableContainer<unknown> = item.parent
@@ -621,25 +621,36 @@ function _generateUpdatedNavState(
 	newFocused: NavigableItem<unknown> | null,
 	page: NavigablePage,
 ): NavState {
-	// TODO: handle if oldFocused === newFocused
-
-	if (oldFocused) {
-		oldFocused.onUnfocus()
-		_propagateFocusChangeEvent(oldFocused, false)
+	if (oldFocused?.id !== newFocused?.id) {
+		oldFocused?.onUnfocus()
+		newFocused?.scrollTo()
+		newFocused?.onFocus()
 	}
 
-	if (newFocused) {
-		newFocused.scrollTo()
-		newFocused.onFocus()
+	if (oldFocused && newFocused) {
+		const oldFocusedParents = new Set(..._getItemParents(oldFocused).map((el) => el.id))
+		const newFocusedParents = new Set(..._getItemParents(newFocused).map((el) => el.id))
+
+		_propagateFocusChangeEvent(oldFocused, false, (parentItem) => !newFocusedParents.has(parentItem.id))
+		_propagateFocusChangeEvent(newFocused, true, (parentItem) => !oldFocusedParents.has(parentItem.id))
+	} else if (oldFocused) {
+		_propagateFocusChangeEvent(oldFocused, false)
+	} else if (newFocused) {
 		_propagateFocusChangeEvent(newFocused, true)
 	}
 
 	return { page, focused: newFocused }
 }
 
-function _propagateFocusChangeEvent(item: NavigableItem<unknown>, focused: boolean): void {
-	for (const subItem of _getItemChain(item)) {
-		subItem.props.onFocusChangeCallback?.(focused)
+function _propagateFocusChangeEvent(
+	item: NavigableItem<unknown>,
+	focused: boolean,
+	cond?: (parentItem: Navigable) => boolean,
+): void {
+	for (const parentItem of _getItemParents(item)) {
+		if (!cond || cond(parentItem)) {
+			parentItem.props.onFocusChangeCallback?.(focused)
+		}
 	}
 }
 
