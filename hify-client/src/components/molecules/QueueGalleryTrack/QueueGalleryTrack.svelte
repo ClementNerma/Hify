@@ -8,22 +8,24 @@
   import Card from '@molecules/Card/Card.svelte'
   import { ContextMenuOption, showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
   import { ctxMenuOptions } from '@globals/context-menu-items'
+  import { RequestFocus } from '@navigable/navigation'
 
   export let track: AudioTrackFragment
   export let position: number
   export let totalTracks: number
   export let isCurrent: boolean
   export let columns: number
+  export let onNavigate: (newPosition: number) => void
 
-  let wasCurrent = isCurrent
-
-  afterUpdate(() => {
-    if (!wasCurrent && isCurrent) {
-      wrapper.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
-    }
-
-    wasCurrent = isCurrent
-  })
+  // let wasCurrent = isCurrent
+  //
+  // afterUpdate(() => {
+  //   if (!wasCurrent && isCurrent) {
+  //     wrapper.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+  //   }
+  //
+  //   wasCurrent = isCurrent
+  // })
 
   function computeContextMenuOptions(): ContextMenuOption[] {
     const options = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)]
@@ -66,6 +68,9 @@
   }
 
   let wrapper: HTMLDivElement
+  let _requestFocus: RequestFocus
+
+  export const requestFocus = () => _requestFocus()
 </script>
 
 <div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
@@ -74,7 +79,11 @@
     onLongPress={() => showContextMenu(computeContextMenuOptions())}
     hasFocusPriority={isCurrent}
     fullHeight
-    let:focused
+    onLeft={() => onNavigate(Math.max(position - 1, 0))}
+    onRight={() => {
+      onNavigate(Math.min(position + 1, totalTracks - 1))
+    }}
+    bind:requestFocus={_requestFocus}
   >
     <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
   </SimpleNavigableItem>
