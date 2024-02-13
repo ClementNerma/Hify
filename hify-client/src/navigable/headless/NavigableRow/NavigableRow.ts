@@ -18,10 +18,6 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<NavigableRowPro
 		}
 
 		switch (direction) {
-			case NavigationDirection.Up:
-			case NavigationDirection.Down:
-				break
-
 			case NavigationDirection.Left:
 				for (const colItem of items.slice(0, colIndex).reverse()) {
 					const item = colItem.navigateToFirstItemDown(NavigationComingFrom.Right)
@@ -42,6 +38,10 @@ export class NavigableRow<P = NoProp> extends NavigableContainer<NavigableRowPro
 					}
 				}
 
+				break
+
+			case NavigationDirection.Up:
+			case NavigationDirection.Down:
 				break
 		}
 

@@ -33,9 +33,8 @@ export type NavigableCommonProps = {
 
 export type Props<N extends NavigableCommon> = N['props']
 
-// TODO: When Typescript adds support for literal empty types, use it here
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type NoProp = {}
+// NOTE: This is askin to an empty type
+export type NoProp = Record<never, never>
 
 export abstract class NavigableCommon<P = NoProp> {
 	readonly parent: NavigableContainer<unknown>

@@ -46,10 +46,6 @@ export class NavigableList<P = NoProp> extends NavigableContainer<NavigableListP
 
 				break
 
-			case NavigationDirection.Left:
-			case NavigationDirection.Right:
-				break
-
 			case NavigationDirection.Down: {
 				const items = this.children()
 
@@ -80,9 +76,16 @@ export class NavigableList<P = NoProp> extends NavigableContainer<NavigableListP
 				if (this.props.trapped) {
 					return null
 				}
+
+				break
 			}
+
+			case NavigationDirection.Left:
+			case NavigationDirection.Right:
+				break
 		}
 
+		// Delegate navigation to parent
 		return this.parent.navigate(this, direction)
 	}
 

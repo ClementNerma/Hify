@@ -11,13 +11,17 @@
   export let onFocusChangeCallback: Props<Nav>['onFocusChangeCallback'] = null
 
   let selected = 0
+  let prevSelected = 0
 
   $: firstDisplayedTrack = Math.max(selected - Math.round((COLUMNS - 1) / 2), 0)
 
   const requestFocusByPosition: Record<number, RequestFocus> = {}
 
   afterUpdate(() => {
-    requestFocusByPosition[selected]?.()
+    if (selected !== prevSelected) {
+      prevSelected = selected
+      requestFocusByPosition[selected]?.()
+    }
   })
 </script>
 
