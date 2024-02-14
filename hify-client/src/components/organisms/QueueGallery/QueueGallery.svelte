@@ -42,7 +42,6 @@
         isCurrent={$queuePosition === $readablePlayQueue.tracks.indexOf(track)}
         totalTracks={$readablePlayQueue.tracks.length}
         columns={COLUMNS}
-        hasFocusPriority={selected === track.idInQueue}
         onNavigate={(newPos) => {
           selected = $readablePlayQueue.tracks[newPos].idInQueue
         }}
