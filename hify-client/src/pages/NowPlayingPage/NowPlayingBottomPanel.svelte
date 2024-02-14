@@ -9,26 +9,28 @@
     setPlayingAudioProgress,
     toggleAudioPlayback,
   } from '@stores/audio-player'
+  import { readablePlayQueue } from '@stores/play-queue'
 
   import { AudioTrackFragment } from '@graphql/generated'
 
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
   import { ROUTES } from '@root/routes'
-  import QueueGallery from '@organisms/QueueGallery/QueueGallery.svelte'
   import Column from '@navigable/ui/molecules/Column/Column.svelte'
   import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
   import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
-  import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
+  // import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
+  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+  import Card from '@molecules/Card/Card.svelte'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false
 
-  function toggleWaveForm() {
-    showWaveform = !showWaveform
-  }
+  // function toggleWaveForm() {
+  //   showWaveform = !showWaveform
+  // }
 
-  let showWaveform = false
+  // let showWaveform = false
 </script>
 
 <div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!currentTrack}>
@@ -39,14 +41,14 @@
         {@const album = tags.album}
         {@const artists = tags.artists.length > 0 ? tags.artists : album.albumArtists}
 
-        {#if showWaveform}
+        <!-- {#if showWaveform}
           <TrackWaveForm
             track={currentTrack}
             progress={($readableAudioProgress ?? 0) / currentTrack.metadata.duration}
             width="100%"
             height="50px"
           />
-        {/if}
+        {/if} -->
 
         <div class="buttons">
           <NavigableRow>
@@ -108,11 +110,10 @@
 
     <div class="play-queue-gallery">
       <Column>
-        <QueueGallery
-          onFocusChangeCallback={(focused) => {
-            isQueueFocused = focused
-          }}
-        />
+        <ProgressiveRow initialItems={$readablePlayQueue.tracks} idProp="idInQueue" let:item={track}>
+          <!-- TODO: classes -->
+          <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
+        </ProgressiveRow>
       </Column>
     </div>
   </Column>

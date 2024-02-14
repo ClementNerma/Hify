@@ -4,14 +4,16 @@
   import MixButton from '@atoms/MixButton/MixButton.svelte'
   import Row from '@navigable/ui/molecules/Row/Row.svelte'
   import { AsyncHomePage, MixOrdering } from '@graphql/generated'
-  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
   import { ROUTES } from '@root/routes'
   import IndexUpdater from './IndexUpdater.svelte'
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import StatsBox from '@molecules/StatsBox/StatsBox.svelte'
   import Centered from '@atoms/Centered/Centered.svelte'
-  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
   import { MIN_GREAT_RATING } from '@root/constants'
+  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
 
   async function fetchFeed() {
     const res = await AsyncHomePage({

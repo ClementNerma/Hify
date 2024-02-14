@@ -1,23 +1,23 @@
 <script lang="ts">
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
+  import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
   import { AlbumCardFragment } from '@graphql/generated'
-  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+  import Card from '@molecules/Card/Card.svelte'
+  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+  import { ROUTES } from '@root/routes'
+  import { navigate } from 'svelte-navigator'
 
   export let albums: AlbumCardFragment[]
-
-  const INITIAL_ITEMS = 10
-
-  let displaying = INITIAL_ITEMS
-
-  function reached(index: number) {
-    if (index >= displaying - 2) {
-      displaying += INITIAL_ITEMS
-    }
-  }
 </script>
 
-<Row>
-  {#each albums.slice(0, displaying) as album, i (album.id)}
-    <AlbumCard {album} onFocus={() => reached(i)} />
-  {/each}
-</Row>
+<ProgressiveRow
+  initialItems={albums}
+  idProp="id"
+  onItemPress={(album) => navigate(ROUTES.album(album.id))}
+  onItemLongPress={() => {
+    // TODO: context menu
+  }}
+  let:item={album}
+>
+  <!-- TODO: enforceMaxWidth? -->
+  <Card title={album.name} subtitle={album.albumArtists.map((artist) => artist.name).join(', ')} art={album.art} />
+</ProgressiveRow>

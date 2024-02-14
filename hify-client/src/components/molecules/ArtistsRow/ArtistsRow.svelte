@@ -1,13 +1,24 @@
 <script lang="ts">
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
+  import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
   import { ArtistCardFragment } from '@graphql/generated'
-  import ArtistCard from '@molecules/ArtistCard/ArtistCard.svelte'
+  import Card from '@molecules/Card/Card.svelte'
+  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+  import { ROUTES } from '@root/routes'
+  import { navigate } from 'svelte-navigator'
 
   export let artists: ArtistCardFragment[]
 </script>
 
-<Row>
-  {#each artists as artist}
-    <ArtistCard {artist} />
-  {/each}
-</Row>
+<ProgressiveRow
+  initialItems={artists}
+  idProp="id"
+  onItemPress={(artist) => navigate(ROUTES.artist(artist.id))}
+  onItemLongPress={(artist) => {
+    showContextMenu(ctxMenuOptions.forArtist(artist.id))
+  }}
+  let:item={artist}
+>
+  <!-- TODO: enforceMaxWidth? -->
+  <Card title={artist.name} subtitle="" art={artist.art} />
+</ProgressiveRow>

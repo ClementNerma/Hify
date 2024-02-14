@@ -1,26 +1,20 @@
 <script lang="ts">
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
+  import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
   import { AudioTrackFragment } from '@graphql/generated'
-  import TrackCard from '@molecules/TrackCard/TrackCard.svelte'
+  import Card from '@molecules/Card/Card.svelte'
+  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 
   export let tracks: AudioTrackFragment[]
-
-  const INITIAL_ITEMS = 10
-
-  let displaying = INITIAL_ITEMS
-
-  function reached(index: number) {
-    if (index >= displaying - 2) {
-      displaying += INITIAL_ITEMS
-    }
-  }
 </script>
 
-<Row>
-  {#each tracks.slice(0, displaying) as track, i (track.id)}
-    <!-- This <div> allows the inner item to reach full height -->
-    <div>
-      <TrackCard {track} {tracks} onFocus={() => reached(i)} />
-    </div>
-  {/each}
-</Row>
+<ProgressiveRow
+  initialItems={tracks}
+  idProp="id"
+  onItemPress={(track) => ctxMenuCallbacks.playTrack(track, tracks, null)}
+  onItemLongPress={(track) =>
+    showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null, goToAlbumOption: true, inPlaylist: null }))}
+  let:item={track}
+>
+  <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} />
+</ProgressiveRow>

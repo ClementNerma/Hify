@@ -15,7 +15,7 @@ type PlayQueue = {
 	isMixFinished: boolean
 }
 
-type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
+export type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
 
 const playQueue = writable<PlayQueue>({
 	tracks: [],
