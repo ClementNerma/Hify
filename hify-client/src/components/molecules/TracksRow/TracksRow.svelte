@@ -13,7 +13,7 @@
   idProp="id"
   onItemPress={(track) => ctxMenuCallbacks.playTrack(track, tracks, null)}
   onItemLongPress={(track) =>
-    showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null, goToAlbumOption: true, inPlaylist: null }))}
+    showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null }, { context: 'normal' }))}
   let:item={track}
 >
   <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} />

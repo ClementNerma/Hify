@@ -1,11 +1,10 @@
 <script lang="ts">
   import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { AsyncPlaylistPage, AudioTrackFragment, PlaylistPageQuery } from '@graphql/generated'
+  import { AsyncPlaylistPage, PlaylistPageQuery } from '@graphql/generated'
   import PlaylistListView from './PlaylistListView.svelte'
   import TracksGrid from '@organisms/TracksGrid/TracksGrid.svelte'
-  import { ContextMenuOption } from '../../navigable/ui/molecules/ContextMenu/ContextMenu'
-  import { NavigableTrackInPlaylist } from '../../components/atoms/NavigableTrack/NavigableTrack.svelte'
+  import type { EntryInPlaylist } from '@globals/context-menu-items'
 
   const TRACKS_BULK = 50
 
@@ -39,7 +38,7 @@
   let playlistEntries: PlaylistPageQuery['playlist']['entries']['nodes'] = []
   let gridView = false
 
-  const inPlaylist: Omit<NavigableTrackInPlaylist, 'trackEntry'> = {
+  const inPlaylist: Omit<EntryInPlaylist, 'trackEntry'> = {
     playlistId,
     allEntries: playlistEntries,
   }

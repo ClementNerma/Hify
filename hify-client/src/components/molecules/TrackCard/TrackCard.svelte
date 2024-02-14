@@ -11,6 +11,11 @@
   export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
 </script>
 
-<NavigableTrack {track} {tracks} {inPlaylist} {onFocus}>
+<NavigableTrack
+  {track}
+  {tracks}
+  context={inPlaylist ? { context: 'playlist', entry: inPlaylist } : { context: 'normal' }}
+  {onFocus}
+>
   <Card title={track.metadata.tags.title} art={track.metadata.tags.album.art} />
 </NavigableTrack>

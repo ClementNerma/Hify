@@ -8,8 +8,8 @@
   export let idProp: keyof T
   export let loadMore: ((count: number) => Promise<T[]>) | null = null
 
-  export let onItemPress: ((item: T) => void) | undefined = undefined
-  export let onItemLongPress: ((item: T) => void) | undefined = undefined
+  export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
+  export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
 
   let items = initialItems
   let position = 0
@@ -66,8 +66,8 @@
           onLeft={() => void onSelect(newPosition - 1)}
           onRight={() => void onSelect(newPosition + 1)}
           onFocus={() => void onSelect(newPosition)}
-          onPress={() => onItemPress?.(item)}
-          onLongPress={() => onItemLongPress?.(item)}
+          onPress={() => onItemPress?.(item, newPosition)}
+          onLongPress={() => onItemLongPress?.(item, newPosition)}
           bind:requestFocus={requestFocusById[item[idProp]]}
           let:item={navigableItem}
           let:focused

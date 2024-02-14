@@ -1,13 +1,14 @@
 <script lang="ts">
-  import NavigableTrack, { NavigableTrackInPlaylist } from '@atoms/NavigableTrack/NavigableTrack.svelte'
+  import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
   import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
+  import { EntryInPlaylist } from '@globals/context-menu-items'
   import { AudioTrackFragment } from '@graphql/generated'
   import { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
   import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
   import { humanReadableDuration } from '@stores/audio-player'
 
   export let tracks: AudioTrackFragment[] = []
-  export let inPlaylist: Omit<NavigableTrackInPlaylist, 'trackEntry'> | null = null
+  export let inPlaylist: Omit<EntryInPlaylist, 'trackEntry'>
   export let feedMore: NavigableListProps['lazyLoader']
 </script>
 
@@ -16,9 +17,12 @@
     <tbody>
       {#each tracks as track, i (track.id)}
         {@const tags = track.metadata.tags}
-        {@const trackInPlaylist = inPlaylist ? { ...inPlaylist, trackEntry: inPlaylist.allEntries[i] } : null}
-
-        <NavigableTrack {track} {tracks} inPlaylist={trackInPlaylist} display="transparent">
+        <NavigableTrack
+          {track}
+          {tracks}
+          context={{ context: 'playlist', entry: { ...inPlaylist, trackEntry: inPlaylist.allEntries[i] } }}
+          display="transparent"
+        >
           <tr class:notFirst={i !== 0}>
             <td class="trackno">{tags.trackNo}</td>
             <td class="title">🎵 {tags.title}</td>

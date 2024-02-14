@@ -9,7 +9,7 @@
     setPlayingAudioProgress,
     toggleAudioPlayback,
   } from '@stores/audio-player'
-  import { readablePlayQueue } from '@stores/play-queue'
+  import { playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
 
   import { AudioTrackFragment } from '@graphql/generated'
 
@@ -22,6 +22,8 @@
   // import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
   import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
   import Card from '@molecules/Card/Card.svelte'
+  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+  import { ctxMenuOptions } from '@globals/context-menu-items'
 
   export let currentTrack: AudioTrackFragment | false
   let isQueueFocused = false
@@ -110,7 +112,26 @@
 
     <div class="play-queue-gallery">
       <Column>
-        <ProgressiveRow initialItems={$readablePlayQueue.tracks} idProp="idInQueue" let:item={track}>
+        <ProgressiveRow
+          initialItems={$readablePlayQueue.tracks}
+          idProp="idInQueue"
+          let:item={track}
+          onItemPress={(_, pos) => playTrackFromCurrentQueue(pos)}
+          onItemLongPress={(track, position) => {
+            showContextMenu(
+              ctxMenuOptions.forTrack(
+                track,
+                { fromMixId: null },
+                {
+                  context: 'queue',
+                  isCurrent: $queuePosition === position,
+                  position,
+                  totalTracks: $readablePlayQueue.tracks.length,
+                },
+              ),
+            )
+          }}
+        >
           <!-- TODO: classes -->
           <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
         </ProgressiveRow>
