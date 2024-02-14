@@ -15,6 +15,7 @@
   import { ItemDisplay } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { ROUTES } from '@root/routes'
   import { enqueue, playTrackFromNewQueue } from '@stores/play-queue'
+  import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 
   export let tracks: AudioTrackFragment[]
   export let track: AudioTrackFragment
@@ -22,6 +23,7 @@
   export let goToAlbumOption = true
   export let display: ItemDisplay = null
   export let fromMixId: string | null = null
+  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
 
   function play() {
     playTrackFromNewQueue(tracks, tracks.indexOf(track), fromMixId)
@@ -77,7 +79,7 @@
               },
             })
           },
-        }
+        },
       )
     }
 
@@ -88,7 +90,7 @@
     options.push(
       { label: 'Play next', onPress: () => enqueue([track], 'next') },
       { label: 'Play last', onPress: () => enqueue([track], 'end') },
-      { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0, fromMixId) }
+      { label: 'Play alone', onPress: () => playTrackFromNewQueue([track], 0, fromMixId) },
     )
 
     return options
@@ -100,8 +102,9 @@
   let:focused
   onPress={play}
   onLongPress={() => showContextMenu(buildContextMenu())}
-  {display}
   fullHeight
+  {display}
+  {onFocus}
 >
   <slot {item} {focused} />
 </SimpleNavigableItem>
