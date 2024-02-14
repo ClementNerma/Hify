@@ -9,7 +9,7 @@
 </script>
 
 <ProgressiveRow
-  initialItems={tracks}
+  items={tracks}
   idProp="id"
   onItemPress={(track) => ctxMenuCallbacks.playTrack(track, tracks, null)}
   onItemLongPress={(track) =>

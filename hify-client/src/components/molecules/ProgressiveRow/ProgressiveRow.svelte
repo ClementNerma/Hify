@@ -1,51 +1,49 @@
 <script lang="ts" generics="T">
-  import { bind } from '@globals/utils'
+  import { afterUpdate } from 'svelte'
+
   import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
   import { RequestFocus } from '@navigable/navigation'
 
-  export let initialItems: T[]
+  export let items: T[]
   export let idProp: keyof T
-  export let loadMore: ((count: number) => Promise<T[]>) | null = null
 
   export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
   export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
 
-  let items = initialItems
   let position = 0
-
   let handlerDisabled = false
+  let prevSelected: T[keyof T] | null = null
 
   const COLUMNS = 7
+
+  afterUpdate(() => {
+    if (position >= items.length) {
+      position = Math.max(items.length - 1, 0)
+      requestFocus(position)
+    } else if (prevSelected !== null && !items.find((item) => item[idProp] === prevSelected)) {
+      requestFocus(position)
+    }
+  })
 
   async function onSelect(newPosition: number) {
     if (handlerDisabled || newPosition < 0) {
       return
     }
 
-    if (newPosition < 0) {
+    position = Math.min(newPosition, items.length - 1)
+    requestFocus(position)
+  }
+
+  function requestFocus(position: number) {
+    if (items.length === 0) {
       return
     }
-
-    while (position >= items.length - 2) {
-      if (!loadMore) {
-        break
-      }
-
-      const newItems = await loadMore(COLUMNS)
-
-      if (newItems.length > 0) {
-        items = items.concat(newItems)
-      } else {
-        break
-      }
-    }
-
-    position = Math.min(newPosition, items.length - 1)
 
     handlerDisabled = true
     requestFocusById[items[position][idProp]]?.()
     handlerDisabled = false
+    prevSelected = items[position][idProp]
   }
 
   $: firstVisibleItemIndex = Math.max(position - Math.round((COLUMNS - 1) / 2), 0)

@@ -10,7 +10,7 @@
 </script>
 
 <ProgressiveRow
-  initialItems={albums}
+  items={albums}
   idProp="id"
   onItemPress={(album) => navigate(ROUTES.album(album.id))}
   onItemLongPress={() => {

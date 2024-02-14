@@ -113,7 +113,7 @@
     <div class="play-queue-gallery">
       <Column>
         <ProgressiveRow
-          initialItems={$readablePlayQueue.tracks}
+          items={$readablePlayQueue.tracks}
           idProp="idInQueue"
           let:item={track}
           onItemPress={(_, pos) => playTrackFromCurrentQueue(pos)}
