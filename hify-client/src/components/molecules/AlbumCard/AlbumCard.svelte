@@ -4,9 +4,11 @@
   import { ROUTES } from '@root/routes'
   import { bind } from '@globals/utils'
   import InteractiveCard from '../Card/InteractiveCard.svelte'
+  import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 
   export let album: AlbumCardFragment
   export let enforceMaxWidth = false
+  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
 </script>
 
 <InteractiveCard
@@ -16,4 +18,5 @@
   onLongPress={() => alert('TODO: context menu for playing options')}
   art={album.art}
   {enforceMaxWidth}
+  {onFocus}
 />
