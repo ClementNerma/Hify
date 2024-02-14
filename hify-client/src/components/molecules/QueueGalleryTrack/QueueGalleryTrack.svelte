@@ -16,7 +16,6 @@
   export let columns: number
   export let onNavigate: (newPosition: number) => void
   export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
-  export let hasFocusPriority: NavigableCommonProps['hasFocusPriority'] = null
 
   function computeContextMenuOptions(): ContextMenuOption[] {
     const options = [ctxMenuOptions.goToAlbum(track.metadata.tags.album.id)]
@@ -58,16 +57,14 @@
     return options
   }
 
-  let wrapper: HTMLDivElement
   let _requestFocus: RequestFocus
 
   export const requestFocus = () => _requestFocus()
 </script>
 
-<div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent bind:this={wrapper}>
+<div class="track" style="--column-size: {`${100 / columns}%`}" class:isCurrent>
   <SimpleNavigableItem
     {onFocus}
-    {hasFocusPriority}
     onPress={bind(position, (position) => playTrackFromCurrentQueue(position))}
     onLongPress={() => showContextMenu(computeContextMenuOptions())}
     fullHeight
