@@ -1,4 +1,6 @@
 <script lang="ts" generics="T">
+  import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+
   import { afterUpdate } from 'svelte'
 
   import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
@@ -10,6 +12,9 @@
 
   export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
   export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
+
+  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
+  export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
 
   let position = 0
   let handlerDisabled = false
@@ -63,7 +68,11 @@
           fullHeight
           onLeft={() => void onSelect(newPosition - 1)}
           onRight={() => void onSelect(newPosition + 1)}
-          onFocus={() => void onSelect(newPosition)}
+          onFocus={() => {
+            void onSelect(newPosition)
+            onFocus?.()
+          }}
+          {onUnfocus}
           onPress={() => onItemPress?.(item, newPosition)}
           onLongPress={() => onItemLongPress?.(item, newPosition)}
           bind:requestFocus={requestFocusById[item[idProp]]}

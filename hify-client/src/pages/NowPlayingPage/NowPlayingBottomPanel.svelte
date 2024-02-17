@@ -33,6 +33,25 @@
   // }
 
   // let showWaveform = false
+
+  function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
+    showContextMenu(
+      ctxMenuOptions.forTrack(
+        track,
+        { fromMixId: null },
+        {
+          context: 'queue',
+          isCurrent: $queuePosition === position,
+          position,
+          totalTracks: $readablePlayQueue.tracks.length,
+        },
+      ),
+    )
+  }
+
+  function setQueueFocused(isFocused: boolean) {
+    isQueueFocused = isFocused
+  }
 </script>
 
 <div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!currentTrack}>
@@ -115,25 +134,20 @@
         <ProgressiveRow
           items={$readablePlayQueue.tracks}
           idProp="idInQueue"
-          let:item={track}
           onItemPress={(_, pos) => playTrackFromCurrentQueue(pos)}
-          onItemLongPress={(track, position) => {
-            showContextMenu(
-              ctxMenuOptions.forTrack(
-                track,
-                { fromMixId: null },
-                {
-                  context: 'queue',
-                  isCurrent: $queuePosition === position,
-                  position,
-                  totalTracks: $readablePlayQueue.tracks.length,
-                },
-              ),
-            )
-          }}
+          onItemLongPress={showTrackCtxMenu}
+          onUnfocus={() => setQueueFocused(false)}
+          onFocus={() => setQueueFocused(true)}
+          let:item={track}
+          let:position
         >
-          <!-- TODO: classes -->
-          <Card title={track.metadata.tags.title} subtitle={null} boxSize={80} art={track.metadata.tags.album.art} />
+          <Card
+            title={track.metadata.tags.title}
+            subtitle={null}
+            boxSize={80}
+            art={track.metadata.tags.album.art}
+            opacity={$queuePosition === position ? 1 : 0.2}
+          />
         </ProgressiveRow>
       </Column>
     </div>

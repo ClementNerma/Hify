@@ -9,13 +9,14 @@
 
   export let boxSize = 120
   export let circle = false
+  export let opacity = 1
 
   // 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
   // It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
   export let enforceMaxWidth = false
 </script>
 
-<div class="card" class:enforceMaxWidth style="--width: {boxSize}px">
+<div class="card" class:enforceMaxWidth style="--width: {boxSize}px; --opacity: {opacity};">
   <ImgLoader {art} let:src>
     <img class="cover" class:circle width={boxSize} height={boxSize} {src} alt="" />
   </ImgLoader>
@@ -31,6 +32,7 @@
   .card {
     text-align: center;
     transition: transform 0.25s;
+    opacity: var(--opacity);
   }
 
   .card.enforceMaxWidth {
