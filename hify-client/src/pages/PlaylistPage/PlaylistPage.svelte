@@ -3,7 +3,7 @@
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import { AsyncPlaylistPage, PlaylistPageQuery } from '@graphql/generated'
   import PlaylistListView from './PlaylistListView.svelte'
-  import TracksGrid from '@organisms/TracksGrid/TracksGrid.svelte'
+  import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
   import type { EntryInPlaylist } from '@globals/context-menu-items'
 
   const TRACKS_BULK = 50

@@ -2,7 +2,7 @@
   import { AsyncHistoryPage, AudioTrackFragment } from '@graphql/generated'
   import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
   import { GRID_TRACKS_PER_ROW } from '../../constants'
-  import TracksGrid from '../../components/organisms/TracksGrid/TracksGrid.svelte'
+  import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
 
   const LINES_PER_PAGE = 5
 
