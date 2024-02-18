@@ -1,8 +1,9 @@
 use std::net::SocketAddr;
 
 use anyhow::Result;
-use axum::{middleware, routing::get, Extension, Router, Server};
+use axum::{middleware, routing::get, Extension, Router};
 use log::info;
+use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use super::{
@@ -51,7 +52,9 @@ pub async fn launch(
 
     info!("> Server is being launched on {address}");
 
-    Server::bind(address).serve(app.into_make_service()).await?;
+    let listener = TcpListener::bind(address).await?;
+
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

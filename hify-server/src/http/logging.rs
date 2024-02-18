@@ -1,8 +1,8 @@
-use axum::{http::Request, middleware::Next, response::Response};
+use axum::{extract::Request, middleware::Next, response::Response};
 use colored::Colorize;
 use log::{debug, error};
 
-pub async fn log_errors<B>(request: Request<B>, next: Next<B>) -> Response {
+pub async fn log_errors(request: Request, next: Next) -> Response {
     let path = request.uri().path().to_owned();
 
     let res = next.run(request).await;
