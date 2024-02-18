@@ -5,7 +5,7 @@ use anyhow::Result;
 use crate::{index::Index, userdata::UserData};
 
 pub fn save_index(to: &Path, index: &Index) -> Result<()> {
-    let json = serde_json::to_string_pretty(index)?;
+    let json = serde_json::to_string(index)?;
     fs::write(to, json)?;
     Ok(())
 }
@@ -18,7 +18,7 @@ pub fn load_index(from: &Path) -> Result<Index> {
 }
 
 pub fn save_user_data(to: &Path, user_data: &UserData) -> Result<()> {
-    let json = serde_json::to_string_pretty(user_data)?;
+    let json = serde_json::to_string(user_data)?;
     fs::write(to, json)?;
     Ok(())
 }
