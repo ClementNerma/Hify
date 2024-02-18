@@ -628,8 +628,8 @@ function _generateUpdatedNavState(
 	}
 
 	if (oldFocused && newFocused) {
-		const oldFocusedParents = new Set(..._getItemParents(oldFocused).map((el) => el.id))
-		const newFocusedParents = new Set(..._getItemParents(newFocused).map((el) => el.id))
+		const oldFocusedParents = new Set(_getItemParents(oldFocused).map((el) => el.id))
+		const newFocusedParents = new Set(_getItemParents(newFocused).map((el) => el.id))
 
 		_propagateFocusChangeEvent(oldFocused, false, (parentItem) => !newFocusedParents.has(parentItem.id))
 		_propagateFocusChangeEvent(newFocused, true, (parentItem) => !oldFocusedParents.has(parentItem.id))
