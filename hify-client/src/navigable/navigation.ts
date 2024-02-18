@@ -616,11 +616,19 @@ function _requestUnfocus(): void {
 	navState.update((state) => (state ? _generateUpdatedNavState(state.focused, null, state.page) : state))
 }
 
+let isUpdatingFocus = false
+
 function _generateUpdatedNavState(
 	oldFocused: NavigableItem<unknown> | null,
 	newFocused: NavigableItem<unknown> | null,
 	page: NavigablePage,
 ): NavState {
+	if (isUpdatingFocus) {
+		throw new Error('Focus is being changed while already being in an update')
+	}
+
+	isUpdatingFocus = true
+
 	if (oldFocused?.id !== newFocused?.id) {
 		oldFocused?.onUnfocus()
 		newFocused?.scrollTo()
@@ -638,6 +646,8 @@ function _generateUpdatedNavState(
 	} else if (newFocused) {
 		_propagateFocusChangeEvent(newFocused, true)
 	}
+
+	isUpdatingFocus = false
 
 	return { page, focused: newFocused }
 }
