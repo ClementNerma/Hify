@@ -36,6 +36,7 @@ async fn main() {
 
     if let Err(err) = inner_main(args).await {
         error!("An error occurred:\n{err:?}");
+        std::process::exit(1);
     }
 }
 
