@@ -29,7 +29,7 @@
 
       // Fallback to first tab if needed
       tabsFocusRequest[index === -1 ? 0 : index]()
-    })
+    }),
   )
 
   function showSubMenu(subMenu: TabDropdownItem[]) {
@@ -37,7 +37,7 @@
       subMenu.map(({ label, uri }) => ({
         label,
         onPress: () => navigate(uri),
-      }))
+      })),
     )
   }
 

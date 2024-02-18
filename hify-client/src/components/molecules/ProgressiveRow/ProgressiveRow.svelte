@@ -1,11 +1,9 @@
 <script lang="ts" generics="T">
-  import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
-
   import { afterUpdate } from 'svelte'
 
   import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
   import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { RequestFocus } from '@navigable/navigation'
+  import { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
 
   export let items: T[]
   export let idProp: keyof T
@@ -13,12 +11,13 @@
   export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
   export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
 
-  export let onFocus: SimpleNavigableItemProps['onFocus'] = undefined
-  export let onUnfocus: SimpleNavigableItemProps['onUnfocus'] = undefined
+  export let onFocusChange: NavigableCommonProps['onFocusChange'] = undefined
 
   let position = 0
   let handlerDisabled = false
   let prevSelected: T[keyof T] | null = null
+
+  let positionOnUnfocused = 0
 
   const COLUMNS = 7
 
@@ -31,13 +30,18 @@
     }
   })
 
-  async function onSelect(newPosition: number) {
+  async function onSelect(newPosition: number, requestItemFocus: boolean) {
     if (handlerDisabled || newPosition < 0) {
       return
     }
 
     position = Math.min(newPosition, items.length - 1)
-    requestFocus(position)
+
+    if (requestItemFocus) {
+      requestFocus(position)
+    }
+
+    positionOnUnfocused = newPosition
   }
 
   function requestFocus(position: number) {
@@ -58,7 +62,7 @@
   let requestFocusById: Record<T[keyof T], RequestFocus> = {}
 </script>
 
-<NavigableRow>
+<NavigableRow {onFocusChange}>
   <div class="gallery">
     {#each visibleTracks as item, i (item[idProp])}
       {@const newPosition = firstVisibleItemIndex + i}
@@ -66,19 +70,17 @@
       <div class="gallery-item" style="--column-size: {`${100 / COLUMNS}%`}">
         <SimpleNavigableItem
           fullHeight
-          onLeft={() => void onSelect(newPosition - 1)}
-          onRight={() => void onSelect(newPosition + 1)}
-          onFocus={() => {
-            void onSelect(newPosition)
-            onFocus?.()
-          }}
-          {onUnfocus}
+          onLeft={() => void onSelect(newPosition - 1, true)}
+          onRight={() => void onSelect(newPosition + 1, true)}
+          onFocus={() => void onSelect(newPosition, false)}
           onPress={() => onItemPress?.(item, newPosition)}
           onLongPress={() => onItemLongPress?.(item, newPosition)}
+          hasFocusPriority={newPosition === positionOnUnfocused}
           bind:requestFocus={requestFocusById[item[idProp]]}
           let:item={navigableItem}
           let:focused
         >
+          {newPosition} / {positionOnUnfocused}
           <slot {item} position={newPosition} {navigableItem} {focused} />
         </SimpleNavigableItem>
       </div>

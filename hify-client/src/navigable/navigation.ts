@@ -28,7 +28,7 @@ export type OnFocusChangeCallback = (isFocused: boolean) => void
 
 export type NavigableCommonProps = {
 	hasFocusPriority: boolean | null
-	onFocusChangeCallback?: OnFocusChangeCallback | null
+	onFocusChange?: OnFocusChangeCallback | null
 }
 
 export type Props<N extends NavigableCommon> = N['props']
@@ -659,7 +659,7 @@ function _propagateFocusChangeEvent(
 ): void {
 	for (const parentItem of _getItemParents(item)) {
 		if (!cond || cond(parentItem)) {
-			parentItem.props.onFocusChangeCallback?.(focused)
+			parentItem.props.onFocusChange?.(focused)
 		}
 	}
 }

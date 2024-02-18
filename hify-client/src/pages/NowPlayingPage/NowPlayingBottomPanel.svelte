@@ -136,8 +136,7 @@
           idProp="idInQueue"
           onItemPress={(_, pos) => playTrackFromCurrentQueue(pos)}
           onItemLongPress={showTrackCtxMenu}
-          onUnfocus={() => setQueueFocused(false)}
-          onFocus={() => setQueueFocused(true)}
+          onFocusChange={setQueueFocused}
           let:item={track}
           let:position
         >

@@ -6,12 +6,12 @@
   import { NavigableRow } from './NavigableRow'
 
   export let hasFocusPriority: Props<NavigableRow>['hasFocusPriority'] = null
-  export let onFocusChangeCallback: Props<NavigableRow>['onFocusChangeCallback'] | null = null
+  export let onFocusChange: Props<NavigableRow>['onFocusChange'] | null = null
   export let trapped: Props<NavigableRow>['trapped'] = undefined
 
   const rowProps = (): Props<NavigableRow> => ({
     hasFocusPriority,
-    onFocusChangeCallback,
+    onFocusChange,
     trapped,
   })
 
