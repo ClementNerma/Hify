@@ -80,7 +80,6 @@
           let:item={navigableItem}
           let:focused
         >
-          {newPosition} / {positionOnUnfocused}
           <slot {item} position={newPosition} {navigableItem} {focused} />
         </SimpleNavigableItem>
       </div>
