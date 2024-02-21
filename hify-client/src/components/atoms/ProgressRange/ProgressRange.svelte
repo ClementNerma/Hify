@@ -29,8 +29,26 @@
   }
 </script>
 
-<SimpleNavigableItem {onLeft} {onRight} {onPress} display="block">
-  <div class="container">
+<SimpleNavigableItem {onLeft} {onRight} {onPress} display="block" let:focused>
+  <div class="container" class:focused>
     <input type="range" {max} {value} bind:this={input} on:change={() => onChange(getValue())} />
   </div>
 </SimpleNavigableItem>
+
+<style>
+  .container {
+    border: 1px solid transparent;
+
+    &.focused {
+      border-color: gray;
+
+      & input {
+        accent-color: orange;
+      }
+    }
+  }
+
+  input {
+    height: 10px;
+  }
+</style>

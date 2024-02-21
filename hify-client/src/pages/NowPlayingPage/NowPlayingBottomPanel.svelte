@@ -192,7 +192,6 @@
   .progress-range,
   .progress-range :global(input) {
     width: calc(100% - 5px);
-    color: red;
   }
 
   .player-time {
