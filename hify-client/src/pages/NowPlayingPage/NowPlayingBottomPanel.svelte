@@ -140,13 +140,14 @@
           onFocusChange={setQueueFocused}
           let:item={track}
           let:position
+          let:focused
         >
           <Card
             title={track.metadata.tags.title}
             subtitle={null}
             boxSize={80}
             art={track.metadata.tags.album.art}
-            opacity={$queuePosition === position ? 1 : 0.2}
+            opacity={$queuePosition === position ? 1 : focused ? 0.7 : 0.2}
           />
         </ProgressiveRow>
       </Column>
