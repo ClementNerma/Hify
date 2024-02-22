@@ -8,6 +8,8 @@
   export let items: T[]
   export let idProp: keyof T
 
+  export let initialPosition = 0
+
   export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
   export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
 
@@ -18,6 +20,8 @@
   let prevSelected: T[keyof T] | null = null
 
   let positionOnUnfocused = 0
+
+  let isFirstEntering = true
 
   const COLUMNS = 7
 
@@ -34,6 +38,8 @@
     if (handlerDisabled || newPosition < 0) {
       return
     }
+
+    isFirstEntering = false
 
     position = Math.min(newPosition, items.length - 1)
 
@@ -75,7 +81,7 @@
           onFocus={() => void onSelect(newPosition, false)}
           onPress={() => onItemPress?.(item, newPosition)}
           onLongPress={() => onItemLongPress?.(item, newPosition)}
-          hasFocusPriority={newPosition === positionOnUnfocused}
+          hasFocusPriority={newPosition === (isFirstEntering ? initialPosition : positionOnUnfocused)}
           bind:requestFocus={requestFocusById[item[idProp]]}
           let:item={navigableItem}
           let:focused

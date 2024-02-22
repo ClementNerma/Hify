@@ -134,6 +134,7 @@
         <ProgressiveRow
           items={$readablePlayQueue.tracks}
           idProp="idInQueue"
+          initialPosition={$queuePosition ?? 0}
           onItemPress={(_, pos) => playTrackFromCurrentQueue(pos)}
           onItemLongPress={showTrackCtxMenu}
           onFocusChange={setQueueFocused}
