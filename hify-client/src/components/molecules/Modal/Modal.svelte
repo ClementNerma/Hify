@@ -64,7 +64,7 @@
         <div class="buttons">
           <Row>
             {#each buttons as button, i (button.label)}
-              <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => onButtonPress(button)} let:focused>
+              <Button bind:requestFocus={buttonsRequestFocus[i]} onPress={() => void onButtonPress(button)} let:focused>
                 {#if loading && focused}
                   <em>Loading...</em>
                 {:else}

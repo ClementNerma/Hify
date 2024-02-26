@@ -1,8 +1,9 @@
+import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import { writable } from 'svelte/store'
 
 export type ContextMenuOption = {
 	label: string
-	onPress: () => void
+	onPress: NonNullable<SimpleNavigableItemProps['onPress']>
 	// onLongPress?: () => void
 }
 

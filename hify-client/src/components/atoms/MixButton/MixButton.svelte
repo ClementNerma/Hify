@@ -8,12 +8,12 @@
 </script>
 
 <Button
-  onPress={() => generateAndPlayMix(mixParams)}
+  onPress={() => void generateAndPlayMix(mixParams)}
   onLongPress={() =>
     showContextMenu([
       {
         label: 'Only with the best rating <3',
-        onPress: () => generateAndPlayMix({ ...mixParams, minRating: 10 }),
+        onPress: () => void generateAndPlayMix({ ...mixParams, minRating: 10 }),
       },
     ])}>Mix me some magic ✨</Button
 >

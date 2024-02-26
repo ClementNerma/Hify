@@ -80,8 +80,8 @@ export const ctxMenuOptions = {
 				options.push(
 					{
 						label: 'Move up',
-						onPress: async () => {
-							await EditPlaylist({
+						onPress: () => {
+							void EditPlaylist({
 								variables: {
 									playlistId,
 									action: {
@@ -93,8 +93,8 @@ export const ctxMenuOptions = {
 					},
 					{
 						label: 'Move down',
-						onPress: async () => {
-							await EditPlaylist({
+						onPress: () => {
+							void EditPlaylist({
 								variables: {
 									playlistId,
 									action: {
@@ -106,8 +106,8 @@ export const ctxMenuOptions = {
 					},
 					{
 						label: 'Remove from playlist',
-						onPress: async () => {
-							await EditPlaylist({
+						onPress: () => {
+							void EditPlaylist({
 								variables: {
 									playlistId,
 									action: {
@@ -148,7 +148,7 @@ export const ctxMenuOptions = {
 			{
 				label: 'Mix me some magic ✨',
 				onPress: () =>
-					generateAndPlayMix({
+					void generateAndPlayMix({
 						source: { allTracks: '-' },
 						ordering: MixOrdering.Random,
 						minRating: MIN_GREAT_RATING,

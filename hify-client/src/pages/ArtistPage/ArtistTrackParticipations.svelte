@@ -54,7 +54,7 @@
     </Grid>
 
     {#if lastPageInfo.hasNextPage}
-      <Button onPress={() => feedMore()}>Load more</Button>
+      <Button onPress={() => void feedMore()}>Load more</Button>
     {/if}
   {/if}
 {:catch e}

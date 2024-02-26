@@ -27,7 +27,7 @@
             {
               label: 'Mix me some magic ✨',
               onPress: () =>
-                generateAndPlayMix({
+                void generateAndPlayMix({
                   source: { allTracks: '-' },
                   ordering: MixOrdering.Random,
                   minRating: MIN_GREAT_RATING,
