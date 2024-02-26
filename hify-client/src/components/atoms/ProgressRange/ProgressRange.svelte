@@ -41,10 +41,6 @@
 
     &.focused {
       border-color: gray;
-
-      & input {
-        accent-color: orange;
-      }
     }
   }
 
