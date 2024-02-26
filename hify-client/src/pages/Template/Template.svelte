@@ -17,6 +17,8 @@
   import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
   import ContextMenu from '@navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
   import ErrorDialog from '../../components/molecules/ErrorDialog/ErrorDialog.svelte'
+  import { onMount } from 'svelte'
+  import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
 
   const location = useLocation()
 
@@ -59,6 +61,16 @@
     }
 
     return KeyPressHandling.Propagate
+  })
+
+  onMount(() => {
+    window.addEventListener('error', (err) => {
+      showErrorDialog('JavaScript runtime error', err.message)
+    })
+
+    window.addEventListener('unhandledrejection', (_) => {
+      showErrorDialog('JavaScript unhandled Promise rejection', '<unknown message>')
+    })
   })
 </script>
 
