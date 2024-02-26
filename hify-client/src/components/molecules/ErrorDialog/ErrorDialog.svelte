@@ -1,6 +1,6 @@
 <script lang="ts">
   import Modal from '../Modal/Modal.svelte'
-  import { currentError, popError } from './ErrorDialog'
+  import { currentError, popError, errors } from './ErrorDialog'
 </script>
 
 {#if $currentError}
@@ -13,8 +13,18 @@
       },
     ]}
   >
-    <strong>{$currentError.title}</strong>
+    <strong>
+      {$currentError.title}
+
+      {#if $errors.length === 2}
+        (1 other error remaining)
+      {:else if $errors.length > 2}
+        ({$errors.length - 2} other errors remaining)
+      {/if}
+    </strong>
+
     <p>{$currentError.message}</p>
+
     <!-- TODO: $currentError.details -->
   </Modal>
 {/if}
