@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte'
 import { get, writable } from 'svelte/store'
-import { logWarn } from '../stores/debugger'
+import { logFatal, logWarn } from '../stores/debugger'
 import { KeyPressHandling, handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
@@ -550,6 +550,10 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 
 				const newFocused = nav.handleAction(event)
 
+				if (newFocused !== null && !(newFocused instanceof NavigableItem)) {
+					logFatal('Value returned by handleAction() is not a NavigableItem!')
+				}
+
 				if (newFocused) {
 					next = newFocused
 				}
@@ -628,6 +632,11 @@ function _generateUpdatedNavState(
 	}
 
 	isUpdatingFocus = true
+
+	if (newFocused && !(newFocused instanceof NavigableItem)) {
+		console.error(newFocused)
+		console.error(new Error())
+	}
 
 	if (oldFocused?.id !== newFocused?.id) {
 		oldFocused?.onUnfocus()
