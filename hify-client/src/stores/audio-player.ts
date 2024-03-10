@@ -63,23 +63,18 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 
 			if (
 				// Don't increase listening duration in case of jump
-				currentTime > lastTimeUpdate + 3 ||
+				currentTime < lastTimeUpdate + 3 &&
 				// Nor when going back
-				currentTime < lastTimeUpdate
+				currentTime > lastTimeUpdate
 			) {
-				lastTimeUpdate = currentTime
-			}
-
-			// Only increase it if last update was more between 1 second ago
-			else if (currentTime >= lastTimeUpdate + 1) {
 				audioListeningDuration.update((d) =>
 					d !== null
-						? { track: d.track, duration_s: d.duration_s + 1 }
+						? { track: d.track, duration_s: d.duration_s + (lastTimeUpdate - currentTime) }
 						: logFatal('Tried to increment null audio listening duration!'),
 				)
-
-				lastTimeUpdate = currentTime
 			}
+
+			lastTimeUpdate = currentTime
 		})
 
 		if (play !== false) {
