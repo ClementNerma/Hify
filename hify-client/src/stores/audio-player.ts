@@ -17,6 +17,8 @@ function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 		if (prevDuration !== null) {
 			const { track, duration_s } = prevDuration
 
+			logInfo(`Registering listening duration of ${duration_s} for track ${track.id} ('${track.metadata.tags.title}')`)
+
 			LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
 				logError('Failed to register listening duration', e),
 			)
@@ -55,7 +57,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 		newAudio.addEventListener('ended', nextHandler)
 		newAudio.addEventListener('timeupdate', () => {
 			const currentTime = newAudio.currentTime
-			audioProgress.set(currentTime)
+			audioProgress.set(Math.round(currentTime))
 
 			if (
 				// Don't increase listening duration in case of jump

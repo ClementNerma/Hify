@@ -1,5 +1,3 @@
-import { logDebug } from '@stores/debugger'
-
 export const REMAPPED_KEYS: Record<string, string> = {
 	F4: 'Escape',
 }
@@ -76,7 +74,7 @@ function shouldNotInterceptKey(e: KeyboardEvent) {
 }
 
 document.body.addEventListener('keydown', (e) => {
-	logDebug(`Key down: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
+	// logDebug(`Key down: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
 
 	if (shouldNotInterceptKey(e)) {
 		return
@@ -107,7 +105,7 @@ document.body.addEventListener('keydown', (e) => {
 })
 
 document.body.addEventListener('keyup', (e) => {
-	logDebug(`Key up: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
+	// logDebug(`Key up: ${e.ctrlKey ? 'Ctrl + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.key}`)
 
 	if (shouldNotInterceptKey(e)) {
 		return
