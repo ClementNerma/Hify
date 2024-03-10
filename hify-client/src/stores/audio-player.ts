@@ -17,7 +17,9 @@ function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 		if (prevDuration !== null) {
 			const { track, duration_s } = prevDuration
 
-			logInfo(`Registering listening duration of ${duration_s} for track ${track.id} ('${track.metadata.tags.title}')`)
+			logInfo(
+				`Registering listening duration of ${duration_s} seconds for track ${track.id} ('${track.metadata.tags.title}')`,
+			)
 
 			LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
 				logError('Failed to register listening duration', e),
@@ -75,6 +77,8 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 						? { track: d.track, duration_s: d.duration_s + 1 }
 						: logFatal('Tried to increment null audio listening duration!'),
 				)
+
+				lastTimeUpdate = currentTime
 			}
 		})
 
