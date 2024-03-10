@@ -61,7 +61,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 
 				// Don't increase listening duration in case of jump
 				// Also don't increase when going back
-				if (currentTime < lastTimeUpdate + 3 && currentTime > lastTimeUpdate) {
+				if (currentTime > lastTimeUpdate + 1 && currentTime < lastTimeUpdate + 2) {
 					audioListeningDuration.update((d) =>
 						d !== null
 							? { track: d.track, duration_s: d.duration_s + 1 }
