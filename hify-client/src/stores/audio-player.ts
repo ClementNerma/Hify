@@ -54,22 +54,25 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 		newAudio.addEventListener('pause', () => audioPaused.set(true))
 		newAudio.addEventListener('ended', nextHandler)
 		newAudio.addEventListener('timeupdate', () => {
-			const currentTime = Math.round(newAudio.currentTime)
+			const currentTime = newAudio.currentTime
+			audioProgress.set(currentTime)
 
-			if (currentTime !== lastTimeUpdate) {
-				audioProgress.set(currentTime)
-
+			if (
 				// Don't increase listening duration in case of jump
-				// Also don't increase when going back
-				if (currentTime > lastTimeUpdate + 1 && currentTime < lastTimeUpdate + 2) {
-					audioListeningDuration.update((d) =>
-						d !== null
-							? { track: d.track, duration_s: d.duration_s + 1 }
-							: logFatal('Tried to increment null audio listening duration!'),
-					)
-				}
-
+				currentTime > lastTimeUpdate + 3 ||
+				// Nor when going back
+				currentTime < lastTimeUpdate
+			) {
 				lastTimeUpdate = currentTime
+			}
+
+			// Only increase it if last update was more between 1 second ago
+			else if (currentTime >= lastTimeUpdate + 1) {
+				audioListeningDuration.update((d) =>
+					d !== null
+						? { track: d.track, duration_s: d.duration_s + 1 }
+						: logFatal('Tried to increment null audio listening duration!'),
+				)
 			}
 		})
 
