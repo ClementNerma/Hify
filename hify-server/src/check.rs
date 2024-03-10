@@ -77,7 +77,8 @@ pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(
 
         if entry.at < against && against - entry.at > time::Duration::SECOND {
             error!(
-                "Overlapping entries in listening history (overlap of ~{:.2}s):\n* {:?}\n* {entry:?}",
+                "Entries {i} and {} overlap in listening history (of about {:.2}s):\n* {:?}\n* {entry:?}",
+                i + 1,
                 (against - entry.at).as_seconds_f32(),
                 history[i - 1],
             );
