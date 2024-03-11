@@ -70,7 +70,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 			) {
 				audioListeningDuration.update((d) =>
 					d !== null
-						? { track: d.track, duration_s: d.duration_s + (lastTimeUpdate - currentTime) }
+						? { track: d.track, duration_s: d.duration_s + (currentTime - lastTimeUpdate) }
 						: logFatal('Tried to increment null audio listening duration!'),
 				)
 			}
