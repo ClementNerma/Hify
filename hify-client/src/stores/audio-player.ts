@@ -15,7 +15,8 @@ export const readableAudioPaused = readonly(audioPaused)
 function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 	audioListeningDuration.update((prevDuration) => {
 		if (prevDuration !== null) {
-			const { track, duration_s } = prevDuration
+			const { track } = prevDuration
+			const duration_s = Math.floor(prevDuration.duration_s)
 
 			logInfo(
 				`Registering listening duration of ${duration_s} seconds for track ${track.id} ('${track.metadata.tags.title}')`,
