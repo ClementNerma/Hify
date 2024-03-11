@@ -19,7 +19,7 @@ function _newListeningSession(resetAs: AudioTrackFragment | null): void {
 			const duration_s = Math.floor(prevDuration.duration_s)
 
 			logInfo(
-				`Registering listening duration of ${duration_s} seconds for track ${track.id} ('${track.metadata.tags.title}')`,
+				`Registering listening duration of ${duration_s} seconds for track with ID: ${track.id} | ${track.metadata.tags.title}`,
 			)
 
 			LogListening({ variables: { trackId: track.id, duration_s } }).catch((e: unknown) =>
