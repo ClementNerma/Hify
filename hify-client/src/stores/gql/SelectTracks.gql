@@ -1,0 +1,5 @@
+query SelectTracks($inIds: [String!]!) {
+    selectTracks(inIds: $inIds) {
+        ...AudioTrack
+    }
+}

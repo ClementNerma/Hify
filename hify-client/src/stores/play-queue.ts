@@ -1,6 +1,12 @@
 import { loadPlayQueue, persistPlayQueue } from '@globals/persistence'
 import { readonly, swapInArray } from '@globals/utils'
-import { type AudioTrackFragment, GenerateMix, GetNextTracksOfMix, type MixParams } from '@graphql/generated'
+import {
+	AsyncSelectTracks,
+	GenerateMix,
+	GetNextTracksOfMix,
+	type AudioTrackFragment,
+	type MixParams,
+} from '@graphql/generated'
 import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
 import { navigate } from 'svelte-navigator'
 import { derived, get, writable } from 'svelte/store'
@@ -18,22 +24,18 @@ export type PlayQueue = {
 
 export type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
 
-const playQueue = writable<PlayQueue>(
-	loadPlayQueue() ?? {
-		tracks: [],
-		position: null,
-		fromMixId: null,
-		isMixFinished: false,
-	},
-)
+const playQueue = writable<PlayQueue>({
+	tracks: [],
+	position: null,
+	fromMixId: null,
+	isMixFinished: false,
+})
 
 export const readablePlayQueue = readonly(playQueue)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
 export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
-
-playQueue.subscribe(persistPlayQueue)
 
 playQueue.subscribe(async ({ tracks, position, fromMixId, isMixFinished }) => {
 	const currentTracks: string[] = tracks.map((track) => track.id)
@@ -62,6 +64,27 @@ playQueue.subscribe(async ({ tracks, position, fromMixId, isMixFinished }) => {
 		}
 	})
 })
+
+const persistedPlayQueue = loadPlayQueue()
+
+playQueue.subscribe(persistPlayQueue)
+
+if (persistedPlayQueue) {
+	const { tracksId, position, fromMixId, isMixFinished } = persistedPlayQueue
+
+	AsyncSelectTracks({
+		variables: {
+			inIds: tracksId,
+		},
+	}).then((res) => {
+		playQueue.set({
+			tracks: res.data.selectTracks.map(makeQueuedTrack),
+			position,
+			fromMixId,
+			isMixFinished,
+		})
+	})
+}
 
 function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
 	return { ...track, idInQueue: Math.random().toString() }

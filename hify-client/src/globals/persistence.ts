@@ -4,12 +4,29 @@ import { array, boolean, nullable, number, object, parse, string } from 'valibot
 
 const PLAY_QUEUE_LOCAL_STORAGE_KEY = 'hifyClient-playQueue'
 
+type PersistedPlayQueue = {
+	tracksId: string[]
+	position: number | null
+	fromMixId: string | null
+	isMixFinished: boolean
+}
+
 export function persistPlayQueue(playQueue: PlayQueue) {
-	localStorage.setItem(PLAY_QUEUE_LOCAL_STORAGE_KEY, JSON.stringify(playQueue))
+	const { tracks, position, fromMixId, isMixFinished } = playQueue
+
+	const state: PersistedPlayQueue = {
+		tracksId: tracks.map((track) => track.id),
+		position,
+		fromMixId,
+		isMixFinished,
+	}
+
+	localStorage.setItem(PLAY_QUEUE_LOCAL_STORAGE_KEY, JSON.stringify(state))
+
 	logDebug('Persisted play queue')
 }
 
-export function loadPlayQueue(): PlayQueue | null {
+export function loadPlayQueue(): PersistedPlayQueue | null {
 	logInfo('Loading play queue...')
 
 	const saved = localStorage.getItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
@@ -28,10 +45,10 @@ export function loadPlayQueue(): PlayQueue | null {
 		return null
 	}
 
-	let validated: PlayQueue
+	let validated: PersistedPlayQueue
 
 	try {
-		validated = parse(PlayQueueSchema, parsed)
+		validated = parse(PersistedPlayQueueSchema, parsed)
 	} catch (e) {
 		logError(`Failed to deserialize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
@@ -39,44 +56,12 @@ export function loadPlayQueue(): PlayQueue | null {
 	}
 
 	logInfo('Successfully loaded persisted play queue')
+
 	return validated
 }
 
-const PlayQueueSchema = object({
-	tracks: array(
-		object({
-			idInQueue: string(),
-			id: string(),
-			metadata: object({
-				duration: number(),
-				tags: object({
-					title: string(),
-					album: object({
-						id: string(),
-						name: string(),
-						albumArtists: array(
-							object({
-								id: string(),
-								name: string(),
-							}),
-						),
-					}),
-					artists: array(
-						object({
-							id: string(),
-							name: string(),
-						}),
-					),
-					genres: array(
-						object({
-							id: string(),
-							name: string(),
-						}),
-					),
-				}),
-			}),
-		}),
-	),
+const PersistedPlayQueueSchema = object({
+	tracksId: array(string()),
 	position: nullable(number()),
 	fromMixId: nullable(string()),
 	isMixFinished: boolean(),

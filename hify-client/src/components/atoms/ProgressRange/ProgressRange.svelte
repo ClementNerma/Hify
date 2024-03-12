@@ -31,7 +31,7 @@ function onRight() {
 
 <SimpleNavigableItem {onLeft} {onRight} {onPress} display="block" let:focused>
   <div class="container" class:focused>
-    <input type="range" {max} {value} bind:this={input} on:change={() => onChange(getValue())} />
+    <input type="range" {max} value={value ?? 0} bind:this={input} on:change={() => onChange(getValue())} />
   </div>
 </SimpleNavigableItem>
 
