@@ -33,7 +33,7 @@ const feedMore = async () => {
 
 export let playlistId: string
 
-const playlist = feedMore().then((playlist) => playlist!)
+const playlist = feedMore()
 
 let playlistEntries: PlaylistPageQuery['playlist']['entries']['nodes'] = []
 let gridView = false
@@ -49,14 +49,18 @@ $: tracks = playlistEntries.map((entry) => entry.track)
 {#await playlist}
   <LoadingIndicator />
 {:then playlist}
-  <h2>{playlist.name}</h2>
-  <Checkbox bind:checked={gridView}>Enable grid view</Checkbox>
+	{#if !playlist}
+		<h2>Playlist with ID {playlistId} not found</h2>
+	{:else}
+		<h2>{playlist.name}</h2>
+		<Checkbox bind:checked={gridView}>Enable grid view</Checkbox>
 
-  {#if gridView}
-    <TracksGrid {tracks} {inPlaylist} {feedMore} />
-  {:else}
-    <PlaylistListView {tracks} {inPlaylist} {feedMore} />
-  {/if}
+		{#if gridView}
+			<TracksGrid {tracks} {inPlaylist} {feedMore} />
+		{:else}
+			<PlaylistListView {tracks} {inPlaylist} {feedMore} />
+		{/if}
+	{/if}
 {:catch e}
   <h2>Failed: {e.message}</h2>
 {/await}

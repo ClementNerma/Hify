@@ -1,21 +1,13 @@
 <script lang="ts">
-import { type AudioTrackFragment, RemoveTrackRating, SetTrackRating } from '@graphql/generated'
+import { RemoveTrackRating, SetTrackRating, type AudioTrackFragment } from '@graphql/generated'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
 export let track: AudioTrackFragment
 
-let initialRating: number
-
-let current: number
-let updating: boolean
-let failed: boolean
-
-{
-	initialRating = track.computedRating ?? 0
-	current = initialRating
-	updating = false
-	failed = false
-}
+let initialRating = track.computedRating ?? 0
+let current = initialRating
+let updating = false
+let failed = false
 
 async function update() {
 	const updatingWith = current
