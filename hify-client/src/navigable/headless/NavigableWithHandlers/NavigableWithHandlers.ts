@@ -1,11 +1,11 @@
-import { InputHandler, KeyPressHandling } from '../../input-manager'
+import type { InputHandler, KeyPressHandling } from '../../input-manager'
 import {
-	Navigable,
+	type Navigable,
 	NavigableContainer,
-	NavigableItem,
+	type NavigableItem,
 	NavigationAction,
-	NavigationDirection,
-	NoProp,
+	type NavigationDirection,
+	type NoProp,
 } from '../../navigation'
 
 export class NavigableWithHandlers<P = NoProp> extends NavigableContainer<NavigableWithHandlersProps & P> {

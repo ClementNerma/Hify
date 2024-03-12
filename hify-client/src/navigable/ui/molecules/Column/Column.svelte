@@ -1,7 +1,7 @@
 <script lang="ts">
+import type { NavigableList as NavigableListClass } from '../../../headless/NavigableList/NavigableList'
 import NavigableList from '../../../headless/NavigableList/NavigableList.svelte'
-import { NavigableList as NavigableListClass } from '../../../headless/NavigableList/NavigableList'
-import { Props } from '../../../navigation'
+import type { Props } from '../../../navigation'
 
 export let hasFocusPriority: Props<NavigableListClass>['hasFocusPriority'] = null
 export let trapped: Props<NavigableListClass>['trapped'] = undefined

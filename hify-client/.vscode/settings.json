@@ -1,15 +1,10 @@
 {
-  "[typescript]": {
+  "[typescript][svelte]": {
     "editor.defaultFormatter": "biomejs.biome",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
     }
-  },
-
-  "[svelte]": {
-    "editor.defaultFormatter": "svelte.svelte-vscode",
-    "editor.formatOnSave": true
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-import { RequestFocus } from '@navigable/navigation'
+import type { RequestFocus } from '@navigable/navigation'
 
 let searchField: HTMLInputElement
 

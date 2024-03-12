@@ -1,5 +1,5 @@
-import { AudioTrackFragment, EditPlaylist, MixOrdering, PlaylistEntryFragment } from '@graphql/generated'
-import { ContextMenuOption } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { type AudioTrackFragment, EditPlaylist, MixOrdering, type PlaylistEntryFragment } from '@graphql/generated'
+import type { ContextMenuOption } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 import { MIN_GREAT_RATING } from '@root/constants'
 import { ROUTES } from '@root/routes'
 import {

@@ -1,10 +1,10 @@
 <script lang="ts">
 import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
 import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-import { AsyncPlaylistPage, PlaylistPageQuery } from '@graphql/generated'
-import PlaylistListView from './PlaylistListView.svelte'
-import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
 import type { EntryInPlaylist } from '@globals/context-menu-items'
+import { AsyncPlaylistPage, type PlaylistPageQuery } from '@graphql/generated'
+import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
+import PlaylistListView from './PlaylistListView.svelte'
 
 const TRACKS_BULK = 50
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
-import { NavigableRowProps } from '../../../headless/NavigableRow/NavigableRow'
+import type { NavigableRowProps } from '../../../headless/NavigableRow/NavigableRow'
 
 export let trapped: NavigableRowProps['trapped'] = undefined
 </script>

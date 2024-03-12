@@ -1,6 +1,6 @@
 <script lang="ts">
-import { navigate } from 'svelte-navigator'
 import { bind, formatDate } from '@globals/utils'
+import { navigate } from 'svelte-navigator'
 
 import {
 	humanReadableDuration,
@@ -11,19 +11,19 @@ import {
 } from '@stores/audio-player'
 import { playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
 
-import { AudioTrackFragment } from '@graphql/generated'
+import type { AudioTrackFragment } from '@graphql/generated'
 
-import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
-import { ROUTES } from '@root/routes'
-import Column from '@navigable/ui/molecules/Column/Column.svelte'
 import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
 import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
+import { ctxMenuOptions } from '@globals/context-menu-items'
+import Card from '@molecules/Card/Card.svelte'
 // import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
 import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
-import Card from '@molecules/Card/Card.svelte'
+import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import Column from '@navigable/ui/molecules/Column/Column.svelte'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
-import { ctxMenuOptions } from '@globals/context-menu-items'
+import { ROUTES } from '@root/routes'
 
 export let currentTrack: AudioTrackFragment | false
 let isQueueFocused = false

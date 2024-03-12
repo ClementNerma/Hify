@@ -1,4 +1,4 @@
-import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+import type { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import { writable } from 'svelte/store'
 
 export type ContextMenuOption = {

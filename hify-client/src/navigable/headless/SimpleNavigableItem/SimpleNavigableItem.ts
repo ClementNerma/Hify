@@ -1,9 +1,9 @@
 import {
-	HTMLNavigableItemWrapperElement,
+	type HTMLNavigableItemWrapperElement,
 	NavigableItem,
 	NavigationAction,
 	NavigationDirection,
-	NoProp,
+	type NoProp,
 } from '../../navigation'
 
 export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNavigableItemProps> {

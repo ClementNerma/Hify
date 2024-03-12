@@ -1,8 +1,8 @@
 <script lang="ts">
-import { AsyncHistoryPage, AudioTrackFragment } from '@graphql/generated'
 import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-import { GRID_TRACKS_PER_ROW } from '../../constants'
+import { AsyncHistoryPage, type AudioTrackFragment } from '@graphql/generated'
 import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
+import { GRID_TRACKS_PER_ROW } from '../../constants'
 
 const LINES_PER_PAGE = 5
 

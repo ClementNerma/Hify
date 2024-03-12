@@ -1,5 +1,5 @@
 import { logError } from '@stores/debugger'
-import { PlayQueue } from '@stores/play-queue'
+import type { PlayQueue } from '@stores/play-queue'
 import { array, boolean, nullable, number, object, parse, string } from 'valibot'
 
 const PLAY_QUEUE_LOCAL_STORAGE_KEY = 'hifyClient-playQueue'

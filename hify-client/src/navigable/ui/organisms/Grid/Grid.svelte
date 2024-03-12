@@ -1,7 +1,7 @@
 <script lang="ts">
-import { NavigableGrid as Nav } from '../../../headless/NavigableGrid/NavigableGrid'
+import type { NavigableGrid as Nav } from '../../../headless/NavigableGrid/NavigableGrid'
 import NavigableGrid from '../../../headless/NavigableGrid/NavigableGrid.svelte'
-import { Props } from '../../../navigation'
+import type { Props } from '../../../navigation'
 
 export let columns: Props<Nav>['columns']
 export let lazyLoader: Props<Nav>['lazyLoader'] = undefined

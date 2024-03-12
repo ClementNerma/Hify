@@ -2,16 +2,16 @@
 import { readableAudioPaused } from '@stores/audio-player'
 import { currentTrack } from '@stores/play-queue'
 
-import { setupDistractionFreeListener } from '@stores/distraction-free'
 import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-import { distractionFreeMode } from '@stores/distraction-free'
-import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
+import Emoji from '@atoms/Emoji/Emoji.svelte'
+import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+import type { AudioTrackFragment } from '@graphql/generated'
 import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
 import { KeyPressHandling } from '@navigable/input-manager'
-import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+import { setupDistractionFreeListener } from '@stores/distraction-free'
+import { distractionFreeMode } from '@stores/distraction-free'
 import { writable } from 'svelte/store'
-import { AudioTrackFragment } from '@graphql/generated'
-import Emoji from '@atoms/Emoji/Emoji.svelte'
+import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
 import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
 const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']

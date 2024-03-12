@@ -1,5 +1,5 @@
 <script lang="ts">
-import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+import type { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
 export let max: number
@@ -11,7 +11,7 @@ export let onPress: SimpleNavigableItemProps['onPress'] = undefined
 let input: HTMLInputElement
 
 function getValue(): number {
-	const number = parseInt(input.value)
+	const number = Number.parseInt(input.value)
 
 	if (Number.isNaN(number)) {
 		throw new Error('Range value is not a number!')

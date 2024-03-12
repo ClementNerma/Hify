@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-import { Writable, writable } from 'svelte/store'
+import { type Writable, writable } from 'svelte/store'
 
 export function setterStore<T>(): Writable<T | null> {
 	return writable(null)

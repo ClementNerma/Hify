@@ -1,8 +1,8 @@
 <script lang="ts">
-import { ProgressiveImgFragment } from '@graphql/generated'
+import type { ProgressiveImgFragment } from '@graphql/generated'
+import type { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 import Card from './Card.svelte'
-import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 
 export let art: ProgressiveImgFragment | null | undefined
 

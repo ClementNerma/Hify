@@ -1,5 +1,5 @@
-import { AudioTrackFragment } from '@graphql/generated'
-import { Readable, Writable, derived } from 'svelte/store'
+import type { AudioTrackFragment } from '@graphql/generated'
+import { type Readable, type Writable, derived } from 'svelte/store'
 
 export function bind<T, U>(data: T, callback: (value: T) => U): () => U {
 	return () => callback(data)

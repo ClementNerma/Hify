@@ -1,7 +1,7 @@
 <script lang="ts">
-import { AudioTrackFragment } from '@graphql/generated'
-import { drawComputedTrackWaveForm, fetchAudioBuffer, generateTrackWaveform } from './waveform'
+import type { AudioTrackFragment } from '@graphql/generated'
 import { beforeUpdate } from 'svelte'
+import { drawComputedTrackWaveForm, fetchAudioBuffer, generateTrackWaveform } from './waveform'
 
 export let track: AudioTrackFragment
 

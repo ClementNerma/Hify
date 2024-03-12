@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store'
 import { getStreamUri } from '../globals/rest-api'
 import { readonly } from '../globals/utils'
-import { AudioTrackFragment, LogListening } from '../graphql/generated'
+import { type AudioTrackFragment, LogListening } from '../graphql/generated'
 import { logDebug, logError, logFatal, logInfo, logWarn } from './debugger'
 
 const audioPlayer = writable<HTMLAudioElement | null>(null)

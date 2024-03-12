@@ -1,11 +1,11 @@
 <script lang="ts">
 import '@navigable/input-manager'
 
-import { Router, Route } from 'svelte-navigator'
 import { ROUTES } from '@root/routes'
+import { Route, Router } from 'svelte-navigator'
 
-import Template from '@pages/Template/Template.svelte'
 import NotFound from '@pages/NotFoundPage/NotFoundPage.svelte'
+import Template from '@pages/Template/Template.svelte'
 
 import Home from '@pages/HomePage/HomePage.svelte'
 
@@ -14,14 +14,14 @@ import AlbumsPage from '@pages/AlbumsPage/AlbumsPage.svelte'
 import AlbumPage from '@pages/AlbumPage/AlbumPage.svelte'
 import ArtistPage from '@pages/ArtistPage/ArtistPage.svelte'
 import ArtistsPage from '@pages/ArtistsPage/ArtistsPage.svelte'
+import DevToolsPage from '@pages/DevToolsPage/DevToolsPage.svelte'
+import GenrePage from '@pages/GenrePage/GenrePage.svelte'
+import GenresPage from '@pages/GenresPage/GenresPage.svelte'
 import HistoryPage from '@pages/HistoryPage/HistoryPage.svelte'
 import NowPlaying from '@pages/NowPlayingPage/NowPlayingPage.svelte'
-import SearchPage from '@pages/SearchPage/SearchPage.svelte'
-import DevToolsPage from '@pages/DevToolsPage/DevToolsPage.svelte'
-import GenresPage from '@pages/GenresPage/GenresPage.svelte'
-import GenrePage from '@pages/GenrePage/GenrePage.svelte'
-import PlaylistsPage from '@pages/PlaylistsPage/PlaylistsPage.svelte'
 import PlaylistPage from '@pages/PlaylistPage/PlaylistPage.svelte'
+import PlaylistsPage from '@pages/PlaylistsPage/PlaylistsPage.svelte'
+import SearchPage from '@pages/SearchPage/SearchPage.svelte'
 </script>
 
 <Router primary={false}>

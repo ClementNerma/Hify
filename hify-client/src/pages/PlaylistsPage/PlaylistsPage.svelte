@@ -1,16 +1,16 @@
 <script lang="ts">
-import { navigate } from 'svelte-navigator'
+import Button from '@atoms/Button/Button.svelte'
+import Input from '@atoms/Input/Input.svelte'
 import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
 import { bind } from '@globals/utils'
-import { AsyncPlaylistsPage, CreatePlaylist, DeletePlaylist, PlaylistsPageQuery } from '@graphql/generated'
+import { AsyncPlaylistsPage, CreatePlaylist, DeletePlaylist, type PlaylistsPageQuery } from '@graphql/generated'
+import Modal from '@molecules/Modal/Modal.svelte'
 import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-import { ROUTES } from '@root/routes'
-import Button from '@atoms/Button/Button.svelte'
-import { RequestFocus } from '@navigable/navigation'
-import Modal from '@molecules/Modal/Modal.svelte'
-import Input from '@atoms/Input/Input.svelte'
+import type { RequestFocus } from '@navigable/navigation'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { ROUTES } from '@root/routes'
+import { navigate } from 'svelte-navigator'
 
 const PLAYLIST_BULK = 50
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-import { Props, RequestFocus } from '@navigable/navigation'
-import {
+import type {
 	SimpleNavigableItem as Nav,
 	SimpleNavigableItemProps,
 } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import type { Props, RequestFocus } from '@navigable/navigation'
 
 export let onPress: SimpleNavigableItemProps['onPress']
 export let disabled = false

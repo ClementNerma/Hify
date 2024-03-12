@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
-import { ArtistCardFragment } from '@graphql/generated'
+import type { ArtistCardFragment } from '@graphql/generated'
 import Card from '@molecules/Card/Card.svelte'
 import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'

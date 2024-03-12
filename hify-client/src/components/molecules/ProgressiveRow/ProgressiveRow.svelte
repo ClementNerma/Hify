@@ -3,7 +3,7 @@ import { afterUpdate } from 'svelte'
 
 import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-import { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
+import type { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
 
 export let items: T[]
 export let idProp: keyof T

@@ -2,7 +2,7 @@
 import { afterUpdate } from 'svelte'
 import InternalNavWrapper from '../InternalNavWrapper.svelte'
 
-import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+import { type Props, getParentNavigable, setChildrenNavigable } from '../../navigation'
 import { NavigableGrid } from './NavigableGrid'
 
 export let hasFocusPriority: Props<NavigableGrid>['hasFocusPriority'] = null

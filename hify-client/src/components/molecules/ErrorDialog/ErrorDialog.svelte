@@ -1,6 +1,6 @@
 <script lang="ts">
 import Modal from '../Modal/Modal.svelte'
-import { currentError, popError, errors } from './ErrorDialog'
+import { currentError, errors, popError } from './ErrorDialog'
 </script>
 
 {#if $currentError}

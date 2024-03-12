@@ -1,9 +1,9 @@
 <script lang="ts">
 import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
 import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
-import { EntryInPlaylist } from '@globals/context-menu-items'
-import { AudioTrackFragment } from '@graphql/generated'
-import { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
+import type { EntryInPlaylist } from '@globals/context-menu-items'
+import type { AudioTrackFragment } from '@graphql/generated'
+import type { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
 import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
 import { humanReadableDuration } from '@stores/audio-player'
 

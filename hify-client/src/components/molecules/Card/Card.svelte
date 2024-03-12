@@ -1,6 +1,6 @@
 <script lang="ts">
 import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
-import { ProgressiveImgFragment } from '@graphql/generated'
+import type { ProgressiveImgFragment } from '@graphql/generated'
 
 export let art: ProgressiveImgFragment | null | undefined
 

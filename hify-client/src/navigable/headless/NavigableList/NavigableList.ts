@@ -1,10 +1,10 @@
 import {
-	Navigable,
+	type Navigable,
 	NavigableContainer,
-	NavigableItem,
+	type NavigableItem,
 	NavigationComingFrom,
 	NavigationDirection,
-	NoProp,
+	type NoProp,
 } from '../../navigation'
 
 export class NavigableList<P = NoProp> extends NavigableContainer<NavigableListProps & P> {

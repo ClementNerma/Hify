@@ -28,5 +28,20 @@
 			"quoteStyle": "single",
 			"semicolons": "asNeeded"
 		}
-	}
+	},
+	"overrides": [
+		{
+			"include": ["*.svelte"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off"
+					},
+					"suspicious": {
+						"noConfusingLabels": "off"
+					}
+				}
+			}
+		}
+	]
 }

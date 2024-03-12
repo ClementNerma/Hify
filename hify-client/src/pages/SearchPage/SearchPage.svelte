@@ -1,18 +1,18 @@
 <script lang="ts">
 import { onMount } from 'svelte'
 
-import { AsyncSearchPage, SearchPageQuery } from '@graphql/generated'
+import { AsyncSearchPage, type SearchPageQuery } from '@graphql/generated'
 
 import { logInfo } from '@stores/debugger'
 
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-import { RequestFocus } from '@navigable/navigation'
-import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
 import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
 import ArtistsRow from '@molecules/ArtistsRow/ArtistsRow.svelte'
+import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+import type { RequestFocus } from '@navigable/navigation'
 
-export let searchTerms: string = ''
+export let searchTerms = ''
 
 const MAX_RESULTS_PER_CATEGORY = 50
 

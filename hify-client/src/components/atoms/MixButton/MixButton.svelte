@@ -1,6 +1,6 @@
 <script lang="ts">
 import Button from '@atoms/Button/Button.svelte'
-import { MixParams } from '@graphql/generated'
+import type { MixParams } from '@graphql/generated'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 import { generateAndPlayMix } from '@stores/play-queue'
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getArtUri } from '@globals/rest-api'
-import { AudioTrackFragment } from '@graphql/generated'
+import type { AudioTrackFragment } from '@graphql/generated'
 
 export let track: AudioTrackFragment | null
 export let dim = false

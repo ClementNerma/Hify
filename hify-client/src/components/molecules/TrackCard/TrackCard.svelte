@@ -1,9 +1,9 @@
 <script lang="ts">
 import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
-import { EntryInPlaylist } from '@globals/context-menu-items'
-import { AudioTrackFragment } from '@graphql/generated'
+import type { EntryInPlaylist } from '@globals/context-menu-items'
+import type { AudioTrackFragment } from '@graphql/generated'
 import Card from '@molecules/Card/Card.svelte'
-import { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+import type { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 
 export let track: AudioTrackFragment
 export let tracks: AudioTrackFragment[]

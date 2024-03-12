@@ -1,5 +1,5 @@
 import { getStreamUri } from '@globals/rest-api'
-import { AudioTrackFragment } from '@graphql/generated'
+import type { AudioTrackFragment } from '@graphql/generated'
 import { logFatal } from '@stores/debugger'
 
 export async function fetchAudioBuffer(track: AudioTrackFragment): Promise<ArrayBuffer> {

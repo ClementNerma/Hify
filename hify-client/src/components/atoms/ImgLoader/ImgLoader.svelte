@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getArtUri } from '@globals/rest-api'
-import { ProgressiveImgFragment } from '@graphql/generated'
+import type { ProgressiveImgFragment } from '@graphql/generated'
 
 export let art: ProgressiveImgFragment | null | undefined
 </script>

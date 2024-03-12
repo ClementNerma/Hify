@@ -1,7 +1,7 @@
 <script lang="ts">
 import { afterUpdate } from 'svelte'
 
-import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+import { type Props, getParentNavigable, setChildrenNavigable } from '../../navigation'
 import InternalNavWrapper from '../InternalNavWrapper.svelte'
 import { NavigableRow } from './NavigableRow'
 

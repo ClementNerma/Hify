@@ -1,9 +1,9 @@
 <script lang="ts">
-import { AudioTrackFragment } from '@graphql/generated'
+import type { EntryInPlaylist } from '@globals/context-menu-items'
+import type { AudioTrackFragment } from '@graphql/generated'
+import TrackCard from '@molecules/TrackCard/TrackCard.svelte'
 import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
 import { GRID_TRACKS_PER_ROW } from '@root/constants'
-import TrackCard from '@molecules/TrackCard/TrackCard.svelte'
-import { EntryInPlaylist } from '@globals/context-menu-items'
 
 export let tracks: AudioTrackFragment[]
 export let inPlaylist: Omit<EntryInPlaylist, 'trackEntry'> | null = null

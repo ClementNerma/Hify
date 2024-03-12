@@ -1,10 +1,10 @@
 <script lang="ts">
-import { AlbumCardFragment, AsyncArtistAlbums } from '@graphql/generated'
+import { type AlbumCardFragment, AsyncArtistAlbums } from '@graphql/generated'
 
-import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
-import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
 import Button from '@atoms/Button/Button.svelte'
 import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
 
 export let artistId: string
 

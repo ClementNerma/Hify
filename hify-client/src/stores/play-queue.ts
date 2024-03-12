@@ -1,6 +1,6 @@
 import { loadPlayQueue, persistPlayQueue } from '@globals/persistence'
 import { readonly, swapInArray } from '@globals/utils'
-import { AudioTrackFragment, GenerateMix, GetNextTracksOfMix, MixParams } from '@graphql/generated'
+import { type AudioTrackFragment, GenerateMix, GetNextTracksOfMix, type MixParams } from '@graphql/generated'
 import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
 import { navigate } from 'svelte-navigator'
 import { derived, get, writable } from 'svelte/store'

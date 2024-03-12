@@ -1,12 +1,12 @@
 <script lang="ts">
-import { navigate } from 'svelte-navigator'
-import { ArtistCardFragment, MixOrdering } from '@graphql/generated'
-import { ROUTES } from '@root/routes'
 import { bind } from '@globals/utils'
-import InteractiveCard from '../Card/InteractiveCard.svelte'
-import { ContextMenuOption, showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { type ArtistCardFragment, MixOrdering } from '@graphql/generated'
+import { type ContextMenuOption, showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 import { MIN_GREAT_RATING } from '@root/constants'
+import { ROUTES } from '@root/routes'
+import { navigate } from 'svelte-navigator'
 import { generateAndPlayMix } from '../../../stores/play-queue'
+import InteractiveCard from '../Card/InteractiveCard.svelte'
 
 export let artist: ArtistCardFragment
 
