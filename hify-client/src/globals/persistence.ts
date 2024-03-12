@@ -21,7 +21,7 @@ export function loadPlayQueue(): PlayQueue | null {
 	let parsed: unknown
 
 	try {
-		parsed = JSON.stringify(saved)
+		parsed = JSON.parse(saved)
 	} catch (e: unknown) {
 		logError(`Failed to deserialize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
