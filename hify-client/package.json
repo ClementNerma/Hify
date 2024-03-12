@@ -46,6 +46,7 @@
     "graphql": "^16.8.0",
     "graphql-tag": "^2.12.6",
     "svelte": "^4.2.0",
-    "svelte-navigator": "^3.2.2"
+    "svelte-navigator": "^3.2.2",
+    "valibot": "^0.30.0"
   }
 }

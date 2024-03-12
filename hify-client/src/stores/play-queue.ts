@@ -1,3 +1,4 @@
+import { loadPlayQueue, persistPlayQueue } from '@globals/persistence'
 import { readonly, swapInArray } from '@globals/utils'
 import { AudioTrackFragment, GenerateMix, GetNextTracksOfMix, MixParams } from '@graphql/generated'
 import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
@@ -8,7 +9,7 @@ import { ROUTES } from '../routes'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logFatal, logInfo, logWarn } from './debugger'
 
-type PlayQueue = {
+export type PlayQueue = {
 	tracks: QueuedTrack[]
 	position: number | null
 	fromMixId: string | null
@@ -17,18 +18,22 @@ type PlayQueue = {
 
 export type QueuedTrack = AudioTrackFragment & Readonly<{ idInQueue: string }>
 
-const playQueue = writable<PlayQueue>({
-	tracks: [],
-	position: null,
-	fromMixId: null,
-	isMixFinished: false,
-})
+const playQueue = writable<PlayQueue>(
+	loadPlayQueue() ?? {
+		tracks: [],
+		position: null,
+		fromMixId: null,
+		isMixFinished: false,
+	},
+)
 
 export const readablePlayQueue = readonly(playQueue)
 export const currentTrack = derived(playQueue, ({ tracks, position }) => position !== null && tracks[position])
 export const queuePosition = derived(playQueue, ({ position }) => position)
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
+
+playQueue.subscribe(persistPlayQueue)
 
 playQueue.subscribe(async ({ tracks, position, fromMixId, isMixFinished }) => {
 	const currentTracks: string[] = tracks.map((track) => track.id)
