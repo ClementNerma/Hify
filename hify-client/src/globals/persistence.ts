@@ -1,4 +1,4 @@
-import { logError } from '@stores/debugger'
+import { logDebug, logError, logInfo } from '@stores/debugger'
 import type { PlayQueue } from '@stores/play-queue'
 import { array, boolean, nullable, number, object, parse, string } from 'valibot'
 
@@ -6,9 +6,12 @@ const PLAY_QUEUE_LOCAL_STORAGE_KEY = 'hifyClient-playQueue'
 
 export function persistPlayQueue(playQueue: PlayQueue) {
 	localStorage.setItem(PLAY_QUEUE_LOCAL_STORAGE_KEY, JSON.stringify(playQueue))
+	logDebug('Persisted play queue')
 }
 
 export function loadPlayQueue(): PlayQueue | null {
+	logInfo('Loading play queue...')
+
 	const saved = localStorage.getItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 
 	if (saved === null) {
@@ -25,13 +28,18 @@ export function loadPlayQueue(): PlayQueue | null {
 		return null
 	}
 
+	let validated: PlayQueue
+
 	try {
-		return parse(PlayQueueSchema, parsed)
+		validated = parse(PlayQueueSchema, parsed)
 	} catch (e) {
 		logError(`Failed to deserialize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null
 	}
+
+	logInfo('Successfully loaded persisted play queue')
+	return validated
 }
 
 const PlayQueueSchema = object({
