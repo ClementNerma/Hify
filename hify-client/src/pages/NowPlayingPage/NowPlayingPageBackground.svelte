@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { getArtUri } from '@globals/rest-api'
-  import { AudioTrackFragment } from '@graphql/generated'
+import { getArtUri } from '@globals/rest-api'
+import { AudioTrackFragment } from '@graphql/generated'
 
-  export let track: AudioTrackFragment | null
-  export let dim = false
+export let track: AudioTrackFragment | null
+export let dim = false
 
-  $: art = track?.metadata.tags.album?.art
-  $: background = art ? `url("${getArtUri(art.id)}")` : 'transparent'
-  $: backdropFilter = `blur(20px) brightness(${dim ? 0.3 : 0.4})`
+$: art = track?.metadata.tags.album?.art
+$: background = art ? `url("${getArtUri(art.id)}")` : 'transparent'
+$: backdropFilter = `blur(20px) brightness(${dim ? 0.3 : 0.4})`
 </script>
 
 <div class="background" style="--background: {background}" />

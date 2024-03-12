@@ -1,52 +1,52 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+import { onMount } from 'svelte'
 
-  import { AsyncSearchPage, SearchPageQuery } from '@graphql/generated'
+import { AsyncSearchPage, SearchPageQuery } from '@graphql/generated'
 
-  import { logInfo } from '@stores/debugger'
+import { logInfo } from '@stores/debugger'
 
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  import { RequestFocus } from '@navigable/navigation'
-  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
-  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
-  import ArtistsRow from '@molecules/ArtistsRow/ArtistsRow.svelte'
+import { RequestFocus } from '@navigable/navigation'
+import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
+import ArtistsRow from '@molecules/ArtistsRow/ArtistsRow.svelte'
 
-  export let searchTerms: string = ''
+export let searchTerms: string = ''
 
-  const MAX_RESULTS_PER_CATEGORY = 50
+const MAX_RESULTS_PER_CATEGORY = 50
 
-  async function onChange() {
-    if (searchTerms.trim().length === 0) {
-      return
-    }
+async function onChange() {
+	if (searchTerms.trim().length === 0) {
+		return
+	}
 
-    logInfo(`Performing search "${searchTerms}"...`)
-    const start = Date.now()
+	logInfo(`Performing search "${searchTerms}"...`)
+	const start = Date.now()
 
-    const res = await AsyncSearchPage({
-      variables: {
-        limit: MAX_RESULTS_PER_CATEGORY,
-        input: searchTerms,
-      },
-    })
+	const res = await AsyncSearchPage({
+		variables: {
+			limit: MAX_RESULTS_PER_CATEGORY,
+			input: searchTerms,
+		},
+	})
 
-    results = res.data.search
+	results = res.data.search
 
-    logInfo(`Received results for search "${searchTerms}" in ${Date.now() - start} ms.`)
-  }
+	logInfo(`Received results for search "${searchTerms}" in ${Date.now() - start} ms.`)
+}
 
-  if (searchTerms.length > 0) {
-    onChange()
-  }
+if (searchTerms.length > 0) {
+	onChange()
+}
 
-  let results: SearchPageQuery['search'] | null = null
+let results: SearchPageQuery['search'] | null = null
 
-  let searchField: HTMLInputElement
+let searchField: HTMLInputElement
 
-  let requestFocus: RequestFocus
+let requestFocus: RequestFocus
 
-  onMount(() => requestFocus())
+onMount(() => requestFocus())
 </script>
 
 <div class="search-container">

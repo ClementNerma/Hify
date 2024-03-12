@@ -1,48 +1,48 @@
 <script lang="ts">
-  import { navigate } from 'svelte-navigator'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { bind } from '@globals/utils'
-  import { AsyncPlaylistsPage, CreatePlaylist, DeletePlaylist, PlaylistsPageQuery } from '@graphql/generated'
-  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { ROUTES } from '@root/routes'
-  import Button from '@atoms/Button/Button.svelte'
-  import { RequestFocus } from '@navigable/navigation'
-  import Modal from '@molecules/Modal/Modal.svelte'
-  import Input from '@atoms/Input/Input.svelte'
-  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { navigate } from 'svelte-navigator'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import { bind } from '@globals/utils'
+import { AsyncPlaylistsPage, CreatePlaylist, DeletePlaylist, PlaylistsPageQuery } from '@graphql/generated'
+import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { ROUTES } from '@root/routes'
+import Button from '@atoms/Button/Button.svelte'
+import { RequestFocus } from '@navigable/navigation'
+import Modal from '@molecules/Modal/Modal.svelte'
+import Input from '@atoms/Input/Input.svelte'
+import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 
-  const PLAYLIST_BULK = 50
+const PLAYLIST_BULK = 50
 
-  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
-  const feedMore = async () => {
-    if (currentPageInfo?.hasNextPage === false) {
-      return
-    }
+const feedMore = async () => {
+	if (currentPageInfo?.hasNextPage === false) {
+		return
+	}
 
-    const res = await AsyncPlaylistsPage({
-      variables: {
-        pagination: {
-          after: currentPageInfo?.endCursor,
-          first: PLAYLIST_BULK,
-        },
-      },
-    })
+	const res = await AsyncPlaylistsPage({
+		variables: {
+			pagination: {
+				after: currentPageInfo?.endCursor,
+				first: PLAYLIST_BULK,
+			},
+		},
+	})
 
-    currentPageInfo = res.data.playlists.pageInfo
-    playlists = [...playlists, ...res.data.playlists.nodes]
-  }
+	currentPageInfo = res.data.playlists.pageInfo
+	playlists = [...playlists, ...res.data.playlists.nodes]
+}
 
-  type PlaylistData = PlaylistsPageQuery['playlists']['nodes'][number]
+type PlaylistData = PlaylistsPageQuery['playlists']['nodes'][number]
 
-  let playlists: PlaylistData[] = []
-  let isPlaylistCreationModalOpen = false
-  let isPlaylistDeletionModalOpen = false
-  let deletionModalForPlaylistId: string | null = null
-  let newPlaylistName = ''
+let playlists: PlaylistData[] = []
+let isPlaylistCreationModalOpen = false
+let isPlaylistDeletionModalOpen = false
+let deletionModalForPlaylistId: string | null = null
+let newPlaylistName = ''
 
-  let requestFocus: RequestFocus
+let requestFocus: RequestFocus
 </script>
 
 {#await feedMore()}

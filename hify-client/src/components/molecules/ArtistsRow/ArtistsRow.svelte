@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
-  import { ArtistCardFragment } from '@graphql/generated'
-  import Card from '@molecules/Card/Card.svelte'
-  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
-  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
-  import { ROUTES } from '@root/routes'
-  import { navigate } from 'svelte-navigator'
+import { ctxMenuCallbacks, ctxMenuOptions } from '@globals/context-menu-items'
+import { ArtistCardFragment } from '@graphql/generated'
+import Card from '@molecules/Card/Card.svelte'
+import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { ROUTES } from '@root/routes'
+import { navigate } from 'svelte-navigator'
 
-  export let artists: ArtistCardFragment[]
+export let artists: ArtistCardFragment[]
 </script>
 
 <ProgressiveRow

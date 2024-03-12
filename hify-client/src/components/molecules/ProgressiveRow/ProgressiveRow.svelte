@@ -1,71 +1,71 @@
 <script lang="ts" generics="T">
-  import { afterUpdate } from 'svelte'
+import { afterUpdate } from 'svelte'
 
-  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
+import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { NavigableCommonProps, RequestFocus } from '@navigable/navigation'
 
-  export let items: T[]
-  export let idProp: keyof T
+export let items: T[]
+export let idProp: keyof T
 
-  export let initialPosition = 0
+export let initialPosition = 0
 
-  export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
-  export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
+export let onItemPress: ((item: T, newPosition: number) => void) | undefined = undefined
+export let onItemLongPress: ((item: T, newPosition: number) => void) | undefined = undefined
 
-  export let onFocusChange: NavigableCommonProps['onFocusChange'] = undefined
+export let onFocusChange: NavigableCommonProps['onFocusChange'] = undefined
 
-  let position = 0
-  let handlerDisabled = false
-  let prevSelected: T[keyof T] | null = null
+let position = 0
+let handlerDisabled = false
+let prevSelected: T[keyof T] | null = null
 
-  let positionOnUnfocused = 0
+let positionOnUnfocused = 0
 
-  let isFirstEntering = true
+let isFirstEntering = true
 
-  const COLUMNS = 7
+const COLUMNS = 7
 
-  afterUpdate(() => {
-    if (position >= items.length) {
-      position = Math.max(items.length - 1, 0)
-      requestFocus(position)
-    } else if (prevSelected !== null && !items.find((item) => item[idProp] === prevSelected)) {
-      requestFocus(position)
-    }
-  })
+afterUpdate(() => {
+	if (position >= items.length) {
+		position = Math.max(items.length - 1, 0)
+		requestFocus(position)
+	} else if (prevSelected !== null && !items.find((item) => item[idProp] === prevSelected)) {
+		requestFocus(position)
+	}
+})
 
-  async function onSelect(newPosition: number, requestItemFocus: boolean) {
-    if (handlerDisabled || newPosition < 0) {
-      return
-    }
+async function onSelect(newPosition: number, requestItemFocus: boolean) {
+	if (handlerDisabled || newPosition < 0) {
+		return
+	}
 
-    isFirstEntering = false
+	isFirstEntering = false
 
-    position = Math.min(newPosition, items.length - 1)
+	position = Math.min(newPosition, items.length - 1)
 
-    if (requestItemFocus) {
-      requestFocus(position)
-    }
+	if (requestItemFocus) {
+		requestFocus(position)
+	}
 
-    positionOnUnfocused = newPosition
-  }
+	positionOnUnfocused = newPosition
+}
 
-  function requestFocus(position: number) {
-    if (items.length === 0) {
-      return
-    }
+function requestFocus(position: number) {
+	if (items.length === 0) {
+		return
+	}
 
-    handlerDisabled = true
-    requestFocusById[items[position][idProp]]?.()
-    handlerDisabled = false
-    prevSelected = items[position][idProp]
-  }
+	handlerDisabled = true
+	requestFocusById[items[position][idProp]]?.()
+	handlerDisabled = false
+	prevSelected = items[position][idProp]
+}
 
-  $: firstVisibleItemIndex = Math.max(position - Math.round((COLUMNS - 1) / 2), 0)
-  $: visibleTracks = items.slice(firstVisibleItemIndex, firstVisibleItemIndex + COLUMNS)
+$: firstVisibleItemIndex = Math.max(position - Math.round((COLUMNS - 1) / 2), 0)
+$: visibleTracks = items.slice(firstVisibleItemIndex, firstVisibleItemIndex + COLUMNS)
 
-  // @ts-ignore
-  let requestFocusById: Record<T[keyof T], RequestFocus> = {}
+// @ts-ignore
+let requestFocusById: Record<T[keyof T], RequestFocus> = {}
 </script>
 
 <NavigableRow {onFocusChange}>

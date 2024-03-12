@@ -1,57 +1,57 @@
 <script lang="ts">
-  import { navigate } from 'svelte-navigator'
-  import { bind, formatDate } from '@globals/utils'
+import { navigate } from 'svelte-navigator'
+import { bind, formatDate } from '@globals/utils'
 
-  import {
-    humanReadableDuration,
-    readableAudioPaused,
-    readableAudioProgress,
-    setPlayingAudioProgress,
-    toggleAudioPlayback,
-  } from '@stores/audio-player'
-  import { playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
+import {
+	humanReadableDuration,
+	readableAudioPaused,
+	readableAudioProgress,
+	setPlayingAudioProgress,
+	toggleAudioPlayback,
+} from '@stores/audio-player'
+import { playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
 
-  import { AudioTrackFragment } from '@graphql/generated'
+import { AudioTrackFragment } from '@graphql/generated'
 
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
-  import { ROUTES } from '@root/routes'
-  import Column from '@navigable/ui/molecules/Column/Column.svelte'
-  import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
-  import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
-  // import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
-  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
-  import Card from '@molecules/Card/Card.svelte'
-  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
-  import { ctxMenuOptions } from '@globals/context-menu-items'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+import { ROUTES } from '@root/routes'
+import Column from '@navigable/ui/molecules/Column/Column.svelte'
+import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackRating.svelte'
+import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
+// import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
+import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+import Card from '@molecules/Card/Card.svelte'
+import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import { ctxMenuOptions } from '@globals/context-menu-items'
 
-  export let currentTrack: AudioTrackFragment | false
-  let isQueueFocused = false
+export let currentTrack: AudioTrackFragment | false
+let isQueueFocused = false
 
-  // function toggleWaveForm() {
-  //   showWaveform = !showWaveform
-  // }
+// function toggleWaveForm() {
+//   showWaveform = !showWaveform
+// }
 
-  // let showWaveform = false
+// let showWaveform = false
 
-  function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
-    showContextMenu(
-      ctxMenuOptions.forTrack(
-        track,
-        { fromMixId: null },
-        {
-          context: 'queue',
-          isCurrent: $queuePosition === position,
-          position,
-          totalTracks: $readablePlayQueue.tracks.length,
-        },
-      ),
-    )
-  }
+function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
+	showContextMenu(
+		ctxMenuOptions.forTrack(
+			track,
+			{ fromMixId: null },
+			{
+				context: 'queue',
+				isCurrent: $queuePosition === position,
+				position,
+				totalTracks: $readablePlayQueue.tracks.length,
+			},
+		),
+	)
+}
 
-  function setQueueFocused(isFocused: boolean) {
-    isQueueFocused = isFocused
-  }
+function setQueueFocused(isFocused: boolean) {
+	isQueueFocused = isFocused
+}
 </script>
 
 <div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!currentTrack}>

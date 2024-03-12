@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-  import { Writable, writable } from 'svelte/store'
+import { Writable, writable } from 'svelte/store'
 
-  export function setterStore<T>(): Writable<T | null> {
-    return writable(null)
-  }
+export function setterStore<T>(): Writable<T | null> {
+	return writable(null)
+}
 </script>
 
 <script lang="ts" generics="T">

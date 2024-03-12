@@ -222,12 +222,12 @@ export function moveTrackPositionInQueue(index: number, newIndex: number): void 
 				position === null
 					? null
 					: (index === position && newIndex < position) || // current track moved left, so move left
-					  (index === position - 1 && newIndex === position) // left track moved right, so move left
-					? position - 1
-					: (index === position && newIndex > position) || // current track moved right, so move right
-					  (index === position + 1 && newIndex === position) // right track moved left, so move right
-					? position + 1
-					: position,
+						  (index === position - 1 && newIndex === position) // left track moved right, so move left
+					  ? position - 1
+					  : (index === position && newIndex > position) || // current track moved right, so move right
+							  (index === position + 1 && newIndex === position) // right track moved left, so move right
+						  ? position + 1
+						  : position,
 			isMixFinished,
 		}
 	})

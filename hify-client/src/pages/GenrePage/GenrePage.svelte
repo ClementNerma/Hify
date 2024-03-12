@@ -1,49 +1,49 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncGenrePage, MixOrdering } from '@graphql/generated'
+import { AlbumCardFragment, AsyncGenrePage, MixOrdering } from '@graphql/generated'
 
-  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
-  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
-  import MixButton from '@atoms/MixButton/MixButton.svelte'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '@root/constants'
+import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+import MixButton from '@atoms/MixButton/MixButton.svelte'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import { LARGE_MIX_TRACKS_QTY, MIN_GREAT_RATING } from '@root/constants'
 
-  const ALBUMS_PER_LINE = 6
-  const LINES_PER_PAGE = 5
+const ALBUMS_PER_LINE = 6
+const LINES_PER_PAGE = 5
 
-  export let genreId: string
+export let genreId: string
 
-  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
-  const feedMore = async () => {
-    if (currentPageInfo?.hasNextPage === false) {
-      return
-    }
+const feedMore = async () => {
+	if (currentPageInfo?.hasNextPage === false) {
+		return
+	}
 
-    const res = await AsyncGenrePage({
-      variables: {
-        genreId,
-        pagination: {
-          after: currentPageInfo?.endCursor,
-          first: ALBUMS_PER_LINE * LINES_PER_PAGE,
-        },
-      },
-    })
+	const res = await AsyncGenrePage({
+		variables: {
+			genreId,
+			pagination: {
+				after: currentPageInfo?.endCursor,
+				first: ALBUMS_PER_LINE * LINES_PER_PAGE,
+			},
+		},
+	})
 
-    if (!res.data.genre) {
-      genreNotFound = true
-      return
-    }
+	if (!res.data.genre) {
+		genreNotFound = true
+		return
+	}
 
-    genreName = res.data.genre.name
-    currentPageInfo = res.data.genre.albums.pageInfo
-    const newAlbums = res.data.genre.albums.nodes
+	genreName = res.data.genre.name
+	currentPageInfo = res.data.genre.albums.pageInfo
+	const newAlbums = res.data.genre.albums.nodes
 
-    albums = [...albums, ...newAlbums]
-  }
+	albums = [...albums, ...newAlbums]
+}
 
-  let albums: AlbumCardFragment[] = []
-  let genreName: string | null = null
-  let genreNotFound: boolean | null = null
+let albums: AlbumCardFragment[] = []
+let genreName: string | null = null
+let genreNotFound: boolean | null = null
 </script>
 
 {#await feedMore()}

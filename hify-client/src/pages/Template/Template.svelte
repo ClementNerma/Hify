@@ -1,77 +1,77 @@
 <script lang="ts">
-  import '@navigable/navigation.css'
+import '@navigable/navigation.css'
 
-  import { useLocation, navigate } from 'svelte-navigator'
+import { useLocation, navigate } from 'svelte-navigator'
 
-  import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@stores/audio-player'
-  import { playNextTrack, playPreviousTrackOrRewind } from '@stores/play-queue'
+import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@stores/audio-player'
+import { playNextTrack, playPreviousTrackOrRewind } from '@stores/play-queue'
 
-  import { ROUTES } from '@root/routes'
+import { ROUTES } from '@root/routes'
 
-  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
-  import NavigablePage from '@navigable/headless/NavigablePage/NavigablePage.svelte'
+import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+import NavigablePage from '@navigable/headless/NavigablePage/NavigablePage.svelte'
 
-  import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import NavBar from '@molecules/NavBar/NavBar.svelte'
-  import { handleInput, KeyPressHandling, registerLongPressableKeys } from '@navigable/input-manager'
-  import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import ContextMenu from '@navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
-  import ErrorDialog from '../../components/molecules/ErrorDialog/ErrorDialog.svelte'
-  import { onMount } from 'svelte'
-  import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
+import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
+import NavBar from '@molecules/NavBar/NavBar.svelte'
+import { handleInput, KeyPressHandling, registerLongPressableKeys } from '@navigable/input-manager'
+import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+import ContextMenu from '@navigable/ui/molecules/ContextMenu/ContextMenu.svelte'
+import ErrorDialog from '../../components/molecules/ErrorDialog/ErrorDialog.svelte'
+import { onMount } from 'svelte'
+import { showErrorDialog } from '@molecules/ErrorDialog/ErrorDialog'
 
-  const location = useLocation()
+const location = useLocation()
 
-  registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape')
+registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape')
 
-  handleInput((key, long) => {
-    switch (key) {
-      case 'MediaPlayPause':
-      case 'p':
-        if (!long) {
-          toggleAudioPlayback()
-        } else {
-          navigate($location.pathname === ROUTES.nowPlaying ? ROUTES.search : ROUTES.nowPlaying)
-        }
+handleInput((key, long) => {
+	switch (key) {
+		case 'MediaPlayPause':
+		case 'p':
+			if (!long) {
+				toggleAudioPlayback()
+			} else {
+				navigate($location.pathname === ROUTES.nowPlaying ? ROUTES.search : ROUTES.nowPlaying)
+			}
 
-        break
+			break
 
-      case 'MediaRewind':
-      case 'r':
-        if (!long) {
-          setPlayingAudioProgressRelative(-10)
-        } else {
-          playPreviousTrackOrRewind()
-        }
+		case 'MediaRewind':
+		case 'r':
+			if (!long) {
+				setPlayingAudioProgressRelative(-10)
+			} else {
+				playPreviousTrackOrRewind()
+			}
 
-        break
+			break
 
-      case 'MediaFastForward':
-      case 'f':
-        if (!long) {
-          setPlayingAudioProgressRelative(+10)
-        } else {
-          playNextTrack()
-        }
+		case 'MediaFastForward':
+		case 'f':
+			if (!long) {
+				setPlayingAudioProgressRelative(+10)
+			} else {
+				playNextTrack()
+			}
 
-        break
+			break
 
-      default:
-        return
-    }
+		default:
+			return
+	}
 
-    return KeyPressHandling.Propagate
-  })
+	return KeyPressHandling.Propagate
+})
 
-  onMount(() => {
-    window.addEventListener('error', (err) => {
-      showErrorDialog('JavaScript runtime error', err.message)
-    })
+onMount(() => {
+	window.addEventListener('error', (err) => {
+		showErrorDialog('JavaScript runtime error', err.message)
+	})
 
-    window.addEventListener('unhandledrejection', (_) => {
-      showErrorDialog('JavaScript unhandled Promise rejection', '<unknown message>')
-    })
-  })
+	window.addEventListener('unhandledrejection', (_) => {
+		showErrorDialog('JavaScript unhandled Promise rejection', '<unknown message>')
+	})
+})
 </script>
 
 <div class="background" />

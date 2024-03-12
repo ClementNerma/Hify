@@ -1,16 +1,16 @@
 <script lang="ts">
-  import Button from '@atoms/Button/Button.svelte'
-  import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
-  import { hifyInterface } from '@globals/injected'
-  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { appLogs } from '@stores/debugger'
-  import { bind } from '@globals/utils'
+import Button from '@atoms/Button/Button.svelte'
+import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
+import Row from '@navigable/ui/molecules/Row/Row.svelte'
+import { hifyInterface } from '@globals/injected'
+import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { appLogs } from '@stores/debugger'
+import { bind } from '@globals/utils'
 
-  let hideDebugLogs = true
+let hideDebugLogs = true
 
-  $: slicedAppLogs = $appLogs.filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
+$: slicedAppLogs = $appLogs.filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true))
 </script>
 
 <h2>Developer Tools</h2>

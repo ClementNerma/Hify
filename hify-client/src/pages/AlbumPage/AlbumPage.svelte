@@ -1,65 +1,65 @@
 <script lang="ts">
-  import { navigate } from 'svelte-navigator'
+import { navigate } from 'svelte-navigator'
 
-  import { ROUTES } from '@root/routes'
-  import { AsyncAlbumPage, AudioTrackFragment } from '@graphql/generated'
+import { ROUTES } from '@root/routes'
+import { AsyncAlbumPage, AudioTrackFragment } from '@graphql/generated'
 
-  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
-  import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
-  import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '@globals/utils'
-  import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
-  import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
-  import Button from '@atoms/Button/Button.svelte'
-  import Emoji from '@atoms/Emoji/Emoji.svelte'
-  import { enqueue, playNewQueueFromBeginning } from '@stores/play-queue'
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
-  import { humanReadableDuration } from '@stores/audio-player'
-  import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
+import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
+import { bind, dedup, filterMap, hasMinimumRating, isDefined, shuffle } from '@globals/utils'
+import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
+import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
+import Button from '@atoms/Button/Button.svelte'
+import Emoji from '@atoms/Emoji/Emoji.svelte'
+import { enqueue, playNewQueueFromBeginning } from '@stores/play-queue'
+import Row from '@navigable/ui/molecules/Row/Row.svelte'
+import { humanReadableDuration } from '@stores/audio-player'
+import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 
-  export let albumId: string
+export let albumId: string
 
-  function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
-    const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
-      number: num.toString(),
-      tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
-    }))
+function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
+	const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
+		number: num.toString(),
+		tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+	}))
 
-    const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
+	const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
 
-    if (tracksWithoutDisc.length > 0) {
-      discs.unshift({ number: '?', tracks: tracksWithoutDisc })
-    }
+	if (tracksWithoutDisc.length > 0) {
+		discs.unshift({ number: '?', tracks: tracksWithoutDisc })
+	}
 
-    return {
-      totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
-      discs,
-    }
-  }
+	return {
+		totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
+		discs,
+	}
+}
 
-  const album = AsyncAlbumPage({
-    variables: {
-      albumId,
-    },
-  }).then((res) => {
-    const album = res.data.album
+const album = AsyncAlbumPage({
+	variables: {
+		albumId,
+	},
+}).then((res) => {
+	const album = res.data.album
 
-    if (!album) {
-      throw new Error("ERROR: Failed to fetch album's data")
-    }
+	if (!album) {
+		throw new Error("ERROR: Failed to fetch album's data")
+	}
 
-    return album
-  })
+	return album
+})
 
-  function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
-    return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 8)) : tracks
-  }
+function filterTracks(tracks: AudioTrackFragment[], onlyShowGreatSongs: boolean): AudioTrackFragment[] {
+	return onlyShowGreatSongs ? tracks.filter((track) => hasMinimumRating(track, 8)) : tracks
+}
 
-  let onlyShowGreatSongs = false
+let onlyShowGreatSongs = false
 </script>
 
 {#await album}

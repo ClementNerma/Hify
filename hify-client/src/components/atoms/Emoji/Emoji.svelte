@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let alone = false
+export let alone = false
 </script>
 
 <span class="emoji" class:alone>

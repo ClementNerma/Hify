@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  let _singletonChecker = false
+let _singletonChecker = false
 </script>
 
 <script lang="ts">

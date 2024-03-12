@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getArtUri } from '@globals/rest-api'
-  import { ProgressiveImgFragment } from '@graphql/generated'
+import { getArtUri } from '@globals/rest-api'
+import { ProgressiveImgFragment } from '@graphql/generated'
 
-  export let art: ProgressiveImgFragment | null | undefined
+export let art: ProgressiveImgFragment | null | undefined
 </script>
 
 {#if art}

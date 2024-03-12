@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
-  export type Tab = {
-    label: string
-    uri: string
-    subMenu?: TabDropdownItem[]
-  }
+export type Tab = {
+	label: string
+	uri: string
+	subMenu?: TabDropdownItem[]
+}
 
-  export type TabDropdownItem = Omit<Tab, 'subMenu'>
+export type TabDropdownItem = Omit<Tab, 'subMenu'>
 </script>
 
 <script lang="ts">

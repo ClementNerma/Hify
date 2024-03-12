@@ -1,49 +1,49 @@
 <script lang="ts">
-  import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { AsyncPlaylistPage, PlaylistPageQuery } from '@graphql/generated'
-  import PlaylistListView from './PlaylistListView.svelte'
-  import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
-  import type { EntryInPlaylist } from '@globals/context-menu-items'
+import Checkbox from '@atoms/Checkbox/Checkbox.svelte'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import { AsyncPlaylistPage, PlaylistPageQuery } from '@graphql/generated'
+import PlaylistListView from './PlaylistListView.svelte'
+import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
+import type { EntryInPlaylist } from '@globals/context-menu-items'
 
-  const TRACKS_BULK = 50
+const TRACKS_BULK = 50
 
-  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
-  const feedMore = async () => {
-    if (currentPageInfo?.hasNextPage === false) {
-      return
-    }
+const feedMore = async () => {
+	if (currentPageInfo?.hasNextPage === false) {
+		return
+	}
 
-    const res = await AsyncPlaylistPage({
-      variables: {
-        playlistId,
-        tracksPagination: {
-          after: currentPageInfo?.endCursor,
-          first: TRACKS_BULK,
-        },
-      },
-    })
+	const res = await AsyncPlaylistPage({
+		variables: {
+			playlistId,
+			tracksPagination: {
+				after: currentPageInfo?.endCursor,
+				first: TRACKS_BULK,
+			},
+		},
+	})
 
-    currentPageInfo = res.data.playlist.entries.pageInfo
-    playlistEntries = [...playlistEntries, ...res.data.playlist.entries.nodes]
+	currentPageInfo = res.data.playlist.entries.pageInfo
+	playlistEntries = [...playlistEntries, ...res.data.playlist.entries.nodes]
 
-    return res.data.playlist
-  }
+	return res.data.playlist
+}
 
-  export let playlistId: string
+export let playlistId: string
 
-  const playlist = feedMore().then((playlist) => playlist!)
+const playlist = feedMore().then((playlist) => playlist!)
 
-  let playlistEntries: PlaylistPageQuery['playlist']['entries']['nodes'] = []
-  let gridView = false
+let playlistEntries: PlaylistPageQuery['playlist']['entries']['nodes'] = []
+let gridView = false
 
-  const inPlaylist: Omit<EntryInPlaylist, 'trackEntry'> = {
-    playlistId,
-    allEntries: playlistEntries,
-  }
+const inPlaylist: Omit<EntryInPlaylist, 'trackEntry'> = {
+	playlistId,
+	allEntries: playlistEntries,
+}
 
-  $: tracks = playlistEntries.map((entry) => entry.track)
+$: tracks = playlistEntries.map((entry) => entry.track)
 </script>
 
 {#await playlist}

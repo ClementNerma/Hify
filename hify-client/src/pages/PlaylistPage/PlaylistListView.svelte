@@ -1,15 +1,15 @@
 <script lang="ts">
-  import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
-  import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
-  import { EntryInPlaylist } from '@globals/context-menu-items'
-  import { AudioTrackFragment } from '@graphql/generated'
-  import { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
-  import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
-  import { humanReadableDuration } from '@stores/audio-player'
+import NavigableTrack from '@atoms/NavigableTrack/NavigableTrack.svelte'
+import TrackRating from '@atoms/TrackRating/TrackRating.svelte'
+import { EntryInPlaylist } from '@globals/context-menu-items'
+import { AudioTrackFragment } from '@graphql/generated'
+import { NavigableListProps } from '@navigable/headless/NavigableList/NavigableList'
+import NavigableList from '@navigable/headless/NavigableList/NavigableList.svelte'
+import { humanReadableDuration } from '@stores/audio-player'
 
-  export let tracks: AudioTrackFragment[] = []
-  export let inPlaylist: Omit<EntryInPlaylist, 'trackEntry'>
-  export let feedMore: NavigableListProps['lazyLoader']
+export let tracks: AudioTrackFragment[] = []
+export let inPlaylist: Omit<EntryInPlaylist, 'trackEntry'>
+export let feedMore: NavigableListProps['lazyLoader']
 </script>
 
 <NavigableList lazyLoader={feedMore}>

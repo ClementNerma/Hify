@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { AsyncGenerateStats } from '@graphql/generated'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { humanReadableDuration } from '@stores/audio-player'
+import { AsyncGenerateStats } from '@graphql/generated'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { humanReadableDuration } from '@stores/audio-player'
 
-  const statsReq = AsyncGenerateStats({
-    variables: {},
-    fetchPolicy: 'no-cache',
-  })
+const statsReq = AsyncGenerateStats({
+	variables: {},
+	fetchPolicy: 'no-cache',
+})
 
-  $: stats = statsReq.then((stats) => stats.data.generateStats)
+$: stats = statsReq.then((stats) => stats.data.generateStats)
 </script>
 
 <SimpleNavigableItem unstyled>

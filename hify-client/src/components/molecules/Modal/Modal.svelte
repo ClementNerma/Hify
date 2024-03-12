@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-  export type ModalButton = {
-    label: string
-    onPress: () => void | boolean | Promise<void | boolean>
-  }
+export type ModalButton = {
+	label: string
+	onPress: () => void | boolean | Promise<void | boolean>
+}
 </script>
 
 <script lang="ts">

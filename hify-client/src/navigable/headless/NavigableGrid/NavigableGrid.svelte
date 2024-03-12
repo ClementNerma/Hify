@@ -1,30 +1,30 @@
 <script lang="ts">
-  import { afterUpdate } from 'svelte'
-  import InternalNavWrapper from '../InternalNavWrapper.svelte'
+import { afterUpdate } from 'svelte'
+import InternalNavWrapper from '../InternalNavWrapper.svelte'
 
-  import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
-  import { NavigableGrid } from './NavigableGrid'
+import { getParentNavigable, Props, setChildrenNavigable } from '../../navigation'
+import { NavigableGrid } from './NavigableGrid'
 
-  export let hasFocusPriority: Props<NavigableGrid>['hasFocusPriority'] = null
+export let hasFocusPriority: Props<NavigableGrid>['hasFocusPriority'] = null
 
-  export let columns: Props<NavigableGrid>['columns']
-  export let lazyLoader: Props<NavigableGrid>['lazyLoader'] = undefined
-  export let distanceBeforeLazyLoading: Props<NavigableGrid>['distanceBeforeLazyLoading'] = undefined
+export let columns: Props<NavigableGrid>['columns']
+export let lazyLoader: Props<NavigableGrid>['lazyLoader'] = undefined
+export let distanceBeforeLazyLoading: Props<NavigableGrid>['distanceBeforeLazyLoading'] = undefined
 
-  const gridProps = (): Props<NavigableGrid> => ({
-    hasFocusPriority,
-    columns,
-    lazyLoader,
-    distanceBeforeLazyLoading,
-  })
+const gridProps = (): Props<NavigableGrid> => ({
+	hasFocusPriority,
+	columns,
+	lazyLoader,
+	distanceBeforeLazyLoading,
+})
 
-  const grid = new NavigableGrid(getParentNavigable(), gridProps())
+const grid = new NavigableGrid(getParentNavigable(), gridProps())
 
-  setChildrenNavigable(grid)
+setChildrenNavigable(grid)
 
-  afterUpdate(() => grid.updateProps(gridProps()))
+afterUpdate(() => grid.updateProps(gridProps()))
 
-  export const requestFocus = () => grid.requestFocus()
+export const requestFocus = () => grid.requestFocus()
 </script>
 
 <InternalNavWrapper navId={grid.id}>

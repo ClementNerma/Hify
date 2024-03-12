@@ -1,19 +1,19 @@
 <script lang="ts">
-  import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
-  import { ProgressiveImgFragment } from '@graphql/generated'
+import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+import { ProgressiveImgFragment } from '@graphql/generated'
 
-  export let art: ProgressiveImgFragment | null | undefined
+export let art: ProgressiveImgFragment | null | undefined
 
-  export let title: string
-  export let subtitle: string | null = null
+export let title: string
+export let subtitle: string | null = null
 
-  export let boxSize = 120
-  export let circle = false
-  export let opacity = 1
+export let boxSize = 120
+export let circle = false
+export let opacity = 1
 
-  // 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
-  // It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
-  export let enforceMaxWidth = false
+// 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
+// It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
+export let enforceMaxWidth = false
 </script>
 
 <div class="card" class:enforceMaxWidth style="--width: {boxSize}px; --opacity: {opacity};">

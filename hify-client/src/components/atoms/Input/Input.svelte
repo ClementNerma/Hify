@@ -1,12 +1,12 @@
 <script lang="ts">
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
-  import { RequestFocus } from '@navigable/navigation'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { RequestFocus } from '@navigable/navigation'
 
-  let searchField: HTMLInputElement
+let searchField: HTMLInputElement
 
-  export let requestFocus: RequestFocus
+export let requestFocus: RequestFocus
 
-  export let value: string
+export let value: string
 </script>
 
 <SimpleNavigableItem

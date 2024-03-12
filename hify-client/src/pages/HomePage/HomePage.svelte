@@ -1,41 +1,41 @@
 <script lang="ts">
-  import { navigate } from 'svelte-navigator'
-  import Button from '@atoms/Button/Button.svelte'
-  import MixButton from '@atoms/MixButton/MixButton.svelte'
-  import Row from '@navigable/ui/molecules/Row/Row.svelte'
-  import { AsyncHomePage, MixOrdering } from '@graphql/generated'
-  import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
-  import { ROUTES } from '@root/routes'
-  import IndexUpdater from './IndexUpdater.svelte'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import StatsBox from '@molecules/StatsBox/StatsBox.svelte'
-  import Centered from '@atoms/Centered/Centered.svelte'
-  import { MIN_GREAT_RATING } from '@root/constants'
-  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
-  import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
-  import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
+import { navigate } from 'svelte-navigator'
+import Button from '@atoms/Button/Button.svelte'
+import MixButton from '@atoms/MixButton/MixButton.svelte'
+import Row from '@navigable/ui/molecules/Row/Row.svelte'
+import { AsyncHomePage, MixOrdering } from '@graphql/generated'
+import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
+import { ROUTES } from '@root/routes'
+import IndexUpdater from './IndexUpdater.svelte'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import StatsBox from '@molecules/StatsBox/StatsBox.svelte'
+import Centered from '@atoms/Centered/Centered.svelte'
+import { MIN_GREAT_RATING } from '@root/constants'
+import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+import TracksRow from '@molecules/TracksRow/TracksRow.svelte'
+import AlbumsRow from '@molecules/AlbumsRow/AlbumsRow.svelte'
 
-  async function fetchFeed() {
-    const res = await AsyncHomePage({
-      variables: {
-        randomItemsParams: {
-          minRating: 8,
-          maxItems: 25,
-        },
-      },
+async function fetchFeed() {
+	const res = await AsyncHomePage({
+		variables: {
+			randomItemsParams: {
+				minRating: 8,
+				maxItems: 25,
+			},
+		},
 
-      fetchPolicy: 'no-cache',
-    })
+		fetchPolicy: 'no-cache',
+	})
 
-    return res.data.generateFeed
-  }
+	return res.data.generateFeed
+}
 
-  function onUpdated() {
-    feed = fetchFeed()
-  }
+function onUpdated() {
+	feed = fetchFeed()
+}
 
-  let feed = fetchFeed()
-  let statsBox = false
+let feed = fetchFeed()
+let statsBox = false
 </script>
 
 {#await feed}

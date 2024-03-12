@@ -1,15 +1,15 @@
 <script>
-  import { onMount } from 'svelte'
+import { onMount } from 'svelte'
 
-  export let delayMillis = 1000
+export let delayMillis = 1000
 
-  let visible = false
+let visible = false
 
-  onMount(() => {
-    setTimeout(() => {
-      visible = true
-    }, delayMillis)
-  })
+onMount(() => {
+	setTimeout(() => {
+		visible = true
+	}, delayMillis)
+})
 </script>
 
 {#if visible}

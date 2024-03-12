@@ -1,44 +1,44 @@
 <script lang="ts">
-  import { AlbumCardFragment, AsyncArtistAlbums } from '@graphql/generated'
+import { AlbumCardFragment, AsyncArtistAlbums } from '@graphql/generated'
 
-  import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
-  import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
-  import Button from '@atoms/Button/Button.svelte'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import Grid from '@navigable/ui/organisms/Grid/Grid.svelte'
+import AlbumCard from '@molecules/AlbumCard/AlbumCard.svelte'
+import Button from '@atoms/Button/Button.svelte'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
 
-  export let artistId: string
+export let artistId: string
 
-  const ALBUMS_PER_LINE = 5
-  const LINES_PER_REQUEST = 5
+const ALBUMS_PER_LINE = 5
+const LINES_PER_REQUEST = 5
 
-  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
-  const feedMore = async () => {
-    if (currentPageInfo?.hasNextPage === false) {
-      return currentPageInfo
-    }
+const feedMore = async () => {
+	if (currentPageInfo?.hasNextPage === false) {
+		return currentPageInfo
+	}
 
-    const res = await AsyncArtistAlbums({
-      variables: {
-        artistId,
-        pagination: {
-          after: currentPageInfo?.endCursor,
-          first: ALBUMS_PER_LINE * LINES_PER_REQUEST,
-        },
-      },
-    }).then((res) => res.data.artist?.albums)
+	const res = await AsyncArtistAlbums({
+		variables: {
+			artistId,
+			pagination: {
+				after: currentPageInfo?.endCursor,
+				first: ALBUMS_PER_LINE * LINES_PER_REQUEST,
+			},
+		},
+	}).then((res) => res.data.artist?.albums)
 
-    if (!res) {
-      throw new Error("Failed to fetch artist's data")
-    }
+	if (!res) {
+		throw new Error("Failed to fetch artist's data")
+	}
 
-    currentPageInfo = res.pageInfo
-    albums = [...albums, ...res.nodes]
+	currentPageInfo = res.pageInfo
+	albums = [...albums, ...res.nodes]
 
-    return currentPageInfo
-  }
+	return currentPageInfo
+}
 
-  let albums: AlbumCardFragment[] = []
+let albums: AlbumCardFragment[] = []
 </script>
 
 {#await feedMore()}

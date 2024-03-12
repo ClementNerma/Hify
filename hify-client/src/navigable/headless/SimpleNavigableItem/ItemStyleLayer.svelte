@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let inlineBlock = false
+export let inlineBlock = false
 </script>
 
 <div class:inlineBlock><slot /></div>

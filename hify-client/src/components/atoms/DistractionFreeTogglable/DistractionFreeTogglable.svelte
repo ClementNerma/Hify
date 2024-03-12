@@ -1,5 +1,5 @@
 <script>
-  import { distractionFreeMode } from '@stores/distraction-free'
+import { distractionFreeMode } from '@stores/distraction-free'
 </script>
 
 <div class:hidden={$distractionFreeMode}>

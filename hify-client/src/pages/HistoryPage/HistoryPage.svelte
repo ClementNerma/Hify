@@ -1,33 +1,33 @@
 <script lang="ts">
-  import { AsyncHistoryPage, AudioTrackFragment } from '@graphql/generated'
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import { GRID_TRACKS_PER_ROW } from '../../constants'
-  import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
+import { AsyncHistoryPage, AudioTrackFragment } from '@graphql/generated'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import { GRID_TRACKS_PER_ROW } from '../../constants'
+import TracksGrid from '@molecules/TracksGrid/TracksGrid.svelte'
 
-  const LINES_PER_PAGE = 5
+const LINES_PER_PAGE = 5
 
-  let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
+let currentPageInfo: { endCursor?: string | null; hasNextPage: boolean } | null = null
 
-  const feedMore = async () => {
-    if (currentPageInfo?.hasNextPage === false) {
-      return
-    }
+const feedMore = async () => {
+	if (currentPageInfo?.hasNextPage === false) {
+		return
+	}
 
-    const res = await AsyncHistoryPage({
-      variables: {
-        pagination: {
-          after: currentPageInfo?.endCursor,
-          first: GRID_TRACKS_PER_ROW * LINES_PER_PAGE,
-        },
-      },
-      fetchPolicy: 'no-cache',
-    })
+	const res = await AsyncHistoryPage({
+		variables: {
+			pagination: {
+				after: currentPageInfo?.endCursor,
+				first: GRID_TRACKS_PER_ROW * LINES_PER_PAGE,
+			},
+		},
+		fetchPolicy: 'no-cache',
+	})
 
-    currentPageInfo = res.data.history.pageInfo
-    tracks = [...tracks, ...res.data.history.nodes]
-  }
+	currentPageInfo = res.data.history.pageInfo
+	tracks = [...tracks, ...res.data.history.nodes]
+}
 
-  let tracks: AudioTrackFragment[] = []
+let tracks: AudioTrackFragment[] = []
 </script>
 
 {#await feedMore()}

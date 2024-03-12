@@ -1,28 +1,28 @@
 <script lang="ts">
-  import Button from '@atoms/Button/Button.svelte'
-  import { IndexUpdater } from '@graphql/generated'
+import Button from '@atoms/Button/Button.svelte'
+import { IndexUpdater } from '@graphql/generated'
 
-  export let onUpdated: (() => void) | null = null
+export let onUpdated: (() => void) | null = null
 
-  function updateIndex() {
-    isUpdating = true
-    updateResult = null
+function updateIndex() {
+	isUpdating = true
+	updateResult = null
 
-    IndexUpdater({ variables: {} })
-      .then(() => {
-        updateResult = { type: 'ok' }
-        onUpdated?.()
-      })
-      .catch((err) => {
-        updateResult = { type: 'err', err }
-      })
-      .finally(() => {
-        isUpdating = false
-      })
-  }
+	IndexUpdater({ variables: {} })
+		.then(() => {
+			updateResult = { type: 'ok' }
+			onUpdated?.()
+		})
+		.catch((err) => {
+			updateResult = { type: 'err', err }
+		})
+		.finally(() => {
+			isUpdating = false
+		})
+}
 
-  let isUpdating = false
-  let updateResult: { type: 'ok' } | { type: 'err'; err: Error } | null = null
+let isUpdating = false
+let updateResult: { type: 'ok' } | { type: 'err'; err: Error } | null = null
 </script>
 
 <Button onPress={() => updateIndex()} disabled={isUpdating} fullHeight

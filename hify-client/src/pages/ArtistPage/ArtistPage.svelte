@@ -1,16 +1,16 @@
 <script lang="ts">
-  import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
-  import MixButton from '@atoms/MixButton/MixButton.svelte'
-  import { AsyncArtistPage, MixOrdering } from '@graphql/generated'
+import LoadingIndicator from '@atoms/LoadingIndicator/LoadingIndicator.svelte'
+import MixButton from '@atoms/MixButton/MixButton.svelte'
+import { AsyncArtistPage, MixOrdering } from '@graphql/generated'
 
-  import ArtistAlbums from './ArtistAlbums.svelte'
-  import ArtistTrackParticipations from './ArtistTrackParticipations.svelte'
+import ArtistAlbums from './ArtistAlbums.svelte'
+import ArtistTrackParticipations from './ArtistTrackParticipations.svelte'
 
-  export let artistId: string
+export let artistId: string
 
-  const artist = AsyncArtistPage({
-    variables: { artistId },
-  }).then((res) => res.data.artist)
+const artist = AsyncArtistPage({
+	variables: { artistId },
+}).then((res) => res.data.artist)
 </script>
 
 {#await artist}

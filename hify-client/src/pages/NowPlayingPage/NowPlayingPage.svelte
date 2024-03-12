@@ -1,71 +1,71 @@
 <script lang="ts">
-  import { readableAudioPaused } from '@stores/audio-player'
-  import { currentTrack } from '@stores/play-queue'
+import { readableAudioPaused } from '@stores/audio-player'
+import { currentTrack } from '@stores/play-queue'
 
-  import { setupDistractionFreeListener } from '@stores/distraction-free'
-  import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
-  import { distractionFreeMode } from '@stores/distraction-free'
-  import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
-  import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
-  import { KeyPressHandling } from '@navigable/input-manager'
-  import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
-  import { writable } from 'svelte/store'
-  import { AudioTrackFragment } from '@graphql/generated'
-  import Emoji from '@atoms/Emoji/Emoji.svelte'
-  import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
+import { setupDistractionFreeListener } from '@stores/distraction-free'
+import DistractionFreeTogglable from '@atoms/DistractionFreeTogglable/DistractionFreeTogglable.svelte'
+import { distractionFreeMode } from '@stores/distraction-free'
+import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
+import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
+import { KeyPressHandling } from '@navigable/input-manager'
+import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
+import { writable } from 'svelte/store'
+import { AudioTrackFragment } from '@graphql/generated'
+import Emoji from '@atoms/Emoji/Emoji.svelte'
+import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
-  const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
+const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 
-  const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
+const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => $readableAudioPaused === false)
 
-  function onKeyPress(key: string): KeyPressHandling {
-    const dfMode = $distractionFreeMode
+function onKeyPress(key: string): KeyPressHandling {
+	const dfMode = $distractionFreeMode
 
-    if (!dfMode && key === 'Escape') {
-      setDistractionFree(true)
-      return KeyPressHandling.Intercepted
-    }
+	if (!dfMode && key === 'Escape') {
+		setDistractionFree(true)
+		return KeyPressHandling.Intercepted
+	}
 
-    if (dfMode && !ignoredKeys.includes(key)) {
-      setDistractionFree(false)
-      return KeyPressHandling.Intercepted
-    }
+	if (dfMode && !ignoredKeys.includes(key)) {
+		setDistractionFree(false)
+		return KeyPressHandling.Intercepted
+	}
 
-    return KeyPressHandling.Propagate
-  }
+	return KeyPressHandling.Propagate
+}
 
-  const newTrackDisplay = writable<{ timeout: number; track: AudioTrackFragment } | null>(null)
+const newTrackDisplay = writable<{ timeout: number; track: AudioTrackFragment } | null>(null)
 
-  currentTrack.subscribe((track) => {
-    if (!track) {
-      newTrackDisplay.update((data) => {
-        if (data !== null) {
-          clearTimeout(data.timeout)
-        }
+currentTrack.subscribe((track) => {
+	if (!track) {
+		newTrackDisplay.update((data) => {
+			if (data !== null) {
+				clearTimeout(data.timeout)
+			}
 
-        return null
-      })
+			return null
+		})
 
-      return
-    }
+		return
+	}
 
-    if ($distractionFreeMode) {
-      newTrackDisplay.update((data) => {
-        if (data !== null) {
-          clearTimeout(data.timeout)
-        }
+	if ($distractionFreeMode) {
+		newTrackDisplay.update((data) => {
+			if (data !== null) {
+				clearTimeout(data.timeout)
+			}
 
-        return {
-          track,
-          timeout: setTimeout(() => {
-            newTrackDisplay.set(null)
-          }, NEW_TRACK_DISPLAY_TIMEOUT),
-        }
-      })
-    }
-  })
+			return {
+				track,
+				timeout: setTimeout(() => {
+					newTrackDisplay.set(null)
+				}, NEW_TRACK_DISPLAY_TIMEOUT),
+			}
+		})
+	}
+})
 
-  const NEW_TRACK_DISPLAY_TIMEOUT = 2000
+const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 </script>
 
 <NowPlayingPageBackground track={$currentTrack || null} dim={!$distractionFreeMode} />

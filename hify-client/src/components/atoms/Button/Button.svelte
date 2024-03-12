@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { Props, RequestFocus } from '@navigable/navigation'
-  import {
-    SimpleNavigableItem as Nav,
-    SimpleNavigableItemProps,
-  } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
-  import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
+import { Props, RequestFocus } from '@navigable/navigation'
+import {
+	SimpleNavigableItem as Nav,
+	SimpleNavigableItemProps,
+} from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
+import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 
-  export let onPress: SimpleNavigableItemProps['onPress']
-  export let disabled = false
-  export let fullHeight = false
+export let onPress: SimpleNavigableItemProps['onPress']
+export let disabled = false
+export let fullHeight = false
 
-  export let hasFocusPriority: Props<Nav>['hasFocusPriority'] = null
-  export let onLongPress: Props<Nav>['onLongPress'] = undefined
-  export let onFocus: Props<Nav>['onFocus'] = undefined
-  export let onUnfocus: Props<Nav>['onFocus'] = undefined
+export let hasFocusPriority: Props<Nav>['hasFocusPriority'] = null
+export let onLongPress: Props<Nav>['onLongPress'] = undefined
+export let onFocus: Props<Nav>['onFocus'] = undefined
+export let onUnfocus: Props<Nav>['onFocus'] = undefined
 
-  export const requestFocus: RequestFocus = () => _requestFocus()
+export const requestFocus: RequestFocus = () => _requestFocus()
 
-  let _requestFocus: RequestFocus
+let _requestFocus: RequestFocus
 </script>
 
 <SimpleNavigableItem

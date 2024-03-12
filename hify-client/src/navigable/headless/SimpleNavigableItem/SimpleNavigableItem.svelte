@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  export type ItemDisplay = 'inline-block' | 'block' | 'transparent' | null
+export type ItemDisplay = 'inline-block' | 'block' | 'transparent' | null
 </script>
 
 <script lang="ts">

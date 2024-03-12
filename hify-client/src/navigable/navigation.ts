@@ -44,7 +44,10 @@ export abstract class NavigableCommon<P = NoProp> {
 
 	protected focused = writable(false)
 
-	constructor(parent: NavigableContainer<unknown> | symbol, protected _props: NavigableCommonProps & P) {
+	constructor(
+		parent: NavigableContainer<unknown> | symbol,
+		protected _props: NavigableCommonProps & P,
+	) {
 		if (!isValidNavigable(this)) {
 			throw new Error(
 				'Invalid navigable detected ; must be an instance of either "NavigableContainer" or "NavigableItem"',
