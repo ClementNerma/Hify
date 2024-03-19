@@ -8,8 +8,7 @@ import ImgLoader from '@atoms/ImgLoader/ImgLoader.svelte'
 import type { AudioTrackFragment } from '@graphql/generated'
 import NavigableWithHandlers from '@navigable/headless/NavigableWithHandlers/NavigableWithHandlers.svelte'
 import { KeyPressHandling } from '@navigable/input-manager'
-import { setupDistractionFreeListener } from '@stores/distraction-free'
-import { distractionFreeMode } from '@stores/distraction-free'
+import { distractionFreeMode, setupDistractionFreeListener } from '@stores/distraction-free'
 import { writable } from 'svelte/store'
 import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
 import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
@@ -80,7 +79,7 @@ const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 
 <DistractionFreeTogglable>
   <NavigableWithHandlers {onKeyPress}>
-    <NowPlayingBottomPanel currentTrack={$currentTrack} />
+    <NowPlayingBottomPanel />
   </NavigableWithHandlers>
 </DistractionFreeTogglable>
 

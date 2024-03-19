@@ -9,7 +9,7 @@ import {
 	setPlayingAudioProgress,
 	toggleAudioPlayback,
 } from '@stores/audio-player'
-import { playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
+import { currentTrack, playTrackFromCurrentQueue, queuePosition, readablePlayQueue } from '@stores/play-queue'
 
 import type { AudioTrackFragment } from '@graphql/generated'
 
@@ -25,7 +25,6 @@ import Column from '@navigable/ui/molecules/Column/Column.svelte'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 import { ROUTES } from '@root/routes'
 
-export let currentTrack: AudioTrackFragment | false
 let isQueueFocused = false
 
 // function toggleWaveForm() {
@@ -54,11 +53,11 @@ function setQueueFocused(isFocused: boolean) {
 }
 </script>
 
-<div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!currentTrack}>
+<div class="player-bottom" class:isQueueFocused class:noCurrentTrack={!$currentTrack}>
   <Column>
     <Column>
-      {#if currentTrack}
-        {@const tags = currentTrack.metadata.tags}
+      {#if $currentTrack}
+        {@const tags = $currentTrack.metadata.tags}
         {@const album = tags.album}
         {@const artists = tags.artists.length > 0 ? tags.artists : album.albumArtists}
 
@@ -97,7 +96,7 @@ function setQueueFocused(isFocused: boolean) {
               <div class="track-action">∿ Waveform</div>
             </SimpleNavigableItem> -->
 
-            <ModifiableTrackRating track={currentTrack} />
+            <ModifiableTrackRating track={$currentTrack} />
           </NavigableRow>
         </div>
 
@@ -113,13 +112,13 @@ function setQueueFocused(isFocused: boolean) {
             {/if}
           </div>
           <div class="track-duration">
-            {humanReadableDuration(currentTrack.metadata.duration)}
+            {humanReadableDuration($currentTrack.metadata.duration)}
           </div>
         </div>
 
         <div class="progress-range">
           <ProgressRange
-            max={currentTrack.metadata.duration}
+            max={$currentTrack.metadata.duration}
             value={$readableAudioProgress}
             onChange={setPlayingAudioProgress}
             onPress={toggleAudioPlayback}
