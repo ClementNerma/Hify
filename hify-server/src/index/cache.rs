@@ -240,6 +240,10 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             .unwrap()
             .iter()
             .map(|track_id| tracks.get(track_id).unwrap())
+            // NOTE: We use the minimum here to avoid a typical problem where
+            //       some tracks are updated manually and mess with the whole ordering.
+            // So instead the lowest (usually common) time of all tracks to determine
+            // the album's one.
             .min_by_key(|track| track.ctime.unwrap_or(track.mtime))
             .unwrap();
 
