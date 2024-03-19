@@ -240,7 +240,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             .unwrap()
             .iter()
             .map(|track_id| tracks.get(track_id).unwrap())
-            .max_by_key(|track| track.ctime.unwrap_or(track.mtime))
+            .min_by_key(|track| track.ctime.unwrap_or(track.mtime))
             .unwrap();
 
         most_recent_track.ctime.unwrap_or(most_recent_track.mtime)
