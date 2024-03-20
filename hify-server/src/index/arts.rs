@@ -81,8 +81,12 @@ pub async fn find_albums_arts(
 
     while let Some(res) = set.join_next().await {
         match res? {
-            Ok(Some(art)) => arts.push(art),
-            Ok(None) => {}
+            Ok(art) => {
+                if let Some(art) = art {
+                    arts.push(art)
+                }
+            }
+
             Err(err) => {
                 error!("Error: {err}");
                 errors += 1;
