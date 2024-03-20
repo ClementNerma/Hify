@@ -76,8 +76,6 @@ pub async fn find_albums_arts(
         });
     }
 
-    pb.finish();
-
     let mut arts = vec![];
     let mut errors = 0;
 
@@ -91,6 +89,8 @@ pub async fn find_albums_arts(
             }
         }
     }
+
+    pb.finish();
 
     if errors > 0 {
         bail!("Encountered {errors} error(s)");
