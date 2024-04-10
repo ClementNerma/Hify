@@ -19,7 +19,7 @@ export let visible = false
         
         &.visible {
             opacity: 1;
-            transition: opacity 1s;
+            transition: opacity 5s ease-in;
         }
     }
 </style>
