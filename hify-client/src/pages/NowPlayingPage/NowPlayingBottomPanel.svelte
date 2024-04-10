@@ -17,13 +17,13 @@ import ModifiableTrackRating from '@atoms/ModifiableTrackRating/ModifiableTrackR
 import ProgressRange from '@atoms/ProgressRange/ProgressRange.svelte'
 import { ctxMenuOptions } from '@globals/context-menu-items'
 import Card from '@molecules/Card/Card.svelte'
-// import TrackWaveForm from '@atoms/TrackWaveForm/TrackWaveForm.svelte'
 import ProgressiveRow from '@molecules/ProgressiveRow/ProgressiveRow.svelte'
 import NavigableRow from '@navigable/headless/NavigableRow/NavigableRow.svelte'
 import SimpleNavigableItem from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem.svelte'
 import Column from '@navigable/ui/molecules/Column/Column.svelte'
 import { showContextMenu } from '@navigable/ui/molecules/ContextMenu/ContextMenu'
 import { ROUTES } from '@root/routes'
+import { enableOpacitor } from '@stores/opacitor'
 
 let isQueueFocused = false
 
@@ -89,6 +89,16 @@ function setQueueFocused(isFocused: boolean) {
                 <div class="track-info">🎤 {artist.name}</div>
               </SimpleNavigableItem>
             {/each}
+
+            <SimpleNavigableItem onPress={() => enableOpacitor.update(enabled => !enabled)}>
+              <div class="option-button">
+                {#if $enableOpacitor}
+                  🔲
+                {:else}
+                  🔳
+                {/if}
+              </div>
+            </SimpleNavigableItem>
 
             <!-- TODO: This works perfectly, but waiting for performance improvements
                        before displaying it again -->
@@ -185,7 +195,7 @@ function setQueueFocused(isFocused: boolean) {
     font-size: 1.2rem;
   }
 
-  .track-info {
+  .track-info, .option-button {
     padding: 5px;
     align-self: stretch;
   }

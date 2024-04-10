@@ -11,6 +11,7 @@ import { KeyPressHandling } from '@navigable/input-manager'
 import { distractionFreeMode, setupDistractionFreeListener } from '@stores/distraction-free'
 import { writable } from 'svelte/store'
 import NowPlayingBottomPanel from './NowPlayingBottomPanel.svelte'
+import NowPlayingOpacitor from './NowPlayingOpacitor.svelte'
 import NowPlayingPageBackground from './NowPlayingPageBackground.svelte'
 
 const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
@@ -82,6 +83,8 @@ const NEW_TRACK_DISPLAY_TIMEOUT = 2000
     <NowPlayingBottomPanel />
   </NavigableWithHandlers>
 </DistractionFreeTogglable>
+
+<NowPlayingOpacitor visible={$distractionFreeMode} />
 
 {#if $newTrackDisplay}
   {@const tags = $newTrackDisplay.track.metadata.tags}
