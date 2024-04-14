@@ -11,7 +11,7 @@ mod index;
 mod library;
 mod userdata;
 
-use std::{fs, net::SocketAddr};
+use std::{fs, net::SocketAddr, process::ExitCode};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
@@ -22,7 +22,7 @@ use crate::{check::check_correctness, cmd::Args};
 use self::helpers::{logging::setup_logger, time::OFFSET};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
     let args = Args::parse();
 
     // Trigger offset fetching
@@ -34,9 +34,13 @@ async fn main() {
         error!("Failed to determine local offset, falling back to UTC.");
     }
 
-    if let Err(err) = inner_main(args).await {
-        error!("An error occurred:\n{err:?}");
-        std::process::exit(1);
+    match inner_main(args).await {
+        Ok(()) => ExitCode::SUCCESS,
+
+        Err(err) => {
+            error!("An error occurred:\n{err:?}");
+            ExitCode::FAILURE
+        }
     }
 }
 
