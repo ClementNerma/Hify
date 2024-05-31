@@ -7,11 +7,11 @@ edition = "2021"
 async-graphql = { default-features = false, features = [
     "graphiql",
     "time",
-], version = "7.0.2" }
-anyhow = "1.0.80"
-async-graphql-axum = "7.0.2"
-axum = "0.7.4"
-clap = { version = "4.5.2", features = ["derive"] }
+], version = "7.0.5" }
+anyhow = "1.0.86"
+async-graphql-axum = "7.0.5"
+axum = "0.7.5"
+clap = { version = "4.5.4", features = ["derive"] }
 colored = "2.1.0"
 dirs = "5.0.1"
 env_logger = "0.11.3"
@@ -19,11 +19,11 @@ log = "0.4.21"
 once_cell = "1.19.0"
 pomsky-macro = "0.11.0"
 rand = "0.8.5"
-regex = "1.10.3"
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.114"
-time = { version = "0.3.34", features = ["local-offset", "std", "serde"] }
-tokio = { version = "1.36.0", features = ["macros", "rt-multi-thread", "fs"] }
+regex = "1.10.4"
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+time = { version = "0.3.36", features = ["local-offset", "std", "serde"] }
+tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread", "fs"] }
 tower = { version = "0.4.13", features = ["util"] }
 tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 walkdir = "2.5.0"
