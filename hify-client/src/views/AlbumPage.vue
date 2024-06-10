@@ -76,7 +76,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           <img class="art" :width="192" :height="192" :src />
         </ImgLoader>
 
-        <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5">
+        <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5 w-full">
           <div class="text-3xl">
             {{ album.name }}
           </div>
