@@ -180,7 +180,7 @@ export abstract class NavigableItem<P = NoProp> extends NavigableCommon<P> {
 		}
 
 		if (!(el.children.length && el.children[0] instanceof HTMLElement)) {
-			logWarn('Failed to scroll to element has it does not have a valid child element')
+			logWarn('Failed to scroll to element as it does not have a valid child element')
 			return
 		}
 

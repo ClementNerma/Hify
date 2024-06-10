@@ -5,6 +5,7 @@ import IndexUpdater from '@/components/atoms/IndexUpdater.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import MixButton from '@/components/atoms/MixButton.vue';
 import AlbumsRow from '@/components/molecules/AlbumsRow.vue';
+import StatsBox from '@/components/molecules/StatsBox.vue';
 import TracksRow from '@/components/molecules/TracksRow.vue';
 import { MIN_GREAT_RATING } from '@/global/constants';
 import { graphql } from '@/graphql/generated';
@@ -86,5 +87,7 @@ const statsBox = ref(false)
       <Button @press="router.push({ name: 'devtools' })">👷 Devtools</Button>
       <Button @press="statsBox = !statsBox">Show me some stats</Button>
     </Row>
+
+    <StatsBox v-if="statsBox" />
   </template>
 </template>

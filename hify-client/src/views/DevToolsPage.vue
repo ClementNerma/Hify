@@ -19,10 +19,10 @@ const win = window
   <h2>Developer Tools</h2>
 
   <Row>
-    <Button @press="win.location.reload()">Reload the application</Button>
-    <Checkbox v-model="hideDebugLogs">Hide debug logs</Checkbox>
+    <Button @press="win.location.reload()" full-height>Reload the application</Button>
+    <Checkbox v-model="hideDebugLogs" full-height>Hide debug logs</Checkbox>
 
-    <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()">
+    <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()" full-height>
       🛠️ Change the application's URL
     </Button>
   </Row>

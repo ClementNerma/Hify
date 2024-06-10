@@ -1,22 +1,25 @@
 <script setup lang="ts">
+// biome-ignore lint/style/useImportType: <explanation>
+import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { UsageStatsDocument } from '@/graphql/generated/graphql';
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import { useQuery } from '@urql/vue';
-import { computed } from 'vue';
+import { computed, onUpdated, ref, watch } from 'vue';
 
-const { data, fetching } = useQuery({
+const { data } = useQuery({
     query: UsageStatsDocument,
 })
 
 const stats = computed(() => data.value?.generateStats)
+
+const itemRef = ref<InstanceType<typeof SimpleNavigableItem> | null>(null)
+
+onUpdated(() => itemRef?.value?.requestFocus())
 </script>
 
 <template>
-    <SimpleNavigableItem>
-        <span v-if="fetching"><strong>Loading...</strong></span>
-
-        <table v-if="stats">
+    <SimpleNavigableItem v-if="stats" ref="itemRef" unstyled>
+        <table>
             <tr>
                 <td>Total number of tracks</td>
                 <td><strong>{{ stats.tracksCount }}</strong></td>

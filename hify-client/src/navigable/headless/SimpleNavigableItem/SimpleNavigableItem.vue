@@ -3,6 +3,7 @@ export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getU
     justForStyle?: boolean
     disabled?: boolean
     fullHeight?: boolean
+    unstyled?: boolean
 }
 </script>
 
@@ -40,12 +41,16 @@ const item = new SimpleNavigableItem(getParentNavigable(true), itemProps.value)
 
 onBeforeUpdate(() => item.updateProps(itemProps.value))
 
+defineExpose({
+    requestFocus: () => item.requestFocus()
+})
+
 const wrapperRef = ref<HTMLNavigableItemWrapperElement | null>(null)
 const focused = ref(false)
 </script>
 
 <template>
-    <navigable-item-wrapper ref="wrapperRef" :class="{ focused, fullHeight }"
+    <navigable-item-wrapper ref="wrapperRef" :class="{ focused, fullHeight, unstyled }"
         :data-navigable-item-id="props.justForStyle ? JUST_FOR_STYLE_ITEM_ID : item.id" @click="props.onPress?.()"
         @contextmenu.prevent="props.onLongPress?.()" @mouseenter="item.requestFocus()"
         @mouseleave="item.page.unfocus()">
