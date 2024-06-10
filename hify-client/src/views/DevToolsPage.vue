@@ -20,6 +20,7 @@ const win = window
 
   <Row>
     <Button @press="win.location.reload()" full-height>Reload the application</Button>
+
     <Checkbox v-model="hideDebugLogs" full-height>Hide debug logs</Checkbox>
 
     <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()" full-height>

@@ -7,8 +7,8 @@ navigable-item-wrapper:not(.noPadding)> :first-child {
 }
 
 navigable-item-wrapper.fullHeight {
-    /* -10px for the 2x 5px padding */
-    height: calc(100% - 10px);
+    /* -10px for the 2x 6px padding */
+    height: calc(100% - 12px);
 }
 
 navigable-item-wrapper.fullHeight.noPadding {

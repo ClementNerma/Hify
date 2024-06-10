@@ -57,10 +57,3 @@ const focused = ref(false)
         <slot :item :focused />
     </navigable-item-wrapper>
 </template>
-
-<style scoped>
-navigable-item-wrapper.fullHeight {
-    /* -12px for the 2x 6px padding */
-    height: calc(100% - 12px);
-}
-</style>
