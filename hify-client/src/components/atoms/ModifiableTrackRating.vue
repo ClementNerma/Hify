@@ -3,7 +3,7 @@ import { gqlClient } from '@/global/urql-client'
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
-import { computed, onBeforeUpdate, onUpdated, ref } from 'vue'
+import { computed, onBeforeUpdate, onMounted, ref } from 'vue'
 
 const props = defineProps<{ track: AudioTrackFragment }>()
 
@@ -15,7 +15,7 @@ const state = ref({
     failed: false
 })
 
-onUpdated(() => {
+function onComponentUpdate() {
     if (state.value.prevTrackId !== props.track.id) {
         state.value = {
             prevTrackId: props.track.id,
@@ -25,7 +25,10 @@ onUpdated(() => {
             failed: false
         }
     }
-})
+}
+
+onMounted(onComponentUpdate)
+onBeforeUpdate(onComponentUpdate)
 
 async function update() {
     const updatingWith = state.value.current
