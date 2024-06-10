@@ -17,7 +17,7 @@ defineSlots<{
 
 <template>
     <SimpleNavigableItem v-bind="props" class="p-0 mr-5" not-rounded v-slot="{ item, focused }">
-        <div class="flex items-center p-1 w-fit"
+        <div class="flex items-center w-fit"
             :class="{ 'border': !borderNone, 'border-solid': !borderNone, 'border-white': !borderNone, 'opacity-50': disabled }">
             <slot :item :focused />
         </div>
