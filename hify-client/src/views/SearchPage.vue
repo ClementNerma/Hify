@@ -71,10 +71,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="search-container">
+  <div class="p-2.5 text-center">
     <SimpleNavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" v-slot="{ item }">
       <Run :run="() => { navItem = item }" />
-      <input class="search" type="text" ref="inputRef" v-model="query" @input="onInput" @change="onInput" />
+
+      <input class="w-1/3 p-3 text-lg border-none rounded-lg outline-none" type="text" ref="inputRef" v-model="query"
+        @input="onInput" @change="onInput" />
     </SimpleNavigableItem>
   </div>
 
@@ -92,19 +94,3 @@ onMounted(() => {
     <ArtistsRow :artists="results.artists" />
   </div>
 </template>
-
-<style scoped>
-.search-container {
-  padding: 10px;
-  text-align: center;
-}
-
-.search {
-  border: none;
-  border-radius: 10px;
-  outline: none;
-  width: 33%;
-  padding: 12px;
-  font-size: 1.2rem;
-}
-</style>

@@ -69,15 +69,15 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
 <template>
   <LoadingIndicator v-if="!data" />
 
-  <div class="container" v-if="album && filteredTracks && infos">
+  <div class="mt-2.5 ml-[15%] w-[70%]" v-if="album && filteredTracks && infos">
     <NavigableList>
-      <div class="header">
+      <div class="flex flex-row">
         <ImgLoader :art="album.art" v-slot="{ src }">
           <img class="art" :width="192" :height="192" :src />
         </ImgLoader>
 
-        <div class="infos">
-          <div class="name">
+        <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5">
+          <div class="text-3xl">
             {{ album.name }}
           </div>
 
@@ -85,23 +85,20 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             🕒 {{ album.year }}
           </SimpleNavigableItem>
 
-          <div class="artists">
-            <NavigableRow>
-              <SimpleNavigableItem v-for="artist in album.albumArtists" :key="artist.id"
-                @press="router.push({ name: 'artist', params: { id: artist.id } })">
-                <span class="artist">🎤 {{ artist.name }}</span>
-              </SimpleNavigableItem>
-            </NavigableRow>
-          </div>
 
-          <div class="genres">
-            <NavigableRow>
-              <SimpleNavigableItem v-for="genre in album.genres" :key="genre.id"
-                @press="router.push({ name: 'genre', params: { id: genre.id } })">
-                <span class="genre">🎤 {{ genre.name }}</span>
-              </SimpleNavigableItem>
-            </NavigableRow>
-          </div>
+          <NavigableRow>
+            <SimpleNavigableItem v-for="artist in album.albumArtists" :key="artist.id"
+              @press="router.push({ name: 'artist', params: { id: artist.id } })">
+              <span class="artist">🎤 {{ artist.name }}</span>
+            </SimpleNavigableItem>
+          </NavigableRow>
+
+          <NavigableRow>
+            <SimpleNavigableItem v-for="genre in album.genres" :key="genre.id"
+              @press="router.push({ name: 'genre', params: { id: genre.id } })">
+              <span class="genre">🎤 {{ genre.name }}</span>
+            </SimpleNavigableItem>
+          </NavigableRow>
 
           <SimpleNavigableItem just-for-style>
             <div class="length">
@@ -140,20 +137,20 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
         Disc {{ disc.number }}
       </h2>
 
-      <table>
+      <table class="mt-2.5 w-full border-collapse">
         <tbody>
           <NavigableList>
             <NavigableTrack v-for="track, i in disc.tracks" :key="track.id" :tracks="filteredTracks"
               :context="{ context: 'album' }" :track>
-              <tr :class="{ notFirst: i !== 0 }">
-                <td class="trackno">{{ track.metadata.tags.trackNo }}</td>
-                <td class="title">{{ track.metadata.tags.title }}</td>
-                <td class="rating">
+              <tr class="w-full [&>td]:p-2.5" :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
+                <td>{{ track.metadata.tags.trackNo }}</td>
+                <td class="w-full">{{ track.metadata.tags.title }}</td>
+                <td>
                   <span v-if="track.computedRating">
                     <TrackRating :rating="track.computedRating" />
                   </span>
                 </td>
-                <td class="duration">{{ humanReadableDuration(track.metadata.duration) }}</td>
+                <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
               </tr>
             </NavigableTrack>
           </NavigableList>
@@ -162,56 +159,3 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
     </div>
   </div>
 </template>
-
-
-<style scoped>
-.container {
-  margin-top: 10px;
-  margin-left: 15%;
-  width: 70%;
-}
-
-.header {
-  display: flex;
-  flex-direction: row;
-}
-
-.infos {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-  margin-left: 10px;
-  gap: 10px;
-}
-
-.infos .name {
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-table {
-  margin-top: 10px;
-  width: 100%;
-  border-collapse: collapse;
-}
-
-tr {
-  width: 100%;
-}
-
-tr.notFirst {
-  border-top: 1px solid rgb(50, 50, 50);
-}
-
-td {
-  padding: 10px;
-}
-
-td.title {
-  width: 100%;
-}
-
-td.duration {
-  text-align: right;
-}
-</style>

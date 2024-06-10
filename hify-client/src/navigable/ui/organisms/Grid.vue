@@ -9,7 +9,7 @@ const columnsSize = computed(() => new Array(props.columns).fill(`${100 / props.
 </script>
 
 <template>
-  <div class="container" :style="`--columns-size: ${columnsSize}`">
+  <div class="container grid text-center" :style="`--columns-size: ${columnsSize}`">
     <NavigableGrid v-bind="props">
       <slot />
     </NavigableGrid>
@@ -18,8 +18,6 @@ const columnsSize = computed(() => new Array(props.columns).fill(`${100 / props.
 
 <style scoped>
 .container {
-  display: grid;
   grid-template-columns: var(--columns-size);
-  text-align: center;
 }
 </style>

@@ -39,22 +39,8 @@ function onRight() {
 
 <template>
     <SimpleNavigableItem :on-left :on-right :on-press v-slot="{ focused }">
-        <div class="container" :class="{ focused }">
-            <input type="range" ref="inputRef" :max :value="value ?? 0" @change="onChange(getValue())" />
+        <div class="border border-solid border-transparent" :class="{ 'border-gray-400': focused }">
+            <input type="range" ref="inputRef" class="h-2.5" :max :value="value ?? 0" @change="onChange(getValue())" />
         </div>
     </SimpleNavigableItem>
 </template>
-
-<style scoped>
-.container {
-    border: 1px solid transparent;
-
-    &.focused {
-        border-color: gray;
-    }
-}
-
-input {
-    height: 10px;
-}
-</style>

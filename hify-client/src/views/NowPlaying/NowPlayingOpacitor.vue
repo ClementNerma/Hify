@@ -5,23 +5,6 @@ defineProps<{ visible: boolean }>()
 </script>
 
 <template>
-  <div class="opacitor" :class="{ visible: visible && enableOpacitor }" />
+  <div class="fixed inset-0 bg-black opacity-0 transition duration-1000"
+    :class="visible && enableOpacitor ? ['opacity-100', 'duration-[5s]', 'ease-in'] : []" />
 </template>
-
-<style scoped>
-.opacitor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: black;
-  opacity: 0;
-  transition: opacity 1s;
-
-  &.visible {
-    opacity: 1;
-    transition: opacity 5s ease-in;
-  }
-}
-</style>

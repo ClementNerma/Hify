@@ -56,12 +56,12 @@ onUpdated(() => {
 </script>
 
 <template>
-  <div class="modal" v-if="open">
-    <div class="modal-inner">
+  <div class="fixed inset-0 bg-black/50 z-10" v-if="open">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2.5 rounded bg-gray-200 text-black">
       <NavigableList trapped>
         <slot />
 
-        <div class="buttons">
+        <div class="mt-4">
           <Row>
             <Button v-for="button, i in buttons" :key="button.label" v-slot="{ item, focused }"
               @press="onButtonPress(button)">
@@ -76,32 +76,3 @@ onUpdated(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  padding: 10px;
-  font-size: 15px;
-  border-radius: 5px;
-  background-color: lightgray;
-  color: black;
-}
-
-.buttons {
-  margin-top: 15px;
-}
-</style>

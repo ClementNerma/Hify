@@ -6,17 +6,9 @@ const props = defineProps<NavigableRowProps>()
 </script>
 
 <template>
-  <div class="row">
+  <div class="flex flex-row overflow-x-hidden">
     <NavigableRow v-bind="props">
       <slot />
     </NavigableRow>
   </div>
 </template>
-
-<style scoped>
-.row {
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: row;
-}
-</style>

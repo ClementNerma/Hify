@@ -71,7 +71,7 @@ const win = window
 </script>
 
 <template>
-    <div class="background" />
+    <div class="background fixed inset-0 -z-30" />
 
     <NavigablePage>
         <NavigableWithHandlers @back="router.back()" @long-back="win.location.reload()">
@@ -106,13 +106,6 @@ const win = window
 
 <style scoped>
 .background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -3;
-
     background: linear-gradient(to bottom, #363636 0%, #080808 33%);
 }
 </style>

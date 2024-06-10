@@ -75,14 +75,16 @@ const containerRef = ref<HTMLDivElement | null>(null)
 
 <template>
   <NavigableWithHandlers v-if="contextMenuStore && contextMenuStore.options.length > 0" @back="closeContextMenu">
-    <div class="container" ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
+    <div
+      class="fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
+      ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
       <Column trapped v-slot="{ column }">
         <Run :run="() => columnRef = column" />
 
         <SimpleNavigableItem v-for="option in contextMenuStore.options" :key="option.label"
           @press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
-          <div class="option-container" :class="{ focused }">
-            <div class="option">{{ option.label }}</div>
+          <div :class="{ 'bg-gray-400': focused }">
+            <div class="p-1.5 option">{{ option.label }}</div>
           </div>
         </SimpleNavigableItem>
       </Column>
@@ -91,28 +93,6 @@ const containerRef = ref<HTMLDivElement | null>(null)
 </template>
 
 <style scoped>
-.container {
-  position: fixed;
-
-  background-color: rgb(42, 42, 42);
-  color: white;
-
-  border: 1px solid rgb(78, 78, 78);
-  border-radius: 5px;
-
-  box-shadow: 2px 2px 5px rgb(60, 60, 60);
-
-  z-index: 10;
-}
-
-.option-container.focused {
-  background-color: darkgray;
-}
-
-.option {
-  padding: 5px;
-}
-
 .option:not(:last-child) {
   border-bottom: 1px solid black;
 }

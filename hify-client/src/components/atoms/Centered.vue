@@ -2,15 +2,7 @@
 </script>
 
 <template>
-    <div class="centered">
+    <div class="flex flex-col items-center">
         <slot />
     </div>
 </template>
-
-<style scoped>
-.centered {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-</style>

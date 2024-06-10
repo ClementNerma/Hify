@@ -76,7 +76,7 @@ const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
 
 <template>
   <NavigableRow :on-focus-change>
-    <div class="gallery">
+    <div class="flex flex-row py-2 overflow-hidden">
       <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]"
         :style="`--column-size: ${100 / COLUMNS}%`">
         <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->
@@ -101,13 +101,6 @@ const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
 </template>
 
 <style scoped>
-.gallery {
-  padding: 7px 0;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-}
-
 .gallery-item {
   text-align: center;
   min-width: var(--column-size);

@@ -75,12 +75,13 @@ function reset() {
 
 const onLeft = computed(() => state.value.current >= 2 ? () => setRatingRelative(-2) : undefined)
 const onRight = computed(() => state.value.current <= 8 ? () => setRatingRelative(+2) : undefined)
+
 </script>
 
 <template>
     <SimpleNavigableItem :on-left :on-right @press="update()" @unfocus="reset">
         <div
-            :class="{ changed: state.current !== state.initialRating, updating: state.updating, failed: state.failed }">
+            :class="state.updating ? ['text-gray', 'opacity-50'] : state.current !== state.initialRating ? ['text-purple-950'] : state.failed ? ['text-red'] : []">
             <span v-for="value in [2, 4, 6, 8, 10]">
                 <span v-if="state.current !== null && state.current >= value">
                     &starf;
@@ -92,18 +93,3 @@ const onRight = computed(() => state.value.current <= 8 ? () => setRatingRelativ
         </div>
     </SimpleNavigableItem>
 </template>
-
-<style scoped>
-.changed {
-    color: purple;
-}
-
-.updating {
-    color: gray;
-    opacity: 0.5;
-}
-
-.failed {
-    color: red;
-}
-</style>

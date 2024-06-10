@@ -3,18 +3,7 @@ import { distractionFreeMode } from '@/global/stores/distraction-free'
 </script>
 
 <template>
-    <div :class="{ hidden: distractionFreeMode }">
+    <div class="transition" :class="distractionFreeMode ? ['opacity-0', 'duration-700'] : ['duration-500']">
         <slot />
     </div>
 </template>
-
-<style scoped>
-div:not(.hidden) {
-    transition: all 0.5s;
-}
-
-.hidden {
-    transition: all 0.7s;
-    opacity: 0;
-}
-</style>

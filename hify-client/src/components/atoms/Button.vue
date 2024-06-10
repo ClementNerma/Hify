@@ -11,24 +11,9 @@ defineSlots<{
 
 <template>
     <SimpleNavigableItem v-bind="props" class="p-0 mr-5" not-rounded v-slot="{ item, focused }">
-        <div class="button" :class="{ disabled: props.disabled }">
+        <div class="flex items-center border border-solid border-white p-5 w-fit"
+            :class="{ 'opacity-50': props.disabled }">
             <slot :item :focused />
         </div>
     </SimpleNavigableItem>
 </template>
-
-<style scoped>
-.button {
-    display: flex;
-    align-items: center;
-
-    border: 1px solid white;
-
-    width: fit-content;
-    padding: 5px;
-}
-
-.button.disabled {
-    opacity: 0.5;
-}
-</style>

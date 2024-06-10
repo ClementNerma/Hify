@@ -48,9 +48,9 @@ const win = window
 </script>
 
 <template>
-  <div class="container" :class="{ isFocused }">
+  <div class="flex flex-row items-center justify-center mb-2.5"
+    :class="isFocused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
     <NavigableRow>
-      <!-- TODO: bind:requestFocus={tabsFocusRequest[tab.label]} -->
       <SimpleNavigableItem v-for="tab in tabs" :key="tab.label" @press="router.push({ name: tab.routeName })"
         @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
         @focus="win.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); isFocused = true" @unfocus="isFocused = false"
@@ -59,37 +59,12 @@ const win = window
         <Run :run="() => { requestFocusByRouteName[tab.routeName] = () => item.requestFocus(); }" />
 
         <div>
-          <div class="tab">
+          <div class="px-6">
             {{ tab.label }}
-            <span class="dropdown" v-if="tab.subMenu">▽</span>
+            <span class="text-xs" v-if="tab.subMenu">▽</span>
           </div>
         </div>
       </SimpleNavigableItem>
     </NavigableRow>
   </div>
 </template>
-
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.container:not(.isFocused) {
-  opacity: 0.2;
-  transition: opacity linear 0.8s;
-  transition-delay: 0.2s;
-}
-
-.tab {
-  padding: 0 25px;
-  font-size: 1rem;
-}
-
-.dropdown {
-  font-size: 8px;
-}
-</style>
