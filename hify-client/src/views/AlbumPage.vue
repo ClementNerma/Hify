@@ -85,20 +85,19 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             🕒 {{ album.year }}
           </SimpleNavigableItem>
 
-
-          <NavigableRow>
+          <Row>
             <SimpleNavigableItem v-for="artist in album.albumArtists" :key="artist.id"
               @press="router.push({ name: 'artist', params: { id: artist.id } })">
               <span class="artist">🎤 {{ artist.name }}</span>
             </SimpleNavigableItem>
-          </NavigableRow>
+          </Row>
 
-          <NavigableRow>
+          <Row>
             <SimpleNavigableItem v-for="genre in album.genres" :key="genre.id"
               @press="router.push({ name: 'genre', params: { id: genre.id } })">
-              <span class="genre">🎤 {{ genre.name }}</span>
+              <span class="genre">🎵 {{ genre.name }}</span>
             </SimpleNavigableItem>
-          </NavigableRow>
+          </Row>
 
           <SimpleNavigableItem just-for-style>
             <div class="length">
@@ -110,9 +109,9 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           </SimpleNavigableItem>
 
           <Row>
-            <Checkbox v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
+            <Checkbox full-height v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
 
-            <Button @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
+            <Button full-height @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
               {
                 label: 'Queue at the end',
                 onPress: () => enqueue(filteredTracks!, 'end'),
@@ -121,7 +120,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
               <Emoji>▶️</Emoji> Play next
             </Button>
 
-            <Button @press="() => {
+            <Button full-height @press="() => {
               playNewQueueFromBeginning(shuffle(filteredTracks!), null)
               router.push({ name: 'now-playing' })
             }">

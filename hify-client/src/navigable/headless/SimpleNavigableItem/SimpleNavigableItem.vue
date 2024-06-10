@@ -2,6 +2,7 @@
 export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getUnderlyingElement'> & {
     justForStyle?: boolean
     disabled?: boolean
+    fullHeight?: boolean
 }
 </script>
 
@@ -44,10 +45,17 @@ const focused = ref(false)
 </script>
 
 <template>
-    <navigable-item-wrapper ref="wrapperRef" :class="{ focused }"
+    <navigable-item-wrapper ref="wrapperRef" :class="{ focused, fullHeight }"
         :data-navigable-item-id="props.justForStyle ? JUST_FOR_STYLE_ITEM_ID : item.id" @click="props.onPress?.()"
         @contextmenu.prevent="props.onLongPress?.()" @mouseenter="item.requestFocus()"
         @mouseleave="item.page.unfocus()">
         <slot :item :focused />
     </navigable-item-wrapper>
 </template>
+
+<style scoped>
+navigable-item-wrapper.fullHeight {
+    /* -12px for the 2x 6px padding */
+    height: calc(100% - 12px);
+}
+</style>

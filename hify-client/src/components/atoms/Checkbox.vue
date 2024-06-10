@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Button from './Button.vue';
-import type { SimpleNavigableItemProps } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
+import { ref } from 'vue';
+import Button, { type ButtonProps } from './Button.vue';
 
 const model = defineModel<boolean>()
-
-const props = defineProps<SimpleNavigableItemProps>()
+const props = defineProps<ButtonProps>()
 
 const checkboxRef = ref<HTMLInputElement | null>(null)
 </script>
@@ -13,8 +11,6 @@ const checkboxRef = ref<HTMLInputElement | null>(null)
 <template>
     <Button v-bind="props" @press="model = !model">
         <input type="checkbox" v-model="model" ref="checkboxRef" />
-        <span>
-            <slot />
-        </span>
+        <slot />
     </Button>
 </template>
