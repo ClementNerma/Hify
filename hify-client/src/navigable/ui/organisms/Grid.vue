@@ -4,12 +4,10 @@ import NavigableGrid from '@/navigable/headless/NavigableGrid/NavigableGrid.vue'
 import { computed } from 'vue';
 
 const props = defineProps<NavigableGridProps>()
-
-const columnsSize = computed(() => new Array(props.columns).fill(`${100 / props.columns}%`).join(' '))
 </script>
 
 <template>
-  <div class="container grid text-center" :style="`--columns-size: ${columnsSize}`">
+  <div class="container grid text-center min-w-full" :style="`--columns: ${columns};`">
     <NavigableGrid v-bind="props">
       <slot />
     </NavigableGrid>
@@ -18,6 +16,6 @@ const columnsSize = computed(() => new Array(props.columns).fill(`${100 / props.
 
 <style scoped>
 .container {
-  grid-template-columns: var(--columns-size);
+  grid-template-columns: repeat(var(--columns), 1fr);
 }
 </style>

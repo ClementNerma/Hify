@@ -68,9 +68,11 @@ onMounted(feedMore)
   <template v-else>
     <h3>Albums ({{ albums.length }})</h3>
 
-    <Grid :columns="ALBUMS_PER_LINE">
-      <AlbumCard v-for="album in albums" :key="album.id" :album />
-    </Grid>
+    <div class="bg-red-200">
+      <Grid :columns="ALBUMS_PER_LINE">
+        <AlbumCard v-for="album in albums" :key="album.id" :album enforce-max-width />
+      </Grid>
+    </div>
 
     <Button v-if="currentPageInfo.hasNextPage" @press="feedMore()">
       Load more

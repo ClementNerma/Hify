@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import ImgLoader from '../atoms/ImgLoader.vue'
-import type { ArtFragment } from '@/graphql/generated/graphql'
-
-defineProps<{
+<script lang="ts">
+export type CardProps = {
     art: ArtFragment | null | undefined,
     title: string,
 
@@ -10,22 +7,26 @@ defineProps<{
     boxSize?: number,
     circle?: boolean,
     opacity?: number,
+}
+</script>
 
-    // 'enforceMaxWidth' is useful for situations like rows where the card may try to take more width than they should
-    // It is harmful though in other contexts like set grids where the width is fixed and cannot be changed
-    enforceMaxWidth?: boolean
-}>()
+<script setup lang="ts">
+import ImgLoader from '../atoms/ImgLoader.vue'
+import type { ArtFragment } from '@/graphql/generated/graphql'
+
+defineProps<CardProps>()
 </script>
 
 <template>
-    <div class="card" :class="{ enforceMaxWidth }" :style="`--width: ${boxSize ?? 120}px; --opacity: ${opacity ?? 1};`">
+    <div class="card" :style="`--opacity: ${opacity ?? 1};`">
         <ImgLoader :art v-slot="{ src }">
-            <img class="cover" :class="{ circle }" :width="boxSize ?? 120" :height="boxSize ?? 120" :src alt="" />
+            <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
+                :src />
         </ImgLoader>
 
         <div class="title experimental-line-limiter">{{ title }}</div>
 
-        <div v-if="subtitle" class="subtitle experimental-line-limiter">{{ subtitle }}</div>
+        <div v-if="subtitle" class="text-sm experimental-line-limiter">{{ subtitle }}</div>
     </div>
 
 </template>
@@ -35,30 +36,6 @@ defineProps<{
     text-align: center;
     transition: transform 0.25s;
     opacity: var(--opacity);
-}
-
-.card.enforceMaxWidth {
-    max-width: var(--width);
-}
-
-.cover.circle {
-    border-radius: 50%;
-}
-
-/* .card.focused {
-    transition: transform 0.25s;
-    transform: scale(1.33);
-    text-decoration: none !important;
-    z-index: 2;
-  } */
-
-/* .title {
-    font-weight: bold;
-  } */
-
-.subtitle {
-    font-size: 0.9rem;
-    /* font-style: italic; */
 }
 
 /* TODO: remove experimental stuff */
