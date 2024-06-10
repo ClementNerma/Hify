@@ -47,7 +47,7 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
               </SimpleNavigableItem>
 
               <SimpleNavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
-                <div class="track-info">🎵 {{ tags.title }}</div>
+                <div class="track-info">💿 {{ tags.album.name }}</div>
               </SimpleNavigableItem>
 
               <SimpleNavigableItem v-if="tags.date" just-for-style>
