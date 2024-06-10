@@ -2,12 +2,12 @@
 import { onBeforeUpdate, onMounted } from 'vue';
 
 // TODO: use an event instead
-const { run } = defineProps<{
-    run: () => unknown
+const emit = defineEmits<{
+    run: []
 }>()
 
-onMounted(run)
-onBeforeUpdate(run)
+onMounted(() => emit('run'))
+onBeforeUpdate(() => emit('run'))
 </script>
 
 <template></template>

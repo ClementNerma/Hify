@@ -1,21 +1,23 @@
 <script setup lang="ts">
+// biome-ignore lint/style/useImportType: <explanation>
+import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue';
 import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue';
 import ProgressRange from '@/components/atoms/ProgressRange.vue';
 import With from '@/components/atoms/With.vue';
 import Card from '@/components/molecules/Card.vue';
-import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue';
 import { ctxMenuOptions } from '@/global/context-menu-items';
 import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgress, toggleAudioPlayback } from '@/global/stores/audio-player';
 import { enableOpacitor } from '@/global/stores/opacitor';
-import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue, type QueuedTrack } from '@/global/stores/play-queue';
-import { bind, formatDate } from '@/global/utils';
+import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';
+import { formatDate } from '@/global/utils';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue';
 import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import Column from '@/navigable/ui/molecules/Column/Column.vue';
 import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu';
+import type Row from '@/navigable/ui/molecules/Row/Row.vue';
 import router from '@/router';
-import { ref } from 'vue';
+import { ref, watch, type ComponentInstance } from 'vue';
 
 const isQueueFocused = ref(false)
 
@@ -33,6 +35,18 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
     ),
   )
 }
+
+const queueGalleryRef = ref<ComponentInstance<typeof ProgressiveRow> | null>(null)
+
+watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery, position]) => {
+  if (gallery !== null && position !== null) {
+    // NOTE: The call below causes an error because `ProgressiveRow` is a generic component
+    //       This causes `ComponentInstance<typeof ProgressiveRow>` to evaluate to `never`
+    //       So here, `gallery` is evaluated as a `never` value, although it shouldn't
+    // @ts-expect-error
+    gallery.jumpUnfocusedPosition(position)
+  }
+})
 </script>
 
 <template>
@@ -96,7 +110,7 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
 
       <div class="play-queue-gallery">
         <Column>
-          <ProgressiveRow :items="readablePlayQueue.tracks" idProp="idInQueue"
+          <ProgressiveRow ref="queueGalleryRef" :items="readablePlayQueue.tracks" idProp="idInQueue"
             :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
             @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
             v-slot="{ item: track, position, focused }">

@@ -1,5 +1,5 @@
 <script lang="ts">
-export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getUnderlyingElement'> & {
+export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getUnderlyingElement'> & NavigableCommonProps & {
     justForStyle?: boolean
     disabled?: boolean
     fullHeight?: boolean
@@ -8,7 +8,7 @@ export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getU
 
 <script setup lang="ts">
 import { SimpleNavigableItem, type SimpleNavigableItemProps as SimpleNavigableItemClassProps } from './SimpleNavigableItem';
-import { JUST_FOR_STYLE_ITEM_ID, getParentNavigable, type HTMLNavigableItemWrapperElement } from '../../navigation'
+import { JUST_FOR_STYLE_ITEM_ID, getParentNavigable, type HTMLNavigableItemWrapperElement, type NavigableCommonProps } from '../../navigation'
 import { computed, onBeforeUpdate, ref } from 'vue';
 import { logFatal } from '@/global/stores/debugger';
 

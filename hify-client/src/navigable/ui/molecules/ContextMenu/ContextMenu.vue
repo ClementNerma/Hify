@@ -79,7 +79,7 @@ const containerRef = ref<HTMLDivElement | null>(null)
       class="fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
       ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
       <Column trapped v-slot="{ column }">
-        <Run :run="() => columnRef = column" />
+        <Run @run="columnRef = column" />
 
         <SimpleNavigableItem v-for="option in contextMenuStore.options" :key="option.label"
           @press="closeContextMenu(); option.onPress()" v-slot="{ focused }">

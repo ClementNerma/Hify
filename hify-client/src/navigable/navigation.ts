@@ -99,7 +99,7 @@ export abstract class NavigableCommon<P = NoProp> {
 
 export abstract class NavigableContainer<P = NoProp> extends NavigableCommon<P> {
 	protected getFocusPriority(): Navigable | null {
-		return this.children().find((item) => item.props.hasFocusPriority === true) ?? null
+		return this.children().find((item) => item.props.hasFocusPriority) ?? null
 	}
 
 	abstract navigate(focusedChild: Navigable, direction: NavigationDirection): NavigableItem<unknown> | null

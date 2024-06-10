@@ -56,7 +56,7 @@ const win = window
         @focus="win.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); isFocused = true" @unfocus="isFocused = false"
         :has-focus-priority="router.currentRoute.value.name === tab.routeName" v-slot="{ item }">
 
-        <Run :run="() => { requestFocusByRouteName[tab.routeName] = () => item.requestFocus(); }" />
+        <Run @run="requestFocusByRouteName[tab.routeName] = () => item.requestFocus()" />
 
         <div>
           <div class="px-6">

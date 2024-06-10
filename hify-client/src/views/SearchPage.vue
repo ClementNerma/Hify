@@ -73,7 +73,7 @@ onMounted(() => {
 <template>
   <div class="p-2.5 text-center">
     <SimpleNavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" v-slot="{ item }">
-      <Run :run="() => { navItem = item }" />
+      <Run @run="navItem = item" />
 
       <input class="w-1/3 p-3 text-lg border-none rounded-lg outline-none" type="text" ref="inputRef" v-model="query"
         @input="onInput" @change="onInput" />

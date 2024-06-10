@@ -19,6 +19,13 @@ defineSlots<{
   default(props: { item: T, position: number, navigableItem: SimpleNavigableItemClass, focused: boolean }): unknown
 }>()
 
+defineExpose({
+  jumpUnfocusedPosition(newPosition: number) {
+    position.value = newPosition
+    positionOnUnfocused.value = newPosition
+  }
+})
+
 const position = ref(0)
 const disableHandler = ref(false)
 const prevSelected = ref<T[K] | null>(null)
@@ -84,14 +91,13 @@ const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
         <SimpleNavigableItem @left="onSelect(firstVisibleItemIndex + i - 1, true)"
           @right="onSelect(firstVisibleItemIndex + i + 1, true)" @focus="onSelect(firstVisibleItemIndex + i, false)"
           @press="onItemPress?.(item, firstVisibleItemIndex + i)"
-          @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)"
-          :has-focus-priority="firstVisibleItemIndex + i === (isFirstEntering ? initialPosition : positionOnUnfocused)"
-          v-slot="{ item: navigableItem, focused }">
+          @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)" v-slot="{ item: navigableItem, focused }"
+          :has-focus-priority="firstVisibleItemIndex + i === position">
 
-          <Run :run="() => {
+          <Run @run="
             // @ts-expect-error
-            itemsById[item[idProp]] = () => navigableItem.requestFocus();
-          }" />
+            itemsById[item[idProp]] = () => navigableItem.requestFocus()
+            " />
 
           <slot :item :position="firstVisibleItemIndex + i" :navigableItem :focused />
         </SimpleNavigableItem>
