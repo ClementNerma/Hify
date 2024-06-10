@@ -1,40 +1,11 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "useUnknownInCatchVariables": true,
-    "strictPropertyInitialization": true,
-
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "moduleResolution": "node",
-    "lib": ["DOM", "ESNext"],
-    "target": "es2017",
-
-    "forceConsistentCasingInFileNames": true,
-    "sourceMap": true,
-
-    "rootDir": "src",
-    "outDir": "dist",
-
-    "paths": {
-      "@atoms/*": ["./src/components/atoms/*"],
-      "@molecules/*": ["./src/components/molecules/*"],
-      "@organisms/*": ["./src/components/organisms/*"],
-      "@globals/*": ["./src/globals/*"],
-      "@graphql/*": ["./src/graphql/*"],
-      "@navigable/*": ["./src/navigable/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@stores/*": ["./src/stores/*"],
-      "@root/*": ["./src/*"]
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
     }
-  },
-
-  "include": ["src"]
+  ]
 }

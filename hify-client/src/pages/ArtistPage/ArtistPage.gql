@@ -1,5 +1,0 @@
-query ArtistPage($artistId: String!) {
-  artist(id: $artistId) {
-    name
-  }
-}

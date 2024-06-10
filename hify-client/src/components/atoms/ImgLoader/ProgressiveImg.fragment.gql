@@ -1,3 +1,0 @@
-fragment ProgressiveImg on Art {
-  id
-}

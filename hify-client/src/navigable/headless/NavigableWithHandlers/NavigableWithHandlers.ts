@@ -1,9 +1,9 @@
 import type { InputHandler, KeyPressHandling } from '../../input-manager'
 import {
-	type Navigable,
 	NavigableContainer,
-	type NavigableItem,
 	NavigationAction,
+	type Navigable,
+	type NavigableItem,
 	type NavigationDirection,
 	type NoProp,
 } from '../../navigation'
@@ -29,20 +29,26 @@ export class NavigableWithHandlers<P = NoProp> extends NavigableContainer<Naviga
 		}
 	}
 
-	override handleAction(action: NavigationAction): NavigableItem<unknown> | null {
+	override handleAction(action: NavigationAction): null {
 		switch (action) {
 			case NavigationAction.Press:
-				return this.props.onPress?.() ?? null
+				this.props.onPress?.()
+				break
 
 			case NavigationAction.LongPress:
-				return this.props.onLongPress?.() ?? null
+				this.props.onLongPress?.()
+				break
 
 			case NavigationAction.Back:
-				return this.props.onBack?.() ?? null
+				this.props.onBack?.()
+				break
 
 			case NavigationAction.LongBack:
-				return this.props.onLongBack?.() ?? null
+				this.props.onLongBack?.()
+				break
 		}
+
+		return null
 	}
 
 	override interceptKeyPress(key: string, long: boolean): KeyPressHandling | void {

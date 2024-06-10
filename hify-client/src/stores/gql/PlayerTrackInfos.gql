@@ -1,5 +1,0 @@
-query PlayerTrackInfos($trackId: String!) {
-  track(id: $trackId) {
-    ...AudioTrack
-  }
-}

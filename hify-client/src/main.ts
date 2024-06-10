@@ -1,13 +1,12 @@
-import App from './App.svelte'
+import './assets/main.css'
+import './assets/navigables.css'
 
-const targetSelector = '#app'
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
 
-const target = document.querySelector(targetSelector)
+const app = createApp(App)
 
-if (!target) {
-	throw new Error(`Target element not found with selector: ${targetSelector}`)
-}
+app.use(router)
 
-const app = new App({ target })
-
-export default app
+app.mount('#app')

@@ -1,0 +1,55 @@
+<script setup lang="ts">
+import Button from '@/components/atoms/Button.vue';
+import Checkbox from '@/components/atoms/Checkbox.vue';
+import { hifyInterface } from '@/global/injected';
+import { appLogs } from '@/global/stores/debugger';
+import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue';
+import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
+import Row from '@/navigable/ui/molecules/Row/Row.vue';
+import { computed, ref } from 'vue'
+
+const hideDebugLogs = ref(true)
+
+const slicedAppLogs = computed(() => appLogs.value.filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true)))
+
+const win = window
+</script>
+
+<template>
+  <h2>Developer Tools</h2>
+
+  <Row>
+    <Button @press="win.location.reload()">Reload the application</Button>
+    <Checkbox v-model="hideDebugLogs">Hide debug logs</Checkbox>
+
+    <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()">
+      🛠️ Change the application's URL
+    </Button>
+  </Row>
+
+  <NavigableList>
+    <SimpleNavigableItem v-for="logEntry in slicedAppLogs">
+      <div class="log-entry" :class="[logEntry.level]">
+        <u>{{ logEntry.level.toLocaleUpperCase() }}</u>
+        <strong>{{ logEntry.at.toLocaleTimeString() }}</strong>: {{ logEntry.message }}
+      </div>
+    </SimpleNavigableItem>
+  </NavigableList>
+</template>
+
+<style scoped>
+.log-entry.info {
+  background-color: lightblue;
+  color: black;
+}
+
+.log-entry.warn {
+  background-color: yellow;
+  color: black;
+}
+
+.log-entry.error {
+  background-color: red;
+  color: white;
+}
+</style>

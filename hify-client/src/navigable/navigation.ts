@@ -1,6 +1,5 @@
-import { getContext, setContext } from 'svelte'
-import { get, writable } from 'svelte/store'
-import { logFatal, logWarn } from '../stores/debugger'
+import { logFatal, logWarn } from '@/global/stores/debugger'
+import { inject, provide, ref, shallowRef } from 'vue'
 import { KeyPressHandling, handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
@@ -27,7 +26,7 @@ export enum NavigationComingFrom {
 export type OnFocusChangeCallback = (isFocused: boolean) => void
 
 export type NavigableCommonProps = {
-	hasFocusPriority: boolean | null
+	hasFocusPriority?: boolean | null | undefined
 	onFocusChange?: OnFocusChangeCallback | null
 }
 
@@ -42,7 +41,7 @@ export abstract class NavigableCommon<P = NoProp> {
 	readonly page: NavigablePage
 	readonly id: string
 
-	protected focused = writable(false)
+	protected focused = shallowRef(false)
 
 	constructor(
 		parent: NavigableContainer<unknown> | symbol,
@@ -181,13 +180,14 @@ export abstract class NavigableItem<P = NoProp> extends NavigableCommon<P> {
 		}
 
 		if (!(el.children.length && el.children[0] instanceof HTMLElement)) {
-			return console.warn('Failed to scroll to element has it does not have a valid child element')
+			logWarn('Failed to scroll to element has it does not have a valid child element')
+			return
 		}
 
 		if (el.children.length > 0) {
 			el.children[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
 		} else {
-			console.warn('Navigable item has no children ; cannot scroll into view')
+			logWarn('Navigable item has no children ; cannot scroll into view')
 		}
 	}
 
@@ -276,7 +276,8 @@ class NavigablePage extends NavigableContainer {
 		const focused = this.focusedItem()
 
 		if (focused === null) {
-			return logWarn('No item focused, cannot unfocus')
+			logWarn('No item focused, cannot unfocus')
+			return
 		}
 
 		this.onRequestUnfocus()
@@ -289,7 +290,8 @@ class NavigablePage extends NavigableContainer {
 			return null
 		}
 
-		if (item.parent.page !== this) {
+		// TODO: should be instance comparison instead of ID comparison
+		if (item.parent.page.id !== this.id) {
 			throw new Error("Cannot return item focused when it isn't part of the same page")
 		}
 
@@ -299,14 +301,14 @@ class NavigablePage extends NavigableContainer {
 
 export function getParentNavigable(item?: true): NavigableContainer<unknown> {
 	if (item) {
-		if (getContext(NAVIGABLE_ITEM_DETECTION_CTX)) {
+		if (inject(NAVIGABLE_ITEM_DETECTION_CTX, false)) {
 			throw new Error('Cannot use a navigable inside an item')
 		}
 
-		setContext(NAVIGABLE_ITEM_DETECTION_CTX, true)
+		provide(NAVIGABLE_ITEM_DETECTION_CTX, true)
 	}
 
-	const nav = getContext(NAVIGATION_CTX)
+	const nav = inject(NAVIGATION_CTX)
 
 	if (nav === null || nav === undefined) {
 		throw new Error('No parent navigable found in the current context')
@@ -319,17 +321,15 @@ export function getParentNavigable(item?: true): NavigableContainer<unknown> {
 	return nav
 }
 
-export function setChildrenNavigable(nav: NavigableContainer) {
-	setContext(NAVIGATION_CTX, nav)
+export function setChildrenNavigable(nav: NavigableContainer<unknown>) {
+	provide(NAVIGATION_CTX, nav)
 }
 
 export function usePageNavigator(): NavigableContainer {
-	const page = new NavigablePage(_requestFocus, _requestUnfocus, () => get(navState)?.focused ?? null)
+	const page = new NavigablePage(_requestFocus, _requestUnfocus, () => navState.value?.focused ?? null)
 
-	navState.update((state) => {
-		state?.focused?.onUnfocus()
-		return { page, focused: null }
-	})
+	navState.value?.focused?.onUnfocus()
+	navState.value = { page, focused: null }
 
 	setChildrenNavigable(page)
 
@@ -461,7 +461,7 @@ function generateNavigableId(): string {
 }
 
 function handleKeyboardEvent(key: string, long: boolean): void {
-	const state = get(navState)
+	const state = navState.value
 
 	if (!state) {
 		return
@@ -471,11 +471,11 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 
 	if (__current) {
 		if (__current.identity !== state.page.identity) {
-			console.warn('Previously-focused element has a different identity than the current page, removing focus')
+			logWarn('Previously-focused element has a different identity than the current page, removing focus')
 			__current.onUnfocus()
 			__current = null
 		} else if (__current.wasDestroyed()) {
-			console.warn('Previously-focused element was destroyed, removing focus')
+			logWarn('Previously-focused element was destroyed, removing focus')
 			__current.onUnfocus()
 			__current = null
 		}
@@ -487,7 +487,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 		__current = state.page.navigateToFirstItemDown(NavigationComingFrom.Above)
 
 		if (!__current) {
-			console.warn('No navigable item in this page')
+			logWarn('No navigable item in this page')
 			return
 		}
 
@@ -553,10 +553,6 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 
 				const newFocused = nav.handleAction(event)
 
-				if (newFocused !== null && !(newFocused instanceof NavigableItem)) {
-					logFatal('Value returned by handleAction() is not a NavigableItem!')
-				}
-
 				if (newFocused) {
 					next = newFocused
 				}
@@ -580,7 +576,7 @@ function handleKeyboardEvent(key: string, long: boolean): void {
 	}
 
 	if (next) {
-		navState.set(_generateUpdatedNavState(current, next, state.page))
+		navState.value = _generateUpdatedNavState(current, next, state.page)
 	}
 }
 
@@ -599,13 +595,13 @@ function _getItemParents(item: NavigableItem<unknown>): Navigable[] {
 
 function _checkItemValidity(item: NavigableItem<unknown>, page: NavigablePage): boolean {
 	if (item.identity !== page.identity) {
-		console.warn('Previously-focused element has a different identity than the current page, removing focus')
+		logWarn('Previously-focused element has a different identity than the current page, removing focus')
 		item.onUnfocus()
 		return false
 	}
 
 	if (item.wasDestroyed()) {
-		console.warn('Previously-focused element was destroyed, removing focus')
+		logWarn('Previously-focused element was destroyed, removing focus')
 		item.onUnfocus()
 		return false
 	}
@@ -614,13 +610,15 @@ function _checkItemValidity(item: NavigableItem<unknown>, page: NavigablePage): 
 }
 
 function _requestFocus(item: NavigableItem<unknown>): void {
-	navState.update((state) =>
-		state && _checkItemValidity(item, state.page) ? _generateUpdatedNavState(state.focused, item, state.page) : state,
-	)
+	const state = navState.value
+
+	navState.value =
+		state && _checkItemValidity(item, state.page) ? _generateUpdatedNavState(state.focused, item, state.page) : state
 }
 
 function _requestUnfocus(): void {
-	navState.update((state) => (state ? _generateUpdatedNavState(state.focused, null, state.page) : state))
+	const state = navState.value
+	navState.value = state ? _generateUpdatedNavState(state.focused, null, state.page) : state
 }
 
 let isUpdatingFocus = false
@@ -636,9 +634,10 @@ function _generateUpdatedNavState(
 
 	isUpdatingFocus = true
 
-	if (newFocused && !(newFocused instanceof NavigableItem)) {
-		console.error(newFocused)
-		console.error(new Error())
+	if (newFocused !== null && !(newFocused instanceof NavigableItem)) {
+		logFatal(
+			`Value returned by handleAction() is not a NavigableItem!\nGot value type: ${(newFocused as object).constructor.name}`,
+		)
 	}
 
 	if (oldFocused?.id !== newFocused?.id) {
@@ -680,23 +679,25 @@ export type RequestFocus = () => boolean
 
 export type Navigable = NavigableContainer<unknown> | NavigableItem<unknown>
 
-const NAVIGATION_CTX = Symbol()
-const NAVIGABLE_ITEM_DETECTION_CTX = Symbol()
-const PAGE_CTR_TOKEN = Symbol()
+const NAVIGATION_CTX = Symbol('NAVIGATION_CTX')
+const NAVIGABLE_ITEM_DETECTION_CTX = Symbol('NAVIGABLE_ITEM_DETECTION_CTX')
+const PAGE_CTR_TOKEN = Symbol('PAGE_CTR_TOKEN')
 
 type NavState = {
 	page: NavigablePage
 	focused: NavigableItem<unknown> | null
 }
 
-const navState = writable<NavState | null>(null)
+const navState = ref<NavState | null>(null) as
+	// HACK: this is required to avoid Vue's typings marking the instance as unwrapped and losing its class
+	//       belonging
+	{ value: NavState | null }
 
 export class HTMLNavigableItemWrapperElement extends HTMLElement {}
 
 export const ITEM_WRAPPER_ELEMENT_TAG_NAME = 'navigable-item-wrapper'
 
 const itemWrapperInPlace = window.customElements.get(ITEM_WRAPPER_ELEMENT_TAG_NAME)
-
 if (!itemWrapperInPlace) {
 	window.customElements.define(ITEM_WRAPPER_ELEMENT_TAG_NAME, HTMLNavigableItemWrapperElement)
 } else if (itemWrapperInPlace.name !== HTMLNavigableItemWrapperElement.name) {

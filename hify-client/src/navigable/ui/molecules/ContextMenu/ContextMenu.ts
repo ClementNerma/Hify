@@ -1,5 +1,5 @@
-import type { SimpleNavigableItemProps } from '@navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
-import { writable } from 'svelte/store'
+import type { SimpleNavigableItemProps } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
+import { ref } from 'vue'
 
 export type ContextMenuOption = {
 	label: string
@@ -16,7 +16,7 @@ export function showContextMenu(options: ContextMenuOption[]): void {
 		throw new Error('Cannot create an empty context menu')
 	}
 
-	contextMenuStore.set({ options })
+	contextMenuStore.value = { options }
 }
 
-export const contextMenuStore = writable<ContextMenuData | null>(null)
+export const contextMenuStore = ref<ContextMenuData | null>(null)

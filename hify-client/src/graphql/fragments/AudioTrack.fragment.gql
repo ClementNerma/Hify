@@ -1,0 +1,38 @@
+fragment AudioTrack on Track {
+  id
+  computedRating
+  # appOnlyRating
+  metadata {
+    #codec
+    duration
+    #fileSize
+    tags {
+      title
+      artists {
+        id
+        name
+      }
+      album {
+        ...Album
+
+        year
+
+        # art {
+        #   blurhash
+        # }
+      }
+      disc
+      trackNo
+      # rating
+      genres {
+        id
+        name
+      }
+      date {
+        year
+        month
+        day
+      }
+    }
+  }
+}

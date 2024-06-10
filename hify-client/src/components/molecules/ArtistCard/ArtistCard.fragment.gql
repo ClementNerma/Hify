@@ -1,7 +1,0 @@
-fragment ArtistCard on ArtistInfos {
-  id
-  name
-  art {
-    ...ProgressiveImg
-  }
-}

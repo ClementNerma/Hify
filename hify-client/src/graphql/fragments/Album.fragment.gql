@@ -1,0 +1,11 @@
+fragment Album on AlbumInfos {
+  id
+  name
+  albumArtists {
+    id
+    name
+  }
+  art {
+    ...Art
+  }
+}

@@ -1,9 +1,31 @@
-/node_modules
-/tsconfig.build.tsbuildinfo
-/src/graphql
-/src/**/*.generated.ts
-/dist
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-/.pnpm-debug.log
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
 
-.env.*
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
+
+# Generated files
+/src/graphql/generated

@@ -1,0 +1,29 @@
+navigable-container-wrapper {
+    display: 'contents';
+}
+
+navigable-item-wrapper:not(.noPadding)> :first-child {
+    padding: 5px;
+}
+
+navigable-item-wrapper.fullHeight {
+    /* -10px for the 2x 5px padding */
+    height: calc(100% - 10px);
+}
+
+navigable-item-wrapper.fullHeight.noPadding {
+    height: 100%;
+}
+
+navigable-item-wrapper.fullHeight> :first-child {
+    min-height: 100%;
+}
+
+navigable-item-wrapper:not(.unstyled).focused> :first-child,
+navigable-item-wrapper:not(.unstyled):hover> :first-child {
+    outline: none;
+    /* color: black;
+    background-color: white; */
+    text-decoration: underline;
+    cursor: pointer;
+}

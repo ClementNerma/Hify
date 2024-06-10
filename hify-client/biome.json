@@ -1,24 +1,19 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"organizeImports": {
+		"enabled": false
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-			"performance": {
-				"noDelete": "off"
-			},
-			"correctness": {
-				"noVoidTypeReturn": "off"
-			},
 			"suspicious": {
 				"noConfusingVoidType": "off"
 			},
 			"style": {
-				"noParameterAssign": "off",
 				"useEnumInitializers": "off"
 			}
-		},
-		"ignore": ["src/graphql"]
+		}
 	},
 	"formatter": {
 		"lineWidth": 120
@@ -28,20 +23,5 @@
 			"quoteStyle": "single",
 			"semicolons": "asNeeded"
 		}
-	},
-	"overrides": [
-		{
-			"include": ["*.svelte"],
-			"linter": {
-				"rules": {
-					"style": {
-						"useConst": "off"
-					},
-					"suspicious": {
-						"noConfusingLabels": "off"
-					}
-				}
-			}
-		}
-	]
+	}
 }

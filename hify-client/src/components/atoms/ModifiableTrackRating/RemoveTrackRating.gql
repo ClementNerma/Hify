@@ -1,3 +1,0 @@
-mutation RemoveTrackRating($trackId: String!) {
-    removeTrackRating(trackId: $trackId)
-}

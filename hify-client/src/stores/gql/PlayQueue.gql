@@ -1,5 +1,0 @@
-query PlayQueue($tracksIds: [String!]!) {
-  selectTracks(inIds: $tracksIds) {
-    ...AudioTrack
-  }
-}

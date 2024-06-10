@@ -1,0 +1,10 @@
+query UsageStats {
+    generateStats {
+        tracksCount
+        albumsCount
+        albumArtistsCount
+        artistsCount
+        totalTracksListened
+        totalListeningTime
+    }
+}

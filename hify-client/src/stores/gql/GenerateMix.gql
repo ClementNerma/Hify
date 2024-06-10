@@ -1,8 +1,0 @@
-mutation GenerateMix($params: MixParams!, $maxTracks: Int!) {
-  generateMix(params: $params, maxTracks: $maxTracks) {
-    mixId
-    firstTracks {
-      ...AudioTrack
-    }
-  }
-}

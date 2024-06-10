@@ -1,8 +1,8 @@
 import {
-	type HTMLNavigableItemWrapperElement,
 	NavigableItem,
 	NavigationAction,
 	NavigationDirection,
+	type HTMLNavigableItemWrapperElement,
 	type NoProp,
 } from '../../navigation'
 
@@ -27,7 +27,7 @@ export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNav
 		}
 	}
 
-	handleAction(action: NavigationAction): NavigableItem<unknown> | null {
+	handleAction(action: NavigationAction): null {
 		const callbacks: { [action in NavigationAction]: SimpleNavigableItemCallback | undefined } = {
 			[NavigationAction.Press]: this.props.onPress,
 			[NavigationAction.LongPress]: this.props.onLongPress,
@@ -41,11 +41,11 @@ export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNav
 			throw new Error('Tried to call unsupported action callback on navigable item')
 		}
 
-		if (this.props.disabled === true) {
-			return null
+		if (this.props.disabled !== true) {
+			fn()
 		}
 
-		return fn() ?? null
+		return null
 	}
 
 	canHandleDirection(direction: NavigationDirection): boolean {
@@ -64,7 +64,7 @@ export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNav
 		}
 	}
 
-	handleDirection(direction: NavigationDirection): NavigableItem<unknown> | null {
+	handleDirection(direction: NavigationDirection): null {
 		const callbacks: { [action in NavigationDirection]: SimpleNavigableItemCallback | undefined } = {
 			[NavigationDirection.Up]: this.props.onUp,
 			[NavigationDirection.Left]: this.props.onLeft,
@@ -78,7 +78,9 @@ export class SimpleNavigableItem<P = NoProp> extends NavigableItem<P & SimpleNav
 			throw new Error('Tried to call unsupported direction callback on navigable item')
 		}
 
-		return fn() ?? null
+		fn()
+
+		return null
 	}
 
 	onFocus(): void {

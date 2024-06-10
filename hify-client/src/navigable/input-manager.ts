@@ -10,6 +10,7 @@ export function dispatchKeyPress(key: KeyboardEvent['key'], long: boolean) {
 	console.debug(`Pressed key: ${key} (${long ? 'long' : 'short'})`)
 
 	if (Object.prototype.hasOwnProperty.call(REMAPPED_KEYS, key)) {
+		// biome-ignore lint/style/noParameterAssign:
 		key = REMAPPED_KEYS[key]
 	}
 
@@ -49,13 +50,13 @@ type RegisteredKeyPress = {
 }
 
 export enum KeyPressType {
-	Simple,
-	Long,
+	Simple = 0,
+	Long = 1,
 }
 
 export enum KeyPressHandling {
-	Intercepted,
-	Propagate,
+	Intercepted = 0,
+	Propagate = 1,
 }
 
 /** Determine if the key should NOT be intercepted */
