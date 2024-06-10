@@ -274,8 +274,6 @@ export async function getNextTracksOfMix(mixId: string): Promise<AudioTrackFragm
 
 const persistedPlayQueue = loadPlayQueue()
 
-watch(playQueue, persistPlayQueue)
-
 if (persistedPlayQueue) {
 	const { tracksId, position, fromMixId, isMixFinished } = persistedPlayQueue
 
@@ -297,3 +295,5 @@ if (persistedPlayQueue) {
 			}
 		})
 }
+
+watch(playQueue, persistPlayQueue, { deep: true })
