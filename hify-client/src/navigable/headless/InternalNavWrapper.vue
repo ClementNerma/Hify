@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="P, N extends NavigableContainer<P>">
-import { onUpdated } from 'vue';
+import { onBeforeUpdate } from 'vue';
 import { type NavigableContainer, setChildrenNavigable, type NavigableCommonProps } from '../navigation';
 import InternalNavComment from './InternalNavComment.vue';
 
@@ -10,7 +10,7 @@ const { nav, props } = defineProps<{
 
 setChildrenNavigable(nav)
 
-onUpdated(() => nav.updateProps(props))
+onBeforeUpdate(() => nav.updateProps(props))
 </script>
 
 <template>

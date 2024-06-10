@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { onMounted, onUpdated } from 'vue';
+import { onBeforeUpdate, onMounted } from 'vue';
 
 // TODO: use an event instead
 const { run } = defineProps<{
     run: () => unknown
 }>()
 
-onMounted(() => {
-    run()
-})
-
-onUpdated(() => {
-    run()
-})
+onMounted(run)
+onBeforeUpdate(run)
 </script>
 
 <template></template>

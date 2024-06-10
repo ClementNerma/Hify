@@ -8,7 +8,7 @@ export type SimpleNavigableItemProps = Omit<SimpleNavigableItemClassProps, 'getU
 <script setup lang="ts">
 import { SimpleNavigableItem, type SimpleNavigableItemProps as SimpleNavigableItemClassProps } from './SimpleNavigableItem';
 import { JUST_FOR_STYLE_ITEM_ID, getParentNavigable, type HTMLNavigableItemWrapperElement } from '../../navigation'
-import { computed, onUpdated, ref } from 'vue';
+import { computed, onBeforeUpdate, ref } from 'vue';
 import { logFatal } from '@/global/stores/debugger';
 
 const props = defineProps<SimpleNavigableItemProps>()
@@ -37,7 +37,7 @@ const itemProps = computed(() => ({
 
 const item = new SimpleNavigableItem(getParentNavigable(true), itemProps.value)
 
-onUpdated(() => item.updateProps(itemProps.value))
+onBeforeUpdate(() => item.updateProps(itemProps.value))
 
 const wrapperRef = ref<HTMLNavigableItemWrapperElement | null>(null)
 const focused = ref(false)
