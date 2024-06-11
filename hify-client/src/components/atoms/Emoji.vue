@@ -1,9 +1,7 @@
-<script setup lang="ts">
-defineProps<{ alone?: boolean }>()
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <span class="emoji" :class="{ 'mr-2': !alone }">
+  <span class="mr-2">
     <slot />
   </span>
 </template>

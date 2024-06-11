@@ -3,6 +3,7 @@ import Button from '@/components/atoms/Button.vue'
 import { UpdateIndexDocument } from '@/graphql/generated/graphql'
 import { useMutation } from '@urql/vue';
 import { watch } from 'vue';
+import Emoji from './Emoji.vue';
 
 const emit = defineEmits<{
     updated: []
@@ -16,9 +17,9 @@ watch(data, () => emit('updated'))
 <template>
     <Button @press="executeMutation({})" :disabled="fetching">
         Update the index (this might take a while)
-    </Button>
 
-    <span v-if="fetching">⌛</span>
-    <span v-if="data">✅</span>
-    <span v-if="error">❌ {{ error.message }}</span>
+        <Emoji v-if="fetching">⌛</Emoji>
+        <Emoji v-else-if="data">✅</Emoji>
+        <Emoji v-else-if="error">❌ {{ error.message }}</Emoji>
+    </Button>
 </template>
