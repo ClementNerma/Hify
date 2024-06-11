@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUpdate, onMounted } from 'vue';
 
-// TODO: use an event instead
 const emit = defineEmits<{
     run: []
 }>()
