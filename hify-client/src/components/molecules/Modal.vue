@@ -10,7 +10,8 @@ import Row from '@/navigable/ui/molecules/Row/Row.vue'
 import Button from '../atoms/Button.vue'
 import { NavigableItem, type RequestFocus, getParentNavigable } from '@/navigable/navigation'
 import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue'
-import { onUpdated, ref } from 'vue'
+import { onMounted, onUpdated, ref } from 'vue'
+import Run from '../atoms/Run.vue'
 
 const props = defineProps<{
   open?: boolean,
@@ -40,7 +41,7 @@ async function onButtonPress(button: ModalButton) {
   loading.value = false
 }
 
-onUpdated(() => {
+async function focusButtonOnOpen() {
   if (wasOpen.value !== open.value) {
     wasOpen.value = open.value
 
@@ -52,7 +53,10 @@ onUpdated(() => {
       prevFocusItem.value?.requestFocus()
     }
   }
-})
+}
+
+onMounted(focusButtonOnOpen)
+onUpdated(focusButtonOnOpen)
 </script>
 
 <template>
@@ -65,7 +69,9 @@ onUpdated(() => {
           <Row>
             <Button v-for="button, i in buttons" :key="button.label" v-slot="{ item, focused }"
               @press="onButtonPress(button)">
-              <!-- TODO: bind button to nth value -->
+
+              <Run @run="buttonsRequestFocus[i] = () => item.requestFocus()" />
+
               <em v-if="loading && focused">Loading...</em>
               <span v-else>{{ button.label }}</span>
             </Button>

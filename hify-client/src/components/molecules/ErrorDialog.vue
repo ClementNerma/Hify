@@ -3,7 +3,6 @@ import Modal from '../molecules/Modal.vue'
 import { currentError, errors, popError } from './ErrorDialog'
 </script>
 
-
 <template>
     <Modal v-if="currentError" open :buttons="[{
         label: 'Close', onPress: () => popError(),
