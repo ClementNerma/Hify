@@ -1,5 +1,5 @@
 import { logFatal, logWarn } from '@/global/stores/debugger'
-import { inject, provide, ref, shallowRef } from 'vue'
+import { inject, provide, ref, shallowRef, type Raw } from 'vue'
 import { KeyPressHandling, handleInput, registerLongPressableKeys } from './input-manager'
 
 export enum NavigationDirection {
@@ -688,10 +688,7 @@ type NavState = {
 	focused: NavigableItem<unknown> | null
 }
 
-const navState = ref<NavState | null>(null) as
-	// HACK: this is required to avoid Vue's typings marking the instance as unwrapped and losing its class
-	//       belonging
-	{ value: NavState | null }
+const navState = ref<Raw<NavState> | null>(null)
 
 export class HTMLNavigableItemWrapperElement extends HTMLElement {}
 
