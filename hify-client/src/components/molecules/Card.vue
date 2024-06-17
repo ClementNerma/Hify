@@ -38,13 +38,14 @@ defineProps<CardProps>()
     opacity: var(--opacity);
 }
 
-/* TODO: remove experimental stuff */
 .experimental-line-limiter {
     overflow: hidden;
     text-overflow: ellipsis;
+
+    /* HACK: Limit the number of lines using deprecated CSS properties
+       Unfortunately, it is currently impossible to do this using standard CSS :( */
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 </style>

@@ -15,5 +15,4 @@ defineProps<{
         <Card :title="album.name" :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
             :art="album.art" />
     </ProgressiveRow>
-
 </template>
