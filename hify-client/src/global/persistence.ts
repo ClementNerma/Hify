@@ -40,7 +40,8 @@ export function loadPlayQueue(): PersistedPlayQueue | null {
 	try {
 		parsed = JSON.parse(saved)
 	} catch (e: unknown) {
-		logError(`Failed to deserialize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		logError(`Failed to parse persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		console.error(saved)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null
 	}
@@ -50,7 +51,8 @@ export function loadPlayQueue(): PersistedPlayQueue | null {
 	try {
 		validated = v.parse(PersistedPlayQueueSchema, parsed)
 	} catch (e) {
-		logError(`Failed to deserialize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		logError(`Failed to destructurize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		console.error(parsed)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null
 	}
