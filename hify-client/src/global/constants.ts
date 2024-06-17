@@ -7,5 +7,4 @@ export const EXTEND_MIX_TRACKS_QTY = 20
 export const GRID_TRACKS_PER_ROW = 7
 
 export const getStreamUri = (trackId: string) => `${API_SERVER_URL}/stream/${trackId}`
-export const getArtUri = (artId: string) => `${API_SERVER_URL}/art/${artId}`
-export const getArtistArtUri = (artistId: string) => `${API_SERVER_URL}/art/artist/${artistId}`
+export const getArtUri = (type: 'album' | 'artist', id: string) => `${API_SERVER_URL}/art/${type}/${id}`

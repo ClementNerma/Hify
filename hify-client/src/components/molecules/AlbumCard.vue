@@ -12,6 +12,6 @@ defineProps<{
 <template>
     <SimpleNavigableItem @press="router.push({ name: 'album', params: { id: album.id } })">
         <Card :title="album.name" :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
-            :art="album.art" />
+            art-type="album" :art-item="album" />
     </SimpleNavigableItem>
 </template>

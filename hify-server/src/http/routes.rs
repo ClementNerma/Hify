@@ -8,27 +8,30 @@ use axum::{
 use tower::ServiceExt;
 use tower_http::services::ServeFile;
 
-use crate::index::{ArtID, ArtTarget, ArtistID, TrackID};
+use crate::{
+    index::{AlbumID, ArtistID, IdType, TrackID},
+    resources::ArtistArt,
+};
 
 use super::AppState;
 
-pub async fn art(
+pub async fn album_art(
     Extension(state): Extension<AppState>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
     let id =
-        ArtID::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid art ID provided"))?;
+        AlbumID::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid album ID provided"))?;
 
     let index = state.index.read().await;
 
-    let art = index
-        .arts
+    let relative_path = index
+        .album_arts
         .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Provided art was not found"))?;
+        .ok_or((StatusCode::NOT_FOUND, "Provided album art was not found"))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
-    let served = ServeFile::new(index.from.join(&art.relative_path))
+    let served = ServeFile::new(index.from.join(relative_path))
         .oneshot(req)
         .await
         // We can unwrap as the Err() variant is Infallible
@@ -42,35 +45,19 @@ pub async fn artist_art(
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
-    let id = ArtistID::decode(&id)
+    let artist_id = ArtistID::decode(&id)
         .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid artist ID provided"))?;
 
-    let index = state.index.read().await;
-
-    let artist_albums = index
-        .cache
-        .artists_albums
-        .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Provided artist was not found"))?;
-
-    let artist_first_album_id = artist_albums.keys().next().ok_or((
-        StatusCode::NOT_FOUND,
-        "Provided artist does not have any album to generate art from",
-    ))?;
-
-    let album_art = index
-        .arts
-        .get(&ArtTarget::AlbumCover(*artist_first_album_id).to_id())
+    let art_path = state
+        .resource_manager
+        .get_path_of::<ArtistArt>(artist_id)
         .ok_or((
             StatusCode::NOT_FOUND,
-            "Artist's first album does not have a cover art",
+            "The provided artist does not have an associated art",
         ))?;
 
-    // TODO: improve artist arts
-    let art = album_art;
-
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
-    let served = ServeFile::new(index.from.join(&art.relative_path))
+    let served = ServeFile::new(art_path)
         .oneshot(req)
         .await
         // We can unwrap as the Err() variant is Infallible

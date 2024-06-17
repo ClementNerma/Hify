@@ -29,3 +29,7 @@ tower-http = { version = "0.5.2", features = ["cors", "fs"] }
 walkdir = "2.5.0"
 indicatif = "0.17.8"
 symphonia = { version = "0.5.4", features = ["all"] }
+image = { version = "0.25.1", default-features = false, features = [
+    "jpeg",
+    "png",
+] }

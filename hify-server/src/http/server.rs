@@ -7,7 +7,7 @@ use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use super::{
-    routes::{art, artist_art, stream},
+    routes::{album_art, artist_art, stream},
     AppState,
 };
 use crate::{
@@ -16,6 +16,7 @@ use crate::{
         graphql::{graphiql, graphql_handler},
         logging::log_errors,
     },
+    resources::ResourceManager,
 };
 use crate::{index::Index, userdata::UserDataWrapper};
 
@@ -25,6 +26,7 @@ pub async fn launch(
     address: &SocketAddr,
     index: Index,
     user_data: UserDataWrapper,
+    res_manager: ResourceManager,
     save_index: SaveIndexFn,
 ) -> Result<()> {
     // TODO: improve this
@@ -33,14 +35,14 @@ pub async fn launch(
         .allow_origin(AllowOrigin::any())
         .allow_headers(AllowHeaders::any());
 
-    let app_state = AppState::new(index, user_data);
+    let app_state = AppState::new(index, user_data, res_manager);
 
     let graphql_schema = get_graphql_schema(app_state.clone(), save_index);
 
     let app = Router::new()
         // Define all routes
         .route(GRAPHQL_ENDPOINT, get(graphiql).post(graphql_handler))
-        .route("/art/:id", get(art))
+        .route("/art/album/:id", get(album_art))
         .route("/art/artist/:id", get(artist_art))
         .route("/stream/:id", get(stream))
         // Define extensions

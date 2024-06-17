@@ -13,6 +13,6 @@ defineProps<{ tracks: AudioTrackFragment[] }>()
         @item-long-press="(track) =>
             showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null }, { context: 'normal' }))"
         v-slot="{ item: track }">
-        <Card :title="track.metadata.tags.title" :art="track.metadata.tags.album.art" />
+        <Card :title="track.metadata.tags.title" art-type="album" :art-item="track.metadata.tags.album" />
     </ProgressiveRow>
 </template>

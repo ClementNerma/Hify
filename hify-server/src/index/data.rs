@@ -2,6 +2,7 @@ use std::{
     cmp::Ordering,
     collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
+    num::ParseIntError,
     path::{Path, PathBuf},
     time::SystemTime,
 };
@@ -19,7 +20,7 @@ pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
     pub tracks: SortedMap<TrackID, Track>,
-    pub arts: HashMap<ArtID, Art>,
+    pub album_arts: HashMap<AlbumID, PathBuf>,
     pub cache: IndexCache,
 }
 
@@ -142,7 +143,7 @@ impl GenreInfos {
     }
 }
 
-define_id_type!(TrackID, AlbumID, ArtistID, GenreID, ArtID);
+define_id_type!(TrackID, AlbumID, ArtistID, GenreID);
 
 /// Full track informations
 /// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway
@@ -402,49 +403,18 @@ impl ScalarType for Rating {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, SimpleObject)]
-pub struct Art {
-    #[graphql(skip)]
-    pub relative_path: PathBuf,
-
-    #[graphql(skip)]
-    pub target: ArtTarget,
-
-    pub id: ArtID,
-    // pub width: u32,
-    // pub height: u32,
-    // pub blurhash: String,
-    // pub dominant_color: Option<ArtRgb>,
-}
-
-impl Art {
-    pub fn still_applies_for(&self, index_cache: &IndexCache) -> bool {
-        match &self.target {
-            ArtTarget::AlbumCover(album_id) => index_cache.albums_infos.contains_key(album_id),
-            ArtTarget::Artist(artist_id) => index_cache.artists_infos.contains_key(artist_id),
-        }
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum ArtTarget {
-    AlbumCover(AlbumID),
-    Artist(ArtistID),
-}
-
-impl ArtTarget {
-    pub fn to_id(self) -> ArtID {
-        let mut hasher = DefaultHasher::new();
-        self.hash(&mut hasher);
-        ArtID(hasher.finish())
-    }
-}
-
 #[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
 pub struct ArtRgb {
     pub r: u8,
     pub g: u8,
     pub b: u8,
+}
+
+pub trait IdType:
+    std::fmt::Debug + Clone + Copy + Hash + PartialEq + Serialize + Deserialize<'static>
+{
+    fn encode(&self) -> String;
+    fn decode(input: &str) -> Result<Self, ParseIntError>;
 }
 
 #[macro_export]
@@ -453,14 +423,12 @@ macro_rules! define_id_type {
         #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
         pub struct $typename(pub u64);
 
-        impl $typename {
-            #[allow(dead_code)]
-            pub fn encode(&self) -> String {
+        impl $crate::index::IdType for $typename {
+            fn encode(&self) -> String {
                 format!("{:x}", self.0)
             }
 
-            #[allow(dead_code)]
-            pub fn decode(input: &str) -> Result<Self, ::std::num::ParseIntError> {
+            fn decode(input: &str) -> Result<Self, ::std::num::ParseIntError> {
                 let id = u64::from_str_radix(input, 16)?;
                 Ok(Self(id))
             }

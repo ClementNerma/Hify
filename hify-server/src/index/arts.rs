@@ -1,114 +1,33 @@
-use std::{collections::HashMap, path::Path, sync::Arc};
-
-use anyhow::{bail, Context, Result};
-use log::error;
-use tokio::{fs, task::JoinSet};
-
-use crate::helpers::logging::progress_bar;
-
-use super::{
-    AlbumID, AlbumInfos, Art, ArtID, ArtTarget, ArtistID, IndexCache, SortedMap, Track, TrackID,
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    sync::Arc,
 };
+
+use anyhow::{anyhow, Context, Result};
+use image::{
+    codecs::png::PngEncoder,
+    imageops::{resize, FilterType},
+    GenericImage, ImageBuffer,
+};
+use tokio::{fs, task::spawn_blocking};
+
+use crate::{
+    helpers::async_batch::AsyncContextualRunner,
+    resources::{ArtistArt, ResourceManager},
+};
+
+use super::{AlbumID, AlbumInfos, ArtistID, IndexCache, SortedMap, Track, TrackID};
 
 static COVER_FILENAMES: &[&str] = &["cover", "folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
-
-pub fn generate_artist_art(
-    artist_id: ArtistID,
-    arts: &HashMap<ArtID, Art>,
-    cache: &IndexCache,
-) -> Option<Art> {
-    let albums = cache.artists_albums.get(&artist_id)?;
-
-    let first_album = albums.values().next()?;
-
-    let album_art = arts.get(&ArtTarget::AlbumCover(first_album.get_id()).to_id())?;
-
-    let target = ArtTarget::Artist(artist_id);
-
-    Some(Art {
-        id: target.to_id(),
-        target,
-        ..album_art.clone()
-    })
-}
-
-pub async fn find_albums_arts(
-    albums: &[&AlbumInfos],
-    base_dir: &Path,
-    tracks: SortedMap<TrackID, Track>,
-    cache: IndexCache,
-) -> Result<Vec<Art>> {
-    let mut set = JoinSet::new();
-    let tracks = Arc::new(tracks);
-    let cache = Arc::new(cache);
-
-    let pb = progress_bar(albums.len());
-
-    for album in albums {
-        let base_dir = base_dir.to_path_buf();
-        let pb = pb.clone();
-        let tracks = Arc::clone(&tracks);
-        let cache = Arc::clone(&cache);
-        let album = AlbumInfos::clone(album);
-
-        set.spawn(async move {
-            let result = find_album_art(album.get_id(), &base_dir, &tracks, &cache).await?;
-
-            if result.is_none() {
-                pb.suspend(|| {
-                    error!(
-                        "Warning: no album art found for album '{}' by '{}'",
-                        album.name,
-                        album
-                            .album_artists
-                            .iter()
-                            .map(|artist| artist.name.clone())
-                            .collect::<Vec<_>>()
-                            .join(" / ")
-                    );
-                });
-            }
-
-            pb.inc(1);
-
-            Ok::<_, anyhow::Error>(result)
-        });
-    }
-
-    let mut arts = vec![];
-    let mut errors = 0;
-
-    while let Some(res) = set.join_next().await {
-        match res? {
-            Ok(art) => {
-                if let Some(art) = art {
-                    arts.push(art)
-                }
-            }
-
-            Err(err) => {
-                error!("Error: {err}");
-                errors += 1;
-            }
-        }
-    }
-
-    pb.finish();
-
-    if errors > 0 {
-        bail!("Encountered {errors} error(s)");
-    }
-
-    Ok(arts)
-}
 
 async fn find_album_art(
     album_id: AlbumID,
     base_dir: &Path,
     tracks: &SortedMap<TrackID, Track>,
     cache: &IndexCache,
-) -> Result<Option<Art>> {
+) -> Result<Option<PathBuf>> {
     let album_tracks_ids = cache.albums_tracks.get(&album_id).unwrap();
 
     // Cannot fail as albums need at least one track to be registered
@@ -134,16 +53,12 @@ async fn find_album_art(
                     if item.file_name().to_string_lossy().to_ascii_lowercase()
                         == format!("{filename}.{extension}")
                     {
-                        let art = make_album_art(&item.path(), base_dir, album_id).with_context(
-                            || {
-                                format!(
-                                    "Failed to make art for album cover at: {}",
-                                    item.path().to_string_lossy()
-                                )
-                            },
-                        )?;
+                        let relative_path = item.path()
+                            .strip_prefix(base_dir)
+                            .expect("Internal error: art path couldn't be stripped of the base directory")
+                            .to_path_buf();
 
-                        return Ok(Some(art));
+                        return Ok(Some(relative_path));
                     }
                 }
             }
@@ -153,52 +68,189 @@ async fn find_album_art(
     Ok(None)
 }
 
-fn make_album_art(path: &Path, base_dir: &Path, album_id: AlbumID) -> Result<Art> {
-    // let img = image::open(path).context("Failed to open the image file")?;
-
-    let relative_path = path
-        .strip_prefix(base_dir)
-        .expect("Internal error: art path couldn't be stripped of the base directory")
-        .to_path_buf();
-
-    let target = ArtTarget::AlbumCover(album_id);
-
-    Ok(Art {
-        relative_path,
-        target,
-
-        id: target.to_id(),
-        // width: img.width(),
-        // height: img.height(),
-        // blurhash: generate_blurhash(&img, MAX_BLURHASH_COMPONENTS_X, MAX_BLURHASH_COMPONENTS_Y)?,
-        // dominant_color: get_dominant_color(&img)?,
-    })
+#[derive(Clone)]
+pub struct AlbumsArtFinder {
+    base_dir: PathBuf,
+    tracks: Arc<SortedMap<TrackID, Track>>,
+    cache: Arc<IndexCache>,
 }
 
-// fn get_dominant_color(img: &DynamicImage) -> Result<Option<ArtRgb>> {
-//     let img = match img.as_rgb8() {
-//         Some(img) => img,
-//         None => return Ok(None),
-//     };
+impl AlbumsArtFinder {
+    pub fn new(base_dir: PathBuf, tracks: SortedMap<TrackID, Track>, cache: IndexCache) -> Self {
+        Self {
+            base_dir,
+            tracks: Arc::new(tracks),
+            cache: Arc::new(cache),
+        }
+    }
+}
 
-//     let bytes_count = img.as_bytes().len();
-//     let expected = usize::try_from(img.width() * img.height() * 3).unwrap();
+impl AsyncContextualRunner for AlbumsArtFinder {
+    type Input = AlbumInfos;
+    type Output = (AlbumID, PathBuf);
 
-//     if bytes_count != expected {
-//         bail!("Invalid image bytes count (found {bytes_count} bytes, expected {expected} bytes)");
-//     }
+    async fn run(
+        self,
+        album: Self::Input,
+        warn: impl Fn(&str) + Send,
+    ) -> Result<Option<Self::Output>> {
+        let album_id = album.get_id();
 
-//     let dominant_color = color_thief::get_palette(img.as_bytes(), ColorFormat::Rgb, 10, 2)?;
+        let relative_path =
+            find_album_art(album_id, &self.base_dir, &self.tracks, &self.cache).await?;
 
-//     if dominant_color.len() != 2 {
-//         bail!("Color Thief did not return exactly one color");
-//     }
+        if relative_path.is_none() {
+            warn(&format!(
+                "Warning: no album art found for album '{}' by '{}'",
+                album.name,
+                album
+                    .album_artists
+                    .iter()
+                    .map(|artist| artist.name.clone())
+                    .collect::<Vec<_>>()
+                    .join(" / ")
+            ));
+        }
 
-//     let dominant_color = dominant_color[0];
+        Ok(relative_path.map(|path| (album_id, path)))
+    }
+}
 
-//     Ok(Some(ArtRgb {
-//         r: dominant_color.r,
-//         g: dominant_color.g,
-//         b: dominant_color.b,
-//     }))
-// }
+// TODO: first decode images for every single album,
+//       THEN use them to generate cover arts for artists
+#[derive(Clone)]
+pub struct ArtistsArtsGenerator {
+    base_dir: PathBuf,
+    album_arts: Arc<HashMap<AlbumID, PathBuf>>,
+    cache: Arc<IndexCache>,
+    res_manager: Arc<ResourceManager>,
+}
+
+impl ArtistsArtsGenerator {
+    pub fn new(
+        base_dir: PathBuf,
+        album_arts: HashMap<AlbumID, PathBuf>,
+        cache: IndexCache,
+        res_manager: ResourceManager,
+    ) -> Self {
+        Self {
+            base_dir,
+            album_arts: Arc::new(album_arts),
+            cache: Arc::new(cache),
+            res_manager: Arc::new(res_manager),
+        }
+    }
+
+    fn create_image_blocking(&self, artist_id: ArtistID) -> Result<Option<Vec<u8>>> {
+        // TODO: improve syntax
+        let empty_map = SortedMap::<AlbumID, AlbumInfos>::empty();
+
+        let albums_id = self
+            .cache
+            .artists_albums
+            .get(&artist_id)
+            .map(|albums| albums.keys())
+            .unwrap_or_else(|| empty_map.keys())
+            .chain(
+                self.cache
+                    .artists_album_participations
+                    .get(&artist_id)
+                    .map(|albums| albums.keys())
+                    .unwrap_or_else(|| empty_map.keys()),
+            );
+
+        let album_arts = albums_id
+            .filter_map(|album_id| self.album_arts.get(album_id))
+            .map(|relative_path| {
+                let path = self.base_dir.join(relative_path);
+
+                image::open(&path).map(Some).map_err(|err| {
+                    anyhow!(
+                        "Failed to open art file at path '{}': {err}",
+                        path.display()
+                    )
+                })
+            })
+            .take(4)
+            .filter_map(|result| result.transpose())
+            .collect::<Result<Vec<_>, _>>()?;
+
+        if album_arts.is_empty() {
+            return Ok(None);
+        }
+
+        let image = match album_arts.len() {
+            1 => {
+                let art = &album_arts[0];
+
+                let mut image = ImageBuffer::new(art.width(), art.height());
+
+                image
+                    .copy_from(art, 0, 0)
+                    .context("Failed to copy single cover art into artist's one")?;
+
+                image
+            }
+
+            _ => {
+                let (top_left, top_right, bottom_left, bottom_right) = match album_arts.as_slice() {
+                    [ref left, ref right] => (left, right, right, left),
+
+                    [ref top_left, ref top_right, ref bottom_left] => {
+                        (top_left, top_right, bottom_left, top_left)
+                    }
+
+                    [ref top_left, ref top_right, ref bottom_left, ref bottom_right] => {
+                        (top_left, top_right, bottom_left, bottom_right)
+                    }
+
+                    _ => unreachable!(),
+                };
+
+                // TODO: dynamic dimensions
+                // TODO: choose how to handle images with different aspect ratios
+                let mut image = ImageBuffer::new(1000, 1000);
+
+                let resize = |image| resize(image, 500, 500, FilterType::Lanczos3);
+
+                image
+                    .copy_from(&resize(top_left), 0, 0)
+                    .and_then(|()| image.copy_from(&resize(top_right), 500, 0))
+                    .and_then(|()| image.copy_from(&resize(bottom_left), 0, 500))
+                    .and_then(|()| image.copy_from(&resize(bottom_right), 500, 500))
+                    .map_err(|err| {
+                        anyhow!("Failed to copy album cover arts into the artist's one: {err}")
+                    })?;
+
+                image
+            }
+        };
+
+        let mut image_buf = vec![];
+
+        image
+            .write_with_encoder(PngEncoder::new(&mut image_buf))
+            .context("Failed to encode artist's art image")?;
+
+        Ok(Some(image_buf))
+    }
+}
+
+impl AsyncContextualRunner for ArtistsArtsGenerator {
+    type Input = ArtistID;
+    type Output = ();
+
+    async fn run(self, artist_id: Self::Input, _: impl Fn(&str)) -> Result<Option<Self::Output>> {
+        let res_manager = self.res_manager.clone();
+
+        let image_buf = spawn_blocking(move || self.create_image_blocking(artist_id))
+            .await
+            .context("Failed to run artist art generation")??;
+
+        if let Some(image_buf) = image_buf {
+            res_manager.store(artist_id, ArtistArt(image_buf)).await?;
+        }
+
+        Ok(None)
+    }
+}

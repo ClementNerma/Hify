@@ -13,6 +13,6 @@ defineProps<{ artists: ArtistFragment[] }>()
     <ProgressiveRow :items="artists" idProp="id"
         @item-press="(artist) => router.push({ name: 'artist', params: { id: artist.id } })"
         @item-long-press="(artist) => showContextMenu(ctxMenuOptions.forArtist(artist.id))" v-slot="{ item: artist }">
-        <Card :title="artist.name" :art="artist.art" />
+        <Card :title="artist.name" art-type="artist" :art-item="artist" />
     </ProgressiveRow>
 </template>

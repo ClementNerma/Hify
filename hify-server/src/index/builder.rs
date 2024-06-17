@@ -10,10 +10,13 @@ use std::{
 };
 use walkdir::WalkDir;
 
-use crate::helpers::logging::spinner;
+use crate::{
+    helpers::{async_batch::AsyncContextualRunner, logging::spinner},
+    index::arts::{AlbumsArtFinder, ArtistsArtsGenerator},
+    resources::ResourceManager,
+};
 
 use super::{
-    arts::{find_albums_arts, generate_artist_art},
     cache::build_index_cache,
     data::{Index, Track},
     metadata,
@@ -25,12 +28,19 @@ pub fn log(time: Instant, message: &str) {
     info!("[{: >4}s] {message}", time.elapsed().as_secs());
 }
 
-pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
+pub async fn build_index(
+    dir: PathBuf,
+    from: Option<Index>,
+    res_manager: &ResourceManager,
+) -> Result<Index> {
     let from = from.unwrap_or_else(|| Index {
         from: dir.clone(),
+
         fingerprint: String::new(),
         tracks: SortedMap::empty(),
-        arts: HashMap::new(),
+
+        album_arts: HashMap::new(),
+
         cache: IndexCache {
             tracks_files_mtime: HashMap::new(),
             tracks_all_artists: HashMap::new(),
@@ -169,6 +179,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         .albums_infos
         .values()
         .filter(|album| !from.cache.albums_infos.contains_key(&album.get_id()))
+        .cloned()
         .collect::<Vec<_>>();
 
     log(
@@ -176,33 +187,33 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         &format!("Searching for new albums' ({}) arts...", new_albums.len()),
     );
 
-    let new_albums_arts =
-        find_albums_arts(&new_albums, &dir, tracks.clone(), cache.clone()).await?;
+    let mut album_arts = from.album_arts;
 
-    let mut arts = from.arts;
+    // Cleanup deleted arts
+    album_arts.retain(|album_id, _| cache.albums_infos.contains_key(album_id));
 
-    arts.retain(|_, art| art.still_applies_for(&cache));
+    // Detect art for new albums
+    let new_albums_arts = AlbumsArtFinder::new(dir.clone(), tracks.clone(), cache.clone())
+        .run_for_batch(new_albums.iter().cloned())
+        .await?;
 
-    arts.extend(
-        new_albums_arts
-            .into_iter()
-            .map(|art| (art.id, art))
-            .collect::<HashMap<_, _>>(),
-    );
+    album_arts.extend(new_albums_arts);
 
     info!(
         "Generating artists' arts ({})...",
         cache.artists_infos.len()
     );
 
-    arts.extend(
-        cache
-            .artists_infos
-            .values()
-            .filter_map(|artist| generate_artist_art(artist.get_id(), &arts, &cache))
-            .map(|art| (art.id, art))
-            .collect::<HashMap<_, _>>(),
-    );
+    // Generate art for artists
+    // TODO: only do this for *NEW* artists *OR* those who don't have the exact same albums
+    ArtistsArtsGenerator::new(
+        dir.clone(),
+        album_arts.clone(),
+        cache.clone(),
+        res_manager.clone(),
+    )
+    .run_for_batch(cache.artists_infos.keys().copied())
+    .await?;
 
     log(started, "Index has been generated.");
 
@@ -216,7 +227,7 @@ pub async fn build_index(dir: PathBuf, from: Option<Index>) -> Result<Index> {
         fingerprint,
         from: dir,
         tracks,
-        arts,
+        album_arts,
         cache,
     })
 }
@@ -225,30 +236,25 @@ pub fn rebuild_cache(index: &mut Index) {
     index.cache = build_index_cache(&index.tracks);
 }
 
-pub async fn rebuild_arts(index: &mut Index) -> Result<()> {
-    let arts = find_albums_arts(
-        index
-            .cache
-            .albums_infos
-            .values()
-            .collect::<Vec<_>>()
-            .as_slice(),
-        &index.from,
+pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager) -> Result<()> {
+    let album_arts = AlbumsArtFinder::new(
+        index.from.clone(),
         index.tracks.clone(),
         index.cache.clone(),
     )
+    .run_for_batch(index.cache.albums_infos.values().cloned())
     .await?;
 
-    index.arts = arts.into_iter().map(|art| (art.id, art)).collect();
-    index.arts.extend(
-        index
-            .cache
-            .artists_infos
-            .values()
-            .filter_map(|artist| generate_artist_art(artist.get_id(), &index.arts, &index.cache))
-            .map(|art| (art.id, art))
-            .collect::<HashMap<_, _>>(),
-    );
+    index.album_arts = album_arts.into_iter().collect();
+
+    ArtistsArtsGenerator::new(
+        index.from.clone(),
+        index.album_arts.clone(),
+        index.cache.clone(),
+        res_manager.clone(),
+    )
+    .run_for_batch(index.cache.artists_infos.keys().copied())
+    .await?;
 
     Ok(())
 }

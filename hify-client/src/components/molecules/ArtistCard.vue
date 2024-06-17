@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type ArtFragment, MixOrdering, type ArtistFragment, ArtFragmentDoc } from '@/graphql/generated/graphql'
+import { MixOrdering, type ArtistFragment } from '@/graphql/generated/graphql'
 import { type ContextMenuOption, showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
 import { MIN_GREAT_RATING } from '@/global/constants'
 import { generateAndPlayMix } from '@/global/stores/play-queue'
@@ -24,13 +24,12 @@ const contextMenuOptions = computed<ContextMenuOption[]>(() => [
             })
         }
     }
-
 ])
 </script>
 
 <template>
     <SimpleNavigableItem @press="router.push({ name: 'artist', params: { id: artist.id } })"
         @long-press="showContextMenu(contextMenuOptions)">
-        <Card :title="artist.name" :art="artist.art" circle />
+        <Card :title="artist.name" art-type="artist" :art-item="artist" circle />
     </SimpleNavigableItem>
 </template>

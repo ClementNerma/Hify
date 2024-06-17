@@ -31,9 +31,15 @@ macro_rules! graphql_user_data {
 }
 
 #[macro_export]
+macro_rules! graphql_ctx {
+    ($ctx_var: ident) => {
+        $ctx_var.data::<$crate::graphql::GraphQLContext>().unwrap()
+    };
+}
+
+#[macro_export]
 macro_rules! graphql_ctx_member {
     ($ctx_var: ident, $($member: ident).+, $mode: ident) => {{
-        let ctx = $ctx_var.data::<$crate::graphql::GraphQLContext>().unwrap();
-        ctx.$($member).+.$mode().await
+        $crate::graphql_ctx!($ctx_var).$($member).+.$mode().await
     }};
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 export type CardProps = {
-    art: ArtFragment | null | undefined,
+    artType: 'album' | 'artist',
+    artItem: { id: string, hasArt: boolean },
     title: string,
 
     subtitle?: string,
@@ -12,14 +13,13 @@ export type CardProps = {
 
 <script setup lang="ts">
 import ImgLoader from '../atoms/ImgLoader.vue'
-import type { ArtFragment } from '@/graphql/generated/graphql'
 
 defineProps<CardProps>()
 </script>
 
 <template>
     <div class="card" :style="`--opacity: ${opacity ?? 1};`">
-        <ImgLoader :art v-slot="{ src }">
+        <ImgLoader :type="artType" :item="artItem" v-slot="{ src }">
             <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
                 :src />
         </ImgLoader>

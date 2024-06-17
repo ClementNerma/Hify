@@ -9,6 +9,7 @@ mod helpers;
 mod http;
 mod index;
 mod library;
+mod resources;
 mod userdata;
 
 use std::{fs, net::SocketAddr, process::ExitCode};
@@ -19,7 +20,10 @@ use log::{error, info};
 
 use crate::{check::check_correctness, cmd::Args};
 
-use self::helpers::{logging::setup_logger, time::OFFSET};
+use self::{
+    helpers::{logging::setup_logger, time::OFFSET},
+    resources::ResourceManager,
+};
 
 #[tokio::main]
 async fn main() -> ExitCode {
@@ -51,7 +55,7 @@ async fn inner_main(args: Args) -> Result<()> {
         data_dir,
         rebuild_index,
         update_index,
-        rebuild_arts,
+        rebuild_resources,
         rebuild_cache,
         refetch_file_times,
         addr,
@@ -77,6 +81,15 @@ async fn inner_main(args: Args) -> Result<()> {
     if !data_dir.exists() {
         fs::create_dir(&data_dir).context("Failed to create the data directory")?;
     }
+
+    let generation_dir = data_dir.join("generated");
+
+    if !generation_dir.exists() {
+        fs::create_dir(&generation_dir)
+            .context("Failed to create the data generation directory")?;
+    }
+
+    let res_manager = ResourceManager::new(generation_dir);
 
     let user_data_file = data_dir.join("userdata.json");
     let index_file = data_dir.join("index.json");
@@ -109,7 +122,7 @@ async fn inner_main(args: Args) -> Result<()> {
             if update_index {
                 info!("> Updating index as requested...");
 
-                index = index::build_index(music_dir.clone(), Some(index))
+                index = index::build_index(music_dir.clone(), Some(index), &res_manager)
                     .await
                     .context("Failed to rebuild index")?;
 
@@ -144,10 +157,10 @@ async fn inner_main(args: Args) -> Result<()> {
                 );
             }
 
-            if rebuild_arts {
-                info!("> Rebuilding arts as requested...");
+            if rebuild_resources {
+                info!("> Rebuilding resources as requested...");
 
-                index::rebuild_arts(&mut index).await?;
+                index::rebuild_resources(&mut index, &res_manager).await?;
 
                 helpers::save::save_index(&index_file, &index)
                     .context("Failed to save index file with rebuilt arts")?;
@@ -161,7 +174,7 @@ async fn inner_main(args: Args) -> Result<()> {
         false => {
             info!("> Generating index...");
 
-            let index = index::build_index(music_dir.clone(), None)
+            let index = index::build_index(music_dir.clone(), None, &res_manager)
                 .await
                 .context("Failed to build index")?;
 
@@ -195,6 +208,7 @@ async fn inner_main(args: Args) -> Result<()> {
         &SocketAddr::from((addr, port)),
         index,
         user_data,
+        res_manager,
         Box::new(move |index| {
             helpers::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
         }),

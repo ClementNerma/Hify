@@ -20,10 +20,10 @@ pub struct Args {
 
     #[clap(
         long,
-        help = "Force to rebuild arts index from scratch",
+        help = "Force to rebuild resources (such as cover arts) from scratch",
         conflicts_with = "rebuild_index"
     )]
-    pub rebuild_arts: bool,
+    pub rebuild_resources: bool,
 
     #[clap(
         long,

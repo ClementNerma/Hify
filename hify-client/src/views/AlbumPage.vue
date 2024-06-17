@@ -72,7 +72,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
   <div class="mt-2.5 ml-[15%] w-[70%]" v-if="album && filteredTracks && infos">
     <NavigableList>
       <div class="flex flex-row">
-        <ImgLoader :art="album.art" v-slot="{ src }">
+        <ImgLoader type="album" :item="album" v-slot="{ src }">
           <img class="art" :width="192" :height="192" :src />
         </ImgLoader>
 

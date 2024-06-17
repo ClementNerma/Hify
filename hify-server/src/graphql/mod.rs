@@ -17,13 +17,15 @@ macro_rules! define_scalar_string {
         impl async_graphql::ScalarType for $typename {
             fn parse(value: async_graphql::Value) -> async_graphql::InputValueResult<Self> {
                 match value {
-                    async_graphql::Value::String(value) => Ok(Self::decode(&value)?),
+                    async_graphql::Value::String(value) => {
+                        Ok(<Self as $crate::index::IdType>::decode(&value)?)
+                    }
                     _ => Err(async_graphql::InputValueError::expected_type(value)),
                 }
             }
 
             fn to_value(&self) -> async_graphql::Value {
-                async_graphql::Value::String(self.encode())
+                async_graphql::Value::String(<Self as $crate::index::IdType>::encode(self))
             }
         }
     };

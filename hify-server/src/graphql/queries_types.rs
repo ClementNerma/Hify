@@ -3,11 +3,12 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
-    graphql_index, graphql_user_data,
+    graphql_ctx, graphql_index, graphql_user_data,
     index::{
-        AlbumID, AlbumInfos, Art, ArtTarget, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating,
-        SortedMap, Track, TrackTags,
+        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating, SortedMap, Track,
+        TrackTags,
     },
+    resources::ArtistArt,
     userdata::{Playlist, PlaylistEntry},
 };
 
@@ -128,11 +129,8 @@ impl AlbumInfos {
             .collect()
     }
 
-    async fn art(&self, ctx: &Context<'_>) -> Option<Art> {
-        graphql_index!(ctx)
-            .arts
-            .get(&ArtTarget::AlbumCover(self.get_id()).to_id())
-            .cloned()
+    async fn has_art(&self, ctx: &Context<'_>) -> bool {
+        graphql_index!(ctx).album_arts.contains_key(&self.get_id())
     }
 }
 
@@ -207,11 +205,11 @@ impl ArtistInfos {
         })
     }
 
-    async fn art(&self, ctx: &Context<'_>) -> Option<Art> {
-        graphql_index!(ctx)
-            .arts
-            .get(&ArtTarget::Artist(self.get_id()).to_id())
-            .cloned()
+    async fn has_art(&self, ctx: &Context<'_>) -> bool {
+        graphql_ctx!(ctx)
+            .app_state
+            .resource_manager
+            .has::<ArtistArt>(self.get_id())
     }
 }
 

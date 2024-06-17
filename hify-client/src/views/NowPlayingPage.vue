@@ -66,7 +66,7 @@ watch(currentTrack, track => {
 
   <h2 v-if="!currentTrack" class="no-playing">Nothing currently</h2>
 
-  <ImgLoader v-else :art="currentTrack.metadata.tags.album.art" v-slot="{ src }">
+  <ImgLoader v-else type="album" :item="currentTrack.metadata.tags.album" v-slot="{ src }">
     <img class="album-art" :class="{ darkened: !distractionFreeMode }" :src />
   </ImgLoader>
 

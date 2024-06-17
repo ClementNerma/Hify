@@ -1,7 +1,4 @@
-use crate::{
-    index::{ArtTarget, Index},
-    userdata::UserDataWrapper,
-};
+use crate::{index::Index, userdata::UserDataWrapper};
 
 pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(), Vec<String>> {
     let mut errors = vec![];
@@ -17,7 +14,7 @@ pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(
         fingerprint: _,
         tracks,
         cache: _, // TODO: check this as well
-        arts,
+        album_arts,
     } = index;
 
     //
@@ -34,35 +31,15 @@ pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(
     }
 
     //
-    // Check arts
+    // Check album arts
     //
 
-    for (id, art) in arts.iter() {
-        if art.id != *id {
+    for (album_id, relative_path) in album_arts.iter() {
+        if !index.cache.albums_infos.contains_key(album_id) {
             error!(
-                "Art registered with ID '{id:?}' in map but has ID '{:?}' instead",
-                art.id
+                "Art at path '{}' registered for unknown album ID '{album_id:?}'",
+                relative_path.display()
             );
-        }
-
-        match art.target {
-            ArtTarget::AlbumCover(album_id) => {
-                if !index.cache.albums_infos.contains_key(&album_id) {
-                    error!(
-                        "Art at path '{}' registered for unknown album ID '{album_id:?}'",
-                        art.relative_path.display()
-                    );
-                }
-            }
-
-            ArtTarget::Artist(artist_id) => {
-                if !index.cache.artists_infos.contains_key(&artist_id) {
-                    error!(
-                        "Art at path '{}' registered for unknown artist ID '{artist_id:?}'",
-                        art.relative_path.display()
-                    );
-                }
-            }
         }
     }
 

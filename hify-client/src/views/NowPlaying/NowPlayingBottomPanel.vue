@@ -114,7 +114,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery
             :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
             @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
             v-slot="{ item: track, position, focused }">
-            <Card :title="track.metadata.tags.title" :box-size="80" :art="track.metadata.tags.album.art"
+            <Card :title="track.metadata.tags.title" :box-size="80" art-type="album" :art-item="track.metadata.tags.album"
               :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2" />
           </ProgressiveRow>
         </Column>
