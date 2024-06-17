@@ -6,7 +6,7 @@ import type { SimpleNavigableItemProps } from '@/navigable/headless/SimpleNaviga
 import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu';
 
-const { fromMixId = null } = defineProps<{
+defineProps<{
     track: AudioTrackFragment,
     tracks: AudioTrackFragment[],
     context: TrackContext,
@@ -23,8 +23,10 @@ defineSlots<{
 </script>
 
 <template>
-    <SimpleNavigableItem v-slot="{ item, focused }" @press="ctxMenuCallbacks.playTrack(track, tracks, fromMixId)"
-        @long-press="showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId }, context))" @focus="onFocus">
+    <SimpleNavigableItem v-slot="{ item, focused }"
+        @press="ctxMenuCallbacks.playTrack(track, tracks, fromMixId ?? null)"
+        @long-press="showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: fromMixId ?? null }, context))"
+        :on-focus>
         <slot :item :focused />
     </SimpleNavigableItem>
 </template>
