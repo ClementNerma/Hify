@@ -19,11 +19,7 @@ navigable-item-wrapper.fullHeight> :first-child {
     min-height: 100%;
 }
 
-navigable-item-wrapper:not(.unstyled).focused> :first-child,
-navigable-item-wrapper:not(.unstyled):hover> :first-child {
+navigable-item-wrapper:not(.unstyled).focused> :first-child {
     outline: none;
-    /* color: black;
-    background-color: white; */
     text-decoration: underline;
-    cursor: pointer;
 }

@@ -51,9 +51,7 @@ const focused = ref(false)
 
 <template>
     <navigable-item-wrapper ref="wrapperRef" :class="{ focused, fullHeight, unstyled }"
-        :data-navigable-item-id="props.justForStyle ? JUST_FOR_STYLE_ITEM_ID : item.id" @click="props.onPress?.()"
-        @contextmenu.prevent="props.onLongPress?.()" @mouseenter="item.requestFocus()"
-        @mouseleave="item.page.unfocus()">
+        :data-navigable-item-id="props.justForStyle ? JUST_FOR_STYLE_ITEM_ID : item.id">
         <slot :item :focused />
     </navigable-item-wrapper>
 </template>
