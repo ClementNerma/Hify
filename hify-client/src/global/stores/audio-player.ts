@@ -103,7 +103,7 @@ export function setPlayingAudioProgress(seconds: number) {
 
 	player.currentTime = seconds
 
-	logDebug(`Set relative audio progress: ${humanReadableDuration(seconds)}`)
+	logDebug(`Set absolute audio progress: ${humanReadableDuration(seconds)}`)
 }
 
 export function setPlayingAudioProgressRelative(relativeSeconds: number) {

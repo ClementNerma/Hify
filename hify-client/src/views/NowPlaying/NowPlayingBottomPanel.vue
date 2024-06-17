@@ -2,11 +2,11 @@
 // biome-ignore lint/style/useImportType: <explanation>
 import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue';
 import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue';
-import ProgressRange from '@/components/atoms/ProgressRange.vue';
+import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue';
 import With from '@/components/atoms/With.vue';
 import Card from '@/components/molecules/Card.vue';
 import { ctxMenuOptions } from '@/global/context-menu-items';
-import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgress, toggleAudioPlayback } from '@/global/stores/audio-player';
+import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
 import { enableOpacitor } from '@/global/stores/opacitor';
 import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';
 import { formatDate } from '@/global/utils';
@@ -102,8 +102,8 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery
           </div>
 
           <div class="progress-range">
-            <ProgressRange :max="currentTrack.metadata.duration" :value="readableAudioProgress"
-              @change="setPlayingAudioProgress" @press="toggleAudioPlayback" :directional-amount="30" />
+            <AudioProgressBar :max="currentTrack.metadata.duration" :value="readableAudioProgress"
+              @press="toggleAudioPlayback" @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
           </div>
         </With>
       </Column>
