@@ -11,8 +11,8 @@ use std::{
 use walkdir::WalkDir;
 
 use crate::{
-    helpers::{async_batch::AsyncContextualRunner, logging::spinner},
-    index::arts::{AlbumsArtFinder, ArtistsArtsGenerator},
+    helpers::logging::spinner,
+    index::arts::{find_albums_arts, generate_artists_art},
     resources::ResourceManager,
 };
 
@@ -193,9 +193,13 @@ pub async fn build_index(
     album_arts.retain(|album_id, _| cache.albums_infos.contains_key(album_id));
 
     // Detect art for new albums
-    let new_albums_arts = AlbumsArtFinder::new(dir.clone(), tracks.clone(), cache.clone())
-        .run_for_batch(new_albums.iter().cloned())
-        .await?;
+    let new_albums_arts = find_albums_arts(
+        new_albums.iter().cloned(),
+        &dir,
+        tracks.clone(),
+        cache.clone(),
+    )
+    .await?;
 
     album_arts.extend(new_albums_arts);
 
@@ -206,14 +210,13 @@ pub async fn build_index(
 
     // Generate art for artists
     // TODO: only do this for *NEW* artists *OR* those who don't have the exact same albums
-    ArtistsArtsGenerator::new(
-        dir.clone(),
+    generate_artists_art(
+        cache.artists_infos.values().cloned(),
+        &dir,
         album_arts.clone(),
         cache.clone(),
         res_manager.clone(),
-    )
-    .run_for_batch(cache.artists_infos.keys().copied())
-    .await?;
+    )?;
 
     log(started, "Index has been generated.");
 
@@ -237,24 +240,23 @@ pub fn rebuild_cache(index: &mut Index) {
 }
 
 pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager) -> Result<()> {
-    let album_arts = AlbumsArtFinder::new(
-        index.from.clone(),
+    let album_arts = find_albums_arts(
+        index.cache.albums_infos.values().cloned(),
+        &index.from,
         index.tracks.clone(),
         index.cache.clone(),
     )
-    .run_for_batch(index.cache.albums_infos.values().cloned())
     .await?;
 
     index.album_arts = album_arts.into_iter().collect();
 
-    ArtistsArtsGenerator::new(
-        index.from.clone(),
+    generate_artists_art(
+        index.cache.artists_infos.values().cloned(),
+        &index.from,
         index.album_arts.clone(),
         index.cache.clone(),
         res_manager.clone(),
-    )
-    .run_for_batch(index.cache.artists_infos.keys().copied())
-    .await?;
+    )?;
 
     Ok(())
 }

@@ -33,3 +33,4 @@ image = { version = "0.25.1", default-features = false, features = [
     "jpeg",
     "png",
 ] }
+rayon = "1.10.0"
