@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue';
+import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
 import TrackRating from '@/components/atoms/TrackRating.vue';
@@ -67,7 +68,9 @@ onMounted(feedMore)
   <LoadingIndicator v-if="!currentPageInfo" />
 
   <template v-else-if="tracks.length > 0">
-    <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
+    <Centered>
+      <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
+    </Centered>
 
     <table class="mt-2.5 w-3/4 border-collapse whitespace-nowrap">
       <tbody>

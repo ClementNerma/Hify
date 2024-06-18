@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue';
+import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { logFatal } from '@/global/stores/debugger';
@@ -66,7 +67,9 @@ onMounted(feedMore)
   <h3 v-else-if="albums.length === 0">No album</h3>
 
   <template v-else>
-    <h3>Albums ({{ albums.length }})</h3>
+    <Centered>
+      <h3>Albums ({{ albums.length }})</h3>
+    </Centered>
 
     <Grid :columns="ALBUMS_PER_LINE">
       <AlbumCard v-for="album in albums" :key="album.id" :album enforce-max-width />
