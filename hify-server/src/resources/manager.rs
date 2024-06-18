@@ -28,7 +28,10 @@ impl ResourceManager {
     }
 
     fn resource_path<R: ManagedResource>(&self, id: R::Id) -> PathBuf {
-        self.storage_path.join(R::ID).join(id.encode())
+        self.storage_path
+            .join(R::ID)
+            .join(id.encode())
+            .with_extension(R::FILE_EXT.unwrap_or_default())
     }
 
     pub async fn store<R: ManagedResource>(&self, id: R::Id, resource: R) -> Result<PathBuf> {
@@ -76,6 +79,7 @@ impl ResourceManager {
 
 pub trait ManagedResource {
     const ID: &'static str;
+    const FILE_EXT: Option<&'static str>;
 
     type Id: IdType;
 
