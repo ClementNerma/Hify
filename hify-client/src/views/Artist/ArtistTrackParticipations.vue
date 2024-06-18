@@ -3,6 +3,7 @@ import Button from '@/components/atoms/Button.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
 import TrackRating from '@/components/atoms/TrackRating.vue';
+import { getAlbumArtUrl } from '@/global/constants';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
@@ -68,23 +69,30 @@ onMounted(feedMore)
   <template v-else-if="tracks.length > 0">
     <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
 
-
-    <table class="mt-2.5 w-1/2 border-collapse">
+    <table class="mt-2.5 w-3/4 border-collapse whitespace-nowrap">
       <tbody>
         <NavigableList>
-          <NavigableTrack v-for="track, i in tracks" :key="track.id" :tracks :context="{ context: 'album' }" :track>
-            <tr class="w-full [&>td]:p-2.5" :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
-              <!-- TODO: show album title + album art -->
-              <td>{{ track.metadata.tags.trackNo }}</td>
-              <td class="w-full">{{ track.metadata.tags.title }}</td>
-              <td>
-                <span v-if="track.computedRating">
-                  <TrackRating :rating="track.computedRating" />
-                </span>
-              </td>
-              <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
-            </tr>
-          </NavigableTrack>
+          <tr v-for="track, i in tracks" :key="track.id" class="[&>td]:p-2.5"
+            :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
+            <td>
+              <img :width="50" :height="50" :src="getAlbumArtUrl(track.metadata.tags.album)" />
+            </td>
+            <td>
+              {{ track.metadata.tags.album.name }}
+              ({{ track.metadata.tags.album.albumArtists.map(artist => artist.name).join(', ') }})
+            </td>
+            <td class="w-full">
+              <NavigableTrack :tracks :context="{ context: 'album' }" :track>
+                <span>{{ track.metadata.tags.title }}</span>
+              </NavigableTrack>
+            </td>
+            <td>
+              <span v-if="track.computedRating">
+                <TrackRating :rating="track.computedRating" />
+              </span>
+            </td>
+            <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
+          </tr>
         </NavigableList>
       </tbody>
     </table>
