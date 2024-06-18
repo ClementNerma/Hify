@@ -74,18 +74,21 @@ async fn inner_main(args: Args) -> Result<()> {
     let data_dir = match data_dir {
         Some(data_dir) => data_dir,
         None => dirs::data_dir()
-            .context("Failed to get path to the user's configuration directory")?
+            .context("Failed to get path to the user's data directory")?
             .join("hify"),
     };
 
     if !data_dir.exists() {
-        fs::create_dir(&data_dir).context("Failed to create the data directory")?;
+        fs::create_dir_all(&data_dir).context("Failed to create the data directory")?;
     }
 
-    let generation_dir = data_dir.join("generated");
+    let generation_dir = dirs::state_dir()
+        .context("Failed to get path to the user's state directory")?
+        .join("hify")
+        .join("generated");
 
     if !generation_dir.exists() {
-        fs::create_dir(&generation_dir)
+        fs::create_dir_all(&generation_dir)
             .context("Failed to create the data generation directory")?;
     }
 
