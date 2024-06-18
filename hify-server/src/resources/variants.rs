@@ -21,8 +21,8 @@ impl Deref for ArtistArt {
 }
 
 impl ManagedResource for ArtistArt {
-    const ID: &'static str = "generated-artist-arts";
-    const FILE_EXT: Option<&'static str> = Some("png");
+    const ID: &'static str = "artist-arts";
+    const FILE_EXT: Option<&'static str> = Some("webp");
 
     type Id = ArtistID;
 

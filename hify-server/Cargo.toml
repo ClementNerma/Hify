@@ -32,5 +32,6 @@ symphonia = { version = "0.5.4", features = ["all"] }
 image = { version = "0.25.1", default-features = false, features = [
     "jpeg",
     "png",
+    "webp",
 ] }
 rayon = "1.10.0"

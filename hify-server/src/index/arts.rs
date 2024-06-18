@@ -9,7 +9,7 @@ use std::{
 
 use anyhow::{anyhow, bail, Context, Result};
 use image::{
-    codecs::png::PngEncoder,
+    codecs::webp::WebPEncoder,
     imageops::{resize, FilterType},
     GenericImage, ImageBuffer,
 };
@@ -300,7 +300,7 @@ fn generate_artist_art(
     let mut image_buf = vec![];
 
     image
-        .write_with_encoder(PngEncoder::new(&mut image_buf))
+        .write_with_encoder(WebPEncoder::new_lossless(&mut image_buf))
         .context("Failed to encode artist's art image")?;
 
     Ok(Some(image_buf))
