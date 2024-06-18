@@ -250,12 +250,14 @@ fn generate_artist_art(
 
     let image = match album_arts.len() {
         1 => {
-            let art = &album_arts[0];
+            // TODO: dynamic dimensions (choose what width and height artists' arts should be and apply it here as well)
+
+            let art = resize(&album_arts[0], 500, 500, FilterType::Lanczos3);
 
             let mut image = ImageBuffer::new(art.width(), art.height());
 
             image
-                .copy_from(art, 0, 0)
+                .copy_from(&art, 0, 0)
                 .context("Failed to copy single cover art into artist's one")?;
 
             image
