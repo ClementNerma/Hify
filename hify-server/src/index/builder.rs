@@ -240,6 +240,11 @@ pub fn rebuild_cache(index: &mut Index) {
 }
 
 pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager) -> Result<()> {
+    info!(
+        "Detecting cover art for {} albums...",
+        index.cache.albums_infos.len()
+    );
+
     let album_arts = find_albums_arts(
         index.cache.albums_infos.values().cloned(),
         &index.from,
@@ -249,6 +254,11 @@ pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager)
     .await?;
 
     index.album_arts = album_arts.into_iter().collect();
+
+    info!(
+        "Generating cover art for {} artists...",
+        index.cache.artists_infos.len()
+    );
 
     generate_artists_art(
         index.cache.artists_infos.values().cloned(),
