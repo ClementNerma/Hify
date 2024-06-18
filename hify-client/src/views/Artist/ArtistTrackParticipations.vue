@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue';
+import ImgLoader from '@/components/atoms/ImgLoader.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import AlbumCard from '@/components/molecules/AlbumCard.vue';
-import TrackCard from '@/components/molecules/TrackCard.vue';
+import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
+import TrackRating from '@/components/atoms/TrackRating.vue';
+import { humanReadableDuration } from '@/global/stores/audio-player';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { graphql } from '@/graphql/generated';
-import type { AlbumFragment, AlbumsPageQuery, ArtistAlbumsQuery, ArtistPageQuery, ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
-import Grid from '@/navigable/ui/organisms/Grid.vue';
+import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
+import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue';
 import { onMounted, ref } from 'vue';
 
 const { artistId } = defineProps<{ artistId: string }>()
@@ -67,12 +69,30 @@ onMounted(feedMore)
   <template v-else-if="tracks.length > 0">
     <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
 
-    <Grid :columns="TRACKS_PER_LINE">
-      <TrackCard v-for="track in tracks" :key="track.id" :track :tracks />
-    </Grid>
+
+    <table class="mt-2.5 w-1/2 border-collapse">
+      <tbody>
+        <NavigableList>
+          <NavigableTrack v-for="track, i in tracks" :key="track.id" :tracks :context="{ context: 'album' }" :track>
+            <tr class="w-full [&>td]:p-2.5" :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
+              <!-- TODO: show album title + album art -->
+              <td>{{ track.metadata.tags.trackNo }}</td>
+              <td class="w-full">{{ track.metadata.tags.title }}</td>
+              <td>
+                <span v-if="track.computedRating">
+                  <TrackRating :rating="track.computedRating" />
+                </span>
+              </td>
+              <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
+            </tr>
+          </NavigableTrack>
+        </NavigableList>
+      </tbody>
+    </table>
 
     <Button v-if="currentPageInfo.hasNextPage" @press="feedMore()">
       Load more
     </Button>
+
   </template>
 </template>
