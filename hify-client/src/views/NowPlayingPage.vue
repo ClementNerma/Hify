@@ -6,12 +6,12 @@ import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import { KeyPressHandling } from '@/navigable/input-manager';
 import { ref, watch } from 'vue';
 import NowPlayingBackground from './NowPlaying/NowPlayingBackground.vue';
-import ImgLoader from '@/components/atoms/ImgLoader.vue';
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue';
 import NavigableWithHandlers from '@/navigable/headless/NavigableWithHandlers/NavigableWithHandlers.vue';
 import NowPlayingBottomPanel from './NowPlaying/NowPlayingBottomPanel.vue';
 import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue';
 import Emoji from '@/components/atoms/Emoji.vue';
+import { getAlbumArtUrl } from '@/global/constants';
 
 const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 const NEW_TRACK_DISPLAY_TIMEOUT = 2000
@@ -66,9 +66,8 @@ watch(currentTrack, track => {
 
   <h2 v-if="!currentTrack" class="no-playing">Nothing currently</h2>
 
-  <ImgLoader v-else type="album" :item="currentTrack.metadata.tags.album" v-slot="{ src }">
-    <img class="album-art" :class="{ darkened: !distractionFreeMode }" :src />
-  </ImgLoader>
+  <img v-else class="album-art" :class="{ darkened: !distractionFreeMode }"
+    :src="getAlbumArtUrl(currentTrack.metadata.tags.album)" />
 
   <DistractionFreeTogglable>
     <NavigableWithHandlers :on-key-press>

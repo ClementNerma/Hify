@@ -1,8 +1,7 @@
 <script lang="ts">
 export type CardProps = {
-    artType: 'album' | 'artist',
-    artItem: { id: string, hasArt: boolean },
     title: string,
+    artUrl: string
 
     subtitle?: string,
     boxSize?: number,
@@ -12,17 +11,13 @@ export type CardProps = {
 </script>
 
 <script setup lang="ts">
-import ImgLoader from '../atoms/ImgLoader.vue'
-
 defineProps<CardProps>()
 </script>
 
 <template>
     <div class="card" :style="`--opacity: ${opacity ?? 1};`">
-        <ImgLoader :type="artType" :item="artItem" v-slot="{ src }">
-            <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
-                :src />
-        </ImgLoader>
+        <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
+            :src="artUrl" />
 
         <div class="title experimental-line-limiter">{{ title }}</div>
 

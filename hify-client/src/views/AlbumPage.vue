@@ -2,10 +2,10 @@
 import Button from '@/components/atoms/Button.vue';
 import Checkbox from '@/components/atoms/Checkbox.vue';
 import Emoji from '@/components/atoms/Emoji.vue';
-import ImgLoader from '@/components/atoms/ImgLoader.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
 import TrackRating from '@/components/atoms/TrackRating.vue';
+import { getAlbumArtUrl } from '@/global/constants';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue';
 import { dedup, filterMap, getRouteParam, hasMinimumRating, isDefined, shuffle } from '@/global/utils';
@@ -72,9 +72,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
   <div class="mt-2.5 ml-[15%] w-[70%]" v-if="album && filteredTracks && infos">
     <NavigableList>
       <div class="flex flex-row">
-        <ImgLoader type="album" :item="album" v-slot="{ src }">
-          <img class="art" :width="192" :height="192" :src />
-        </ImgLoader>
+        <img class="art" :width="192" :height="192" :src="getAlbumArtUrl(album)" />
 
         <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5 w-full">
           <div class="text-3xl">

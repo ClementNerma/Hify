@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue';
-import ImgLoader from '@/components/atoms/ImgLoader.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
 import TrackRating from '@/components/atoms/TrackRating.vue';

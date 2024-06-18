@@ -1,6 +1,6 @@
 import { LogListeningDocument, type AudioTrackFragment } from '@/graphql/generated/graphql'
 import { readonly, ref, shallowRef } from 'vue'
-import { getStreamUri } from '../constants'
+import { getStreamUrl } from '../constants'
 import { gqlClient } from '../urql-client'
 import { logDebug, logError, logFatal, logInfo, logWarn } from './debugger'
 
@@ -55,7 +55,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 
 	let lastTimeUpdate = 0
 
-	const newAudio = new Audio(getStreamUri(track.id))
+	const newAudio = new Audio(getStreamUrl(track.id))
 
 	newAudio.addEventListener('error', (e) => logError('Failed to load audio track', e))
 	newAudio.addEventListener('play', () => {

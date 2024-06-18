@@ -4,6 +4,7 @@ import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
 import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
+import { getAlbumArtUrl } from '@/global/constants'
 
 defineProps<{ tracks: AudioTrackFragment[] }>() 
 </script>
@@ -13,6 +14,6 @@ defineProps<{ tracks: AudioTrackFragment[] }>()
         @item-long-press="(track) =>
             showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null }, { context: 'normal' }))"
         v-slot="{ item: track }">
-        <Card :title="track.metadata.tags.title" art-type="album" :art-item="track.metadata.tags.album" />
+        <Card :title="track.metadata.tags.title" :art-url="getAlbumArtUrl(track.metadata.tags.album)" />
     </ProgressiveRow>
 </template>

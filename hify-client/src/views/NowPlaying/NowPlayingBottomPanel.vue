@@ -18,6 +18,7 @@ import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMen
 import type Row from '@/navigable/ui/molecules/Row/Row.vue';
 import router from '@/router';
 import { ref, watch, type ComponentInstance } from 'vue';
+import { getAlbumArtUrl } from '@/global/constants';
 
 const isQueueFocused = ref(false)
 
@@ -103,7 +104,8 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery
 
           <div class="progress-range">
             <AudioProgressBar :max="currentTrack.metadata.duration" :value="readableAudioProgress"
-              @press="toggleAudioPlayback" @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
+              @press="toggleAudioPlayback"
+              @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
           </div>
         </With>
       </Column>
@@ -114,7 +116,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery
             :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
             @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
             v-slot="{ item: track, position, focused }">
-            <Card :title="track.metadata.tags.title" :box-size="80" art-type="album" :art-item="track.metadata.tags.album"
+            <Card :title="track.metadata.tags.title" :box-size="80" :art-url="getAlbumArtUrl(track.metadata.tags.album)"
               :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2" />
           </ProgressiveRow>
         </Column>
