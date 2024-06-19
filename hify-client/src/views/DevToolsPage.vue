@@ -10,7 +10,7 @@ import { computed, ref } from 'vue'
 
 const hideDebugLogs = ref(true)
 
-const slicedAppLogs = computed(() => appLogs.value.filter((entry) => (hideDebugLogs ? entry.level !== 'debug' : true)))
+const slicedAppLogs = computed(() => appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== 'debug' : true)))
 
 const win = window
 </script>
