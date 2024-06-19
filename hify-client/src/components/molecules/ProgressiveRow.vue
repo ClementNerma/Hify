@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="K extends string, T extends { [key in K]: string }">
+<script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
 import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue'
 import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
 import type { SimpleNavigableItem as SimpleNavigableItemClass } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
@@ -67,12 +67,10 @@ function requestFocus(position: number) {
   const itemId = props.items[position][props.idProp]
 
   disableHandler.value = true
-  // @ts-expect-error
-  itemsById.value[itemId]?.()
+    ; (itemsById.value as Record<T[K], RequestFocus>)[itemId]?.()
   disableHandler.value = false
 
-  // @ts-expect-error
-  prevSelected.value = itemId
+    ; (prevSelected.value as T[K]) = itemId
 }
 
 const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.round((COLUMNS - 1) / 2), 0))
@@ -94,10 +92,7 @@ const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
           @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)" v-slot="{ item: navigableItem, focused }"
           :has-focus-priority="firstVisibleItemIndex + i === position">
 
-          <Run @run="
-            // @ts-expect-error
-            itemsById[item[idProp]] = () => navigableItem.requestFocus()
-            " />
+          <Run @run="(itemsById as any)[(item as any)[idProp]] = () => navigableItem.requestFocus()" />
 
           <slot :item :position="firstVisibleItemIndex + i" :navigableItem :focused />
         </SimpleNavigableItem>

@@ -6,16 +6,15 @@ import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue';
 import With from '@/components/atoms/With.vue';
 import Card from '@/components/molecules/Card.vue';
 import { ctxMenuOptions } from '@/global/context-menu-items';
-import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
+import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
 import { enableOpacitor } from '@/global/stores/opacitor';
-import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';
+import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue, type QueuedTrack } from '@/global/stores/play-queue';
 import { formatDate } from '@/global/utils';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue';
 import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import Column from '@/navigable/ui/molecules/Column/Column.vue';
 import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu';
-import type Row from '@/navigable/ui/molecules/Row/Row.vue';
 import router from '@/router';
 import { ref, watch, type ComponentInstance } from 'vue';
 import { getAlbumArtUrl } from '@/global/constants';
@@ -37,15 +36,15 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
   )
 }
 
-const queueGalleryRef = ref<ComponentInstance<typeof ProgressiveRow> | null>(null)
+const queueGalleryRef = ref<ComponentInstance<typeof ProgressiveRow<QueuedTrack, 'idInQueue'>> | null>(null)
 
-watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery, position]) => {
+watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, ([gallery, position]) => {
   if (gallery !== null && position !== null) {
     // NOTE: The call below causes an error because `ProgressiveRow` is a generic component
     //       This causes `ComponentInstance<typeof ProgressiveRow>` to evaluate to `never`
     //       So here, `gallery` is evaluated as a `never` value, although it shouldn't
-    // @ts-expect-error
-    gallery.jumpUnfocusedPosition(position)
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    (gallery as any).jumpUnfocusedPosition(position)
   }
 })
 </script>
