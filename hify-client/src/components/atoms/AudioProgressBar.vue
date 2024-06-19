@@ -4,7 +4,7 @@ import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/Simple
 
 defineProps<{
     max: number,
-    value: number | null,
+    value: number,
     onDirection: (direction: 'left' | 'right') => void,
     onPress?: SimpleNavigableItemProps['onPress']
 }>()
@@ -13,7 +13,7 @@ defineProps<{
 <template>
     <SimpleNavigableItem @left="onDirection('left')" @right="onDirection('right')" :on-press v-slot="{ focused }">
         <div class="border border-solid border-transparent" :class="{ 'border-gray-400': focused }">
-            <input type="range" ref="inputRef" class="h-2.5" :max :value="value ?? 0" />
+            <input type="range" ref="inputRef" class="h-2.5" :max :value />
         </div>
     </SimpleNavigableItem>
 </template>

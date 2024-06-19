@@ -103,7 +103,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position], ([gallery
           </div>
 
           <div class="progress-range">
-            <AudioProgressBar :max="currentTrack.metadata.duration" :value="readableAudioProgress"
+            <AudioProgressBar :max="currentTrack.metadata.duration" :value="readableAudioProgress ?? 0"
               @press="toggleAudioPlayback"
               @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
           </div>
