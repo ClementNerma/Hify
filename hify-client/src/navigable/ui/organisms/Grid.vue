@@ -7,7 +7,7 @@ const props = defineProps<NavigableGridProps>()
 </script>
 
 <template>
-  <div class="container grid text-center min-w-full" :style="`--columns: ${columns};`">
+  <div class="container grid text-center min-w-full">
     <NavigableGrid v-bind="props">
       <slot />
     </NavigableGrid>
@@ -16,6 +16,6 @@ const props = defineProps<NavigableGridProps>()
 
 <style scoped>
 .container {
-  grid-template-columns: repeat(var(--columns), 1fr);
+  grid-template-columns: repeat(v-bind(columns), 1fr);
 }
 </style>

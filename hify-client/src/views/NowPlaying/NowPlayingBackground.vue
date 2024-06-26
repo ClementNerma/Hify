@@ -14,16 +14,16 @@ const backdropFilter = computed(() => `blur(20px) brightness(${props.dim ? 0.3 :
 </script>
 
 <template>
-  <div class="background fixed inset-0 -z-20 bg-center bg-no-repeat bg-cover" :style="`--background: ${background}`" />
-  <div class="filter fixed inset-0 -z-10" :style="`--backdrop-filter: ${backdropFilter}`" />
+  <div class="background fixed inset-0 -z-20 bg-center bg-no-repeat bg-cover" />
+  <div class="filter fixed inset-0 -z-10" />
 </template>
 
 <style scoped>
 .background {
-  background-image: var(--background);
+  background-image: v-bind(background);
 }
 
 .filter {
-  backdrop-filter: var(--backdrop-filter);
+  backdrop-filter: v-bind(backdropFilter);
 }
 </style>

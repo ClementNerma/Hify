@@ -77,13 +77,14 @@ const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.roun
 const visibleTracks = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS))
 
 const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
+
+const columnSize = computed(() => 100 / COLUMNS)
 </script>
 
 <template>
   <NavigableRow :on-focus-change>
     <div class="flex flex-row py-2 overflow-hidden">
-      <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]"
-        :style="`--column-size: ${100 / COLUMNS}%`">
+      <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]">
         <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->
 
         <SimpleNavigableItem @left="onSelect(firstVisibleItemIndex + i - 1, true)"
@@ -104,8 +105,8 @@ const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
 <style scoped>
 .gallery-item {
   text-align: center;
-  min-width: var(--column-size);
-  width: var(--column-size);
-  max-width: var(--column-size);
+  min-width: v-bind(columnSize);
+  width: v-bind(columnSize);
+  max-width: v-bind(columnSize);
 }
 </style>

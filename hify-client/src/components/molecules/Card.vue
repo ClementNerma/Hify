@@ -11,11 +11,15 @@ export type CardProps = {
 </script>
 
 <script setup lang="ts">
-defineProps<CardProps>()
+import { computed } from 'vue';
+
+const props = defineProps<CardProps>()
+
+const opacity = computed(() => props.opacity ?? 1)
 </script>
 
 <template>
-    <div class="card" :style="`--opacity: ${opacity ?? 1};`">
+    <div class="card">
         <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
             :src="artUrl" />
 
@@ -30,7 +34,7 @@ defineProps<CardProps>()
 .card {
     text-align: center;
     transition: transform 0.25s;
-    opacity: var(--opacity);
+    opacity: v-bind(opacity);
 }
 
 .experimental-line-limiter {
