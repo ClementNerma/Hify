@@ -20,7 +20,7 @@ const backdropFilter = computed(() => `blur(20px) brightness(${props.dim ? 0.3 :
 
 <style scoped>
 .background {
-  background: var(--background);
+  background-image: var(--background);
 }
 
 .filter {
