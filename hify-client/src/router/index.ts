@@ -15,13 +15,8 @@ const router = createRouter({
 			component: () => import('../views/NowPlayingPage.vue'),
 		},
 		{
-			path: '/search',
+			path: '/search/:query?',
 			name: 'search',
-			component: () => import('../views/SearchPage.vue'),
-		},
-		{
-			path: '/search/:query',
-			name: 'search-with-query',
 			component: () => import('../views/SearchPage.vue'),
 		},
 		{

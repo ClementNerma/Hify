@@ -67,6 +67,10 @@ onMounted(() => {
   }
 
   navItem.value.requestFocus()
+
+  if (query.value) {
+    onInput()
+  }
 })
 </script>
 
