@@ -87,6 +87,6 @@ defineSlots<{
 
 <style scoped>
 .container {
-    grid-template-columns: v-bind(columns);
+    grid-template-columns: repeat(v-bind(columns), 1fr);
 }
 </style>
