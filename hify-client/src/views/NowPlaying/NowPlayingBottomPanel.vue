@@ -11,13 +11,13 @@ import { enableOpacitor } from '@/global/stores/opacitor';
 import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue, type QueuedTrack } from '@/global/stores/play-queue';
 import { formatDate } from '@/global/utils';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue';
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
-import Column from '@/navigable/ui/molecules/Column/Column.vue';
-import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu';
 import router from '@/router';
 import { ref, watch, type ComponentInstance } from 'vue';
 import { getAlbumArtUrl } from '@/global/constants';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import { showContextMenu } from '@/global/stores/context-menu';
 
 const isQueueFocused = ref(false)
 
@@ -51,34 +51,34 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
 
 <template>
   <div class="player-bottom" :class="{ isQueueFocused, noCurrentTrack: !currentTrack }">
-    <Column>
-      <Column v-if="currentTrack">
+    <NavigableList>
+      <NavigableList v-if="currentTrack">
         <With :data="{ currentTrack, tags: currentTrack.metadata.tags }" v-slot="{ data: { currentTrack, tags } }">
           <div class="buttons">
             <NavigableRow>
-              <SimpleNavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
+              <NavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
                 <div class="track-info">🎵 {{ tags.title }}</div>
-              </SimpleNavigableItem>
+              </NavigableItem>
 
-              <SimpleNavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
+              <NavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
                 <div class="track-info">💿 {{ tags.album.name }}</div>
-              </SimpleNavigableItem>
+              </NavigableItem>
 
-              <SimpleNavigableItem v-if="tags.date" just-for-style>
+              <NavigableItem v-if="tags.date" just-for-style>
                 <div class="track-info">🕒 {{ formatDate(tags.date) }}</div>
-              </SimpleNavigableItem>
+              </NavigableItem>
 
-              <SimpleNavigableItem v-for="artist in tags.artists" :key="artist.id"
+              <NavigableItem v-for="artist in tags.artists" :key="artist.id"
                 @press="router.push({ name: 'artist', params: { id: artist.id } })">
                 <div class="track-info">🎤 {{ artist.name }}</div>
-              </SimpleNavigableItem>
+              </NavigableItem>
 
-              <SimpleNavigableItem @press="enableOpacitor = !enableOpacitor">
+              <NavigableItem @press="enableOpacitor = !enableOpacitor">
                 <div class="option-button">
                   <span v-if="enableOpacitor">🔲</span>
                   <span v-else>🔳</span>
                 </div>
-              </SimpleNavigableItem>
+              </NavigableItem>
 
               <ModifiableTrackRating :track="currentTrack" />
             </NavigableRow>
@@ -107,10 +107,10 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
               @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
           </div>
         </With>
-      </Column>
+      </NavigableList>
 
       <div class="play-queue-gallery">
-        <Column>
+        <NavigableList>
           <ProgressiveRow ref="queueGalleryRef" :items="readablePlayQueue.tracks" idProp="idInQueue"
             :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
             @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
@@ -118,9 +118,9 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
             <Card :title="track.metadata.tags.title" :box-size="80" :art-url="getAlbumArtUrl(track.metadata.tags.album)"
               :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2" />
           </ProgressiveRow>
-        </Column>
+        </NavigableList>
       </div>
-    </Column>
+    </NavigableList>
   </div>
 </template>
 

@@ -4,8 +4,8 @@ import { ctxMenuOptions } from '@/global/context-menu-items'
 import type { ArtistFragment } from '@/graphql/generated/graphql'
 import Card from '@/components/molecules/Card.vue'
 import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue'
-import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
 import { getArtistArtUrl } from '@/global/constants'
+import { showContextMenu } from '@/global/stores/context-menu'
 
 defineProps<{ artists: ArtistFragment[] }>()
 </script>

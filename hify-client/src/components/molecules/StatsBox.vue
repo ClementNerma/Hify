@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// biome-ignore lint/style/useImportType: <explanation>
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { UsageStatsDocument } from '@/graphql/generated/graphql';
+import { requestFocusById, type NavigableElementByType } from '@/navigable';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { useQuery } from '@urql/vue';
 import { computed, onUpdated, ref, watch } from 'vue';
 
@@ -12,13 +12,14 @@ const { data } = useQuery({
 
 const stats = computed(() => data.value?.generateStats)
 
-const itemRef = ref<InstanceType<typeof SimpleNavigableItem> | null>(null)
+const itemRef = ref<NavigableElementByType<'item'> | null>(null)
 
-onUpdated(() => itemRef?.value?.requestFocus())
+onUpdated(() => itemRef.value && requestFocusById(itemRef.value.id))
 </script>
 
 <template>
-    <SimpleNavigableItem v-if="stats" ref="itemRef" unstyled>
+    <!-- TODO: implement "unstyled" attribute -->
+    <NavigableItem v-if="stats" ref="itemRef" unstyled>
         <table>
             <tr>
                 <td>Total number of tracks</td>
@@ -45,5 +46,5 @@ onUpdated(() => itemRef?.value?.requestFocus())
                 <td><strong>{{ humanReadableDuration(stats.totalListeningTime) }}</strong></td>
             </tr>
         </table>
-    </SimpleNavigableItem>
+    </NavigableItem>
 </template>

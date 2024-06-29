@@ -1,9 +1,9 @@
-import type { SimpleNavigableItemProps } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
-import { ref } from 'vue'
+import { ref } from "vue"
+import { logFatal } from "./debugger"
 
 export type ContextMenuOption = {
 	label: string
-	onPress: NonNullable<SimpleNavigableItemProps['onPress']>
+	onPress: () => void
 	// onLongPress?: () => void
 }
 
@@ -13,7 +13,7 @@ export type ContextMenuData = {
 
 export function showContextMenu(options: ContextMenuOption[]): void {
 	if (options.length === 0) {
-		throw new Error('Cannot create an empty context menu')
+		logFatal('Cannot create an empty context menu')
 	}
 
 	contextMenuStore.value = { options }

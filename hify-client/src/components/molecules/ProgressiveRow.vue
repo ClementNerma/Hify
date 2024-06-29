@@ -1,10 +1,9 @@
 <script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
-import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue'
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
-import type { SimpleNavigableItem as SimpleNavigableItemClass } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
-import type { NavigableCommonProps, RequestFocus } from '@/navigable/navigation'
 import { computed, onUpdated, ref } from 'vue';
 import Run from '../atoms/Run.vue';
+import { requestFocusById, type NavigableElementByType } from '@/navigable';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 
 const props = defineProps<{
   items: T[],
@@ -12,11 +11,11 @@ const props = defineProps<{
   initialPosition?: number,
   onItemPress?: (item: T, newPosition: number) => void
   onItemLongPress?: (item: T, newPosition: number) => void
-  onFocusChange?: NavigableCommonProps['onFocusChange'],
+  onFocusChange?: (nowFocused: boolean) => void
 }>()
 
 defineSlots<{
-  default(props: { item: T, position: number, navigableItem: SimpleNavigableItemClass, focused: boolean }): unknown
+  default(props: { item: T, position: number, navigableItem: NavigableElementByType<'item'>, focused: boolean }): unknown
 }>()
 
 defineExpose({
@@ -67,7 +66,13 @@ function requestFocus(position: number) {
   const itemId = props.items[position][props.idProp]
 
   disableHandler.value = true
-    ; (itemsById.value as Record<T[K], RequestFocus>)[itemId]?.()
+
+  const navItemId = (itemsById.value as Record<T[K], string>)[itemId]
+
+  if (itemId) {
+    requestFocusById(navItemId)
+  }
+
   disableHandler.value = false
 
     ; (prevSelected.value as T[K]) = itemId
@@ -76,27 +81,28 @@ function requestFocus(position: number) {
 const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.round((COLUMNS - 1) / 2), 0))
 const visibleTracks = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS))
 
-const itemsById = ref<Partial<Record<T[K], RequestFocus>>>({})
+const itemsById = ref<Partial<Record<T[K], string>>>({})
 
-const columnSize = computed(() => 100 / COLUMNS)
+const columnSize = computed(() => `${100 / COLUMNS}%`)
 </script>
 
 <template>
-  <NavigableRow :on-focus-change>
-    <div class="flex flex-row py-2 overflow-hidden">
+  <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)">
+    <div class="flex flex-row py-2 overflow-hidden w-full">
       <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]">
         <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->
 
-        <SimpleNavigableItem @left="onSelect(firstVisibleItemIndex + i - 1, true)"
-          @right="onSelect(firstVisibleItemIndex + i + 1, true)" @focus="onSelect(firstVisibleItemIndex + i, false)"
+        <NavigableItem @left-key="onSelect(firstVisibleItemIndex + i - 1, true)"
+          @right-key="onSelect(firstVisibleItemIndex + i + 1, true)" @focus="onSelect(firstVisibleItemIndex + i, false)"
           @press="onItemPress?.(item, firstVisibleItemIndex + i)"
-          @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)" v-slot="{ item: navigableItem, focused }"
-          :has-focus-priority="firstVisibleItemIndex + i === position">
+          @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)"
+          :has-focus-priority="firstVisibleItemIndex + i === position" v-slot="{ item: navigableItem, focused }">
 
-          <Run @run="(itemsById as any)[(item as any)[idProp]] = () => navigableItem.requestFocus()" />
+          <!-- TODO: simple "ref" binding from Item instead? -->
+          <Run @run="(itemsById as any)[(item as any)[idProp]] = navigableItem.id" />
 
           <slot :item :position="firstVisibleItemIndex + i" :navigableItem :focused />
-        </SimpleNavigableItem>
+        </NavigableItem>
       </div>
     </div>
   </NavigableRow>

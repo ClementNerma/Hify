@@ -2,7 +2,6 @@
 import NavigableTrack from '../atoms/NavigableTrack.vue'
 import type { EntryInPlaylist } from '@/global/context-menu-items'
 import Card from './Card.vue'
-import type { SimpleNavigableItemProps } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import { getAlbumArtUrl } from '@/global/constants';
 
@@ -10,7 +9,7 @@ defineProps<{
     track: AudioTrackFragment,
     tracks: AudioTrackFragment[],
     inPlaylist?: EntryInPlaylist,
-    onFocus?: SimpleNavigableItemProps['onFocus']
+    onFocus?: () => void
 }>()
 
 </script>

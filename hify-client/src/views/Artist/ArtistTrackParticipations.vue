@@ -10,7 +10,7 @@ import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { graphql } from '@/graphql/generated';
 import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
-import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 import { onMounted, ref } from 'vue';
 
 const { artistId } = defineProps<{ artistId: string }>()

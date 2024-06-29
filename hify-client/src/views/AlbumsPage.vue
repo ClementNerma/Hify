@@ -4,7 +4,7 @@ import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { graphql } from '@/graphql/generated';
 import type { AlbumFragment, AlbumsPageQuery } from '@/graphql/generated/graphql';
-import Grid from '@/navigable/ui/organisms/Grid.vue';
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
 import { onMounted, ref } from 'vue';
 
 const ALBUMS_PER_LINE = 6
@@ -54,7 +54,7 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <Grid :columns="ALBUMS_PER_LINE" :lazy-loader="feedMore">
+  <NavigableGrid :columns="ALBUMS_PER_LINE" :lazy-loader="feedMore">
     <AlbumCard v-for="album in albums" :key="album.id" :album />
-  </Grid>
+  </NavigableGrid>
 </template>

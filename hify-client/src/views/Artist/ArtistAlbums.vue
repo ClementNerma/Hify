@@ -6,8 +6,8 @@ import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { graphql } from '@/graphql/generated';
-import type { AlbumFragment, AlbumsPageQuery, ArtistAlbumsQuery, ArtistPageQuery } from '@/graphql/generated/graphql';
-import Grid from '@/navigable/ui/organisms/Grid.vue';
+import type { AlbumFragment, ArtistAlbumsQuery } from '@/graphql/generated/graphql';
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
 import { onMounted, ref } from 'vue';
 
 const { artistId } = defineProps<{ artistId: string }>()
@@ -71,9 +71,9 @@ onMounted(feedMore)
       <h3>Albums ({{ albums.length }})</h3>
     </Centered>
 
-    <Grid :columns="ALBUMS_PER_LINE">
+    <NavigableGrid :columns="ALBUMS_PER_LINE">
       <AlbumCard v-for="album in albums" :key="album.id" :album enforce-max-width />
-    </Grid>
+    </NavigableGrid>
 
     <Button v-if="currentPageInfo.hasNextPage" @press="feedMore()">
       Load more

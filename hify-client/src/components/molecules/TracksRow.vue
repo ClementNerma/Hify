@@ -3,8 +3,8 @@ import { ctxMenuCallbacks, ctxMenuOptions } from '@/global/context-menu-items'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
-import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
 import { getAlbumArtUrl } from '@/global/constants'
+import { showContextMenu } from '@/global/stores/context-menu'
 
 defineProps<{ tracks: AudioTrackFragment[] }>() 
 </script>

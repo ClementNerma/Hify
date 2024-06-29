@@ -3,9 +3,9 @@ import Button from '@/components/atoms/Button.vue';
 import Checkbox from '@/components/atoms/Checkbox.vue';
 import { hifyInterface } from '@/global/injected';
 import { appLogs } from '@/global/stores/debugger';
-import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue';
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
-import Row from '@/navigable/ui/molecules/Row/Row.vue';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
 import { computed, ref } from 'vue'
 
 const hideDebugLogs = ref(true)
@@ -18,7 +18,7 @@ const win = window
 <template>
   <h2>Developer Tools</h2>
 
-  <Row>
+  <NavigableRow>
     <Button @press="win.location.reload()" full-height>Reload the application</Button>
 
     <Checkbox v-model="hideDebugLogs" full-height>Hide debug logs</Checkbox>
@@ -26,15 +26,15 @@ const win = window
     <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()" full-height>
       🛠️ Change the application's URL
     </Button>
-  </Row>
+  </NavigableRow>
 
   <NavigableList>
-    <SimpleNavigableItem v-for="logEntry in slicedAppLogs">
+    <NavigableItem v-for="logEntry in slicedAppLogs">
       <div class="log-entry" :class="[logEntry.level]">
         <u>{{ logEntry.level.toLocaleUpperCase() }}</u>
         <strong>{{ logEntry.at.toLocaleTimeString() }}</strong>: {{ logEntry.message }}
       </div>
-    </SimpleNavigableItem>
+    </NavigableItem>
   </NavigableList>
 </template>
 

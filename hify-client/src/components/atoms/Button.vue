@@ -1,25 +1,30 @@
 <script lang="ts">
-export type ButtonProps = SimpleNavigableItemProps & {
+export type ButtonProps = NavigableItemProps & {
     borderNone?: boolean
 }
 </script>
 
 <script setup lang="ts">
-import type { SimpleNavigableItem as SimpleNavigableItemClass } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem';
-import SimpleNavigableItem, { type SimpleNavigableItemProps } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
+import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
+import { type NavigableItem as NavigableItemType } from '@/navigable';
+import { ref } from 'vue';
 
 const props = defineProps<ButtonProps>()
 
 defineSlots<{
-    default(props: { item: SimpleNavigableItemClass, focused: boolean }): unknown
+    default(props: { item: NavigableItemType, focused: boolean }): unknown
 }>()
+
+const itemRef = ref<InstanceType<typeof NavigableItem> | null>(null)
+
+defineExpose({ itemRef })
 </script>
 
 <template>
-    <SimpleNavigableItem v-bind="props" class="p-0 mr-5" not-rounded v-slot="{ item, focused }">
+    <NavigableItem class="p-0 mr-5" v-bind="props" v-slot="{ item, focused }" ref="itemRef">
         <div class="flex items-center w-fit"
             :class="{ 'border': !borderNone, 'border-solid': !borderNone, 'border-white': !borderNone, 'opacity-50': disabled }">
             <slot :item :focused />
         </div>
-    </SimpleNavigableItem>
+    </NavigableItem>
 </template>

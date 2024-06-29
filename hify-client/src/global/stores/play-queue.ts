@@ -1,4 +1,3 @@
-import { showErrorDialog } from '@/components/molecules/ErrorDialog'
 import {
 	GenerateMixDocument,
 	GetNextTracksOfMixDocument,
@@ -14,6 +13,7 @@ import { gqlClient } from '../urql-client'
 import { swapInArray } from '../utils'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
 import { logError, logFatal, logInfo, logWarn } from './debugger'
+import { NotificationLevel, showNotification } from './notifications'
 
 export type PlayQueue = {
 	tracks: QueuedTrack[]
@@ -75,7 +75,7 @@ export function playNewQueueFromBeginning(tracks: AudioTrackFragment[], fromMixI
 
 export function playTrackFromNewQueue(tracks: AudioTrackFragment[], position: number, fromMixId: string | null): void {
 	if (tracks.length === 0) {
-		showErrorDialog('Empty queue', 'Cannot play queue as it contains no track')
+		showNotification(NotificationLevel.Error, 'Cannot play queue as it contains no track')
 		return
 	}
 

@@ -7,8 +7,8 @@ import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { getRouteParam } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
-import { MixOrdering, type AlbumFragment, type AlbumsPageQuery, type GenrePageQuery } from '@/graphql/generated/graphql';
-import Grid from '@/navigable/ui/organisms/Grid.vue';
+import { MixOrdering, type AlbumFragment, type GenrePageQuery } from '@/graphql/generated/graphql';
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
 import { onMounted, ref } from 'vue';
 
 const ALBUMS_PER_LINE = 6
@@ -80,8 +80,8 @@ onMounted(feedMore)
 
     <h3>List of albums</h3>
 
-    <Grid :columns="ALBUMS_PER_LINE" :lazy-loader="feedMore">
+    <NavigableGrid :columns="ALBUMS_PER_LINE" :lazy-loader="feedMore">
       <AlbumCard v-for="album in albums" :key="album.id" :album />
-    </Grid>
+    </NavigableGrid>
   </template>
 </template>

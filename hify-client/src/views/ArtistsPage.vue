@@ -4,7 +4,7 @@ import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { graphql } from '@/graphql/generated';
 import type { ArtistFragment, ArtistsPageQuery } from '@/graphql/generated/graphql';
-import Grid from '@/navigable/ui/organisms/Grid.vue';
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
 import { onMounted, ref } from 'vue';
 
 const ARTISTS_PER_LINE = 6
@@ -54,7 +54,7 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <Grid :columns="ARTISTS_PER_LINE" :lazy-loader="feedMore">
+  <NavigableGrid :columns="ARTISTS_PER_LINE" :lazy-loader="feedMore">
     <ArtistCard v-for="artist in artists" :key="artist.id" :artist />
-  </Grid>
+  </NavigableGrid>
 </template>

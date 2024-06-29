@@ -9,8 +9,8 @@ import StatsBox from '@/components/molecules/StatsBox.vue';
 import TracksRow from '@/components/molecules/TracksRow.vue';
 import { MIN_GREAT_RATING } from '@/global/constants';
 import { graphql } from '@/graphql/generated';
-import { MixOrdering, type HomePageQuery } from '@/graphql/generated/graphql';
-import Row from '@/navigable/ui/molecules/Row/Row.vue';
+import { MixOrdering, } from '@/graphql/generated/graphql';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
 import router from '@/router';
 import { useQuery } from '@urql/vue';
 import { computed, ref } from 'vue';
@@ -82,11 +82,11 @@ const statsBox = ref(false)
       <h3>Tools</h3>
     </Centered>
 
-    <Row>
+    <NavigableRow>
       <IndexUpdater @updated="executeQuery" />
       <Button @press="router.push({ name: 'devtools' })">👷 Devtools</Button>
       <Button @press="statsBox = !statsBox">Show me some stats</Button>
-    </Row>
+    </NavigableRow>
 
     <StatsBox v-if="statsBox" />
   </template>

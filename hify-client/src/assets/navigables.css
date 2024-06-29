@@ -1,7 +1,3 @@
-navigable-container-wrapper {
-    display: 'contents';
-}
-
 navigable-item-wrapper:not(.noPadding)> :first-child {
     padding: 5px;
 }
@@ -19,7 +15,7 @@ navigable-item-wrapper.fullHeight> :first-child {
     min-height: 100%;
 }
 
-navigable-item-wrapper:not(.unstyled).focused> :first-child {
+navigable-item-wrapper:not(.unstyled)[data-nav-focused]> :first-child {
     outline: none;
     text-decoration: underline;
 }

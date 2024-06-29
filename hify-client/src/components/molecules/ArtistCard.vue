@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { MixOrdering, type ArtistFragment } from '@/graphql/generated/graphql'
-import { type ContextMenuOption, showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
 import { MIN_GREAT_RATING, getArtistArtUrl } from '@/global/constants'
 import { generateAndPlayMix } from '@/global/stores/play-queue'
 import { computed } from 'vue'
 import router from '@/router'
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
 import Card from './Card.vue'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import { showContextMenu, type ContextMenuOption } from '@/global/stores/context-menu'
 
 const { artist } = defineProps<{
     artist: ArtistFragment
@@ -28,8 +28,8 @@ const contextMenuOptions = computed<ContextMenuOption[]>(() => [
 </script>
 
 <template>
-    <SimpleNavigableItem @press="router.push({ name: 'artist', params: { id: artist.id } })"
+    <NavigableItem @press="router.push({ name: 'artist', params: { id: artist.id } })"
         @long-press="showContextMenu(contextMenuOptions)">
         <Card :title="artist.name" :art-url="getArtistArtUrl(artist)" circle />
-    </SimpleNavigableItem>
+    </NavigableItem>
 </template>

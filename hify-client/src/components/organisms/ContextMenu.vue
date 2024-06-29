@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import type { NavigableItem } from '@/navigable/navigation'
-import NavigableWithHandlers from '@/navigable/headless/NavigableWithHandlers/NavigableWithHandlers.vue'
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
-import Column from '../Column/Column.vue'
-import { contextMenuStore } from './ContextMenu'
 import { logFatal } from '@/global/stores/debugger'
 import { onUpdated, ref } from 'vue'
 import Run from '@/components/atoms/Run.vue'
-import type { NavigableList } from '@/navigable/headless/NavigableList/NavigableList'
+import { getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import { contextMenuStore } from '@/global/stores/context-menu';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 
-function getBoundingClientRect(el: HTMLElement): DOMRect | null {
+function getBoundingClientRect(el: Element): DOMRect | null {
   let rect = el.getBoundingClientRect()
   const children = Array.from(el.children)
 
@@ -39,14 +37,15 @@ onUpdated(() => {
   }
 
   const container = containerRef.value
-  const column = columnRef.value ?? logFatal('Column reference not initialized yet')
+  const column = listRef.value ?? logFatal('Column reference not initialized yet')
 
-  const focusedItem = column.page.focusedItem()
-  if (!contextMenuStore.value || !contextMenuStore.value.options.length || !focusedItem) {
+  const focusedItemId = getFocusedItemId()
+
+  if (!contextMenuStore.value || !contextMenuStore.value.options.length || !focusedItemId) {
     return
   }
 
-  const rect = getBoundingClientRect(focusedItem.underlyingElement())
+  const rect = getBoundingClientRect(getNavigableDOMElementById(focusedItemId) ?? logFatal('Could not get DOM element of currently-focused item'))
 
   const top = rect ? (rect.top + rect.bottom) / 2 : 0
   const left = rect ? (rect.left + rect.right) / 2 : 0
@@ -54,42 +53,46 @@ onUpdated(() => {
   ctxTop.value = top + container.clientHeight > window.innerHeight ? window.innerHeight - container.clientHeight - 5 : top
   ctxLeft.value = left + container.clientWidth > window.innerWidth ? window.innerWidth - container.clientWidth - 5 : left
 
-  prevFocusItem.value = focusedItem
+  prevFocusItemId.value = focusedItemId
 
-  column.requestFocus()
+  requestFocusOnElement(column)
 })
 
 function closeContextMenu() {
-  prevFocusItem.value?.requestFocus()
+  if (prevFocusItemId.value) {
+    requestFocusById(prevFocusItemId.value)
+    prevFocusItemId.value = null
+  }
+
   contextMenuStore.value = null
 }
 
-const prevFocusItem = ref<NavigableItem<unknown> | null>(null)
+const prevFocusItemId = ref<string | null>(null)
 
 const ctxTop = ref(-1)
 const ctxLeft = ref(-1)
 
-const columnRef = ref<NavigableList | null>(null)
+const listRef = ref<NavigableElementByType<'list'> | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
 </script>
 
 <template>
-  <NavigableWithHandlers v-if="contextMenuStore && contextMenuStore.options.length > 0" @back="closeContextMenu">
+  <NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0" @back-key="closeContextMenu">
     <div
       class="fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
       ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
-      <Column trapped v-slot="{ column }">
-        <Run @run="columnRef = column" />
+      <NavigableList trapped v-slot="{ list }">
+        <Run @run="listRef = list" />
 
-        <SimpleNavigableItem v-for="option in contextMenuStore.options" :key="option.label"
+        <NavigableItem v-for="option in contextMenuStore.options" :key="option.label"
           @press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
           <div :class="{ 'bg-gray-400': focused }">
             <div class="p-1.5 option">{{ option.label }}</div>
           </div>
-        </SimpleNavigableItem>
-      </Column>
+        </NavigableItem>
+      </NavigableList>
     </div>
-  </NavigableWithHandlers>
+  </NavigableList>
 </template>
 
 <style scoped>

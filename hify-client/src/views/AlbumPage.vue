@@ -7,15 +7,14 @@ import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
 import TrackRating from '@/components/atoms/TrackRating.vue';
 import { getAlbumArtUrl } from '@/global/constants';
 import { humanReadableDuration } from '@/global/stores/audio-player';
+import { showContextMenu } from '@/global/stores/context-menu';
 import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue';
 import { dedup, filterMap, getRouteParam, hasMinimumRating, isDefined, shuffle } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue';
-import NavigableRow from '@/navigable/headless/NavigableRow/NavigableRow.vue';
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
-import { showContextMenu } from '@/navigable/ui/molecules/ContextMenu/ContextMenu';
-import Row from '@/navigable/ui/molecules/Row/Row.vue';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
 import router from '@/router';
 import { useQuery } from '@urql/vue';
 import { computed, ref } from 'vue';
@@ -79,34 +78,35 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             {{ album.name }}
           </div>
 
-          <SimpleNavigableItem v-if="album.year" just-for-style>
+          <!-- TODO: implement attr "just-for-style" -->
+          <NavigableItem v-if="album.year" just-for-style>
             🕒 {{ album.year }}
-          </SimpleNavigableItem>
+          </NavigableItem>
 
-          <Row>
-            <SimpleNavigableItem v-for="artist in album.albumArtists" :key="artist.id"
+          <NavigableRow>
+            <NavigableItem v-for="artist in album.albumArtists" :key="artist.id"
               @press="router.push({ name: 'artist', params: { id: artist.id } })">
               <span class="artist">🎤 {{ artist.name }}</span>
-            </SimpleNavigableItem>
-          </Row>
+            </NavigableItem>
+          </NavigableRow>
 
-          <Row>
-            <SimpleNavigableItem v-for="genre in album.genres" :key="genre.id"
+          <NavigableRow>
+            <NavigableItem v-for="genre in album.genres" :key="genre.id"
               @press="router.push({ name: 'genre', params: { id: genre.id } })">
               <span class="genre">🎵 {{ genre.name }}</span>
-            </SimpleNavigableItem>
-          </Row>
+            </NavigableItem>
+          </NavigableRow>
 
-          <SimpleNavigableItem just-for-style>
+          <NavigableItem just-for-style>
             <div class="length">
               ⌛ {{ humanReadableDuration(infos.totalDuration) }} /
               {{ filteredTracks.length }} track{{ filteredTracks.length > 1 ? 's' : '' }}
 
               <span v-if="infos.discs.length > 1">/ {{ infos.discs.length }} discs</span>
             </div>
-          </SimpleNavigableItem>
+          </NavigableItem>
 
-          <Row>
+          <NavigableRow>
             <Checkbox full-height v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
 
             <Button full-height @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
@@ -124,7 +124,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             }">
               <Emoji>🔀</Emoji> Shuffle
             </Button>
-          </Row>
+          </NavigableRow>
         </div>
       </div>
     </NavigableList>

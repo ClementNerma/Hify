@@ -1,26 +1,43 @@
 <script setup lang="ts">
-import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
-import { playNextTrack, playPreviousTrackOrRewind } from '@/global/stores/play-queue'
-
-import NavigableList from '@/navigable/headless/NavigableList/NavigableList.vue'
-import NavigablePage from '@/navigable/headless/NavigablePage/NavigablePage.vue'
-
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
-import { showErrorDialog } from '@/components/molecules/ErrorDialog'
 import NavBar from '@/components/molecules/NavBar.vue'
-import NavigableWithHandlers from '@/navigable/headless/NavigableWithHandlers/NavigableWithHandlers.vue'
-import { KeyPressHandling, handleInput, registerLongPressableKeys } from '@/navigable/input-manager'
-import ContextMenu from '@/navigable/ui/molecules/ContextMenu/ContextMenu.vue'
-import ErrorDialog from '@/components/molecules/ErrorDialog.vue'
 import router from '@/router'
 import { onMounted } from 'vue'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import ContextMenu from '@/components/organisms/ContextMenu.vue'
+import { InputHandlingResult, handleInput, setupNavigable } from '@/navigable'
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
+import Notifications from '@/components/molecules/Notifications.vue'
+import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
+import { playNextTrack, playPreviousTrackOrRewind } from '@/global/stores/play-queue'
+import { NotificationLevel, showNotification } from '@/global/stores/notifications'
 
-registerLongPressableKeys('MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape')
+onMounted(() => {
+    setupNavigable({
+        logFatal(message) {
+            showNotification(NotificationLevel.Error, message)
+            throw new Error(message)
+        },
+
+        logWarn(message) {
+            showNotification(NotificationLevel.Warn, message)
+            console.warn(message)
+        }
+    })
+
+    window.addEventListener('error', (err) => {
+        showNotification(NotificationLevel.Error, `JavaScript runtime error:\n\n${err.message}`)
+        console.error(err)
+    })
+
+    window.addEventListener('unhandledrejection', (e) => {
+        showNotification(NotificationLevel.Error, `JavaScript unhandled Promise rejection:\n\n${typeof e === 'string' ? e : e instanceof Error ? e.message : '<no specified message>'}`)
+    })
+})
 
 handleInput((key, long) => {
     switch (key) {
         case 'MediaPlayPause':
-        case 'p':
             if (!long) {
                 toggleAudioPlayback()
             } else {
@@ -30,7 +47,6 @@ handleInput((key, long) => {
             break
 
         case 'MediaRewind':
-        case 'r':
             if (!long) {
                 setPlayingAudioProgressRelative(-10)
             } else {
@@ -40,7 +56,6 @@ handleInput((key, long) => {
             break
 
         case 'MediaFastForward':
-        case 'f':
             if (!long) {
                 setPlayingAudioProgressRelative(+10)
             } else {
@@ -50,58 +65,41 @@ handleInput((key, long) => {
             break
 
         default:
-            return
+            return InputHandlingResult.Propagate
     }
 
-    return KeyPressHandling.Propagate
+    return InputHandlingResult.Intercepted
 })
 
-onMounted(() => {
-    window.addEventListener('error', (err) => {
-        console.error(err)
-        showErrorDialog('JavaScript runtime error', err.message)
-    })
-
-    window.addEventListener('unhandledrejection', () => {
-        showErrorDialog('JavaScript unhandled Promise rejection', '<unknown message>')
-    })
-})
-
-const win = window
 </script>
 
 <template>
     <div class="background fixed inset-0 -z-30" />
 
-    <NavigablePage>
-        <NavigableWithHandlers @back="router.back()" @long-back="win.location.reload()">
-            <NavigableList>
-                <ContextMenu />
-                <ErrorDialog />
+    <NavigableList @back-key="router.back()">
+        <ContextMenu />
+        <Notifications />
 
-                <DistractionFreeTogglable>
-                    <NavigableWithHandlers @long-press="router.push({ name: 'devtools' })">
-                        <NavBar :tabs="[
-                            { label: 'Home', routeName: 'home' },
-                            { label: 'History', routeName: 'history' },
-                            { label: 'Now Playing', routeName: 'now-playing' },
-                            {
-                                label: 'Albums',
-                                routeName: 'albums',
-                                subMenu: [
-                                    { label: 'Artists', routeName: 'artists' },
-                                    { label: 'Genres', routeName: 'genres' }
-                                ],
-                            },
-                            { label: 'Playlists', routeName: 'playlists' },
-                            { label: 'Search', routeName: 'search' }]" />
-                    </NavigableWithHandlers>
-                </DistractionFreeTogglable>
+        <DistractionFreeTogglable>
+            <NavBar :tabs="[
+                { label: 'Home', routeName: 'home' },
+                { label: 'History', routeName: 'history' },
+                { label: 'Now Playing', routeName: 'now-playing' },
+                {
+                    label: 'Albums',
+                    routeName: 'albums',
+                    subMenu: [
+                        { label: 'Artists', routeName: 'artists' },
+                        { label: 'Genres', routeName: 'genres' }
+                    ],
+                },
+                { label: 'Playlists', routeName: 'playlists' },
+                { label: 'Search', routeName: 'search' }]" />
+        </DistractionFreeTogglable>
 
-                <slot />
-            </NavigableList>
-        </NavigableWithHandlers>
-    </NavigablePage>
+        <slot />
+    </NavigableList>
+
 </template>
 
 <style scoped>

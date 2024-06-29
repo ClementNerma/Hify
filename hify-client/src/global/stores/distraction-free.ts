@@ -1,15 +1,21 @@
-import { handleInput } from '@/navigable/input-manager'
+import { InputHandlingResult, handleInput } from '@/navigable'
 import { onUnmounted, readonly, ref } from 'vue'
 
 const _distractionFreeMode = ref(false)
 
 export const distractionFreeMode = readonly(_distractionFreeMode)
 
-export function setupDistractionFreeListener(
-	delay: number,
-	ignoreKeys?: string[],
-	interceptTurningOn?: () => boolean,
-): (enabled: boolean) => void {
+export type DistractionFreeListenerOptions = {
+	delayMillis: number
+	dontWakeUpForKeys?: string[]
+	darkeningCondition?: () => boolean
+}
+
+export function setupDistractionFreeListener({
+	delayMillis,
+	dontWakeUpForKeys,
+	darkeningCondition,
+}: DistractionFreeListenerOptions): (enabled: boolean) => void {
 	function restartDistractionFreeTimeout() {
 		if (destroyed) {
 			return
@@ -20,10 +26,10 @@ export function setupDistractionFreeListener(
 		}
 
 		distractionModeTimeout = window.setTimeout(() => {
-			if (interceptTurningOn?.() !== false) {
+			if (darkeningCondition?.() !== false) {
 				_distractionFreeMode.value = true
 			}
-		}, delay)
+		}, delayMillis)
 	}
 
 	function resetDistractionFreeMode(): void {
@@ -50,13 +56,12 @@ export function setupDistractionFreeListener(
 	let destroyed = false
 
 	handleInput((key) => {
-		if (destroyed) {
-			return
+		if (!destroyed && _distractionFreeMode.value && !dontWakeUpForKeys?.includes(key)) {
+			resetDistractionFreeMode()
+			return InputHandlingResult.Intercepted
 		}
 
-		if (!ignoreKeys?.includes(key)) {
-			resetDistractionFreeMode()
-		}
+		return InputHandlingResult.Propagate
 	})
 
 	let distractionModeTimeout: number | null = null

@@ -4,9 +4,9 @@ import {
 	type AudioTrackFragment,
 	type PlaylistEntryFragment,
 } from '@/graphql/generated/graphql'
-import type { ContextMenuOption } from '@/navigable/ui/molecules/ContextMenu/ContextMenu'
 import router from '@/router'
 import { MIN_GREAT_RATING } from './constants'
+import type { ContextMenuOption } from './stores/context-menu'
 import {
 	enqueue,
 	generateAndPlayMix,

@@ -3,35 +3,38 @@ import { readableAudioPaused } from '@/global/stores/audio-player';
 import { distractionFreeMode, setupDistractionFreeListener } from '@/global/stores/distraction-free';
 import { currentTrack } from '@/global/stores/play-queue';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import { KeyPressHandling } from '@/navigable/input-manager';
 import { ref, watch } from 'vue';
 import NowPlayingBackground from './NowPlaying/NowPlayingBackground.vue';
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue';
-import NavigableWithHandlers from '@/navigable/headless/NavigableWithHandlers/NavigableWithHandlers.vue';
 import NowPlayingBottomPanel from './NowPlaying/NowPlayingBottomPanel.vue';
 import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue';
 import Emoji from '@/components/atoms/Emoji.vue';
 import { getAlbumArtUrl } from '@/global/constants';
+import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import { InputHandlingResult, NavigationDirection } from '@/navigable';
 
-const ignoredKeys = ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape']
 const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 
-const setDistractionFree = setupDistractionFreeListener(3000, ignoredKeys, () => readableAudioPaused.value === false)
+const setDistractionFree = setupDistractionFreeListener({
+  delayMillis: 3000,
+  darkeningCondition: () => readableAudioPaused.value === false,
+  dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape'],
+})
 
-function onKeyPress(key: string): KeyPressHandling {
+function onKeyPress(key: NavigationDirection): InputHandlingResult {
   const dfMode = distractionFreeMode.value
 
-  if (!dfMode && key === 'Escape') {
+  if (!dfMode && key === NavigationDirection.Back) {
     setDistractionFree(true)
-    return KeyPressHandling.Intercepted
+    return InputHandlingResult.Intercepted
   }
 
-  if (dfMode && !ignoredKeys.includes(key)) {
+  if (dfMode) {
     setDistractionFree(false)
-    return KeyPressHandling.Intercepted
+    return InputHandlingResult.Intercepted
   }
 
-  return KeyPressHandling.Propagate
+  return InputHandlingResult.Propagate
 }
 
 const newTrackDisplay = ref<{ timeout: number; track: AudioTrackFragment } | null>(null)
@@ -70,9 +73,9 @@ watch(currentTrack, track => {
     :src="getAlbumArtUrl(currentTrack.metadata.tags.album)" />
 
   <DistractionFreeTogglable>
-    <NavigableWithHandlers :on-key-press>
+    <NavigableList @navigate="onKeyPress">
       <NowPlayingBottomPanel />
-    </NavigableWithHandlers>
+    </NavigableList>
   </DistractionFreeTogglable>
 
   <NowPlayingOpacitor :visible="distractionFreeMode" />

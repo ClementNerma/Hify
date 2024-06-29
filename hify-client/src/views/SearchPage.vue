@@ -8,8 +8,8 @@ import { gqlClient } from '@/global/urql-client';
 import { getRouteParam } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { SearchPageQuery } from '@/graphql/generated/graphql';
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue';
-import type { SimpleNavigableItem as SimpleNavigableItemClass } from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem';
+import { requestFocusOnItem, requestFocusById, type NavigableElementByType } from '@/navigable';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { onMounted, ref } from 'vue';
 
 const MAX_RESULTS_PER_CATEGORY = 50
@@ -59,14 +59,14 @@ async function onInput() {
 const query = ref(getRouteParam('query', ''))
 const results = ref<SearchPageQuery['search'] | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
-const navItem = ref<SimpleNavigableItemClass | null>(null)
+const navItem = ref<NavigableElementByType<'item'> | null>(null)
 
 onMounted(() => {
   if (!navItem.value) {
     logFatal('Nav item reference not initialized yet')
   }
 
-  navItem.value.requestFocus()
+  requestFocusOnItem(navItem.value)
 
   if (query.value) {
     onInput()
@@ -76,12 +76,13 @@ onMounted(() => {
 
 <template>
   <div class="p-2.5 text-center">
-    <SimpleNavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" v-slot="{ item }">
+    <NavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" v-slot="{ item }" ref="navItem">
+      <!-- TODO: improve -->
       <Run @run="navItem = item" />
 
       <input class="w-1/3 p-3 text-lg border-none rounded-lg outline-none" type="text" ref="inputRef" v-model="query"
         @input="onInput" @change="onInput" />
-    </SimpleNavigableItem>
+    </NavigableItem>
   </div>
 
   <div v-if="results">

@@ -2,7 +2,7 @@
 import { gqlClient } from '@/global/urql-client'
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
-import SimpleNavigableItem from '@/navigable/headless/SimpleNavigableItem/SimpleNavigableItem.vue'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { computed, onBeforeUpdate, onMounted, ref } from 'vue'
 
 const props = defineProps<{ track: AudioTrackFragment }>()
@@ -82,7 +82,7 @@ const onRight = computed(() => state.value.current <= 8 ? () => setRatingRelativ
 </script>
 
 <template>
-    <SimpleNavigableItem :on-left :on-right @press="update()" @unfocus="reset">
+    <NavigableItem :on-left :on-right @press="update()" @unfocus="reset">
         <div
             :class="state.updating ? ['text-gray', 'opacity-50'] : state.current !== state.initialRating ? ['text-purple-950'] : state.failed ? ['text-red'] : []">
             <span v-for="value in [2, 4, 6, 8, 10]">
@@ -94,5 +94,5 @@ const onRight = computed(() => state.value.current <= 8 ? () => setRatingRelativ
                 </span>
             </span>
         </div>
-    </SimpleNavigableItem>
+    </NavigableItem>
 </template>
