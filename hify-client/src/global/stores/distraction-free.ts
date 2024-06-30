@@ -79,7 +79,6 @@ export function setupDistractionFreeListener({
 		}
 
 		_distractionFreeMode.value = false
-		resetDistractionFreeMode()
 	})
 
 	return externallySetDistractionFreeMode
