@@ -36,7 +36,7 @@ export function setupNavigable(options: SetupNavigableOptions) {
 
 	window.customElements.define('navigable-element-wrapper', HTMLNavigableElementWrapper)
 
-	watchLongPressForKey('Enter')
+	watchLongPressForKeys(['Enter'])
 
 	handleInput((key, longPress) => {
 		if (key === 'Enter') {
@@ -79,7 +79,7 @@ function getSetupOptions(): SetupNavigableOptions {
 }
 
 const pendingKeyLongPresses = new Map<string, { at: number; timeout: number } | null>()
-const watchLongPressForKeys = new Set<string>()
+const watchingLongPressForKeys = new Set<string>()
 const triggeredKeyLongPress = new Set<string>()
 
 const DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS = 250
@@ -91,7 +91,7 @@ function handleKeyDownEvent(e: KeyboardEvent): void {
 
 	const { key } = e
 
-	if (watchLongPressForKeys.has(key)) {
+	if (watchingLongPressForKeys.has(key)) {
 		e.preventDefault()
 
 		if (!pendingKeyLongPresses.has(key) && !triggeredKeyLongPress.has(key)) {
@@ -116,7 +116,7 @@ function handleKeyUpEvent(e: KeyboardEvent): void {
 
 	const { key } = e
 
-	if (!watchLongPressForKeys.has(key)) {
+	if (!watchingLongPressForKeys.has(key)) {
 		return
 	}
 
@@ -141,8 +141,10 @@ function handleKeyUpEvent(e: KeyboardEvent): void {
 	dispatchKeyInput(key, longPressed)
 }
 
-export function watchLongPressForKey(key: string): void {
-	watchLongPressForKeys.add(key)
+export function watchLongPressForKeys(keys: string[]): void {
+	for (const key of keys) {
+		watchingLongPressForKeys.add(key)
+	}
 }
 
 export type InputHandler = (key: string, long: boolean) => InputHandlingResult

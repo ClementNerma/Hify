@@ -5,8 +5,7 @@ import router from '@/router'
 import { onMounted } from 'vue'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import ContextMenu from '@/components/organisms/ContextMenu.vue'
-import { InputHandlingResult, handleInput, setupNavigable } from '@/navigable'
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
+import { InputHandlingResult, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
 import Notifications from '@/components/molecules/Notifications.vue'
 import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
 import { playNextTrack, playPreviousTrackOrRewind } from '@/global/stores/play-queue'
@@ -34,6 +33,8 @@ onMounted(() => {
         showNotification(NotificationLevel.Error, `JavaScript unhandled Promise rejection:\n\n${typeof e === 'string' ? e : e instanceof Error ? e.message : '<no specified message>'}`)
     })
 })
+
+watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])
 
 handleInput((key, long) => {
     switch (key) {
