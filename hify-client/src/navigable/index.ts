@@ -760,14 +760,17 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 		return
 	}
 
-	const focusedItem =
-		getNavigableElementById(focusedItemId) ??
-		// TODO: fallback to another element in this case?
+	const focusedItem = getNavigableElementById(focusedItemId)
+
+	if (!focusedItem) {
+		focusedItemId = null
 		logFatal(`Focused element with ID "${focusedItemId}" was not found`)
+	}
 
 	const { navEl: focusedNavEl } = focusedItem
 
 	if (focusedNavEl.type !== 'item') {
+		focusedItemId = null
 		logFatal('Retrieved focused item is not an item but a container!')
 	}
 
