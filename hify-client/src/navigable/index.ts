@@ -193,12 +193,13 @@ export enum NavigationDirection {
 	DirectFocus = 'DIRECT_FOCUS',
 }
 
-export type NavigableElement =
-	| { id: string; type: 'item'; hasFocusPriority?: boolean }
-	| { id: string; type: 'list' }
-	| { id: string; type: 'row' }
-	| { id: string; type: 'grid'; columns: number }
-	| { id: string; type: 'customContainer'; customId?: string }
+export type NavigableElement = { id: string } & (
+	| { type: 'item'; hasFocusPriority?: boolean }
+	| { type: 'list' }
+	| { type: 'row' }
+	| { type: 'grid'; columns: number }
+	| { type: 'customContainer'; customId?: string }
+)
 
 export type NavigableElementType = NavigableElement['type']
 
@@ -261,34 +262,28 @@ const ELEMENTS_CREATOR = {
 export type NavigationResult = { type: 'focusItem'; item: NavigableItem } | { type: 'propagate' } | { type: 'trap' }
 export type NavigationNativeFallbackResult = { type: 'native' }
 
-export type NavigableElementBaseInteractionHandlers<T extends NavigableElementType> = {
-	focus(navEl: NavigableElementByType<T>): void
-	unfocus(navEl: NavigableElementByType<T>): void
-}
-
-export type NavigableItemInteractionHandlers = NavigableElementBaseInteractionHandlers<'item'> & {
+export type NavigableItemInteractionHandlers = {
+	focus(navEl: NavigableItem): void
+	unfocus(navEl: NavigableItem): void
 	press(item: NavigableItem): void
 	longPress(item: NavigableItem): void
 	directionKeyPress(item: NavigableItem, key: NavigationDirection): NavigationResult
 }
 
-export type NavigableContainerInteractionHandlers<T extends NavigableElementType> =
-	NavigableElementBaseInteractionHandlers<T> & {
-		navigate(
-			navEl: NavigableElementByType<T>,
-			currentChild: NavigableElement,
-			direction: NavigationDirection,
-		): NavigationResult
-		enterFrom(navEl: NavigableElementByType<T>, from: NavigationDirection): NavigationResult
-	}
+export type NavigableContainerInteractionHandlers<T extends NavigableContainerType> = {
+	focus(navEl: NavigableElementByType<T>, focusedChild: NavigableElement): void
+	unfocus(navEl: NavigableElementByType<T>, previouslyFocusedChild: NavigableElement): void
+	navigate(
+		navEl: NavigableElementByType<T>,
+		currentChild: NavigableElement,
+		direction: NavigationDirection,
+	): NavigationResult
+	enterFrom(navEl: NavigableElementByType<T>, from: NavigationDirection): NavigationResult
+}
 
-// export type NavigableElementInteractionHandlers<T extends NavigableElementType> = T extends 'item'
-// 	? NavigableItemInteractionHandlers
-// 	: NavigableContainerInteractionHandlers<T>
-
-type _NavigableElementInteractionHandlers<T extends NavigableElementType> = T extends 'item'
-	? NavigableItemInteractionHandlers
-	: NavigableContainerInteractionHandlers<T>
+type _NavigableElementInteractionHandlers<T extends NavigableElementType> = T extends NavigableContainerType
+	? NavigableContainerInteractionHandlers<T>
+	: NavigableItemInteractionHandlers
 
 export type NavigableElementInteractionHandlers<ElementType extends NavigableElementType> = {
 	[SubType in ElementType]: _NavigableElementInteractionHandlers<SubType>
@@ -884,6 +879,9 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 		getNavigableDOMElementById(navEl.id) ??
 		logFatal(`Internal error: newly-focused item "${navEl.id}" does not have a DOM element`)
 
+	const oneShiftedList = <T>(array: T[], withFirst: T): [T, T][] =>
+		array.map((value, i) => [value, i === 0 ? withFirst : array[i - 1]])
+
 	const previouslyFocused = focusedItemId !== null ? getNavigableElementById(focusedItemId) : null
 
 	const previouslyFocusedAncestors = previouslyFocused ? getNavigableAncestors(previouslyFocused) : []
@@ -898,8 +896,8 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 			(el) => !newlyFocusedAncestors.find((c) => c.navEl.id === el.navEl.id),
 		)
 
-		for (const ancestor of unfocusedAncestors) {
-			runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'unfocus'))
+		for (const [ancestor, ancestorChild] of oneShiftedList(unfocusedAncestors, previouslyFocused)) {
+			runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'unfocus', ancestorChild.navEl))
 		}
 	}
 
@@ -911,8 +909,10 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 		(el) => !previouslyFocusedAncestors.find((c) => c.navEl.id === el.navEl.id),
 	)
 
-	for (const ancestor of focusedAncestors) {
-		runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'focus'))
+	const newlyFocused: ConcreteNavigable<NavigableElement> = { navEl, domEl }
+
+	for (const [ancestor, ancestorChild] of oneShiftedList(focusedAncestors, newlyFocused)) {
+		runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'focus', ancestorChild.navEl))
 	}
 
 	focusedItemId = navEl.id
@@ -1028,7 +1028,7 @@ export function triggerNavigableEvent<
 
 	if (customHandler) {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		const ret = customHandler(navEl as any, ...(params as any))
+		const ret = customHandler(navEl as any, ...(params as any as [any, any]))
 
 		if (ret === undefined) {
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>

@@ -8,10 +8,10 @@ export type NavigableItemProps = {
 
   display?: CSSProperties['display'],
 
-  onPress?: (item: NavigableItem) => void,
-  onLongPress?: (item: NavigableItem) => void,
   onFocus?: (item: NavigableItem) => void,
   onUnfocus?: (item: NavigableItem) => void,
+  onPress?: (item: NavigableItem) => void,
+  onLongPress?: (item: NavigableItem) => void,
   onDirectionKeyPress?: (key: NavigationDirection, item: NavigableItem) => void,
   onLeftKey?: (item: NavigableItem) => void,
   onRightKey?: (item: NavigableItem) => void,
@@ -23,7 +23,7 @@ export type NavigableItemProps = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, encodeNavigableElement, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 

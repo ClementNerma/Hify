@@ -7,8 +7,8 @@ export type NavigableRowProps = {
 
     display?: CSSProperties['display'],
 
-    onFocus?: (row: NavigableRow) => void,
-    onUnfocus?: (row: NavigableRow) => void,
+    onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void,
+    onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void,
     onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, row: NavigableRow) => void,
     onEnter?: (from: NavigationDirection, row: NavigableRow) => void,
     onLeftKey?: (row: NavigableRow) => void,
@@ -56,14 +56,14 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>
         return { type: 'native' }
     },
 
-    focus(row) {
+    focus(row, focusedChild) {
         focused.value = true
-        props.onFocus?.(row)
+        props.onFocus?.(row, focusedChild)
     },
 
-    unfocus(row) {
+    unfocus(row, unfocusedChild) {
         focused.value = false
-        props.onUnfocus?.(row)
+        props.onUnfocus?.(row, unfocusedChild)
     },
 }))
 

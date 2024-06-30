@@ -82,3 +82,21 @@ export function swapInArray<T>(array: T[], index: number, newIndex: number): T[]
 
 	return newArray
 }
+
+export function noParallel<F extends (...args: Args) => Promise<unknown>, Args extends unknown[]>(
+	value: F,
+): (...args: Args) => Promise<void> {
+	let isRunning = false
+
+	return async (...args) => {
+		if (!isRunning) {
+			isRunning = true
+
+			try {
+				value(...args)
+			} finally {
+				isRunning = false
+			}
+		}
+	}
+}

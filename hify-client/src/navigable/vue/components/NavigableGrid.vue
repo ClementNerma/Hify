@@ -5,8 +5,8 @@ type NavigableGrid = { id: string, type: 'grid', columns: number }
 export type NavigableGridProps = {
     interceptDirectionKeys?: NavigationDirection[]
 
-    onFocus?: (grid: NavigableGrid) => void,
-    onUnfocus?: (grid: NavigableGrid) => void,
+    onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void,
+    onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void,
     onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void,
     onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void,
     onLeftKey?: (grid: NavigableGrid) => void,
@@ -55,14 +55,14 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>
         return { type: 'native' }
     },
 
-    focus(grid) {
+    focus(grid, focusedChild) {
         focused.value = true
-        props.onFocus?.(grid)
+        props.onFocus?.(grid, focusedChild)
     },
 
-    unfocus(grid) {
+    unfocus(grid, unfocusedChild) {
         focused.value = false
-        props.onUnfocus?.(grid)
+        props.onUnfocus?.(grid, unfocusedChild)
     },
 }))
 

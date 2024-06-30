@@ -7,8 +7,8 @@ export type NavigableListProps = {
 
     display?: CSSProperties['display'],
 
-    onFocus?: (list: NavigableList) => void,
-    onUnfocus?: (list: NavigableList) => void,
+    onFocus?: (grid: NavigableList, focusedChild: NavigableElement) => void,
+    onUnfocus?: (grid: NavigableList, unfocusedChild: NavigableElement) => void,
     onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, list: NavigableList) => void,
     onEnter?: (from: NavigationDirection, list: NavigableList) => void,
     onLeftKey?: (list: NavigableList) => void,
@@ -56,14 +56,14 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
         return { type: 'native' }
     },
 
-    focus(list) {
+    focus(list, focusedChild) {
         focused.value = true
-        props.onFocus?.(list)
+        props.onFocus?.(list, focusedChild)
     },
 
-    unfocus(list) {
+    unfocus(list, unfocusedChild) {
         focused.value = false
-        props.onUnfocus?.(list)
+        props.onUnfocus?.(list, unfocusedChild)
     },
 }))
 
