@@ -22,8 +22,6 @@ const setDistractionFree = setupDistractionFreeListener({
 })
 
 function onKeyPress(dir: NavigationDirection | null): boolean {
-  console.log({ dir })
-
   const dfMode = distractionFreeMode.value
 
   if (!dfMode && dir === NavigationDirection.Back) {

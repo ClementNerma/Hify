@@ -56,9 +56,13 @@ export function setupDistractionFreeListener({
 	let destroyed = false
 
 	handleInput((key) => {
-		if (!destroyed && _distractionFreeMode.value && !dontWakeUpForKeys?.includes(key)) {
-			resetDistractionFreeMode()
-			return InputHandlingResult.Intercepted
+		if (!destroyed && !dontWakeUpForKeys?.includes(key)) {
+			if (_distractionFreeMode.value) {
+				resetDistractionFreeMode()
+				return InputHandlingResult.Intercepted
+			}
+
+			restartDistractionFreeTimeout()
 		}
 
 		return InputHandlingResult.Propagate
