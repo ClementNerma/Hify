@@ -791,6 +791,12 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 		}
 	}
 
+	const interception = triggerNavigableEvent(focusedNavEl, 'interceptKeyPress', key, longPress)
+
+	if (handleNavigationResult(interception)) {
+		return
+	}
+
 	for (const [ancestor, focusedChild] of _oneShiftedList(getNavigableAncestors(focusedItem), focusedItem)) {
 		const interception = triggerNavigableEvent(ancestor.navEl, 'interceptKeyPress', key, longPress, focusedChild.navEl)
 

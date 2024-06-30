@@ -32,21 +32,25 @@ const list = computed<NavigableList>(() => ({
     type: 'list',
 }))
 
-const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>>(() => ({
-    navigate(list, currentChild, key) {
-        props.onNavigate?.(key, currentChild, list)
+function handleDirectionKeyPress(dir: NavigationDirection, list: NavigableList): void {
+    if (dir === NavigationDirection.Up) {
+        props.onUpKey?.(list)
+    } else if (dir === NavigationDirection.Left) {
+        props.onLeftKey?.(list)
+    } else if (dir === NavigationDirection.Right) {
+        props.onRightKey?.(list)
+    } else if (dir === NavigationDirection.Down) {
+        props.onDownKey?.(list)
+    } else if (dir === NavigationDirection.Back) {
+        props.onBackKey?.(list)
+    }
+}
 
-        if (key === NavigationDirection.Up) {
-            props.onUpKey?.(list)
-        } else if (key === NavigationDirection.Left) {
-            props.onLeftKey?.(list)
-        } else if (key === NavigationDirection.Right) {
-            props.onRightKey?.(list)
-        } else if (key === NavigationDirection.Down) {
-            props.onDownKey?.(list)
-        } else if (key === NavigationDirection.Back) {
-            props.onBackKey?.(list)
-        }
+const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>>(() => ({
+    navigate(list, currentChild, dir) {
+        props.onNavigate?.(dir, currentChild, list)
+
+        handleDirectionKeyPress(dir, list)
 
         return { type: 'native' }
     },
@@ -56,8 +60,14 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
         return { type: 'native' }
     },
 
-    interceptKeyPress(navEl, key, longPress, currentlyFocusedChild) {
-        return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, navEl) ? { type: 'trap' } : { type: 'native' }
+    interceptKeyPress(list, key, longPress, currentlyFocusedChild) {
+        const dir = longPress ? null : translateNavigationKey(key)
+
+        if (dir) {
+            handleDirectionKeyPress(dir, list)
+        }
+
+        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, list) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(list, focusedChild) {

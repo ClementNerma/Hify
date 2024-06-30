@@ -36,6 +36,20 @@ const item = computed<NavigableItem>(() => ({
   hasFocusPriority: props.hasFocusPriority
 }))
 
+function handleDirectionKeyPress(dir: NavigationDirection, item: NavigableItem): void {
+  if (dir === NavigationDirection.Up) {
+    props.onUpKey?.(item)
+  } else if (dir === NavigationDirection.Left) {
+    props.onLeftKey?.(item)
+  } else if (dir === NavigationDirection.Right) {
+    props.onRightKey?.(item)
+  } else if (dir === NavigationDirection.Down) {
+    props.onDownKey?.(item)
+  } else if (dir === NavigationDirection.Back) {
+    props.onBackKey?.(item)
+  }
+}
+
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>>(() => ({
   press(item) {
     if (!props.disabled) {
@@ -50,21 +64,13 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
   },
 
   interceptKeyPress(item, key, longPress) {
-    const direction = !longPress && translateNavigationKey(key)
+    const dir = longPress ? null : translateNavigationKey(key)
 
-    if (direction === NavigationDirection.Left) {
-      props.onLeftKey?.(item)
-    } else if (direction === NavigationDirection.Right) {
-      props.onLeftKey?.(item)
-    } else if (direction === NavigationDirection.Up) {
-      props.onLeftKey?.(item)
-    } else if (direction === NavigationDirection.Down) {
-      props.onLeftKey?.(item)
-    } else if (direction === NavigationDirection.Back) {
-      props.onLeftKey?.(item)
+    if (dir) {
+      handleDirectionKeyPress(dir, item)
     }
 
-    return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, item) ? { type: 'trap' } : { type: 'native' }
+    return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, item) ? { type: 'trap' } : { type: 'native' }
   },
 
 
