@@ -3,10 +3,11 @@
 type NavigableItem = { id: string, type: 'item', hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
-  disabled?: boolean
-  interceptDirectionKeys?: NavigationDirection[]
-
   display?: CSSProperties['display'],
+
+  disabled?: boolean
+
+  interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, item: NavigableItem) => boolean
 
   onFocus?: (item: NavigableItem) => void,
   onUnfocus?: (item: NavigableItem) => void,
@@ -23,7 +24,7 @@ export type NavigableItemProps = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 
@@ -48,27 +49,24 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
     }
   },
 
-  directionKeyPress(item, key) {
-    if (props.disabled) {
-      return { type: 'native' }
-    }
+  interceptKeyPress(item, key, longPress) {
+    const direction = !longPress && translateNavigationKey(key)
 
-    props.onDirectionKeyPress?.(key, item)
-
-    if (key === NavigationDirection.Up) {
-      props.onUpKey?.(item)
-    } else if (key === NavigationDirection.Left) {
+    if (direction === NavigationDirection.Left) {
       props.onLeftKey?.(item)
-    } else if (key === NavigationDirection.Right) {
-      props.onRightKey?.(item)
-    } else if (key === NavigationDirection.Down) {
-      props.onDownKey?.(item)
-    } else if (key === NavigationDirection.Back) {
-      props.onBackKey?.(item)
+    } else if (direction === NavigationDirection.Right) {
+      props.onLeftKey?.(item)
+    } else if (direction === NavigationDirection.Up) {
+      props.onLeftKey?.(item)
+    } else if (direction === NavigationDirection.Down) {
+      props.onLeftKey?.(item)
+    } else if (direction === NavigationDirection.Back) {
+      props.onLeftKey?.(item)
     }
 
-    return props.interceptDirectionKeys?.includes(key) ? { type: 'trap' } : { type: 'native' }
+    return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, item) ? { type: 'trap' } : { type: 'native' }
   },
+
 
   focus(item) {
     focused.value = true

@@ -3,9 +3,9 @@
 type NavigableRow = { id: string, type: 'row' }
 
 export type NavigableRowProps = {
-    interceptDirectionKeys?: NavigationDirection[]
-
     display?: CSSProperties['display'],
+
+    interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, row: NavigableRow) => boolean
 
     onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void,
     onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void,
@@ -21,7 +21,7 @@ export type NavigableRowProps = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableRowProps>()
 
@@ -48,12 +48,16 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>
             props.onBackKey?.(row)
         }
 
-        return props.interceptDirectionKeys?.includes(key) ? { type: 'trap' } : { type: 'native' }
+        return { type: 'native' }
     },
 
     enterFrom(row, from) {
         props.onEnter?.(from, row)
         return { type: 'native' }
+    },
+
+    interceptKeyPress(navEl, key, longPress, currentlyFocusedChild) {
+        return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, navEl) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(row, focusedChild) {

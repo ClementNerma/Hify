@@ -3,7 +3,7 @@
 type NavigableGrid = { id: string, type: 'grid', columns: number }
 
 export type NavigableGridProps = {
-    interceptDirectionKeys?: NavigationDirection[]
+    interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, grid: NavigableGrid) => boolean
 
     onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void,
     onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void,
@@ -19,7 +19,7 @@ export type NavigableGridProps = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableGridProps>()
 
@@ -32,27 +32,31 @@ const grid = computed<NavigableGrid>(() => ({
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>>(() => ({
-    navigate(grid, currentChild, key) {
-        props.onNavigate?.(key, currentChild, grid)
+    navigate(grid, currentChild, dir) {
+        props.onNavigate?.(dir, currentChild, grid)
 
-        if (key === NavigationDirection.Up) {
+        if (dir === NavigationDirection.Up) {
             props.onUpKey?.(grid)
-        } else if (key === NavigationDirection.Left) {
+        } else if (dir === NavigationDirection.Left) {
             props.onLeftKey?.(grid)
-        } else if (key === NavigationDirection.Right) {
+        } else if (dir === NavigationDirection.Right) {
             props.onRightKey?.(grid)
-        } else if (key === NavigationDirection.Down) {
+        } else if (dir === NavigationDirection.Down) {
             props.onDownKey?.(grid)
-        } else if (key === NavigationDirection.Back) {
+        } else if (dir === NavigationDirection.Back) {
             props.onBackKey?.(grid)
         }
 
-        return props.interceptDirectionKeys?.includes(key) ? { type: 'trap' } : { type: 'native' }
+        return { type: 'native' }
     },
 
     enterFrom(grid, from) {
         props.onEnter?.(from, grid)
         return { type: 'native' }
+    },
+
+    interceptKeyPress(navEl, key, longPress, currentlyFocusedChild) {
+        return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, navEl) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(grid, focusedChild) {

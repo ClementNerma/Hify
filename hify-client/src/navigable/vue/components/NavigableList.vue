@@ -3,12 +3,12 @@
 type NavigableList = { id: string, type: 'list' }
 
 export type NavigableListProps = {
-    interceptDirectionKeys?: NavigationDirection[]
-
     display?: CSSProperties['display'],
 
-    onFocus?: (grid: NavigableList, focusedChild: NavigableElement) => void,
-    onUnfocus?: (grid: NavigableList, unfocusedChild: NavigableElement) => void,
+    interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, list: NavigableList) => boolean
+
+    onFocus?: (list: NavigableList, focusedChild: NavigableElement) => void,
+    onUnfocus?: (list: NavigableList, unfocusedChild: NavigableElement) => void,
     onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, list: NavigableList) => void,
     onEnter?: (from: NavigationDirection, list: NavigableList) => void,
     onLeftKey?: (list: NavigableList) => void,
@@ -21,7 +21,7 @@ export type NavigableListProps = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableListProps>()
 
@@ -48,12 +48,16 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
             props.onBackKey?.(list)
         }
 
-        return props.interceptDirectionKeys?.includes(key) ? { type: 'trap' } : { type: 'native' }
+        return { type: 'native' }
     },
 
     enterFrom(list, from) {
         props.onEnter?.(from, list)
         return { type: 'native' }
+    },
+
+    interceptKeyPress(navEl, key, longPress, currentlyFocusedChild) {
+        return props.interceptKeyPress?.(longPress ? null : translateNavigationKey(key), key, longPress, navEl) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(list, focusedChild) {

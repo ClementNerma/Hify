@@ -11,7 +11,7 @@ import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue';
 import Emoji from '@/components/atoms/Emoji.vue';
 import { getAlbumArtUrl } from '@/global/constants';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import { InputHandlingResult, NavigationDirection } from '@/navigable';
+import { NavigationDirection, } from '@/navigable';
 
 const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 
@@ -21,20 +21,22 @@ const setDistractionFree = setupDistractionFreeListener({
   dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape'],
 })
 
-function onKeyPress(key: NavigationDirection): InputHandlingResult {
+function onKeyPress(dir: NavigationDirection | null): boolean {
+  console.log({ dir })
+
   const dfMode = distractionFreeMode.value
 
-  if (!dfMode && key === NavigationDirection.Back) {
+  if (!dfMode && dir === NavigationDirection.Back) {
     setDistractionFree(true)
-    return InputHandlingResult.Intercepted
+    return true
   }
 
   if (dfMode) {
     setDistractionFree(false)
-    return InputHandlingResult.Intercepted
+    return true
   }
 
-  return InputHandlingResult.Propagate
+  return false
 }
 
 const newTrackDisplay = ref<{ timeout: number; track: AudioTrackFragment } | null>(null)
@@ -73,7 +75,7 @@ watch(currentTrack, track => {
     :src="getAlbumArtUrl(currentTrack.metadata.tags.album)" />
 
   <DistractionFreeTogglable>
-    <NavigableList @navigate="onKeyPress">
+    <NavigableList :intercept-key-press="onKeyPress">
       <NowPlayingBottomPanel />
     </NavigableList>
   </DistractionFreeTogglable>

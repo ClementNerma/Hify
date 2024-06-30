@@ -38,29 +38,7 @@ export function setupNavigable(options: SetupNavigableOptions) {
 
 	watchLongPressForKeys(['Enter'])
 
-	handleInput((key, longPress) => {
-		if (key === 'Enter') {
-			handleDOMEvent({ type: longPress ? 'longPress' : 'press' })
-			return InputHandlingResult.Intercepted
-		}
-
-		const keys: Record<string, NavigationDirection> = {
-			ArrowUp: NavigationDirection.Up,
-			ArrowDown: NavigationDirection.Down,
-			ArrowLeft: NavigationDirection.Left,
-			ArrowRight: NavigationDirection.Right,
-			Escape: NavigationDirection.Back,
-			Home: NavigationDirection.Beginning,
-			End: NavigationDirection.End,
-		}
-
-		if (Object.prototype.hasOwnProperty.call(keys, key)) {
-			handleDOMEvent({ type: 'directionKeyPress', to: keys[key] })
-			return InputHandlingResult.Intercepted
-		}
-
-		return InputHandlingResult.Propagate
-	})
+	handleInput(handleKeyPress)
 
 	if (options.inputHandler) {
 		options.inputHandler(handleKeyDownEvent, handleKeyUpEvent)
@@ -147,7 +125,7 @@ export function watchLongPressForKeys(keys: string[]): void {
 	}
 }
 
-export type InputHandler = (key: string, long: boolean) => InputHandlingResult
+export type InputHandler = (key: string, long: boolean) => InputHandlingResult | void
 
 const inputHandlers: InputHandler[] = []
 
@@ -155,15 +133,8 @@ function dispatchKeyInput(key: string, longPress: boolean): InputHandlingResult 
 	for (const handler of inputHandlers) {
 		const result = handler(key, longPress)
 
-		switch (result) {
-			case InputHandlingResult.Intercepted:
-				return InputHandlingResult.Intercepted
-
-			case InputHandlingResult.Propagate:
-				break
-
-			default:
-				assertNever(result)
+		if (result === InputHandlingResult.Intercepted) {
+			return result
 		}
 	}
 
@@ -178,11 +149,6 @@ export enum InputHandlingResult {
 	Intercepted = 'INTERCEPTED',
 	Propagate = 'PROPAGATE',
 }
-
-export type NavigableInteractionDOMEvent =
-	| { type: 'press' }
-	| { type: 'longPress' }
-	| { type: 'directionKeyPress'; to: NavigationDirection }
 
 export enum NavigationDirection {
 	Up = 'UP',
@@ -260,16 +226,15 @@ const ELEMENTS_CREATOR = {
 	}
 }
 
-// TODO: add an option for native fallback in custom event handlers
 export type NavigationResult = { type: 'focusItem'; item: NavigableItem } | { type: 'propagate' } | { type: 'trap' }
 export type NavigationNativeFallbackResult = { type: 'native' }
 
 export type NavigableItemInteractionHandlers = {
-	focus(navEl: NavigableItem): void
-	unfocus(navEl: NavigableItem): void
+	focus(item: NavigableItem): void
+	unfocus(item: NavigableItem): void
 	press(item: NavigableItem): void
 	longPress(item: NavigableItem): void
-	directionKeyPress(item: NavigableItem, key: NavigationDirection): NavigationResult
+	interceptKeyPress(item: NavigableItem, key: string, longPress: boolean): NavigationResult
 }
 
 export type NavigableContainerInteractionHandlers<T extends NavigableContainerType> = {
@@ -281,6 +246,12 @@ export type NavigableContainerInteractionHandlers<T extends NavigableContainerTy
 		direction: NavigationDirection,
 	): NavigationResult
 	enterFrom(navEl: NavigableElementByType<T>, from: NavigationDirection): NavigationResult
+	interceptKeyPress(
+		navEl: NavigableElementByType<T>,
+		key: string,
+		longPress: boolean,
+		currentlyFocusedChild: NavigableElement,
+	): NavigationResult
 }
 
 type _NavigableElementInteractionHandlers<T extends NavigableElementType> = T extends NavigableContainerType
@@ -342,7 +313,7 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 	item: {
 		press: (_) => {},
 		longPress: (_) => {},
-		directionKeyPress: (_) => ({ type: 'propagate' }),
+		interceptKeyPress: (_) => ({ type: 'propagate' }),
 		focus: (_) => {},
 		unfocus: (_) => {},
 	},
@@ -394,6 +365,8 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 			return navigateToFirstDescendantIn(from === NavigationDirection.Down ? children.reverse() : children, from, true)
 		},
 
+		interceptKeyPress: () => ({ type: 'propagate' }),
+
 		focus: () => {},
 		unfocus: () => {},
 	})),
@@ -444,6 +417,8 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 
 			return navigateToFirstDescendantIn(from === NavigationDirection.Right ? children.reverse() : children, from, true)
 		},
+
+		interceptKeyPress: () => ({ type: 'propagate' }),
 
 		focus: () => {},
 		unfocus: () => {},
@@ -565,14 +540,17 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 				}
 			},
 
+			interceptKeyPress: () => ({ type: 'propagate' }),
+
 			focus: () => {},
 			unfocus: () => {},
 		}
 	}),
 
 	customContainer: {
-		navigate: () => ({ type: 'trap' }),
-		enterFrom: () => ({ type: 'trap' }),
+		navigate: () => ({ type: 'propagate' }),
+		enterFrom: () => ({ type: 'propagate' }),
+		interceptKeyPress: () => ({ type: 'propagate' }),
 		focus: () => {},
 		unfocus: () => {},
 	},
@@ -737,13 +715,39 @@ export function isNavigableContainer(
 	return el.navEl.type !== 'item'
 }
 
-function handleDOMEvent(evt: NavigableInteractionDOMEvent): void {
+export function translateNavigationKey(key: string): NavigationDirection | null {
+	const keys: Record<string, NavigationDirection> = {
+		ArrowUp: NavigationDirection.Up,
+		ArrowDown: NavigationDirection.Down,
+		ArrowLeft: NavigationDirection.Left,
+		ArrowRight: NavigationDirection.Right,
+		Escape: NavigationDirection.Back,
+		Home: NavigationDirection.Beginning,
+		End: NavigationDirection.End,
+	}
+
+	return Object.prototype.hasOwnProperty.call(keys, key) ? keys[key] : null
+}
+
+export function handleKeyPress(key: string, longPress: boolean): void {
 	if (isHandlingInteraction) {
 		logFatal('[DATA RACE] Got a DOM event to handle while already handling one')
 	}
 
 	isHandlingInteraction = true
 
+	try {
+		__handleKeyPress(key, longPress)
+	} finally {
+		isHandlingInteraction = false
+	}
+}
+
+function _oneShiftedList<T>(array: T[], withFirst: T): [T, T][] {
+	return array.map((value, i) => [value, i === 0 ? withFirst : array[i - 1]])
+}
+
+function __handleKeyPress(key: string, longPress: boolean): void {
 	if (focusedItemId === null) {
 		const firstItem = findFirstFocusableItem()
 
@@ -751,7 +755,6 @@ function handleDOMEvent(evt: NavigableInteractionDOMEvent): void {
 			requestFocusOnItem(firstItem)
 		}
 
-		isHandlingInteraction = false
 		return
 	}
 
@@ -760,82 +763,81 @@ function handleDOMEvent(evt: NavigableInteractionDOMEvent): void {
 		// TODO: fallback to another element in this case?
 		logFatal(`Focused element with ID "${focusedItemId}" was not found`)
 
-	if (!isNavigableItem(focusedItem)) {
-		logFatal(
-			`Internal error: currently focused navigable is not an item but a "${focusedItem.navEl.type}" (ID: "${focusedItem.navEl.id}")`,
-		)
+	const { navEl: focusedNavEl } = focusedItem
+
+	if (focusedNavEl.type !== 'item') {
+		logFatal('Retrieved focused item is not an item but a container!')
 	}
 
-	function tryRun<T>(handler: () => T): T {
-		try {
-			return handler()
-		} finally {
-			isHandlingInteraction = false
-		}
-	}
-
-	let runAtEnd: (() => NavigationResult | void) | null = null
-
-	switch (evt.type) {
-		case 'press': {
-			runAtEnd = () => triggerNavigableEvent(focusedItem.navEl, 'press')
-			break
-		}
-
-		case 'longPress': {
-			runAtEnd = () => triggerNavigableEvent(focusedItem.navEl, 'longPress')
-			break
-		}
-
-		case 'directionKeyPress': {
-			const result = tryRun(() => triggerNavigableEvent(focusedItem.navEl, 'directionKeyPress', evt.to))
-
-			if (result.type === 'focusItem') {
+	function handleNavigationResult(result: NavigationResult): boolean {
+		switch (result.type) {
+			case 'focusItem':
 				requestFocusOnItem(result.item)
-				break
-			}
+				return true
 
-			if (result.type === 'trap') {
-				break
-			}
+			case 'trap':
+				return true
 
-			// trigger navigation in parent
-			let parent = getNavigableParent(focusedItem)
+			case 'propagate':
+				return false
 
-			if (!parent) {
-				logWarn(`Navigable item "${focusedItem.navEl.id}" does not have a parent!`)
-				break
-			}
+			default:
+				assertNever(result)
+		}
+	}
 
-			let current: ConcreteNavigable<NavigableElement> = focusedItem
+	for (const [ancestor, focusedChild] of _oneShiftedList(getNavigableAncestors(focusedItem), focusedItem)) {
+		const interception = triggerNavigableEvent(ancestor.navEl, 'interceptKeyPress', key, longPress, focusedChild.navEl)
 
-			while (parent) {
-				const infos = { parent, current }
-				const result = tryRun(() => triggerNavigableEvent(infos.parent.navEl, 'navigate', infos.current.navEl, evt.to))
+		if (handleNavigationResult(interception)) {
+			return
+		}
+	}
 
-				if (result.type === 'focusItem') {
-					requestFocusOnItem(result.item)
-					break
-				}
+	if (key === 'Enter') {
+		isHandlingInteraction = false
+		triggerNavigableEvent(focusedNavEl, longPress ? 'longPress' : 'press')
+		return
+	}
 
-				if (result.type === 'trap') {
-					break
-				}
+	if (longPress) {
+		return
+	}
 
-				current = parent
-				parent = getNavigableParent(parent)
-			}
+	const direction = translateNavigationKey(key)
 
+	if (!direction) {
+		return
+	}
+
+	// trigger navigation in parent
+	let parent = getNavigableParent(focusedItem)
+
+	if (!parent) {
+		logWarn(`Navigable item "${focusedItem.navEl.id}" does not have a parent!`)
+		return
+	}
+
+	let current: ConcreteNavigable<NavigableElement> = focusedItem
+
+	while (parent) {
+		const infos = { parent, current }
+		const result = triggerNavigableEvent(infos.parent.navEl, 'navigate', infos.current.navEl, direction)
+
+		if (result.type === 'focusItem') {
+			requestFocusOnItem(result.item)
 			break
 		}
 
-		default:
-			assertNever(evt)
+		if (result.type === 'trap') {
+			break
+		}
+
+		current = parent
+		parent = getNavigableParent(parent)
 	}
 
 	isHandlingInteraction = false
-
-	runAtEnd?.()
 }
 
 export function findFirstFocusableItem(): NavigableItem | null {
@@ -872,9 +874,6 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 		getNavigableDOMElementById(navEl.id) ??
 		logFatal(`Internal error: newly-focused item "${navEl.id}" does not have a DOM element`)
 
-	const oneShiftedList = <T>(array: T[], withFirst: T): [T, T][] =>
-		array.map((value, i) => [value, i === 0 ? withFirst : array[i - 1]])
-
 	const previouslyFocused = focusedItemId !== null ? getNavigableElementById(focusedItemId) : null
 
 	const previouslyFocusedAncestors = previouslyFocused ? getNavigableAncestors(previouslyFocused) : []
@@ -889,7 +888,7 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 			(el) => !newlyFocusedAncestors.find((c) => c.navEl.id === el.navEl.id),
 		)
 
-		for (const [ancestor, ancestorChild] of oneShiftedList(unfocusedAncestors, previouslyFocused)) {
+		for (const [ancestor, ancestorChild] of _oneShiftedList(unfocusedAncestors, previouslyFocused)) {
 			runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'unfocus', ancestorChild.navEl))
 		}
 	}
@@ -904,7 +903,7 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 
 	const newlyFocused: ConcreteNavigable<NavigableElement> = { navEl, domEl }
 
-	for (const [ancestor, ancestorChild] of oneShiftedList(focusedAncestors, newlyFocused)) {
+	for (const [ancestor, ancestorChild] of _oneShiftedList(focusedAncestors, newlyFocused)) {
 		runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'focus', ancestorChild.navEl))
 	}
 
@@ -1023,7 +1022,7 @@ export function triggerNavigableEvent<
 
 	if (customHandler) {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-		const ret = customHandler(navEl as any, ...(params as any as [any, any]))
+		const ret = customHandler(navEl as any, ...(params as any as [never]))
 
 		if (ret === undefined) {
 			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
