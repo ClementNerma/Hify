@@ -729,7 +729,7 @@ export function translateNavigationKey(key: string): NavigationDirection | null 
 	return Object.prototype.hasOwnProperty.call(keys, key) ? keys[key] : null
 }
 
-export function handleKeyPress(key: string, longPress: boolean): void {
+export function handleKeyPress(key: string, longPress: boolean): InputHandlingResult {
 	if (isHandlingInteraction) {
 		logFatal('[DATA RACE] Got a DOM event to handle while already handling one')
 	}
@@ -737,7 +737,7 @@ export function handleKeyPress(key: string, longPress: boolean): void {
 	isHandlingInteraction = true
 
 	try {
-		__handleKeyPress(key, longPress)
+		return __handleKeyPress(key, longPress)
 	} finally {
 		isHandlingInteraction = false
 	}
@@ -747,7 +747,7 @@ function _oneShiftedList<T>(array: T[], withFirst: T): [T, T][] {
 	return array.map((value, i) => [value, i === 0 ? withFirst : array[i - 1]])
 }
 
-function __handleKeyPress(key: string, longPress: boolean): void {
+function __handleKeyPress(key: string, longPress: boolean): InputHandlingResult {
 	if (focusedItemId === null) {
 		const firstItem = findFirstFocusableItem()
 
@@ -755,7 +755,7 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 			requestFocusOnItem(firstItem)
 		}
 
-		return
+		return InputHandlingResult.Intercepted
 	}
 
 	const focusedItem =
@@ -790,24 +790,19 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 		const interception = triggerNavigableEvent(ancestor.navEl, 'interceptKeyPress', key, longPress, focusedChild.navEl)
 
 		if (handleNavigationResult(interception)) {
-			return
+			return InputHandlingResult.Intercepted
 		}
 	}
 
 	if (key === 'Enter') {
-		isHandlingInteraction = false
 		triggerNavigableEvent(focusedNavEl, longPress ? 'longPress' : 'press')
-		return
-	}
-
-	if (longPress) {
-		return
+		return InputHandlingResult.Intercepted
 	}
 
 	const direction = translateNavigationKey(key)
 
-	if (!direction) {
-		return
+	if (longPress || !direction) {
+		return InputHandlingResult.Propagate
 	}
 
 	// trigger navigation in parent
@@ -815,7 +810,7 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 
 	if (!parent) {
 		logWarn(`Navigable item "${focusedItem.navEl.id}" does not have a parent!`)
-		return
+		return InputHandlingResult.Intercepted
 	}
 
 	let current: ConcreteNavigable<NavigableElement> = focusedItem
@@ -837,7 +832,7 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 		parent = getNavigableParent(parent)
 	}
 
-	isHandlingInteraction = false
+	return InputHandlingResult.Intercepted
 }
 
 export function findFirstFocusableItem(): NavigableItem | null {
