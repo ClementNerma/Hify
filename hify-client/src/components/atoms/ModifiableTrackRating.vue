@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { gqlClient } from '@/global/urql-client'
+import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { NavigationDirection, type InputHandlingResult } from '@/navigable';
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { computed, onBeforeUpdate, onMounted, ref } from 'vue'
 
@@ -30,7 +32,20 @@ function onComponentUpdate() {
 onMounted(onComponentUpdate)
 onBeforeUpdate(onComponentUpdate)
 
-async function update() {
+const modifying = ref(false)
+
+async function onPress() {
+    if (!modifying.value) {
+        modifying.value = true
+        return
+    }
+
+    update().finally(() => {
+        modifying.value = false
+    })
+}
+
+const update = noParallel(async () => {
     const updatingWith = state.value.current
 
     state.value.updating = true
@@ -65,32 +80,53 @@ async function update() {
     // Not ideal but required because re-fetching the whole tracks list
     // would be both complex and inefficient
     props.track.computedRating = updatingWith
-}
+})
 
 function setRatingRelative(rel: number) {
-    state.value.current += rel
+    state.value.current = Math.max(0, Math.min(10, state.value.current + rel))
     state.value.failed = false
 }
 
-function reset() {
+function onUnfocus() {
     state.value.current = state.value.initialRating
 }
 
-const onLeft = computed(() => state.value.current >= 2 ? () => setRatingRelative(-2) : undefined)
-const onRight = computed(() => state.value.current <= 8 ? () => setRatingRelative(+2) : undefined)
+function interceptKeyPress(dir: NavigationDirection | null) {
+    if (!modifying.value) {
+        return false
+    }
 
+    if (dir === NavigationDirection.Left) {
+        setRatingRelative(-2)
+        return true
+    }
+
+    if (dir === NavigationDirection.Right) {
+        setRatingRelative(+2)
+        return true
+    }
+
+    if (dir === NavigationDirection.Back) {
+        state.value.current = state.value.initialRating
+        modifying.value = false
+        return true
+    }
+
+    return false
+}
 </script>
 
 <template>
-    <NavigableItem :on-left :on-right @press="update()" @unfocus="reset">
-        <div
-            :class="state.updating ? ['text-gray', 'opacity-50'] : state.current !== state.initialRating ? ['text-purple-950'] : state.failed ? ['text-red'] : []">
-            <span v-for="value in [2, 4, 6, 8, 10]">
-                <span v-if="state.current !== null && state.current >= value">
-                    &starf;
-                </span>
-                <span v-else>
-                    &star;
+    <NavigableItem :on-press :intercept-key-press :on-unfocus>
+        <div :class="state.updating ? ['text-gray', 'opacity-50'] : state.failed ? ['text-red'] : []">
+            <span :class="modifying ? ['bg-white', 'text-black', 'rounded'] : []">
+                <span v-for="value in [2, 4, 6, 8, 10]">
+                    <span v-if="state.current !== null && state.current >= value">
+                        &starf;
+                    </span>
+                    <span v-else>
+                        &star;
+                    </span>
                 </span>
             </span>
         </div>
