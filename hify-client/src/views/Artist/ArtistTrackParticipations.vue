@@ -8,6 +8,7 @@ import { getAlbumArtUrl } from '@/global/constants';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
+import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
@@ -18,7 +19,7 @@ const { artistId } = defineProps<{ artistId: string }>()
 const TRACKS_PER_LINE = 6
 const LINES_PER_PAGE = 5
 
-async function feedMore() {
+const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
     return
   }
@@ -55,7 +56,7 @@ async function feedMore() {
 
   currentPageInfo.value = data.artist.trackParticipations.pageInfo
   tracks.value.push(...data.artist.trackParticipations.nodes)
-}
+})
 
 const currentPageInfo = ref<NonNullable<ArtistTrackParticipationsQuery['artist']>['trackParticipations']['pageInfo'] | null>(null)
 

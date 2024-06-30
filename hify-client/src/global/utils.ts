@@ -100,3 +100,7 @@ export function noParallel<F extends (...args: Args) => Promise<unknown>, Args e
 		}
 	}
 }
+
+export function isApproachingGridEnd(itemIndex: number, columnsPerRow: number, totalItems: number): boolean {
+	return itemIndex + columnsPerRow * 3 >= totalItems
+}

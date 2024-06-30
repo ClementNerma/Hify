@@ -5,7 +5,7 @@ import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { MIN_GREAT_RATING } from '@/global/constants';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
-import { getRouteParam } from '@/global/utils';
+import { getRouteParam, isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import { MixOrdering, type AlbumFragment, type GenrePageQuery } from '@/graphql/generated/graphql';
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
@@ -16,7 +16,7 @@ const LINES_PER_PAGE = 5
 
 const genreId = getRouteParam('id')
 
-async function feedMore() {
+const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
     return
   }
@@ -56,7 +56,7 @@ async function feedMore() {
   currentPageInfo.value = data.genre.albums.pageInfo
   albums.value.push(...data.genre.albums.nodes)
   genreName.value = data.genre.name
-}
+})
 
 const currentPageInfo = ref<NonNullable<GenrePageQuery['genre']>['albums']['pageInfo'] | null>(null)
 const genreName = ref<string | null>(null)
@@ -80,8 +80,9 @@ onMounted(feedMore)
 
     <h3>List of albums</h3>
 
-    <NavigableGrid :columns="ALBUMS_PER_LINE" :lazy-loader="feedMore">
-      <AlbumCard v-for="album in albums" :key="album.id" :album />
+    <NavigableGrid :columns="ALBUMS_PER_LINE">
+      <AlbumCard v-for="album, i in albums" :key="album.id" :album
+        @focus="isApproachingGridEnd(i, ALBUMS_PER_LINE, albums.length) && feedMore()" />
     </NavigableGrid>
   </template>
 </template>

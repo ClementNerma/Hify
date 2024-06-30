@@ -313,8 +313,6 @@ function navigateToFirstDescendantIn(
 	enteringFrom: NavigationDirection,
 	handleFocusPriority?: boolean,
 ): NavigationResult {
-	// TODO: trigger lazy-loading
-
 	if (handleFocusPriority) {
 		for (const child of children) {
 			if (child.navEl.type === 'item' && child.navEl.hasFocusPriority) {
@@ -490,13 +488,6 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 
 					case NavigationDirection.Down: {
 						const rowIndex = Math.floor(childIndex / grid.columns)
-
-						// Required to trigger lazy loader when either:
-						// * We navigate to the last row from the above one
-						// * We navigate to the last row from below
-						if (rowIndex > rows.length - 3) {
-							// TODO: trigger lazy loading
-						}
 
 						if (rowIndex === rows.length - 1) {
 							return { type: 'propagate' }
@@ -860,10 +851,10 @@ export function findFirstFocusableItem(): NavigableItem | null {
 	return null
 }
 
-let isHandlingRequestFocus = false
+let isHandlingFocusRequest = false
 
 export function requestFocusOnItem(navEl: NavigableItem): void {
-	if (isHandlingRequestFocus) {
+	if (isHandlingFocusRequest) {
 		logFatal('[DATA RACE] Got a request focus while already handling one')
 	}
 
@@ -871,7 +862,7 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 		return
 	}
 
-	isHandlingRequestFocus = true
+	isHandlingFocusRequest = true
 
 	const runHandlers: (() => void)[] = []
 
@@ -917,14 +908,16 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 
 	focusedItemId = navEl.id
 
-	isHandlingRequestFocus = false
-
 	for (const handler of runHandlers) {
 		try {
 			handler()
 		} finally {
 		}
 	}
+
+	domEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+
+	isHandlingFocusRequest = false
 }
 
 export function requestFocusOnElement(navEl: NavigableElement): void {

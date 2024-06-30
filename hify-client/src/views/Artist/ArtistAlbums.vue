@@ -5,6 +5,7 @@ import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
+import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { AlbumFragment, ArtistAlbumsQuery } from '@/graphql/generated/graphql';
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
@@ -15,7 +16,7 @@ const { artistId } = defineProps<{ artistId: string }>()
 const ALBUMS_PER_LINE = 6
 const LINES_PER_PAGE = 5
 
-async function feedMore() {
+const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
     return
   }
@@ -52,7 +53,7 @@ async function feedMore() {
 
   currentPageInfo.value = data.artist.albums.pageInfo
   albums.value.push(...data.artist.albums.nodes)
-}
+})
 
 const currentPageInfo = ref<NonNullable<ArtistAlbumsQuery['artist']>['albums']['pageInfo'] | null>(null)
 
