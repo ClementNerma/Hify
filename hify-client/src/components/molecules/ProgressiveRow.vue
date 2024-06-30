@@ -1,3 +1,10 @@
+<script lang="ts">
+export type ProgressiveRowExposeType = {
+  jumpUnfocusedPosition(newPosition: number): void
+  requestFocus(position: number): void
+}
+</script>
+
 <script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
 import { computed, onUpdated, ref } from 'vue';
 import Run from '../atoms/Run.vue';
@@ -18,10 +25,14 @@ defineSlots<{
   default(props: { item: T, position: number, navigableItem: NavigableElementByType<'item'>, focused: boolean }): unknown
 }>()
 
-defineExpose({
-  jumpUnfocusedPosition(newPosition: number) {
+defineExpose<ProgressiveRowExposeType>({
+  jumpUnfocusedPosition(newPosition) {
     position.value = newPosition
     positionOnUnfocused.value = newPosition
+  },
+
+  requestFocus(position) {
+    requestFocus(position)
   }
 })
 

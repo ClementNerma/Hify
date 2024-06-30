@@ -1,6 +1,5 @@
 <script setup lang="ts">
-// biome-ignore lint/style/useImportType: <explanation>
-import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue';
+import ProgressiveRow, { type ProgressiveRowExposeType } from '@/components/molecules/ProgressiveRow.vue';
 import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue';
 import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue';
 import With from '@/components/atoms/With.vue';
@@ -8,11 +7,11 @@ import Card from '@/components/molecules/Card.vue';
 import { ctxMenuOptions } from '@/global/context-menu-items';
 import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
 import { enableOpacitor } from '@/global/stores/opacitor';
-import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue, type QueuedTrack } from '@/global/stores/play-queue';
+import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';
 import { formatDate } from '@/global/utils';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import router from '@/router';
-import { ref, watch, type ComponentInstance } from 'vue';
+import { ref, watch } from 'vue';
 import { getAlbumArtUrl } from '@/global/constants';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
@@ -31,20 +30,17 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
         isCurrent: readablePlayQueue.value.position === position,
         position,
         totalTracks: readablePlayQueue.value.tracks.length,
+        onQueueEdition: () => queueGalleryRef.value?.requestFocus(position)
       },
     ),
   )
 }
 
-const queueGalleryRef = ref<ComponentInstance<typeof ProgressiveRow<QueuedTrack, 'idInQueue'>> | null>(null)
+const queueGalleryRef = ref<ProgressiveRowExposeType | null>(null)
 
 watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, ([gallery, position]) => {
   if (gallery !== null && position !== null) {
-    // NOTE: The call below causes an error because `ProgressiveRow` is a generic component
-    //       This causes `ComponentInstance<typeof ProgressiveRow>` to evaluate to `never`
-    //       So here, `gallery` is evaluated as a `never` value, although it shouldn't
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    (gallery as any).jumpUnfocusedPosition(position)
+    gallery.jumpUnfocusedPosition(position)
   }
 })
 </script>

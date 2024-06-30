@@ -20,7 +20,7 @@ export type TrackContext =
 	| { context: 'normal' }
 	| { context: 'album' }
 	| { context: 'playlist'; entry: EntryInPlaylist }
-	| { context: 'queue'; isCurrent: boolean; position: number; totalTracks: number }
+	| { context: 'queue'; isCurrent: boolean; position: number; totalTracks: number; onQueueEdition?: () => void }
 
 export type EntryInPlaylist = {
 	playlistId: string
@@ -38,13 +38,14 @@ export const ctxMenuOptions = {
 				break
 
 			case 'queue': {
-				const { isCurrent, position, totalTracks } = ctx
+				const { isCurrent, position, totalTracks, onQueueEdition } = ctx
 
 				if (!isCurrent) {
 					options.push({
 						label: 'Remove from queue',
 						onPress() {
 							removeFromQueue(position)
+							onQueueEdition?.()
 						},
 					})
 				}
@@ -54,6 +55,7 @@ export const ctxMenuOptions = {
 						label: 'Move left',
 						onPress() {
 							moveTrackPositionInQueue(position, position - 1)
+							onQueueEdition?.()
 						},
 					})
 				}
@@ -63,6 +65,7 @@ export const ctxMenuOptions = {
 						label: 'Move right',
 						onPress() {
 							moveTrackPositionInQueue(position, position + 1)
+							onQueueEdition?.()
 						},
 					})
 				}
@@ -71,6 +74,7 @@ export const ctxMenuOptions = {
 					label: 'Play after current track',
 					onPress() {
 						enqueue([track], 'next')
+						onQueueEdition?.()
 					},
 				})
 
