@@ -724,6 +724,7 @@ export function translateNavigationKey(key: string): NavigationDirection | null 
 		ArrowLeft: NavigationDirection.Left,
 		ArrowRight: NavigationDirection.Right,
 		Escape: NavigationDirection.Back,
+		F4: NavigationDirection.Back,
 		Home: NavigationDirection.Beginning,
 		End: NavigationDirection.End,
 	}

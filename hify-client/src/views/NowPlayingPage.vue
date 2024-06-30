@@ -18,7 +18,7 @@ const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 const setDistractionFree = setupDistractionFreeListener({
   delayMillis: 3000,
   darkeningCondition: () => readableAudioPaused.value === false,
-  dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape'],
+  dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape', 'F4'],
 })
 
 function onKeyPress(dir: NavigationDirection | null): boolean {
