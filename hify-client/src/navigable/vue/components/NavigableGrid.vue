@@ -15,6 +15,11 @@ export type NavigableGridProps = {
     onDownKey?: (grid: NavigableGrid) => void
     onBackKey?: (grid: NavigableGrid) => void
 } & Omit<NavigableGrid, 'id' | 'type'>
+
+export type NavigableGridExposeType = {
+    grid: NavigableGrid
+    focused: boolean
+}
 </script>
 
 <script setup lang="ts">

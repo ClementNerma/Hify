@@ -17,6 +17,11 @@ export type NavigableListProps = {
     onDownKey?: (list: NavigableList) => void
     onBackKey?: (list: NavigableList) => void
 } & Omit<NavigableList, 'id' | 'type'>
+
+export type NavigableListExposeType = {
+    list: NavigableList
+    focused: boolean
+}
 </script>
 
 <script setup lang="ts">

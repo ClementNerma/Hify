@@ -7,10 +7,10 @@ export type ProgressiveRowExposeType = {
 
 <script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
 import { computed, onUpdated, ref } from 'vue';
-import Run from '../atoms/Run.vue';
 import { requestFocusById, type NavigableElementByType } from '@/navigable';
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
+import { bindRef } from '@/global/utils';
 
 const props = defineProps<{
   items: T[],
@@ -78,10 +78,10 @@ function requestFocus(position: number) {
 
   disableHandler.value = true
 
-  const navItemId = (itemsById.value as Record<T[K], string>)[itemId]
+  const itemRef = (itemsById.value as Record<T[K], NavigableItemExposeType>)[itemId]
 
   if (itemId) {
-    requestFocusById(navItemId)
+    requestFocusById(itemRef.item.id)
   }
 
   disableHandler.value = false
@@ -92,7 +92,7 @@ function requestFocus(position: number) {
 const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.round((COLUMNS - 1) / 2), 0))
 const visibleTracks = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS))
 
-const itemsById = ref<Partial<Record<T[K], string>>>({})
+const itemsById = ref<Partial<Record<T[K], NavigableItemExposeType>>>({})
 
 const columnSize = computed(() => `${100 / COLUMNS}%`)
 </script>
@@ -103,14 +103,12 @@ const columnSize = computed(() => `${100 / COLUMNS}%`)
       <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]">
         <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->
 
-        <NavigableItem @left-key="onSelect(firstVisibleItemIndex + i - 1, true)"
+        <NavigableItem :ref="bindRef(itemsById as any, (item as any)[idProp])"
+          @left-key="onSelect(firstVisibleItemIndex + i - 1, true)"
           @right-key="onSelect(firstVisibleItemIndex + i + 1, true)" @focus="onSelect(firstVisibleItemIndex + i, false)"
           @press="onItemPress?.(item, firstVisibleItemIndex + i)"
           @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)"
           :has-focus-priority="firstVisibleItemIndex + i === position" v-slot="{ item: navigableItem, focused }">
-
-          <!-- TODO: simple "ref" binding from Item instead? -->
-          <Run @run="(itemsById as any)[(item as any)[idProp]] = navigableItem.id" />
 
           <slot :item :position="firstVisibleItemIndex + i" :navigableItem :focused />
         </NavigableItem>

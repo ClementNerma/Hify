@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Run from '@/components/atoms/Run.vue';
 import AlbumsRow from '@/components/molecules/AlbumsRow.vue';
 import ArtistsRow from '@/components/molecules/ArtistsRow.vue';
 import TracksRow from '@/components/molecules/TracksRow.vue';
@@ -8,8 +7,8 @@ import { gqlClient } from '@/global/urql-client';
 import { getRouteParam } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { SearchPageQuery } from '@/graphql/generated/graphql';
-import { requestFocusOnItem, requestFocusById, type NavigableElementByType } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import { requestFocusOnItem, } from '@/navigable';
+import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
 import { onMounted, ref } from 'vue';
 
 const MAX_RESULTS_PER_CATEGORY = 50
@@ -59,14 +58,14 @@ async function onInput() {
 const query = ref(getRouteParam('query', ''))
 const results = ref<SearchPageQuery['search'] | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
-const navItem = ref<NavigableElementByType<'item'> | null>(null)
+const navItem = ref<NavigableItemExposeType | null>(null)
 
 onMounted(() => {
   if (!navItem.value) {
     logFatal('Nav item reference not initialized yet')
   }
 
-  requestFocusOnItem(navItem.value)
+  requestFocusOnItem(navItem.value.item)
 
   if (query.value) {
     onInput()
@@ -76,10 +75,7 @@ onMounted(() => {
 
 <template>
   <div class="p-2.5 text-center">
-    <NavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" v-slot="{ item }" ref="navItem">
-      <!-- TODO: improve -->
-      <Run @run="navItem = item" />
-
+    <NavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" ref="navItem">
       <input class="w-1/3 p-3 text-lg border-none rounded-lg outline-none" type="text" ref="inputRef" v-model="query"
         @input="onInput" @change="onInput" />
     </NavigableItem>

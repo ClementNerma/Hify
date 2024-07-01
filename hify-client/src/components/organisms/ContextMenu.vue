@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { logFatal } from '@/global/stores/debugger'
 import { onUpdated, ref } from 'vue'
-import Run from '@/components/atoms/Run.vue'
 import { NavigationDirection, getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { contextMenuStore } from '@/global/stores/context-menu';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import NavigableList, { type NavigableListExposeType } from '@/navigable/vue/components/NavigableList.vue';
 
 onUpdated(() => {
   if (!containerRef.value) {
@@ -32,7 +31,7 @@ onUpdated(() => {
 
   prevFocusItemId.value = focusedItemId
 
-  requestFocusOnElement(column)
+  requestFocusOnElement(column.list)
 })
 
 function closeContextMenu() {
@@ -49,7 +48,7 @@ const prevFocusItemId = ref<string | null>(null)
 const ctxTop = ref(-1)
 const ctxLeft = ref(-1)
 
-const listRef = ref<NavigableElementByType<'list'> | null>(null)
+const listRef = ref<NavigableListExposeType | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
 </script>
 
@@ -59,9 +58,7 @@ const containerRef = ref<HTMLDivElement | null>(null)
     <div
       class="fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
       ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
-      <NavigableList trapped v-slot="{ list }">
-        <Run @run="listRef = list" />
-
+      <NavigableList trapped ref="listRef">
         <NavigableItem v-for="option in contextMenuStore.options" :key="option.label"
           @press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
           <div :class="{ 'bg-gray-400': focused }">

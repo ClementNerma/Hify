@@ -17,6 +17,11 @@ export type NavigableRowProps = {
     onDownKey?: (row: NavigableRow) => void
     onBackKey?: (row: NavigableRow) => void
 } & Omit<NavigableRow, 'id' | 'type'>
+
+export type NavigableRowExposeType = {
+    row: NavigableRow
+    focused: boolean
+}
 </script>
 
 <script setup lang="ts">
