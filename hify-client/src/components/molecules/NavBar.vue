@@ -11,26 +11,26 @@ export type TabDropdownItem = Omit<Tab, 'subMenu'>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import router from '@/router'
-import Run from '../atoms/Run.vue'
-import { requestFocusById } from '@/navigable'
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import { requestFocusOnItem } from '@/navigable'
+import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import { showContextMenu } from '@/global/stores/context-menu'
+import { bindRef } from '@/global/utils'
 
-const { tabs } = defineProps<{
+const props = defineProps<{
   tabs: Tab[],
 }>()
 
-onMounted(() =>
+onMounted(() => {
   router.afterEach((to) => {
-    if (typeof to.name === 'string' && Object.prototype.hasOwnProperty.call(linkIdByRouteName.value, to.name)) {
-      requestFocusById(linkIdByRouteName.value[to.name])
+    if (typeof to.name === 'string' && Object.prototype.hasOwnProperty.call(routeLinkByName.value, to.name)) {
+      requestFocusOnItem(routeLinkByName.value[to.name].item)
     } else {
-      // Fallback to first tab if needed
-      requestFocusById(Object.values(linkIdByRouteName.value)[0])
+      // Fallback to first link
+      requestFocusOnItem(Object.values(routeLinkByName.value)[0].item)
     }
   })
-)
+})
 
 function showSubMenu(subMenu: TabDropdownItem[]) {
   showContextMenu(
@@ -41,8 +41,7 @@ function showSubMenu(subMenu: TabDropdownItem[]) {
   )
 }
 
-const linkIdByRouteName = ref<Record<string, string>>({})
-const isFocused = ref(false)
+const routeLinkByName = ref<Record<string, NavigableItemExposeType>>({})
 
 function scrollTop() {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
@@ -50,16 +49,13 @@ function scrollTop() {
 </script>
 
 <template>
-  <NavigableRow @focus="scrollTop(); isFocused = true" @unfocus="isFocused = false">
+  <NavigableRow @focus="scrollTop()" v-slot="{ focused }">
     <div class="flex flex-row items-center justify-center mb-2.5 w-full"
-      :class="isFocused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
-      <NavigableItem v-for="tab in tabs" :key="tab.label" @press="router.push({ name: tab.routeName })"
-        @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
-        :has-focus-priority="router.currentRoute.value.name === tab.routeName" v-slot="{ item }">
-
-        <!-- TODO: simple "ref" binding from Item instead? -->
-        <Run @run="linkIdByRouteName[tab.routeName] = item.id" />
-
+      :class="focused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
+      <NavigableItem v-for="tab in tabs" :key="tab.label" :ref="bindRef(routeLinkByName, tab.routeName)"
+        @press="router.push({ name: tab.routeName })" @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
+        :has-focus-priority="router.currentRoute.value.name === tab.routeName">
+        <!-- TODO: why is a wrapping <div> needed? -->
         <div>
           <div class="px-6">
             {{ tab.label }}

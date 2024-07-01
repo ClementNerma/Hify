@@ -22,8 +22,8 @@ export type NavigableItemProps = {
 } & Omit<NavigableItem, 'id' | 'type'>
 
 export type NavigableItemExposeType = {
-  item: ComputedRef<NavigableItem>,
-  focused: Ref<boolean>
+  item: NavigableItem
+  focused: boolean
 }
 </script>
 
@@ -96,7 +96,7 @@ onBeforeUnmount(() => unregisterNavigableElementHandlers(item.value))
 
 const focused = ref(false)
 
-defineExpose<NavigableItemExposeType>({ item, focused })
+defineExpose({ item, focused })
 
 defineSlots<{
   default(props: { item: NavigableItem, focused: boolean }): unknown

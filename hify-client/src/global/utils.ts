@@ -1,4 +1,5 @@
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import type { VNodeRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { logFatal } from './stores/debugger'
 
@@ -103,4 +104,11 @@ export function noParallel<F extends (...args: Args) => Promise<unknown>, Args e
 
 export function isApproachingGridEnd(itemIndex: number, columnsPerRow: number, totalItems: number): boolean {
 	return itemIndex + columnsPerRow * 3 >= totalItems
+}
+
+export function bindRef<T extends object>(container: T, key: keyof T): VNodeRef {
+	return (value) => {
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		container[key] = value as any
+	}
 }
