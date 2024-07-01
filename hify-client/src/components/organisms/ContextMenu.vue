@@ -7,30 +7,6 @@ import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { contextMenuStore } from '@/global/stores/context-menu';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 
-function getBoundingClientRect(el: Element): DOMRect | null {
-  let rect = el.getBoundingClientRect()
-  const children = Array.from(el.children)
-
-  while (
-    rect.top === 0 &&
-    rect.left === 0 &&
-    rect.right === 0 &&
-    rect.bottom === 0 &&
-    rect.height === 0 &&
-    rect.width === 0
-  ) {
-    const child = children.shift()
-
-    if (!child) {
-      return null
-    }
-
-    rect = child.getBoundingClientRect()
-  }
-
-  return rect
-}
-
 onUpdated(() => {
   if (!containerRef.value) {
     return
@@ -45,7 +21,8 @@ onUpdated(() => {
     return
   }
 
-  const rect = getBoundingClientRect(getNavigableDOMElementById(focusedItemId) ?? logFatal('Could not get DOM element of currently-focused item'))
+  const focusedDomEl = getNavigableDOMElementById(focusedItemId) ?? logFatal('Focused DOM element not found')
+  const rect = focusedDomEl.getBoundingClientRect()
 
   const top = rect ? (rect.top + rect.bottom) / 2 : 0
   const left = rect ? (rect.left + rect.right) / 2 : 0

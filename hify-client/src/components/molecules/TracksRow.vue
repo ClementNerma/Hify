@@ -5,8 +5,9 @@ import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
 import { getAlbumArtUrl } from '@/global/constants'
 import { showContextMenu } from '@/global/stores/context-menu'
+import { onMounted } from 'vue'
 
-defineProps<{ tracks: AudioTrackFragment[] }>() 
+defineProps<{ tracks: AudioTrackFragment[] }>()
 </script>
 
 <template>
