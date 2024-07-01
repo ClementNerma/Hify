@@ -2,7 +2,7 @@
 import { logFatal } from '@/global/stores/debugger'
 import { onUpdated, ref } from 'vue'
 import Run from '@/components/atoms/Run.vue'
-import { getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
+import { NavigationDirection, getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { contextMenuStore } from '@/global/stores/context-menu';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
@@ -54,7 +54,8 @@ const containerRef = ref<HTMLDivElement | null>(null)
 </script>
 
 <template>
-  <NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0" @back-key="closeContextMenu">
+  <NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0"
+    :intercept-key-press="dir => dir === NavigationDirection.Back" @back-key="closeContextMenu">
     <div
       class="fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
       ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
