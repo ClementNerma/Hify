@@ -116,10 +116,12 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         .map(|(k, v)| {
             (
                 k,
-                v.into_iter().map(|album| (album.get_id(), album)).collect(),
+                v.into_iter()
+                    .map(|album| (album.get_id(), album))
+                    .collect::<SortedMap<_, _>>(),
             )
         })
-        .collect();
+        .collect::<HashMap<_, _>>();
 
     let artists_albums = artists_albums
         .into_iter()
@@ -163,6 +165,27 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
             (
                 k,
                 v.into_iter().map(|album| (album.get_id(), album)).collect(),
+            )
+        })
+        .collect();
+
+    let artists_albums_and_participations = artists_infos
+        .keys()
+        .map(|artist_id| {
+            (
+                *artist_id,
+                artists_albums
+                    .get(artist_id)
+                    .unwrap_or(&SortedMap::empty())
+                    .iter()
+                    .chain(
+                        artists_album_participations
+                            .get(artist_id)
+                            .unwrap_or(&SortedMap::empty())
+                            .iter(),
+                    )
+                    .map(|(album_id, album_infos)| (*album_id, album_infos.clone()))
+                    .collect::<SortedMap<_, _>>(),
             )
         })
         .collect();
@@ -258,6 +281,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
         artists_albums,
         artists_album_participations,
+        artists_albums_and_participations,
         artists_tracks,
         artists_track_participations,
 

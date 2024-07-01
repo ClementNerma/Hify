@@ -1,6 +1,6 @@
 use std::{
-    collections::{hash_map::Keys, HashMap},
-    hash::Hash,
+    collections::HashMap,
+    hash::{DefaultHasher, Hash, Hasher},
     slice::{Iter, IterMut},
 };
 
@@ -9,36 +9,44 @@ use serde::{Deserialize, Serialize};
 
 use crate::graphql::Paginable;
 
-/// An immutable ordered map
+/// An immutable ordered map, iteration order is values comparison order
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SortedMap<K: Eq + Hash, V: Ord> {
+    keys: Vec<K>,
     values: Vec<V>,
-    indexes: HashMap<K, usize>,
+    keys_by_hash: HashMap<u64, usize>,
 }
 
 impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
+    pub fn key_hash(key: &K) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        key.hash(&mut hasher);
+        hasher.finish()
+    }
+
     pub fn empty() -> Self {
         Self {
+            keys: vec![],
             values: vec![],
-            indexes: HashMap::new(),
+            keys_by_hash: HashMap::new(),
         }
     }
 
     pub fn contains_key(&self, key: &K) -> bool {
-        self.indexes.contains_key(key)
+        self.keys_by_hash.contains_key(&Self::key_hash(key))
+    }
+
+    pub fn get_key_index(&self, key: &K) -> Option<usize> {
+        self.keys_by_hash.get(&Self::key_hash(key)).copied()
     }
 
     pub fn get<'a>(&'a self, key: &K) -> Option<&'a V> {
-        let index = self.indexes.get(key)?;
-        Some(self.values.get(*index).unwrap())
+        self.get_key_index(key)
+            .map(|index| self.values.get(index).unwrap())
     }
 
-    pub fn get_index(&self, key: &K) -> Option<usize> {
-        self.indexes.get(key).copied()
-    }
-
-    pub fn keys(&self) -> Keys<K, usize> {
-        self.indexes.keys()
+    pub fn keys(&self) -> Iter<K> {
+        self.keys.iter()
     }
 
     pub fn values(&self) -> Iter<V> {
@@ -50,7 +58,7 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
-        self.indexes.keys().map(|key| (key, self.get(key).unwrap()))
+        self.keys().zip(self.values())
     }
 
     pub fn into_values(self) -> Vec<V> {
@@ -58,27 +66,34 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     }
 
     pub fn len(&self) -> usize {
-        self.values.len()
+        self.keys_by_hash.len()
     }
 }
 
 impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for SortedMap<K, V> {
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
-        let mut entries: Vec<_> = iter.into_iter().collect();
-        entries.sort_by(|(_, a), (_, b)| a.cmp(b));
+        let mut from_entries: Vec<_> = iter.into_iter().collect();
+        from_entries.sort_by(|(_, a), (_, b)| a.cmp(b));
 
-        let mut values = Vec::with_capacity(entries.len());
-        let mut indexes = HashMap::with_capacity(entries.len());
+        let mut keys = Vec::with_capacity(from_entries.len());
+        let mut values = Vec::with_capacity(from_entries.len());
+        let mut keys_by_hash = HashMap::with_capacity(from_entries.len());
 
-        for (i, (key, value)) in entries.into_iter().enumerate() {
+        for (i, (key, value)) in from_entries.into_iter().enumerate() {
+            keys_by_hash.insert(Self::key_hash(&key), i);
+            keys.push(key);
             values.push(value);
-            indexes.insert(key, i);
         }
 
-        Self { values, indexes }
+        Self {
+            keys,
+            values,
+            keys_by_hash,
+        }
     }
 }
 
+// TODO: remove reference?
 impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ SortedMap<K, V> {
     type By = K;
     type Item = V;
@@ -88,7 +103,7 @@ impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ S
     }
 
     fn get_index(&self, cursor: &Self::By) -> Option<usize> {
-        SortedMap::get_index(self, cursor)
+        SortedMap::get_key_index(self, cursor)
     }
 
     fn ordered_values(&self) -> &[Self::Item] {

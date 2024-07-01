@@ -39,6 +39,9 @@ pub struct IndexCache {
     /// Albums where the artist is listed in one of the tracks but not in the "album artists" tag
     pub artists_album_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
 
+    /// Combination of "artists_albums" and "artists_album_participations"
+    pub artists_albums_and_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+
     /// Tracks where the artist is listed in
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
 

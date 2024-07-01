@@ -22,7 +22,7 @@ use crate::{
     resources::{ArtistArt, ResourceManager},
 };
 
-use super::{AlbumID, AlbumInfos, ArtistID, ArtistInfos, IndexCache, SortedMap, Track, TrackID};
+use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, SortedMap, Track, TrackID};
 
 static COVER_FILENAMES: &[&str] = &["cover", "folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
@@ -144,10 +144,10 @@ async fn find_album_art(
     Ok(None)
 }
 
-pub fn generate_artists_art(
-    artists: impl ExactSizeIterator<Item = ArtistInfos> + ParallelBridge + Send,
+pub fn generate_artists_art<'a>(
+    artists: impl ExactSizeIterator<Item = &'a ArtistInfos> + ParallelBridge + Send,
     base_dir: &Path,
-    album_arts: HashMap<AlbumID, PathBuf>,
+    album_arts: &HashMap<AlbumID, PathBuf>,
     cache: IndexCache,
     res_manager: ResourceManager,
 ) -> Result<()> {
@@ -160,7 +160,16 @@ pub fn generate_artists_art(
         let res_manager = res_manager.clone();
         let artist_id = artist.get_id();
 
-        match generate_artist_art(artist_id, base_dir, &cache, &album_arts) {
+        match generate_artist_art(
+            base_dir,
+            cache
+                .artists_albums_and_participations
+                .get(&artist_id)
+                .unwrap()
+                .keys()
+                .copied(),
+            album_arts,
+        ) {
             Err(err) => {
                 pb.suspend(|| {
                     error!(
@@ -207,29 +216,12 @@ pub fn generate_artists_art(
 }
 
 fn generate_artist_art(
-    artist_id: ArtistID,
     base_dir: &Path,
-    cache: &IndexCache,
+    albums_and_participations: impl Iterator<Item = AlbumID>,
     album_arts: &HashMap<AlbumID, PathBuf>,
 ) -> Result<Option<Vec<u8>>> {
-    // TODO: improve syntax
-    let empty_map = SortedMap::<AlbumID, AlbumInfos>::empty();
-
-    let albums_id = cache
-        .artists_albums
-        .get(&artist_id)
-        .map(|albums| albums.keys())
-        .unwrap_or_else(|| empty_map.keys())
-        .chain(
-            cache
-                .artists_album_participations
-                .get(&artist_id)
-                .map(|albums| albums.keys())
-                .unwrap_or_else(|| empty_map.keys()),
-        );
-
-    let album_arts = albums_id
-        .filter_map(|album_id| album_arts.get(album_id))
+    let album_arts = albums_and_participations
+        .filter_map(|album_id| album_arts.get(&album_id))
         .map(|relative_path| {
             let path = base_dir.join(relative_path);
 

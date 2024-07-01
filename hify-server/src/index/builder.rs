@@ -47,6 +47,7 @@ pub async fn build_index(
 
             artists_albums: HashMap::new(),
             artists_album_participations: HashMap::new(),
+            artists_albums_and_participations: HashMap::new(),
             artists_tracks: HashMap::new(),
             artists_track_participations: HashMap::new(),
 
@@ -182,41 +183,60 @@ pub async fn build_index(
         .cloned()
         .collect::<Vec<_>>();
 
-    log(
-        started,
-        &format!("Searching for new albums' ({}) arts...", new_albums.len()),
-    );
-
     let mut album_arts = from.album_arts;
 
-    // Cleanup deleted arts
-    album_arts.retain(|album_id, _| cache.albums_infos.contains_key(album_id));
+    if !new_albums.is_empty() {
+        log(
+            started,
+            &format!("Searching for new albums' ({}) arts...", new_albums.len()),
+        );
 
-    // Detect art for new albums
-    let new_albums_arts = find_albums_arts(
-        new_albums.iter().cloned(),
-        &dir,
-        tracks.clone(),
-        cache.clone(),
-    )
-    .await?;
+        // Cleanup deleted arts
+        album_arts.retain(|album_id, _| cache.albums_infos.contains_key(album_id));
 
-    album_arts.extend(new_albums_arts);
+        // Detect art for new albums
+        let new_albums_arts = find_albums_arts(
+            new_albums.iter().cloned(),
+            &dir,
+            tracks.clone(),
+            cache.clone(),
+        )
+        .await?;
 
-    info!(
-        "Generating artists' arts ({})...",
-        cache.artists_infos.len()
-    );
+        album_arts.extend(new_albums_arts);
+    }
 
     // Generate art for artists
-    // TODO: only do this for *NEW* artists *OR* those who don't have the exact same albums
-    generate_artists_art(
-        cache.artists_infos.values().cloned(),
-        &dir,
-        album_arts.clone(),
-        cache.clone(),
-        res_manager.clone(),
-    )?;
+    let artists_new_or_diff_albums = cache
+        .artists_albums_and_participations
+        .iter()
+        .filter(|(artist_id, albums)| {
+            from.cache
+                .artists_albums_and_participations
+                .get(artist_id)
+                .is_none_or(|old_albums| {
+                    // NOTE: we don't check if albums have been removed at the end, as only the first ones are necessary for generation
+                    let mut old_albums = old_albums.keys();
+                    albums.keys().any(|id| old_albums.next() != Some(id))
+                })
+        })
+        .map(|(artist_id, _)| cache.artists_infos.get(artist_id).unwrap())
+        .collect::<Vec<_>>();
+
+    if !artists_new_or_diff_albums.is_empty() {
+        info!(
+            "Generating art for {} artist(s)...",
+            artists_new_or_diff_albums.len(),
+        );
+
+        generate_artists_art(
+            artists_new_or_diff_albums.into_iter(),
+            &dir,
+            &album_arts,
+            cache.clone(),
+            res_manager.clone(),
+        )?;
+    }
 
     log(started, "Index has been generated.");
 
@@ -261,9 +281,9 @@ pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager)
     );
 
     generate_artists_art(
-        index.cache.artists_infos.values().cloned(),
+        index.cache.artists_infos.values(),
         &index.from,
-        index.album_arts.clone(),
+        &index.album_arts,
         index.cache.clone(),
         res_manager.clone(),
     )?;

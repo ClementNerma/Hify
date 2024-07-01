@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 #![forbid(unused_must_use)]
+#![feature(is_none_or)]
 #![warn(unused_crate_dependencies)]
 
 mod check;
