@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{anyhow, bail, Context, Result};
 use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
@@ -7,8 +9,7 @@ use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
 use crate::index::{Rating, TrackDate, TrackTags};
 
 pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
-    // TODO: change to HashMap when StandardTagKey implements Hash
-    let mut standard_tags = vec![];
+    let mut standard_tags = HashMap::new();
 
     for tag in rev.tags() {
         let Tag {
@@ -18,23 +19,19 @@ pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
         } = tag;
 
         if let Some(std_key) = std_key {
-            standard_tags.push((*std_key, value));
+            standard_tags.insert(*std_key, value);
         }
     }
 
     let get_tag_str = |name: StandardTagKey| -> Result<Option<String>> {
-        let value = standard_tags
-            .iter()
-            .find_map(|(key, value)| if *key == name { Some(value) } else { None });
-
-        let value = value
+        standard_tags
+            .get(&name)
             .map(|value| {
                 decode_value_as_string(value)
                     .with_context(|| format!("Failed to decode tag '{name:?}'"))
             })
-            .transpose()?;
-
-        Ok(value.flatten())
+            .transpose()
+            .map(Option::flatten)
     };
 
     let tags = TrackTags {
