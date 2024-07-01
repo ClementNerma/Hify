@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import { UsageStatsDocument } from '@/graphql/generated/graphql';
-import { requestFocusById, type NavigableElementByType } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import { requestFocusById } from '@/navigable';
+import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
 import { useQuery } from '@urql/vue';
-import { computed, onUpdated, ref, watch } from 'vue';
+import { computed, onUpdated, ref } from 'vue';
 
 const { data } = useQuery({
     query: UsageStatsDocument,
@@ -12,14 +12,13 @@ const { data } = useQuery({
 
 const stats = computed(() => data.value?.generateStats)
 
-const itemRef = ref<NavigableElementByType<'item'> | null>(null)
+const itemRef = ref<NavigableItemExposeType | null>(null)
 
-onUpdated(() => itemRef.value && requestFocusById(itemRef.value.id))
+onUpdated(() => itemRef.value && requestFocusById(itemRef.value.item.id))
 </script>
 
 <template>
-    <!-- TODO: implement "unstyled" attribute -->
-    <NavigableItem v-if="stats" ref="itemRef" unstyled>
+    <NavigableItem v-if="stats" ref="itemRef" class="unstyled">
         <table>
             <tr>
                 <td>Total number of tracks</td>

@@ -20,10 +20,15 @@ export type NavigableItemProps = {
   onDownKey?: (item: NavigableItem) => void
   onBackKey?: (item: NavigableItem) => void
 } & Omit<NavigableItem, 'id' | 'type'>
+
+export type NavigableItemExposeType = {
+  item: ComputedRef<NavigableItem>,
+  focused: Ref<boolean>
+}
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, type ComputedRef, type Ref, } from 'vue';
 import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
@@ -91,7 +96,7 @@ onBeforeUnmount(() => unregisterNavigableElementHandlers(item.value))
 
 const focused = ref(false)
 
-defineExpose({ item, focused })
+defineExpose<NavigableItemExposeType>({ item, focused })
 
 defineSlots<{
   default(props: { item: NavigableItem, focused: boolean }): unknown
