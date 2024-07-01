@@ -44,16 +44,17 @@ function showSubMenu(subMenu: TabDropdownItem[]) {
 const linkIdByRouteName = ref<Record<string, string>>({})
 const isFocused = ref(false)
 
-const win = window
+function scrollTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+}
 </script>
 
 <template>
-  <NavigableRow>
+  <NavigableRow @focus="scrollTop(); isFocused = true" @unfocus="isFocused = false">
     <div class="flex flex-row items-center justify-center mb-2.5 w-full"
       :class="isFocused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
       <NavigableItem v-for="tab in tabs" :key="tab.label" @press="router.push({ name: tab.routeName })"
         @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
-        @focus="win.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); isFocused = true" @unfocus="isFocused = false"
         :has-focus-priority="router.currentRoute.value.name === tab.routeName" v-slot="{ item }">
 
         <!-- TODO: simple "ref" binding from Item instead? -->
