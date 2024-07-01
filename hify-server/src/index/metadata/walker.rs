@@ -68,7 +68,10 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
         None => return false,
     };
 
-    if matches!(audio_ext.as_str(), "mpeg" | "mp4" | "alac" | "aiff" | "dsf") {
+    if matches!(
+        audio_ext.as_str(),
+        "mpeg" | "mp4" | "webm" | "alac" | "aiff" | "dsf"
+    ) {
         error!(
             "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
             path.to_string_lossy()
@@ -79,6 +82,6 @@ pub fn is_audio_file(path: impl AsRef<Path>) -> bool {
 
     matches!(
         audio_ext.as_str(),
-        "mp3" | "flac" | "wav" | "aac" | "ogg" | "m4a" | "opus" | "webm"
+        "mp3" | "flac" | "wav" | "aac" | "m4a" | "ogg" | "opus"
     )
 }
