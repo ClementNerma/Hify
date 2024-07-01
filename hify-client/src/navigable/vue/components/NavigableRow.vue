@@ -32,25 +32,9 @@ const row = computed<NavigableRow>(() => ({
     type: 'row',
 }))
 
-function handleDirectionKeyPress(dir: NavigationDirection, row: NavigableRow): void {
-    if (dir === NavigationDirection.Up) {
-        props.onUpKey?.(row)
-    } else if (dir === NavigationDirection.Left) {
-        props.onLeftKey?.(row)
-    } else if (dir === NavigationDirection.Right) {
-        props.onRightKey?.(row)
-    } else if (dir === NavigationDirection.Down) {
-        props.onDownKey?.(row)
-    } else if (dir === NavigationDirection.Back) {
-        props.onBackKey?.(row)
-    }
-}
-
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>(() => ({
     navigate(row, currentChild, dir) {
         props.onNavigate?.(dir, currentChild, row)
-
-        handleDirectionKeyPress(dir, row)
 
         return { type: 'native' }
     },
@@ -63,8 +47,16 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>
     interceptKeyPress(row, key, longPress, currentlyFocusedChild) {
         const dir = longPress ? null : translateNavigationKey(key)
 
-        if (dir) {
-            handleDirectionKeyPress(dir, row)
+        if (dir === NavigationDirection.Up) {
+            props.onUpKey?.(row)
+        } else if (dir === NavigationDirection.Left) {
+            props.onLeftKey?.(row)
+        } else if (dir === NavigationDirection.Right) {
+            props.onRightKey?.(row)
+        } else if (dir === NavigationDirection.Down) {
+            props.onDownKey?.(row)
+        } else if (dir === NavigationDirection.Back) {
+            props.onBackKey?.(row)
         }
 
         return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, row) ? { type: 'trap' } : { type: 'native' }
