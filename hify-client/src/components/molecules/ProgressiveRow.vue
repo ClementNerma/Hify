@@ -2,6 +2,7 @@
 export type ProgressiveRowExposeType = {
   jumpUnfocusedPosition(newPosition: number): void
   requestFocus(position: number): void
+
 }
 </script>
 
@@ -15,6 +16,7 @@ import { bindRef } from '@/global/utils';
 const props = defineProps<{
   items: T[],
   idProp: K,
+  disableScroll?: boolean
   initialPosition?: number,
   onItemPress?: (item: T, newPosition: number) => void
   onItemLongPress?: (item: T, newPosition: number) => void
@@ -98,7 +100,7 @@ const columnSize = computed(() => `${100 / COLUMNS}%`)
 </script>
 
 <template>
-  <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)">
+  <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)" :disable-scroll>
     <div class="flex flex-row py-2 overflow-hidden w-full">
       <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]">
         <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->

@@ -107,7 +107,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
 
       <div class="play-queue-gallery">
         <NavigableList>
-          <ProgressiveRow ref="queueGalleryRef" :items="readablePlayQueue.tracks" idProp="idInQueue"
+          <ProgressiveRow ref="queueGalleryRef" :items="readablePlayQueue.tracks" idProp="idInQueue" disable-scroll
             :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
             @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
             v-slot="{ item: track, position, focused }">
