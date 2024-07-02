@@ -23,6 +23,7 @@ const { data, fetching } = await useQuery({
       }
     }
   `),
+  variables: {}
 })
 
 const genres = computed(() => data.value?.genres)

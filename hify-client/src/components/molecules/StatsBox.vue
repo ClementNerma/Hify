@@ -8,6 +8,7 @@ import { computed, onUpdated, ref } from 'vue';
 
 const { data } = useQuery({
     query: UsageStatsDocument,
+    variables: {}
 })
 
 const stats = computed(() => data.value?.generateStats)
