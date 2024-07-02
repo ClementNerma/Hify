@@ -914,14 +914,14 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 
 	focusedItemId = navEl.id
 
+	scrollToElement(domEl)
+
 	for (const handler of runHandlers) {
 		try {
 			handler()
 		} finally {
 		}
 	}
-
-	scrollToElement(domEl)
 
 	isHandlingFocusRequest = false
 }
