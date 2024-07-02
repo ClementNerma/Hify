@@ -914,7 +914,7 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 
 	focusedItemId = navEl.id
 
-	scrollToElement(domEl)
+	domEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
 
 	for (const handler of runHandlers) {
 		try {
@@ -924,63 +924,6 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 	}
 
 	isHandlingFocusRequest = false
-}
-
-/**
- * Scroll the view so that the provided element is fully visible
- * Always scroll the least possible amount
- * This function improves over Element.scrollIntoView()
- */
-export function scrollToElement(element: Element): void {
-	const winView = {
-		width: window.innerWidth,
-		height: window.innerHeight,
-
-		top: window.scrollY,
-		left: window.scrollX,
-
-		right: window.scrollX + window.innerWidth,
-		bottom: window.scrollY + window.innerHeight,
-	}
-
-	const relativeElRect = element.getBoundingClientRect()
-
-	const elRect = {
-		top: relativeElRect.top + winView.top,
-		left: relativeElRect.left + winView.left,
-		right: relativeElRect.right + winView.left,
-		bottom: relativeElRect.bottom + winView.top,
-		width: relativeElRect.width,
-		height: relativeElRect.height,
-	}
-
-	let scrollToY: number
-
-	if (elRect.bottom > winView.bottom) {
-		// Scroll down
-		scrollToY = Math.max(elRect.top + elRect.height - winView.height + 1, 0)
-	} else if (elRect.top < winView.top) {
-		// Scroll up
-		scrollToY = elRect.top
-	} else {
-		// Don't scroll
-		scrollToY = winView.top
-	}
-
-	let scrollToX: number
-
-	if (elRect.right > winView.right) {
-		// Scroll right
-		scrollToX = Math.max(elRect.left + elRect.width - winView.width + 1, 0)
-	} else if (elRect.left < winView.left) {
-		// Scroll left
-		scrollToX = elRect.left
-	} else {
-		// Don't scroll
-		scrollToX = winView.left
-	}
-
-	window.scrollTo({ behavior: 'smooth', top: scrollToY, left: scrollToX })
 }
 
 export function requestFocusOnElement(navEl: NavigableElement): void {
