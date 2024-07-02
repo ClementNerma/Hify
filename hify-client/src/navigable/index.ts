@@ -109,7 +109,7 @@ function handleKeyUpEvent(e: KeyboardEvent): void {
 	const pending = pendingKeyLongPresses.get(key)
 
 	if (pending === null || pending === undefined) {
-		logFatal('Internal error: timeout of Enter keydown event is not initialized')
+		logFatal(`Internal error: timeout of keydown event for key "${key}" is not initialized`)
 	}
 
 	clearTimeout(pending.timeout)
