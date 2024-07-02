@@ -8,7 +8,16 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
     color: rgb(230, 230, 230);
     overflow: hidden;
+
+    /* These properties are required as simply using "bottom: 0" causes problems due to the hack below */
+    min-height: 100%;
+    margin: 0;
+    padding: 8px;
+
+    /* HACK: Elements disappear when scrolling on WebKit, this fixes it */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    z-index: 1;
 }
