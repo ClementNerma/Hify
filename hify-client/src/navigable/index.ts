@@ -163,13 +163,19 @@ export enum NavigationDirection {
 	DirectFocus = 'DIRECT_FOCUS',
 }
 
-export type NavigableElement = { id: string } & (
-	| { type: 'item'; hasFocusPriority?: boolean }
-	| { type: 'list' }
-	| { type: 'row' }
-	| { type: 'grid'; columns: number }
-	| { type: 'customContainer'; customId?: string }
-)
+export type NavigableCommonElementProps = {
+	id: string
+	disableScroll?: boolean
+}
+
+export type NavigableElement = NavigableCommonElementProps &
+	(
+		| { type: 'item'; hasFocusPriority?: boolean }
+		| { type: 'list' }
+		| { type: 'row' }
+		| { type: 'grid'; columns: number }
+		| { type: 'customContainer'; customId?: string }
+	)
 
 export type NavigableElementType = NavigableElement['type']
 
@@ -208,7 +214,13 @@ const PARAM_PARSERS = {
 		value === 'true' ? true : value === 'false' ? false : new Error(`expected a boolean, got: "${value}"`),
 }
 
-const ELEMENTS_CREATOR = {
+const COMMON_ELEMENTS_PROPS_PARSER = {
+	disableScroll: PARAM_PARSERS.optional(PARAM_PARSERS.bool),
+} satisfies {
+	[ParamName in keyof Omit<NavigableCommonElementProps, 'id'>]: ParamParser<NavigableCommonElementProps[ParamName]>
+}
+
+const ELEMENTS_PARSER = {
 	item: {
 		hasFocusPriority: PARAM_PARSERS.optional(PARAM_PARSERS.bool),
 	},
@@ -222,9 +234,10 @@ const ELEMENTS_CREATOR = {
 	},
 } satisfies {
 	[ElementType in NavigableElementType]: {
-		[ParamName in keyof Omit<NavigableElementByType<ElementType>, 'id' | 'type'>]: ParamParser<
-			NavigableElementByType<ElementType>[ParamName]
-		>
+		[ParamName in Exclude<
+			keyof NavigableElementByType<ElementType>,
+			keyof NavigableCommonElementProps | 'type'
+		>]: ParamParser<NavigableElementByType<ElementType>[ParamName]>
 	}
 }
 
@@ -622,8 +635,8 @@ function getNavigableAncestors(el: ConcreteNavigable<NavigableElement>): Concret
 	return ancestors
 }
 
-export function isValidElementType(type: string): type is keyof typeof ELEMENTS_CREATOR {
-	return Object.prototype.hasOwnProperty.call(ELEMENTS_CREATOR, type)
+export function isValidElementType(type: string): type is keyof typeof ELEMENTS_PARSER {
+	return Object.prototype.hasOwnProperty.call(ELEMENTS_PARSER, type)
 }
 
 function parseNavigableElementData(data: string): NavigableElement {
@@ -648,7 +661,7 @@ function parseNavigableElementData(data: string): NavigableElement {
 		}),
 	)
 
-	const navigableElt: object = parseParams(params, ELEMENTS_CREATOR[type], type)
+	const navigableElt: object = parseParams(params, { ...COMMON_ELEMENTS_PROPS_PARSER, ...ELEMENTS_PARSER[type] }, type)
 
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	return { ...(navigableElt as any), id, type }
@@ -914,7 +927,9 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 
 	focusedItemId = navEl.id
 
-	domEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+	if (![newlyFocused].concat(focusedAncestors).find((el) => el.navEl.disableScroll)) {
+		domEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+	}
 
 	for (const handler of runHandlers) {
 		try {

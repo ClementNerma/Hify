@@ -1,6 +1,6 @@
 <script lang="ts">
 // TODO: required because Vue's compiler is not smart enough yet
-type NavigableRow = { id: string, type: 'row' }
+type NavigableRow = NavigableCommonElementProps & { type: 'row' }
 
 export type NavigableRowProps = {
     display?: CSSProperties['display'],
@@ -26,7 +26,7 @@ export type NavigableRowExposeType = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, type NavigableCommonElementProps, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableRowProps>()
 
@@ -35,6 +35,7 @@ const id = generateNavigableElementId()
 const row = computed<NavigableRow>(() => ({
     id,
     type: 'row',
+    disableScroll: props.disableScroll
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>(() => ({

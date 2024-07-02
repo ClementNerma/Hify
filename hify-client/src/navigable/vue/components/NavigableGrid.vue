@@ -1,6 +1,6 @@
 <script lang="ts">
 // TODO: required because Vue's compiler is not smart enough yet
-type NavigableGrid = { id: string, type: 'grid', columns: number }
+type NavigableGrid = NavigableCommonElementProps & { type: 'grid', columns: number }
 
 export type NavigableGridProps = {
     interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, grid: NavigableGrid) => boolean
@@ -24,7 +24,7 @@ export type NavigableGridExposeType = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableGridProps>()
 
@@ -33,6 +33,7 @@ const id = generateNavigableElementId()
 const grid = computed<NavigableGrid>(() => ({
     id,
     type: 'grid',
+    disableScroll: props.disableScroll,
     columns: props.columns
 }))
 

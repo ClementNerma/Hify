@@ -1,6 +1,6 @@
 <script lang="ts">
 // TODO: required because Vue's compiler is not smart enough yet
-type NavigableList = { id: string, type: 'list' }
+type NavigableList = NavigableCommonElementProps & { type: 'list' }
 
 export type NavigableListProps = {
     display?: CSSProperties['display'],
@@ -26,7 +26,7 @@ export type NavigableListExposeType = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableListProps>()
 
@@ -35,6 +35,7 @@ const id = generateNavigableElementId()
 const list = computed<NavigableList>(() => ({
     id,
     type: 'list',
+    disableScroll: props.disableScroll,
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>>(() => ({

@@ -1,6 +1,6 @@
 <script lang="ts">
 // TODO: required because Vue's compiler is not smart enough yet
-type NavigableItem = { id: string, type: 'item', hasFocusPriority?: boolean }
+type NavigableItem = NavigableCommonElementProps & { type: 'item', hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
   display?: CSSProperties['display'],
@@ -29,7 +29,7 @@ export type NavigableItemExposeType = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, type ComputedRef, type Ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 
@@ -38,7 +38,8 @@ const id = generateNavigableElementId()
 const item = computed<NavigableItem>(() => ({
   id,
   type: 'item',
-  hasFocusPriority: props.hasFocusPriority
+  disableScroll: props.disableScroll,
+  hasFocusPriority: props.hasFocusPriority,
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>>(() => ({
