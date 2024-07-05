@@ -777,8 +777,9 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 	const focusedItem = getNavigableElementById(focusedItemId)
 
 	if (!focusedItem) {
+		const erroneousId = focusedItemId
 		focusedItemId = null
-		logFatal(`Focused element with ID "${focusedItemId}" was not found`)
+		logFatal(`Focused item with ID "${erroneousId}" was not found`)
 	}
 
 	const { navEl: focusedNavEl } = focusedItem
