@@ -50,18 +50,15 @@ function scrollTop() {
 
 <template>
   <NavigableRow @focus="scrollTop()" v-slot="{ focused }">
-    <div class="flex flex-row items-center justify-center mb-2.5 w-full"
+    <div class="flex flex-row items-center justify-center mb-2.5 w-full gap-10"
       :class="focused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
       <NavigableItem v-for="tab in tabs" :key="tab.label" :ref="bindRef(routeLinkByName, tab.routeName)"
         @press="router.push({ name: tab.routeName })" @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
         :has-focus-priority="router.currentRoute.value.name === tab.routeName">
-        <!-- TODO: why is a wrapping <div> needed? -->
-        <div>
-          <div class="px-6">
-            {{ tab.label }}
-            <span class="text-xs" v-if="tab.subMenu">▽</span>
-          </div>
-        </div>
+        <span class="px-6">
+          {{ tab.label }}
+          <span class="text-xs" v-if="tab.subMenu">▽</span>
+        </span>
       </NavigableItem>
     </div>
   </NavigableRow>
