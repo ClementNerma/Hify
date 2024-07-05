@@ -93,6 +93,7 @@ function requestFocus(position: number) {
 
 const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.round((COLUMNS - 1) / 2), 0))
 const visibleTracks = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS))
+const visibleTracksWithPosition = computed(() => visibleTracks.value.map((track, i) => [track, firstVisibleItemIndex.value + i] as const))
 
 const itemsById = ref<Partial<Record<T[K], NavigableItemExposeType>>>({})
 
@@ -102,17 +103,14 @@ const columnSize = computed(() => `${100 / COLUMNS}%`)
 <template>
   <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)" :disable-scroll>
     <div class="flex flex-row py-2 overflow-hidden w-full">
-      <div class="gallery-item" v-for="item, i in visibleTracks" :key="item[idProp as K]">
-        <!-- TODO: const binding newPosition = firstVisibleItemIndex + i -->
-
+      <div class="gallery-item" v-for="[item, newPosition], i in visibleTracksWithPosition" :key="item[idProp as K]">
         <NavigableItem :ref="bindRef(itemsById as any, (item as any)[idProp])"
-          @left-key="onSelect(firstVisibleItemIndex + i - 1, true)"
-          @right-key="onSelect(firstVisibleItemIndex + i + 1, true)" @focus="onSelect(firstVisibleItemIndex + i, false)"
-          @press="onItemPress?.(item, firstVisibleItemIndex + i)"
-          @long-press="onItemLongPress?.(item, firstVisibleItemIndex + i)"
-          :has-focus-priority="firstVisibleItemIndex + i === position" v-slot="{ item: navigableItem, focused }">
+          @left-key="onSelect(newPosition - 1, true)" @right-key="onSelect(newPosition + 1, true)"
+          @focus="onSelect(newPosition, false)" @press="onItemPress?.(item, newPosition)"
+          @long-press="onItemLongPress?.(item, newPosition)" :has-focus-priority="newPosition === position"
+          v-slot="{ item: navigableItem, focused }">
 
-          <slot :item :position="firstVisibleItemIndex + i" :navigableItem :focused />
+          <slot :item :position="newPosition" :navigableItem :focused />
         </NavigableItem>
       </div>
     </div>
