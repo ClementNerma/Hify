@@ -86,24 +86,22 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           <NavigableRow>
             <NavigableItem v-for="artist in album.albumArtists" :key="artist.id"
               @press="router.push({ name: 'artist', params: { id: artist.id } })">
-              <span class="artist">🎤 {{ artist.name }}</span>
+              🎤 {{ artist.name }}
             </NavigableItem>
           </NavigableRow>
 
           <NavigableRow>
             <NavigableItem v-for="genre in album.genres" :key="genre.id"
               @press="router.push({ name: 'genre', params: { id: genre.id } })">
-              <span class="genre">🎵 {{ genre.name }}</span>
+              🎵 {{ genre.name }}
             </NavigableItem>
           </NavigableRow>
 
-          <NavigableItem just-for-style>
-            <div class="length">
-              ⌛ {{ humanReadableDuration(infos.totalDuration) }} /
-              {{ filteredTracks.length }} track{{ filteredTracks.length > 1 ? 's' : '' }}
+          <NavigableItem>
+            ⌛ {{ humanReadableDuration(infos.totalDuration) }} /
+            {{ filteredTracks.length }} track{{ filteredTracks.length > 1 ? 's' : '' }}
 
-              <span v-if="infos.discs.length > 1">/ {{ infos.discs.length }} discs</span>
-            </div>
+            <span v-if="infos.discs.length > 1">/ {{ infos.discs.length }} discs</span>
           </NavigableItem>
 
           <NavigableRow>
