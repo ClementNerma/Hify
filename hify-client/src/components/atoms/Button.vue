@@ -28,3 +28,10 @@ defineExpose({ itemRef })
         </div>
     </NavigableItem>
 </template>
+
+<style scoped>
+div {
+    /* Prevent overflows in buttons */
+    white-space: nowrap;
+}
+</style>
