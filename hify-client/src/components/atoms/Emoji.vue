@@ -1,7 +1,5 @@
-<script setup lang="ts"></script>
-
 <template>
-  <span class="mr-2">
+  <span class="mr-1">
     <slot />
   </span>
 </template>

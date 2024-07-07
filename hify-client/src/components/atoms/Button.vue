@@ -5,7 +5,7 @@ export type ButtonProps = NavigableItemProps & {
 </script>
 
 <script setup lang="ts">
-import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
+import NavigableItem, { type NavigableItemExposeType, type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
 import { type NavigableItem as NavigableItemType } from '@/navigable';
 import { ref } from 'vue';
 
@@ -15,7 +15,7 @@ defineSlots<{
     default(props: { item: NavigableItemType, focused: boolean }): unknown
 }>()
 
-const itemRef = ref<InstanceType<typeof NavigableItem> | null>(null)
+const itemRef = ref<NavigableItemExposeType | null>(null)
 
 defineExpose({ itemRef })
 </script>
