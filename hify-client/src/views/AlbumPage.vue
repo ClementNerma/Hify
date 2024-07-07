@@ -107,9 +107,9 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           </NavigableItem>
 
           <NavigableRow>
-            <Checkbox full-height v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
+            <Checkbox v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
 
-            <Button full-height @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
+            <Button @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
               {
                 label: 'Queue at the end',
                 onPress: () => enqueue(filteredTracks!, 'end'),
@@ -118,7 +118,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
               <Emoji>▶️</Emoji> Play next
             </Button>
 
-            <Button full-height @press="() => {
+            <Button @press="() => {
               playNewQueueFromBeginning(shuffle(filteredTracks!), null)
               router.push({ name: 'now-playing' })
             }">
