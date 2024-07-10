@@ -11,7 +11,7 @@ import Centered from '@/components/atoms/Centered.vue';
 
 const artistId = getRouteParam('id')
 
-const { data, fetching } = useQuery({
+const { data, fetching, error } = useQuery({
   query: graphql(`
     query ArtistPage($artistId: String!) {
       artist(id: $artistId) {
@@ -26,7 +26,7 @@ const { data, fetching } = useQuery({
 </script>
 
 <template>
-  <LoadingIndicator v-if="fetching" />
+  <LoadingIndicator v-if="fetching" :error="error?.message" />
 
   <h2 v-else-if="data && !data.artist">Artist was not found</h2>
 

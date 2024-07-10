@@ -63,7 +63,7 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!currentPageInfo" />
+  <LoadingIndicator v-if="!currentPageInfo" :error="null /* TODO */" />
 
   <h3 v-else-if="albums.length === 0">No album</h3>
 

@@ -66,7 +66,7 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!genreName" />
+  <LoadingIndicator v-if="!genreName" :error="null /* TODO */" />
 
   <template v-else>
     <h2>Genre: {{ genreName }}</h2>

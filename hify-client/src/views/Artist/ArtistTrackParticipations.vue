@@ -66,7 +66,7 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!currentPageInfo" />
+  <LoadingIndicator v-if="!currentPageInfo" :error="null /* TODO */" />
 
   <template v-else-if="tracks.length > 0">
     <Centered>

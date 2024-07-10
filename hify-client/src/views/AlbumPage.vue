@@ -39,7 +39,7 @@ function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
   }
 }
 
-const { data } = useQuery({
+const { data, fetching, error } = useQuery({
   query: graphql(`
     query AlbumPage($albumId: String!) {
       album(id: $albumId) {
@@ -66,7 +66,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
 </script>
 
 <template>
-  <LoadingIndicator v-if="!data" />
+  <LoadingIndicator v-if="fetching" :error="error?.message" />
 
   <div class="mt-2.5 ml-[15%] w-[70%]" v-if="album && filteredTracks && infos">
     <NavigableList>

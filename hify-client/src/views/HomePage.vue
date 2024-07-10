@@ -15,7 +15,7 @@ import router from '@/router';
 import { useQuery } from '@urql/vue';
 import { computed, ref } from 'vue';
 
-const { data, executeQuery } = useQuery({
+const { data, error, executeQuery } = useQuery({
   query: graphql(`
     query HomePage($randomItemsParams: FeedParams!) {
       generateFeed(input: $randomItemsParams) {
@@ -47,7 +47,7 @@ const statsBox = ref(false)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!feed" />
+  <LoadingIndicator v-if="!feed" :error="error?.message" />
 
   <template v-else>
     <Centered>

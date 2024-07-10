@@ -13,7 +13,7 @@ import { computed, } from 'vue';
 
 const GENRES_PER_LINE = 6
 
-const { data, fetching } = await useQuery({
+const { data, fetching, error } = await useQuery({
   query: graphql(`
     query GenresPage {
       genres {
@@ -30,7 +30,7 @@ const genres = computed(() => data.value?.genres)
 </script>
 
 <template>
-  <LoadingIndicator v-if="fetching" />
+  <LoadingIndicator v-if="fetching" :error="error?.message" />
 
   <template v-else-if="genres">
     <h2>List of all genres ({{ genres.length }}) and number of albums:</h2>
