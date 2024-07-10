@@ -22,7 +22,7 @@ defineExpose({ itemRef })
 
 <template>
     <NavigableItem class="p-0 mr-5" v-bind="props" v-slot="{ item, focused }" ref="itemRef">
-        <div class="flex items-center w-fit"
+        <div class="items-center w-fit"
             :class="{ 'border': !borderNone, 'border-solid': !borderNone, 'border-white': !borderNone, 'opacity-50': disabled }">
             <slot :item :focused />
         </div>

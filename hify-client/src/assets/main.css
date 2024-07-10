@@ -19,8 +19,3 @@ body {
     margin: 0;
     padding: 8px;
 }
-
-navigable-item-wrapper {
-    /* Prevent overflows in navigable item wrappers */
-    white-space: nowrap;
-}

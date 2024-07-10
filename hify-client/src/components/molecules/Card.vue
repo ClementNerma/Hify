@@ -45,6 +45,7 @@ const opacity = computed(() => props.opacity ?? 1)
        Unfortunately, it is currently impossible to do this using standard CSS :( */
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 </style>

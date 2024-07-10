@@ -98,7 +98,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
           </div>
 
           <div class="progress-range">
-            <AudioProgressBar :max="currentTrack.metadata.duration" :value="readableAudioProgress ?? 0"
+            <AudioProgressBar class="w-full" :max="currentTrack.metadata.duration" :value="readableAudioProgress ?? 0"
               @press="toggleAudioPlayback"
               @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
           </div>
@@ -157,8 +157,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
   align-self: stretch;
 }
 
-.progress-range,
-.progress-range :global(input) {
+.progress-range {
   width: calc(100% - 5px);
 }
 

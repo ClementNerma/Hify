@@ -20,5 +20,4 @@ defineProps<{
     }" :on-focus>
         <Card :title="track.metadata.tags.title" :art-url="getAlbumArtUrl(track.metadata.tags.album)" />
     </NavigableTrack>
-
 </template>
