@@ -97,6 +97,8 @@ onBeforeUnmount(() => unregisterNavigableElementHandlers(item.value))
 
 const focused = ref(false)
 
+const display = computed(() => props.display ?? 'contents')
+
 defineExpose({ item, focused })
 
 defineSlots<{
