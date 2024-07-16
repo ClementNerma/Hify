@@ -107,7 +107,7 @@ defineSlots<{
 </script>
 
 <template>
-  <navigable-item-wrapper v-bind="navigableElementAttrs(item)">
+  <navigable-item-wrapper v-bind="navigableElementAttrs(item)" :data-nav-transparent="display === 'contents'">
     <slot :item :focused />
   </navigable-item-wrapper>
 </template>
