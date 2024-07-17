@@ -97,12 +97,12 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             </NavigableItem>
           </NavigableRow>
 
-          <NavigableItem>
+          <div>
             ⌛ {{ humanReadableDuration(infos.totalDuration) }} /
             {{ filteredTracks.length }} track{{ filteredTracks.length > 1 ? 's' : '' }}
 
             <span v-if="infos.discs.length > 1">/ {{ infos.discs.length }} discs</span>
-          </NavigableItem>
+          </div>
 
           <NavigableRow>
             <Checkbox v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
