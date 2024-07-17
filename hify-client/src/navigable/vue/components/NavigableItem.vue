@@ -3,8 +3,6 @@
 type NavigableItem = NavigableCommonElementProps & { type: 'item', hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
-  display?: CSSProperties['display'],
-
   disabled?: boolean
 
   interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, item: NavigableItem) => boolean
@@ -97,8 +95,6 @@ onBeforeUnmount(() => unregisterNavigableElementHandlers(item.value))
 
 const focused = ref(false)
 
-const display = computed(() => props.display ?? 'contents')
-
 defineExpose({ item, focused })
 
 defineSlots<{
@@ -107,13 +103,7 @@ defineSlots<{
 </script>
 
 <template>
-  <navigable-item-wrapper v-bind="navigableElementAttrs(item)" :data-nav-transparent="display === 'contents'">
+  <navigable-item-wrapper v-bind="navigableElementAttrs(item)">
     <slot :item :focused />
   </navigable-item-wrapper>
 </template>
-
-<style scoped>
-navigable-item-wrapper {
-  display: v-bind(display);
-}
-</style>

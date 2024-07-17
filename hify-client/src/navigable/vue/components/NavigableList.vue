@@ -3,8 +3,6 @@
 type NavigableList = NavigableCommonElementProps & { type: 'list' }
 
 export type NavigableListProps = {
-    display?: CSSProperties['display'],
-
     interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, list: NavigableList) => boolean
 
     onFocus?: (list: NavigableList, focusedChild: NavigableElement) => void,

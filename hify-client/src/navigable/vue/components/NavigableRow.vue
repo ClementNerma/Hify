@@ -3,8 +3,6 @@
 type NavigableRow = NavigableCommonElementProps & { type: 'row' }
 
 export type NavigableRowProps = {
-    display?: CSSProperties['display'],
-
     interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, row: NavigableRow) => boolean
 
     onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void,
