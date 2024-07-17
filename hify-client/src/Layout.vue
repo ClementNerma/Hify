@@ -105,6 +105,6 @@ handleInput((key, long) => {
 
 <style scoped>
 .background {
-    background: linear-gradient(to bottom, #363636 0%, #080808 33%);
+    background: linear-gradient(to bottom, #363636 0vh, #080808 33vh);
 }
 </style>
