@@ -68,6 +68,8 @@ impl ResourceManager {
         }
     }
 
+    // Currently unused
+    #[expect(dead_code)]
     pub async fn retrieve<R: ManagedResource>(&self, id: R::Id) -> Result<Option<R>> {
         let Some(path) = self.get_path_of::<R>(id) else {
             return Ok(None);
