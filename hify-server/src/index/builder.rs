@@ -17,6 +17,7 @@ use crate::{
 };
 
 use super::{
+    arts::detect_deleted_arts,
     cache::build_index_cache,
     data::{Index, Track},
     metadata,
@@ -183,12 +184,45 @@ pub async fn build_index(
         .cloned()
         .collect::<Vec<_>>();
 
-    let mut album_arts = from.album_arts;
+    let mut album_arts = from
+        .album_arts
+        .into_iter()
+        .filter(|(id, _)| cache.albums_infos.contains_key(id))
+        .collect::<HashMap<_, _>>();
 
-    if !new_albums.is_empty() {
+    log(
+        started,
+        &format!(
+            "Searching for existing albums' ({}) arts...",
+            album_arts.len()
+        ),
+    );
+
+    // TODO: remove deleted albums from this
+    let deleted_arts = detect_deleted_arts(&dir, &album_arts).await?;
+
+    if !deleted_arts.is_empty() {
         log(
             started,
-            &format!("Searching for new albums' ({}) arts...", new_albums.len()),
+            &format!("> Detected {} deleted arts", deleted_arts.len()),
+        );
+    }
+
+    let mut search_for_album_arts = new_albums;
+    search_for_album_arts.extend(
+        deleted_arts
+            .iter()
+            .map(|id| from.cache.albums_infos.get(id).unwrap())
+            .cloned(),
+    );
+
+    if !search_for_album_arts.is_empty() {
+        log(
+            started,
+            &format!(
+                "Searching for {} albums' art...",
+                search_for_album_arts.len()
+            ),
         );
 
         // Cleanup deleted arts
@@ -196,7 +230,7 @@ pub async fn build_index(
 
         // Detect art for new albums
         let new_albums_arts = find_albums_arts(
-            new_albums.iter().cloned(),
+            search_for_album_arts.iter().cloned(),
             &dir,
             tracks.clone(),
             cache.clone(),

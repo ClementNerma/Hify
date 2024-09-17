@@ -15,7 +15,7 @@ use image::{
 };
 use log::{error, warn};
 use rayon::iter::{ParallelBridge, ParallelIterator};
-use tokio::{fs, runtime::Handle, task::JoinSet};
+use tokio::{fs, runtime::Handle, sync::Mutex, task::JoinSet};
 
 use crate::{
     helpers::logging::progress_bar,
@@ -296,4 +296,32 @@ fn generate_artist_art(
         .context("Failed to encode artist's art image")?;
 
     Ok(Some(image_buf))
+}
+
+pub async fn detect_deleted_arts(
+    base_dir: &Path,
+    album_arts: &HashMap<AlbumID, PathBuf>,
+) -> Result<Vec<AlbumID>> {
+    let mut arts_file_checker = JoinSet::new();
+    let deleted_arts = Arc::new(Mutex::new(vec![]));
+
+    for (album_id, path) in album_arts {
+        let album_id = *album_id;
+        let path = path.clone();
+        let deleted_arts = Arc::clone(&deleted_arts);
+        let base_dir = base_dir.to_owned(); // TODO: wrap in an Arc<> instead
+
+        arts_file_checker.spawn(async move {
+            if !fs::try_exists(base_dir.join(path))
+                .await
+                .is_ok_and(|exists| exists)
+            {
+                deleted_arts.lock().await.push(album_id);
+            }
+        });
+    }
+
+    arts_file_checker.join_all().await;
+
+    Ok(Arc::into_inner(deleted_arts).unwrap().into_inner())
 }
