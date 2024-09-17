@@ -51,6 +51,7 @@ class MainActivity: Activity() {
         }.start()
     }
 
+    @Deprecated("still works fine, will change later")
     override fun onBackPressed() {
         val webView = findViewById<CustomWebView>(R.id.customWebView)
         webView.simulateBackButton()

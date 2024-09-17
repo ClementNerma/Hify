@@ -4,15 +4,19 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.current()
+        targetCompatibility JavaVersion.current()
+    }
 
     defaultConfig {
         applicationId "com.clementnerma.hify"
         minSdk 28
-        targetSdk 32
+        targetSdk 35
         versionCode 1
         versionName "1.0"
-
     }
 
     buildTypes {
@@ -21,11 +25,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     namespace 'com.clementnerma.hify'
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.leanback:leanback:1.0.0'
 }
