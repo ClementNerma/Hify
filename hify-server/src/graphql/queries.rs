@@ -17,7 +17,7 @@ use crate::{
 
 use super::{
     pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
-    queries_types::*,
+    queries_on_types::*,
 };
 
 transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);

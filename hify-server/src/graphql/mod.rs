@@ -2,7 +2,7 @@ mod entrypoint;
 mod mutations;
 mod pagination;
 mod queries;
-mod queries_types;
+mod queries_on_types;
 mod state;
 
 use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
