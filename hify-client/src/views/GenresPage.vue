@@ -13,7 +13,7 @@ import { computed, } from 'vue';
 
 const GENRES_PER_LINE = 6
 
-const { data, fetching, error } = await useQuery({
+const { data, fetching, error } = useQuery({
   query: graphql(`
     query GenresPage {
       genres {
