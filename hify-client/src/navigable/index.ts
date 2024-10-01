@@ -1109,7 +1109,7 @@ export function unregisterNavigableElementHandlers<ElementType extends Navigable
 	ELEMENTS_CUSTOM_EVT_HANDLERS.delete(element.id)
 
 	if (focusedItemId === element.id) {
-		logWarn(`Item '${element.id}' has been removed while still being focused`)
+		logWarn(`Navigable item with ID '${element.id}' has been removed while still being focused`)
 		focusedItemId = null
 	}
 }
