@@ -113,7 +113,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
                 onPress: () => enqueue(filteredTracks!, 'end'),
               }
             ])">
-              <Emoji>▶️</Emoji> Play next
+                <Emoji>▶️</Emoji> Play next
             </Button>
 
             <Button @press="() => {
