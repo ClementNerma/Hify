@@ -190,6 +190,22 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         })
         .collect();
 
+    let artists_tracks_and_participations = artists_infos
+        .keys()
+        .map(|artist_id| {
+            let mut all_tracks = match artists_tracks.get(artist_id) {
+                Some(tracks) => tracks.clone(),
+                None => vec![],
+            };
+
+            if let Some(tracks) = artists_track_participations.get(artist_id) {
+                all_tracks.extend(tracks.iter().copied());
+            }
+
+            (*artist_id, all_tracks)
+        })
+        .collect();
+
     debug!("| Building statistics...");
 
     debug!("| > Albums' mean score...");
@@ -282,8 +298,10 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         artists_albums,
         artists_album_participations,
         artists_albums_and_participations,
+
         artists_tracks,
         artists_track_participations,
+        artists_tracks_and_participations,
 
         albums_tracks,
 

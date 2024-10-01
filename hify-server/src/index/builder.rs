@@ -49,8 +49,10 @@ pub async fn build_index(
             artists_albums: HashMap::new(),
             artists_album_participations: HashMap::new(),
             artists_albums_and_participations: HashMap::new(),
+
             artists_tracks: HashMap::new(),
             artists_track_participations: HashMap::new(),
+            artists_tracks_and_participations: HashMap::new(),
 
             artists_mean_score: HashMap::new(),
             album_artists_mean_score: HashMap::new(),

@@ -205,6 +205,25 @@ impl ArtistInfos {
         })
     }
 
+    async fn all_tracks(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
+        let index = graphql_index!(ctx);
+
+        let track_ids = index
+            .cache
+            .artists_tracks_and_participations
+            .get(&self.get_id())
+            .map(Vec::as_slice)
+            .unwrap_or(&[]);
+
+        paginate_mapped_slice(pagination, track_ids, |track| {
+            index.tracks.get(track).unwrap().clone()
+        })
+    }
+
     async fn has_art(&self, ctx: &Context<'_>) -> bool {
         graphql_ctx!(ctx)
             .app_state
