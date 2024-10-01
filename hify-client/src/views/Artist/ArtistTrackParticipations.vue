@@ -73,9 +73,9 @@ onMounted(feedMore)
       <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
     </Centered>
 
-    <table class="mt-2.5 w-3/4 border-collapse whitespace-nowrap">
-      <tbody>
-        <NavigableList>
+    <NavigableList>
+      <table class="mt-2.5 w-3/4 border-collapse whitespace-nowrap">
+        <tbody>
           <tr v-for="track, i in tracks" :key="track.id" class="[&>td]:p-2.5"
             :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
             <td>
@@ -97,9 +97,9 @@ onMounted(feedMore)
             </td>
             <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
           </tr>
-        </NavigableList>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </NavigableList>
 
     <Button v-if="currentPageInfo.hasNextPage" @press="feedMore()">
       Load more
