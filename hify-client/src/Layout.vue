@@ -90,6 +90,7 @@ handleInput((key, long) => {
                     label: 'Albums',
                     routeName: 'albums',
                     subMenu: [
+                        { label: 'Album artists', routeName: 'album-artists' },
                         { label: 'Artists', routeName: 'artists' },
                         { label: 'Genres', routeName: 'genres' }
                     ],
