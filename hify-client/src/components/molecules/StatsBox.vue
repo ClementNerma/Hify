@@ -21,30 +21,32 @@ onUpdated(() => itemRef.value && requestFocusById(itemRef.value.item.id))
 <template>
     <NavigableItem v-if="stats" ref="itemRef" class="unstyled">
         <table>
-            <tr>
-                <td>Total number of tracks</td>
-                <td><strong>{{ stats.tracksCount }}</strong></td>
-            </tr>
-            <tr>
-                <td>Total number of albums</td>
-                <td><strong>{{ stats.albumsCount }}</strong></td>
-            </tr>
-            <tr>
-                <td>Total number of album artists</td>
-                <td><strong>{{ stats.albumArtistsCount }}</strong></td>
-            </tr>
-            <tr>
-                <td>Total number of artists</td>
-                <td><strong>{{ stats.artistsCount }}</strong></td>
-            </tr>
-            <tr>
-                <td>Number of listened tracks</td>
-                <td><strong>{{ stats.totalTracksListened }}</strong></td>
-            </tr>
-            <tr>
-                <td>Total listening duration</td>
-                <td><strong>{{ humanReadableDuration(stats.totalListeningTime) }}</strong></td>
-            </tr>
+            <tbody>
+                <tr>
+                    <td>Total number of tracks</td>
+                    <td><strong>{{ stats.tracksCount }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Total number of albums</td>
+                    <td><strong>{{ stats.albumsCount }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Total number of album artists</td>
+                    <td><strong>{{ stats.albumArtistsCount }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Total number of artists</td>
+                    <td><strong>{{ stats.artistsCount }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Number of listened tracks</td>
+                    <td><strong>{{ stats.totalTracksListened }}</strong></td>
+                </tr>
+                <tr>
+                    <td>Total listening duration</td>
+                    <td><strong>{{ humanReadableDuration(stats.totalListeningTime) }}</strong></td>
+                </tr>
+            </tbody>
         </table>
     </NavigableItem>
 </template>
