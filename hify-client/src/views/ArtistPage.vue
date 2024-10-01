@@ -8,6 +8,9 @@ import { useQuery } from '@urql/vue';
 import ArtistAlbums from './Artist/ArtistAlbums.vue';
 import ArtistTrackParticipations from './Artist/ArtistTrackParticipations.vue';
 import Centered from '@/components/atoms/Centered.vue';
+import Button from '@/components/atoms/Button.vue';
+import router from '@/router';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
 
 const artistId = getRouteParam('id')
 
@@ -34,12 +37,18 @@ const { data, fetching, error } = useQuery({
     <Centered>
       <h2>Artist: {{ data.artist.name }}</h2>
 
-      <MixButton :mix-params="{
-        source: { allTracks: '-' },
-        ordering: MixOrdering.Random,
-        minRating: 8,
-        fromArtists: [artistId],
-      }" />
+      <NavigableRow>
+        <MixButton :mix-params="{
+          source: { allTracks: '-' },
+          ordering: MixOrdering.Random,
+          minRating: 8,
+          fromArtists: [artistId],
+        }" />
+
+        <Button @press="router.push({ name: 'artist-tracks', params: { id: artistId } })">
+          Show all tracks 🎵
+        </Button>
+      </NavigableRow>
     </Centered>
 
     <ArtistAlbums :artist-id />

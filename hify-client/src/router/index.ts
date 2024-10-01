@@ -60,6 +60,11 @@ const router = createRouter({
 			component: () => import('../views/ArtistPage.vue'),
 		},
 		{
+			path: '/artist/:id/tracks',
+			name: 'artist-tracks',
+			component: () => import('../views/ArtistTracksPage.vue'),
+		},
+		{
 			path: '/genre/:id',
 			name: 'genre',
 			component: () => import('../views/GenrePage.vue'),
