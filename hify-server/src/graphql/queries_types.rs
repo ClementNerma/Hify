@@ -22,7 +22,7 @@ pub struct IndexInfos {
     pub fingerprint: String,
     pub albums_count: usize,
     pub artists_count: usize,
-    pub albums_artists_count: usize,
+    pub album_artists_count: usize,
     pub tracks_count: usize,
 }
 

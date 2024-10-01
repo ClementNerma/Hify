@@ -32,7 +32,7 @@ impl QueryRoot {
         IndexInfos {
             fingerprint: index.fingerprint.clone(),
             albums_count: index.cache.albums_infos.len(),
-            albums_artists_count: index.cache.albums_artists_infos.len(),
+            album_artists_count: index.cache.album_artists_infos.len(),
             artists_count: index.cache.artists_infos.len(),
             tracks_count: index.tracks.len(),
         }
@@ -108,7 +108,7 @@ impl QueryRoot {
         )
     }
 
-    async fn albums_artists(
+    async fn album_artists(
         &self,
         ctx: &Context<'_>,
         pagination: PaginationInput,
@@ -116,7 +116,7 @@ impl QueryRoot {
         let index = graphql_index!(ctx);
         paginate(
             pagination,
-            &index.cache.albums_artists_infos,
+            &index.cache.album_artists_infos,
             |artist: &ArtistInfos| artist.get_id(),
         )
     }

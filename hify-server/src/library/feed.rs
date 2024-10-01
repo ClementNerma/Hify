@@ -111,7 +111,7 @@ pub fn generate_feed(
     );
 
     let random_great_artists = get_random_great(
-        &index.cache.albums_artists_mean_score,
+        &index.cache.album_artists_mean_score,
         |artist_id| index.cache.artists_infos.get(&artist_id).unwrap().clone(),
         min_rating,
         max_items,

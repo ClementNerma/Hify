@@ -15,7 +15,7 @@ pub struct LibraryStats {
 pub fn generate_stats(index: &Index, user_data: &UserDataWrapper) -> LibraryStats {
     LibraryStats {
         tracks_count: index.tracks.len(),
-        album_artists_count: index.cache.albums_artists_infos.len(),
+        album_artists_count: index.cache.album_artists_infos.len(),
         albums_count: index.cache.albums_infos.len(),
         artists_count: index.cache.artists_infos.len(),
         total_tracks_listened: user_data.history().entries().len(),

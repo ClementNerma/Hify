@@ -58,13 +58,13 @@ pub struct IndexCache {
     pub artists_mean_score: HashMap<ArtistID, f64>,
 
     /// Mean score of an album artist (= artist who has at least 1 album)
-    pub albums_artists_mean_score: HashMap<ArtistID, f64>,
+    pub album_artists_mean_score: HashMap<ArtistID, f64>,
 
     /// Informations about artists
     pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
 
     /// Informations about album arists
-    pub albums_artists_infos: SortedMap<ArtistID, ArtistInfos>,
+    pub album_artists_infos: SortedMap<ArtistID, ArtistInfos>,
 
     /// Informations about albums
     pub albums_infos: SortedMap<AlbumID, AlbumInfos>,

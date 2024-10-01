@@ -23,7 +23,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
     let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
 
     let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
-    let mut albums_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
+    let mut album_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
 
     let mut genres_infos = HashMap::<GenreID, GenreInfos>::new();
@@ -50,7 +50,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
         let non_album_artists = &track_artists - &album_artists;
 
         for album_artist_infos in &album_artists {
-            albums_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
+            album_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
 
             artists_albums
                 .entry(album_artist_infos.get_id())
@@ -234,7 +234,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
     debug!("| > Album artists' mean score...");
 
-    let albums_artists_mean_score = artists_albums
+    let album_artists_mean_score = artists_albums
         .iter()
         .filter_map(|(artist_id, artist_albums)| {
             let rated_tracks: Vec<_> = artist_albums
@@ -289,10 +289,10 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
 
         albums_mean_score,
         artists_mean_score,
-        albums_artists_mean_score,
+        album_artists_mean_score,
 
         artists_infos: artists_infos.into_iter().collect(),
-        albums_artists_infos: albums_artists_infos.into_iter().collect(),
+        album_artists_infos: album_artists_infos.into_iter().collect(),
         albums_infos: albums_infos.into_iter().collect(),
         genre_infos: genres_infos.into_iter().collect(),
 

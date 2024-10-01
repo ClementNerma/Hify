@@ -53,13 +53,13 @@ pub async fn build_index(
             artists_track_participations: HashMap::new(),
 
             artists_mean_score: HashMap::new(),
-            albums_artists_mean_score: HashMap::new(),
+            album_artists_mean_score: HashMap::new(),
 
             albums_tracks: HashMap::new(),
             albums_mean_score: HashMap::new(),
 
             artists_infos: SortedMap::empty(),
-            albums_artists_infos: SortedMap::empty(),
+            album_artists_infos: SortedMap::empty(),
             albums_infos: SortedMap::empty(),
             genre_infos: SortedMap::empty(),
 

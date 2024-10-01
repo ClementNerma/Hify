@@ -19,7 +19,7 @@ const feedMore = noParallel(async () => {
   const { data, error } = await gqlClient.query(
     graphql(`
       query AlbumArtistsPage($pagination: PaginationInput!) {
-        albumsArtists(pagination: $pagination) {
+        albumArtists(pagination: $pagination) {
           nodes {
             ...Artist
           }
@@ -43,11 +43,11 @@ const feedMore = noParallel(async () => {
     logFatal('Failed to fetch albums list', error)
   }
 
-  currentPageInfo.value = data.albumsArtists.pageInfo
-  artists.value.push(...data.albumsArtists.nodes)
+  currentPageInfo.value = data.albumArtists.pageInfo
+  artists.value.push(...data.albumArtists.nodes)
 })
 
-const currentPageInfo = ref<AlbumArtistsPageQuery['albumsArtists']['pageInfo'] | null>(null)
+const currentPageInfo = ref<AlbumArtistsPageQuery['albumArtists']['pageInfo'] | null>(null)
 
 const artists = ref<ArtistFragment[]>([])
 
