@@ -999,13 +999,15 @@ export type OptionalUndefined<
 >
 
 export function getChildrenOfElement(el: Element, navEl: NavigableElement): ConcreteNavigable<NavigableElement>[] {
-	const descendantsEl = Array.from(el.querySelectorAll(`[${DATA_NAV_ATTR_NAME}]`))
-
-	const childrenEl = descendantsEl.filter((child) =>
-		child.parentElement
-			?.closest(`[${DATA_NAV_ATTR_NAME}]`)
-			?.getAttribute(DATA_NAV_ATTR_NAME)
-			?.startsWith(`${navEl.id};`),
+	const childrenEl = Array.from(
+		el.querySelectorAll(
+			// Select all DOM elements with the navigable attribute
+			// ...which are not descendants of another navigable
+			//    themselves descendants of the parent element we're starting from
+			//
+			// Result: select all direct descendent navigable elements
+			`[${DATA_NAV_ATTR_NAME}]:not([${DATA_NAV_ATTR_NAME}^="${navEl.id};"] [${DATA_NAV_ATTR_NAME}] *)`,
+		),
 	)
 
 	return childrenEl.map((domEl) => ({
