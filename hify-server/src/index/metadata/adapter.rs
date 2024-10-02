@@ -34,6 +34,16 @@ pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
             .map(Option::flatten)
     };
 
+    let get_first_tag_str = |names: &[StandardTagKey]| -> Result<Option<String>> {
+        for name in names {
+            if let Some(value) = get_tag_str(*name)? {
+                return Ok(Some(value));
+            }
+        }
+
+        Ok(None)
+    };
+
     let tags = TrackTags {
         title: get_tag_str(StandardTagKey::TrackTitle)?.context("Track title is missing")?,
         artists: get_tag_str(StandardTagKey::Artist)?
@@ -52,7 +62,7 @@ pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
         track_no: get_tag_str(StandardTagKey::TrackNumber)?
             .map(|value| parse_set_number(&value, "track number"))
             .transpose()?,
-        date: get_tag_str(StandardTagKey::ReleaseDate)?
+        date: get_first_tag_str(&[StandardTagKey::ReleaseDate, StandardTagKey::Date, StandardTagKey::OriginalDate])?
             .map(|date| parse_date(&date))
             .transpose()?,
         genres: get_tag_str(StandardTagKey::Genre)?

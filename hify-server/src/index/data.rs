@@ -235,7 +235,7 @@ pub struct TrackMetadata {
 }
 
 /// List of audio tags
-#[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, SimpleObject, PartialEq, Eq)]
 #[graphql(complex)]
 pub struct TrackTags {
     /// The track's title
@@ -316,7 +316,7 @@ pub enum AudioCodec {
 }
 
 /// The release date of a track
-#[derive(Serialize, Deserialize, Clone, Copy, SimpleObject, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, SimpleObject, PartialEq, Eq)]
 pub struct TrackDate {
     /// The full year
     pub year: u32,
@@ -328,7 +328,7 @@ pub struct TrackDate {
     pub day: Option<u8>,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rating {
     Zero = 0, // Only for compatibility with existing tracks
     One = 1,
