@@ -78,10 +78,10 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
             {{ album.name }}
           </div>
 
-          <!-- TODO: implement attr "just-for-style" -->
-          <NavigableItem v-if="album.year" just-for-style>
+          <!-- Just for the style -->
+          <navigable-item-wrapper v-if="album.year">
             🕒 {{ album.year }}
-          </NavigableItem>
+          </navigable-item-wrapper>
 
           <NavigableRow>
             <NavigableItem v-for="artist in album.albumArtists" :key="artist.id" display="inline"
@@ -113,7 +113,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
                 onPress: () => enqueue(filteredTracks!, 'end'),
               }
             ])">
-                <Emoji>▶️</Emoji> Play next
+              <Emoji>▶️</Emoji> Play next
             </Button>
 
             <Button @press="() => {
