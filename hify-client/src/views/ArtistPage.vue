@@ -39,7 +39,7 @@ const { data, fetching, error } = useQuery({
 
       <NavigableRow>
         <MixButton :mix-params="{
-          source: { allTracks: '-' },
+          source: { allTracks: null },
           ordering: MixOrdering.Random,
           minRating: 8,
           fromArtists: [artistId],

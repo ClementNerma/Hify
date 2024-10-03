@@ -11,6 +11,12 @@ export default {
 			},
 			config: {
 				useTypeImports: true,
+				scalars: {
+					Empty: {
+						input: 'null',
+						output: 'null',
+					},
+				},
 			},
 		},
 	},

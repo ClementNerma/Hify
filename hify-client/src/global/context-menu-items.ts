@@ -7,6 +7,7 @@ import {
 import router from '@/router'
 import { MIN_GREAT_RATING } from './constants'
 import type { ContextMenuOption } from './stores/context-menu'
+import { logFatal } from './stores/debugger'
 import {
 	enqueue,
 	generateAndPlayMix,
@@ -26,6 +27,7 @@ export type EntryInPlaylist = {
 	playlistId: string
 	trackEntry: PlaylistEntryFragment
 	allEntries: PlaylistEntryFragment[]
+	reloadPlaylist: () => void
 }
 
 export const ctxMenuOptions = {
@@ -82,44 +84,49 @@ export const ctxMenuOptions = {
 			}
 
 			case 'playlist': {
-				const { playlistId, trackEntry, allEntries } = ctx.entry
+				const { playlistId, trackEntry, allEntries, reloadPlaylist } = ctx.entry
 				const position = allEntries.findIndex((entry) => entry.id === trackEntry.id)
 
-				// TODO: when modifying, refresh parent components
 				options.push(
 					{
 						label: 'Move up',
 						onPress: () => {
-							gqlClient.mutation(EditPlaylistDocument, {
-								playlistId,
-								action: {
-									move: { entries: [trackEntry.id], putAfter: position === 0 ? null : allEntries[position - 1].id },
-								},
-							})
+							gqlClient
+								.mutation(EditPlaylistDocument, {
+									playlistId,
+									action: {
+										move: { entries: [trackEntry.id], putAfter: position === 0 ? null : allEntries[position - 1].id },
+									},
+								})
+								.then(reloadPlaylist, (err) => logFatal('Failed to move track up in playlist', err))
 						},
 					},
 					{
 						label: 'Move down',
 						onPress: () => {
-							gqlClient.mutation(EditPlaylistDocument, {
-								playlistId,
-								action: {
-									move: { entries: [trackEntry.id], putAfter: allEntries[position].id },
-								},
-							})
+							gqlClient
+								.mutation(EditPlaylistDocument, {
+									playlistId,
+									action: {
+										move: { entries: [trackEntry.id], putAfter: allEntries[position].id },
+									},
+								})
+								.then(reloadPlaylist, (err) => logFatal('Failed to move track down in playlist', err))
 						},
 					},
 					{
 						label: 'Remove from playlist',
 						onPress: () => {
-							gqlClient.mutation(EditPlaylistDocument, {
-								playlistId,
-								action: {
-									remove: {
-										entries: [trackEntry.id],
+							gqlClient
+								.mutation(EditPlaylistDocument, {
+									playlistId,
+									action: {
+										remove: {
+											entries: [trackEntry.id],
+										},
 									},
-								},
-							})
+								})
+								.then(reloadPlaylist, (err) => logFatal('Failed to remove track from playlist', err))
 						},
 					},
 				)
@@ -160,7 +167,7 @@ export const ctxMenuOptions = {
 				label: 'Mix me some magic ✨',
 				onPress: () => {
 					generateAndPlayMix({
-						source: { allTracks: '-' },
+						source: { allTracks: null },
 						ordering: MixOrdering.Random,
 						minRating: MIN_GREAT_RATING,
 						fromArtists: [artistId],

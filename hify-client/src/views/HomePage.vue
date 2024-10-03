@@ -54,7 +54,7 @@ const statsBox = ref(false)
       <h2>Welcome!</h2>
 
       <MixButton :mixParams="{
-        source: { allTracks: '-' },
+        source: { allTracks: null },
         ordering: MixOrdering.Random,
         minRating: MIN_GREAT_RATING,
       }" />
