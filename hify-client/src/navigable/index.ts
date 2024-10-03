@@ -996,6 +996,10 @@ export type OptionalUndefined<
 	}
 >
 
+export function parseConcreteNavigable(domEl: Element): ConcreteNavigable<NavigableElement> {
+	return { domEl, navEl: parseNavigableDataFromElement(domEl) }
+}
+
 export function getChildrenOfElement(el: Element, navEl: NavigableElement): ConcreteNavigable<NavigableElement>[] {
 	const childrenEl = Array.from(
 		el.querySelectorAll(
@@ -1008,10 +1012,7 @@ export function getChildrenOfElement(el: Element, navEl: NavigableElement): Conc
 		),
 	)
 
-	return childrenEl.map((domEl) => ({
-		navEl: parseNavigableDataFromElement(domEl),
-		domEl,
-	}))
+	return childrenEl.map(parseConcreteNavigable)
 }
 
 export function getChildrenOf(navEl: NavigableContainer): ConcreteNavigable<NavigableElement>[] {
