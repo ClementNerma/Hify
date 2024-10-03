@@ -335,7 +335,6 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 
 	list: _structElementEvtHandlers('list', () => ({
 		navigate(listEl, currentChild, direction) {
-			// TODO: be lazy, don't parse each child! It's useless
 			const children = getChildrenOf(listEl)
 
 			const childIndex = children.findIndex(({ navEl }) => navEl.id === currentChild.id)
@@ -388,7 +387,6 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 
 	row: _structElementEvtHandlers('row', () => ({
 		navigate(listEl, currentChild, direction) {
-			// TODO: be lazy, don't parse each child! It's useless
 			const children = getChildrenOf(listEl)
 
 			const childIndex = children.findIndex(({ navEl }) => navEl.id === currentChild.id)
