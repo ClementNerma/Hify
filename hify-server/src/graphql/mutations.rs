@@ -1,6 +1,6 @@
 use async_graphql::{Context, Object, SimpleObject};
 
-use super::{EmptyAnswer, GraphQLContext, EMPTY_ANSWER};
+use super::{EmptyScalar, GraphQLContext};
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
     index::{build_index, Index, Rating, Track, TrackID},
@@ -13,7 +13,7 @@ pub struct MutationRoot;
 #[Object]
 
 impl MutationRoot {
-    async fn update_index(&self, ctx: &Context<'_>) -> Result<EmptyAnswer, String> {
+    async fn update_index(&self, ctx: &Context<'_>) -> Result<EmptyScalar, String> {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
 
         let current = Index::clone(&*ctx.app_state.index.read().await);
@@ -37,7 +37,7 @@ impl MutationRoot {
         // Update the index
         *ctx.app_state.index.write().await = index;
 
-        Ok(EMPTY_ANSWER)
+        Ok(EmptyScalar)
     }
 
     async fn log_listening(
@@ -45,11 +45,11 @@ impl MutationRoot {
         ctx: &Context<'_>,
         track_id: TrackID,
         duration_s: u32,
-    ) -> EmptyAnswer {
+    ) -> EmptyScalar {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .log_listening(OneListening::new_now(track_id, duration_s));
 
-        EMPTY_ANSWER
+        EmptyScalar
     }
 
     async fn set_track_rating(
@@ -57,17 +57,17 @@ impl MutationRoot {
         ctx: &Context<'_>,
         track_id: TrackID,
         rating: Rating,
-    ) -> EmptyAnswer {
+    ) -> EmptyScalar {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .set_track_rating(track_id, Some(rating));
 
-        EMPTY_ANSWER
+        EmptyScalar
     }
 
-    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> EmptyAnswer {
+    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> EmptyScalar {
         graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, None);
 
-        EMPTY_ANSWER
+        EmptyScalar
     }
 
     async fn create_playlist(
@@ -84,20 +84,20 @@ impl MutationRoot {
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
         action: PlaylistEditAction,
-    ) -> Result<EmptyAnswer, &'static str> {
+    ) -> Result<EmptyScalar, &'static str> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .edit_playlist(playlist_id, action)
-            .map(|()| EMPTY_ANSWER)
+            .map(|()| EmptyScalar)
     }
 
     async fn delete_playlist(
         &self,
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
-    ) -> Result<EmptyAnswer, &'static str> {
+    ) -> Result<EmptyScalar, &'static str> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .delete_playlist(playlist_id)
-            .map(|()| EMPTY_ANSWER)
+            .map(|()| EmptyScalar)
     }
 
     async fn generate_mix(

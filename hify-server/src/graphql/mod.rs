@@ -31,10 +31,6 @@ macro_rules! define_scalar_string {
     };
 }
 
-type EmptyAnswer = &'static str;
-
-const EMPTY_ANSWER: EmptyAnswer = "OK";
-
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub struct EmptyScalar;
 
@@ -42,15 +38,12 @@ pub struct EmptyScalar;
 impl ScalarType for EmptyScalar {
     fn parse(value: Value) -> InputValueResult<Self> {
         match value {
-            Value::String(ref string) => match string.as_str() {
-                "-" => Ok(Self),
-                _ => Err(InputValueError::expected_type(value)),
-            },
+            Value::Null => Ok(Self),
             _ => Err(InputValueError::expected_type(value)),
         }
     }
 
     fn to_value(&self) -> Value {
-        Value::String("-".to_owned())
+        Value::Null
     }
 }
