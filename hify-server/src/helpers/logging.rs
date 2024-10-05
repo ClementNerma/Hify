@@ -1,11 +1,9 @@
-use std::{io::IsTerminal, time::Duration};
+use std::{io::IsTerminal, sync::LazyLock, time::Duration};
 
 use indicatif::{ProgressBar, ProgressStyle};
 use log::LevelFilter;
 
-use once_cell::sync::Lazy;
-
-pub static IS_TERMINAL: Lazy<bool> = Lazy::new(|| std::io::stdout().is_terminal());
+pub static IS_TERMINAL: LazyLock<bool> = LazyLock::new(|| std::io::stdout().is_terminal());
 
 pub fn setup_logger(logging_level: LevelFilter, display_timestamps_in_tty: bool) {
     let mut builder = env_logger::builder();

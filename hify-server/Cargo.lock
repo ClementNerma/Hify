@@ -796,7 +796,6 @@ dependencies = [
  "image",
  "indicatif",
  "log",
- "once_cell",
  "pomsky-macro",
  "rand",
  "rayon",

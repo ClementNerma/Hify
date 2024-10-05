@@ -1,7 +1,6 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 use anyhow::{anyhow, bail, Context, Result};
-use once_cell::sync::Lazy;
 use pomsky_macro::pomsky;
 use regex::Regex;
 use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
@@ -192,7 +191,7 @@ fn decode_value_as_string(value: &Value) -> Result<Option<String>> {
     Ok(decoded)
 }
 
-static PARSE_TRACK_OR_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
+static PARSE_TRACK_OR_DISC_NUMBER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(pomsky!(
         Start
             :number([digit]+)
@@ -202,7 +201,7 @@ static PARSE_TRACK_OR_DISC_NUMBER: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-static PARSE_TRACK_YEAR_OR_DATE_1: Lazy<Regex> = Lazy::new(|| {
+static PARSE_TRACK_YEAR_OR_DATE_1: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(pomsky!(
         Start
             :year([digit]{4})
@@ -217,7 +216,7 @@ static PARSE_TRACK_YEAR_OR_DATE_1: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-static PARSE_TRACK_YEAR_OR_DATE_2: Lazy<Regex> = Lazy::new(|| {
+static PARSE_TRACK_YEAR_OR_DATE_2: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(pomsky!(
         Start
             :month([digit]{2})
@@ -231,7 +230,7 @@ static PARSE_TRACK_YEAR_OR_DATE_2: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
+static PARSE_TRACK_YEAR_OR_DATE_3: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(pomsky!(
         Start
             :year([digit]{4})
@@ -240,7 +239,7 @@ static PARSE_TRACK_YEAR_OR_DATE_3: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-// static PARSE_MUSICBEE_WMP_POPM: Lazy<Regex> = Lazy::new(|| {
+// static PARSE_MUSICBEE_WMP_POPM: LazyLock<Regex> = LazyLock::new(|| {
 //     Regex::new(pomsky!(
 //         Start ("MusicBee" | "Windows Media Player 9 Series") " " :score([digit]+) " 0" End
 //     ))
