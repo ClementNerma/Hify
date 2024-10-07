@@ -55,7 +55,7 @@ function scrollTop() {
       <NavigableItem v-for="tab in tabs" :key="tab.label" :ref="bindRef(routeLinkByName, tab.routeName)"
         @press="router.push({ name: tab.routeName })" @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
         :has-focus-priority="router.currentRoute.value.name === tab.routeName">
-        <span class="px-6">
+        <span class="inline-block !px-6 !py-1">
           {{ tab.label }}
           <span class="text-xs" v-if="tab.subMenu">▽</span>
         </span>
