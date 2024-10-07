@@ -13,8 +13,8 @@ const checkboxRef = ref<HTMLInputElement | null>(null)
     <Button v-bind="props" @press="model = !model">
         <span>
             <Emoji>
-                <template v-if="model">🔲</template>
-                <template v-else>☑️</template>
+                <template v-if="model">☑️</template>
+                <template v-else>🔲</template>
             </Emoji>
         </span>
 
