@@ -23,7 +23,7 @@ use crate::{index::Index, userdata::UserDataWrapper};
 pub static GRAPHQL_ENDPOINT: &str = "/graphql";
 
 pub async fn launch(
-    address: &SocketAddr,
+    addr: SocketAddr,
     index: Index,
     user_data: UserDataWrapper,
     res_manager: ResourceManager,
@@ -52,9 +52,9 @@ pub async fn launch(
         .layer(cors)
         .layer(middleware::from_fn(log_errors));
 
-    info!("> Server is being launched on {address}");
+    info!("> Server is being launched on {addr}");
 
-    let listener = TcpListener::bind(address).await?;
+    let listener = TcpListener::bind(addr).await?;
 
     axum::serve(listener, app).await?;
 

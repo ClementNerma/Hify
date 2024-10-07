@@ -208,7 +208,7 @@ async fn inner_main(args: Args) -> Result<()> {
     info!("> Launching server...");
 
     http::launch(
-        &SocketAddr::from((addr, port)),
+        SocketAddr::from((addr, port)),
         index,
         user_data,
         res_manager,

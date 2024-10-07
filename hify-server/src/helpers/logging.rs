@@ -1,23 +1,27 @@
 use std::{io::IsTerminal, sync::LazyLock, time::Duration};
 
+use env_logger::TimestampPrecision;
 use indicatif::{ProgressBar, ProgressStyle};
 use log::LevelFilter;
 
 pub static IS_TERMINAL: LazyLock<bool> = LazyLock::new(|| std::io::stdout().is_terminal());
 
 pub fn setup_logger(logging_level: LevelFilter, display_timestamps_in_tty: bool) {
-    let mut builder = env_logger::builder();
-
-    builder
+    env_logger::builder()
+        // Hide informations from Symphonia
         .filter_module("symphonia", LevelFilter::Error)
+        // Don't display module names
         .format_target(false)
-        .filter_level(logging_level);
-
-    if *IS_TERMINAL && !display_timestamps_in_tty {
-        builder.format_timestamp(None);
-    }
-
-    builder.init();
+        // Hide timestamp if requested to
+        .format_timestamp(if *IS_TERMINAL && !display_timestamps_in_tty {
+            None
+        } else {
+            Some(TimestampPrecision::default())
+        })
+        // Ignore logs with a level inferior to the requested one
+        .filter_level(logging_level)
+        // Initialize the logger
+        .init();
 }
 
 pub fn progress_bar(len: usize) -> ProgressBar {
