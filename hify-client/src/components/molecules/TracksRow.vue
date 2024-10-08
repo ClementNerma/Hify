@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ctxMenuCallbacks, ctxMenuOptions } from '@/global/context-menu-items'
+import { ctxMenuCallbacks, ctxMenuOptions } from '@/global/ctx-menu-content'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'

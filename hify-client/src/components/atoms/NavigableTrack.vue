@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ctxMenuCallbacks, ctxMenuOptions, type TrackContext } from '@/global/context-menu-items';
+import { ctxMenuCallbacks, ctxMenuOptions, type TrackContext } from '@/global/ctx-menu-content';
 import { showContextMenu } from '@/global/stores/context-menu';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import type { NavigableItem as NavigableItemType } from '@/navigable';

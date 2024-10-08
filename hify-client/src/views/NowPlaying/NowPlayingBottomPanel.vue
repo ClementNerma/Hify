@@ -4,7 +4,7 @@ import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue'
 import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue';
 import With from '@/components/atoms/With.vue';
 import Card from '@/components/molecules/Card.vue';
-import { ctxMenuOptions } from '@/global/context-menu-items';
+import { ctxMenuOptions } from '@/global/ctx-menu-content';
 import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
 import { enableOpacitor } from '@/global/stores/opacitor';
 import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';

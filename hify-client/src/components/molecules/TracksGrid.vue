@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EntryInPlaylist } from '@/global/context-menu-items';
+import type { EntryInPlaylist } from '@/global/ctx-menu-content';
 import { GRID_TRACKS_PER_ROW } from '@/global/constants';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import TrackCard from './TrackCard.vue';
