@@ -12,7 +12,8 @@ body {
     overflow: hidden;
 
     /* HACK: Elements disappear when scrolling on WebKit, this fixes it */
-    perspective: 1px;
+    /* Removed for now as it doesn't seem to be required anymore on my system */
+    /* perspective: 1px; */
 
     /* These properties are required as simply using "bottom: 0" causes problems with the hack above */
     min-height: 100%;
