@@ -1,6 +1,6 @@
 use std::{fs::File, path::PathBuf};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, ensure, Context, Result};
 use symphonia::core::{
     codecs::{
         CODEC_TYPE_AAC, CODEC_TYPE_FLAC, CODEC_TYPE_MP3, CODEC_TYPE_NULL, CODEC_TYPE_OPUS,
@@ -72,9 +72,10 @@ pub fn analyze_file(path: PathBuf) -> Result<TrackMetadata> {
         .next()
         .context("No supported audio track found")?;
 
-    if tracks_iter.next().is_some() {
-        bail!("Multiple audio tracks found in file");
-    }
+    ensure!(
+        tracks_iter.next().is_none(),
+        "Multiple audio tracks found in file"
+    );
 
     let codec = match track.codec_params.codec {
         CODEC_TYPE_MP3 => AudioCodec::MP3,

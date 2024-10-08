@@ -14,7 +14,7 @@ mod userdata;
 
 use std::{fs, net::SocketAddr, process::ExitCode};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, ensure, Context, Result};
 use clap::Parser;
 use log::{error, info};
 
@@ -67,9 +67,7 @@ async fn inner_main(args: Args) -> Result<()> {
         display_timestamps_in_tty: _,
     } = args;
 
-    if !music_dir.is_dir() {
-        bail!("Music path is not a directory");
-    }
+    ensure!(music_dir.is_dir(), "Music path is not a directory");
 
     let data_dir = match data_dir {
         Some(data_dir) => data_dir,
@@ -112,9 +110,7 @@ async fn inner_main(args: Args) -> Result<()> {
         }),
     );
 
-    if index_file.is_dir() {
-        bail!("Index file must not be a directory");
-    }
+    ensure!(!index_file.is_dir(), "Index file must not be a directory");
 
     let index = match index_file.is_file() && !rebuild_index {
         true => {

@@ -7,7 +7,7 @@ use std::{
     },
 };
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{anyhow, ensure, Context, Result};
 use image::{
     codecs::webp::WebPEncoder,
     imageops::{resize, FilterType},
@@ -22,7 +22,7 @@ use crate::{
     resources::{ArtistArt, ResourceManager},
 };
 
-use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, ValueOrdMap, Track, TrackID};
+use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, Track, TrackID, ValueOrdMap};
 
 static COVER_FILENAMES: &[&str] = &["cover", "folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
@@ -91,9 +91,7 @@ pub async fn find_albums_arts(
 
     pb.finish();
 
-    if errors > 0 {
-        bail!("Encountered {errors} error(s)");
-    }
+    ensure!(errors == 0, "Encountered {errors} error(s)");
 
     Ok(arts)
 }
@@ -208,9 +206,7 @@ pub fn generate_artists_art<'a>(
 
     let errors = errors.load(Ordering::SeqCst);
 
-    if errors > 0 {
-        bail!("Failed with {errors} error(s)");
-    }
+    ensure!(errors == 0, "Failed with {errors} error(s)");
 
     Ok(())
 }
