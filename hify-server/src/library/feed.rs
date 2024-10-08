@@ -10,7 +10,7 @@ use time::Duration;
 use crate::{
     helpers::time::get_now,
     index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
-    userdata::UserDataWrapper,
+    userdata::UserData,
 };
 
 #[derive(SimpleObject)]
@@ -44,7 +44,7 @@ pub enum PopularityPeriod {
 
 pub fn generate_feed(
     index: &Index,
-    user_data: &UserDataWrapper,
+    user_data: &UserData,
     FeedParams {
         min_rating,
         max_items,
@@ -140,14 +140,14 @@ pub fn generate_feed(
     }
 }
 
-fn get_popular_tracks(user_data: &UserDataWrapper) -> impl Iterator<Item = &TrackID> {
+fn get_popular_tracks(user_data: &UserData) -> impl Iterator<Item = &TrackID> {
     let mut popular_tracks: Vec<_> = user_data.cache().listening_durations().iter().collect();
     popular_tracks.sort_by_key(|(_, count)| u32::MAX - **count);
     popular_tracks.into_iter().map(|(id, _)| id)
 }
 
 fn get_periodically_popular_tracks(
-    user_data: &UserDataWrapper,
+    user_data: &UserData,
     period: PopularityPeriod,
 ) -> impl Iterator<Item = &TrackID> {
     let mut popular_tracks = HashMap::new();

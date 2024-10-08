@@ -1,6 +1,6 @@
-use crate::{index::Index, userdata::UserDataWrapper};
+use crate::{index::Index, userdata::UserData};
 
-pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(), Vec<String>> {
+pub fn check_correctness(index: &Index, user_data: &UserData) -> Result<(), Vec<String>> {
     let mut errors = vec![];
 
     macro_rules! error {

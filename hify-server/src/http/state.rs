@@ -3,22 +3,18 @@ use tokio::sync::RwLock;
 use crate::{
     index::{Index, SearchCache},
     resources::ResourceManager,
-    userdata::UserDataWrapper,
+    userdata::UserData,
 };
 
 pub struct AppState {
     pub index: RwLock<Index>,
-    pub user_data: RwLock<UserDataWrapper>,
+    pub user_data: RwLock<UserData>,
     pub search_cache: RwLock<SearchCache>,
     pub resource_manager: ResourceManager,
 }
 
 impl AppState {
-    pub fn new(
-        index: Index,
-        user_data: UserDataWrapper,
-        resource_manager: ResourceManager,
-    ) -> Self {
+    pub fn new(index: Index, user_data: UserData, resource_manager: ResourceManager) -> Self {
         Self {
             index: RwLock::new(index),
             user_data: RwLock::new(user_data),

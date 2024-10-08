@@ -101,10 +101,10 @@ async fn inner_main(args: Args) -> Result<()> {
         true => {
             helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
         }
-        false => userdata::UserData::with_default_config(),
+        false => userdata::UserDataInner::with_default_config(),
     };
 
-    let mut user_data = userdata::UserDataWrapper::new(
+    let mut user_data = userdata::UserData::new(
         user_data,
         Box::new(move |user_data| {
             // TODO: error handling
