@@ -1,16 +1,20 @@
 use std::{
     collections::HashMap,
     hash::{DefaultHasher, Hash, Hasher},
+    marker::PhantomData,
     slice::{Iter, IterMut},
 };
 
 use async_graphql::{connection::CursorType, OutputType};
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{MapAccess, Visitor},
+    Deserialize, Serialize,
+};
 
 use crate::graphql::Paginable;
 
 /// A key-value dictionary, whose iteration order is based on values' ordering
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 pub struct ValueOrdMap<K: Eq + Hash, V: Ord> {
     keys: Vec<K>,
     values: Vec<V>,
@@ -18,15 +22,12 @@ pub struct ValueOrdMap<K: Eq + Hash, V: Ord> {
 }
 
 impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
-    pub fn new(iter: impl Iterator<Item = (K, V)>) -> Self {
-        let mut from_entries: Vec<_> = iter.into_iter().collect();
-        from_entries.sort_by(|(_, a), (_, b)| a.cmp(b));
+    fn from_sorted(entries: impl ExactSizeIterator<Item = (K, V)>) -> Self {
+        let mut keys = Vec::with_capacity(entries.len());
+        let mut values = Vec::with_capacity(entries.len());
+        let mut keys_by_hash = HashMap::with_capacity(entries.len());
 
-        let mut keys = Vec::with_capacity(from_entries.len());
-        let mut values = Vec::with_capacity(from_entries.len());
-        let mut keys_by_hash = HashMap::with_capacity(from_entries.len());
-
-        for (i, (key, value)) in from_entries.into_iter().enumerate() {
+        for (i, (key, value)) in entries.enumerate() {
             keys_by_hash.insert(Self::hash_key(&key), i);
             keys.push(key);
             values.push(value);
@@ -37,6 +38,11 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
             values,
             keys_by_hash,
         }
+    }
+
+    pub fn from_entries(mut entries: Vec<(K, V)>) -> Self {
+        entries.sort_by(|(_, a), (_, b)| a.cmp(b));
+        Self::from_sorted(entries.into_iter())
     }
 
     pub fn empty() -> Self {
@@ -93,7 +99,7 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
 
 impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for ValueOrdMap<K, V> {
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
-        Self::new(iter.into_iter())
+        Self::from_entries(iter.into_iter().collect())
     }
 }
 
@@ -113,5 +119,57 @@ impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for Value
         &self,
     ) -> impl DoubleEndedIterator<Item = &Self::Item> + ExactSizeIterator<Item = &Self::Item> {
         self.values.iter()
+    }
+}
+
+// Manual serialization allows to serialize this as a simple dictionary-like structure
+// instead of serializing every field from the [`ValueOrdMap`] struct
+impl<K: Eq + Hash + Serialize, V: Ord + Serialize> Serialize for ValueOrdMap<K, V> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.collect_map(self.iter())
+    }
+}
+
+// Manual serialization means we must also use manual deserialization
+impl<'de, K: Eq + Hash + Deserialize<'de>, V: Ord + Deserialize<'de>> Deserialize<'de>
+    for ValueOrdMap<K, V>
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct MapVisitor<K, V> {
+            marker: PhantomData<(K, V)>,
+        }
+
+        impl<'de, K: Eq + Hash + Deserialize<'de>, V: Ord + Deserialize<'de>> Visitor<'de>
+            for MapVisitor<K, V>
+        {
+            type Value = ValueOrdMap<K, V>;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a map")
+            }
+
+            #[inline]
+            fn visit_map<A: MapAccess<'de>>(self, mut access: A) -> Result<Self::Value, A::Error> {
+                let mut entries = vec![];
+
+                while let Some(entry) = access.next_entry::<K, V>()? {
+                    entries.push(entry);
+                }
+
+                Ok(ValueOrdMap::from_entries(entries))
+            }
+        }
+
+        let visitor = MapVisitor {
+            marker: PhantomData,
+        };
+
+        deserializer.deserialize_map(visitor)
     }
 }
