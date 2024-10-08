@@ -98,11 +98,17 @@ impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ S
     type By = K;
     type Item = V;
 
+    fn len(&self) -> usize {
+        self.values.len()
+    }
+
     fn find_pos(&self, cursor: &Self::By) -> Option<usize> {
         SortedMap::get_key_index(self, cursor)
     }
 
-    fn ordered_values(&self) -> &[Self::Item] {
-        &self.values
+    fn iter_ordered(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = &Self::Item> + ExactSizeIterator<Item = &Self::Item> {
+        self.values.iter()
     }
 }

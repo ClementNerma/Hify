@@ -129,16 +129,13 @@ pub fn raw_paginate<
         }
     };
 
-    // Get ordered item values
-    let ordered_items = items.ordered_values();
-
     // Create a Relay value
     let mut connection =
-        Connection::<C, U, _, _, N, E>::new(start_at > 0, start_at + count < ordered_items.len());
+        Connection::<C, U, _, _, N, E>::new(start_at > 0, start_at + count < items.len());
 
     // Compute the paginated results' edges lazily
-    let edges = ordered_items
-        .iter()
+    let edges = items
+        .iter_ordered()
         .skip(start_at)
         .take(count)
         .enumerate()
@@ -158,13 +155,20 @@ pub trait Paginable {
     type By;
     type Item;
 
+    fn len(&self) -> usize;
     fn find_pos(&self, cursor: &Self::By) -> Option<usize>;
-    fn ordered_values(&self) -> &[Self::Item];
+    fn iter_ordered(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = &Self::Item> + ExactSizeIterator<Item = &Self::Item>;
 }
 
 impl<T> Paginable for &[T] {
     type By = usize;
     type Item = T;
+
+    fn len(&self) -> usize {
+        <[T]>::len(self)
+    }
 
     fn find_pos(&self, cursor: &Self::By) -> Option<usize> {
         if *cursor >= self.len() {
@@ -174,8 +178,10 @@ impl<T> Paginable for &[T] {
         }
     }
 
-    fn ordered_values(&self) -> &[Self::Item] {
-        self
+    fn iter_ordered(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = &Self::Item> + ExactSizeIterator<Item = &Self::Item> {
+        self.iter()
     }
 }
 
