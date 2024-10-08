@@ -18,8 +18,7 @@ const focused = ref(false)
         @focus="focused = true" @unfocus="focused = false" @left-key="onDirection('left')"
         @right-key="onDirection('right')" :on-press v-slot="{ focused }">
         <div class="border border-solid border-transparent" v-bind="$attrs">
-            <input type="range" ref="inputRef" class="h-2.5 w-full" :max :value
-                :class="{ 'accent-orange-400': focused }" />
+            <input type="range" class="h-2.5 w-full" :max :value :class="{ 'accent-orange-400': focused }" />
         </div>
     </NavigableItem>
 </template>

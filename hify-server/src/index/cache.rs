@@ -3,8 +3,8 @@ use std::collections::{BTreeSet, HashMap, HashSet};
 use log::debug;
 
 use super::{
-    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, ValueOrdMap, Track,
-    TrackID,
+    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, Track, TrackID,
+    ValueOrdMap,
 };
 
 // TODO: lots of optimization to perform here
@@ -288,6 +288,9 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
 
         most_recent_track.ctime.unwrap_or(most_recent_track.mtime)
     });
+
+    // Reverse to get the most recent albums first
+    most_recent_albums.reverse();
 
     debug!("| Done.");
 

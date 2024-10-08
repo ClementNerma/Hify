@@ -5,7 +5,8 @@ mod on_types;
 
 declare_gql_connection!(
     TrackIDConnection => TrackIDEdge,
-    TrackUsizeConnection => TrackUsizeEdge
+    TrackUsizeConnection => TrackUsizeEdge,
+    AlbumUsizeConnection => AlbumUsizeEdge
 );
 
 pub use global::QueryRoot;

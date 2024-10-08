@@ -14,6 +14,8 @@ export type NavigableListProps = {
     onUpKey?: (list: NavigableList) => void,
     onDownKey?: (list: NavigableList) => void
     onBackKey?: (list: NavigableList) => void
+
+    trapped?: boolean
 } & Omit<NavigableList, 'id' | 'type'>
 
 export type NavigableListExposeType = {
@@ -40,7 +42,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
     navigate(list, currentChild, dir) {
         props.onNavigate?.(dir, currentChild, list)
 
-        return { type: 'native' }
+        return { type: 'native', trap: props.trapped }
     },
 
     enterFrom(list, from) {

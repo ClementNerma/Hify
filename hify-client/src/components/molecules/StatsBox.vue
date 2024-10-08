@@ -19,7 +19,7 @@ onUpdated(() => itemRef.value && requestFocusById(itemRef.value.item.id))
 </script>
 
 <template>
-    <NavigableItem v-if="stats" ref="itemRef" class="unstyled">
+    <NavigableItem v-if="stats" ref="togglerRef" class="unstyled">
         <table>
             <tbody>
                 <tr>

@@ -166,6 +166,7 @@ export enum NavigationDirection {
 export type NavigableCommonElementProps = {
 	id: string
 	disableScroll?: boolean
+	// TODO: implement "trapped" here?
 }
 
 export type NavigableElement = NavigableCommonElementProps &

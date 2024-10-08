@@ -121,7 +121,6 @@ pub fn generate_feed(
         .cache
         .most_recent_albums
         .iter()
-        .rev()
         .take(max_items)
         .map(|album_id| index.cache.albums_infos.get(album_id).unwrap().clone())
         .collect::<Vec<_>>();

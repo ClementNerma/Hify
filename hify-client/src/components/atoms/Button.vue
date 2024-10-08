@@ -2,12 +2,14 @@
 export type ButtonProps = NavigableItemProps & {
     borderNone?: boolean
 }
+
+export type ButtonExposeType = { itemRef: NavigableItemExposeType | null }
 </script>
 
 <script setup lang="ts">
 import NavigableItem, { type NavigableItemExposeType, type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
 import { type NavigableItem as NavigableItemType } from '@/navigable';
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 const props = defineProps<ButtonProps>()
 

@@ -18,7 +18,8 @@ use crate::{
 use super::{
     super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
     on_types::*,
-    TrackIDConnection, TrackIDEdge, TrackUsizeConnection, TrackUsizeEdge,
+    AlbumUsizeConnection, AlbumUsizeEdge, TrackIDConnection, TrackIDEdge, TrackUsizeConnection,
+    TrackUsizeEdge,
 };
 
 transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);
@@ -88,6 +89,18 @@ impl QueryRoot {
 
         paginate(pagination, &index.cache.albums_infos, |album| {
             album.get_id()
+        })
+    }
+
+    async fn most_recent_albums(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, AlbumInfos, AlbumUsizeConnection, AlbumUsizeEdge> {
+        let index = graphql_index!(ctx);
+
+        paginate_mapped_slice(pagination, &index.cache.most_recent_albums, |album_id| {
+            index.cache.albums_infos.get(album_id).unwrap().clone()
         })
     }
 
