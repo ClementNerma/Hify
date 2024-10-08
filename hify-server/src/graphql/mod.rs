@@ -31,6 +31,10 @@ macro_rules! define_scalar_string {
     };
 }
 
+/// NOTE: This scalar resolves to a `true` boolean (input & output)
+///
+/// We can't make it resolve to a `null` value as this would clash with GraphQL's spec
+/// when using it as an input object for @oneOf()
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub struct EmptyScalar;
 
@@ -38,12 +42,12 @@ pub struct EmptyScalar;
 impl ScalarType for EmptyScalar {
     fn parse(value: Value) -> InputValueResult<Self> {
         match value {
-            Value::Null => Ok(Self),
+            Value::Boolean(true) => Ok(Self),
             _ => Err(InputValueError::expected_type(value)),
         }
     }
 
     fn to_value(&self) -> Value {
-        Value::Null
+        Value::Boolean(true)
     }
 }

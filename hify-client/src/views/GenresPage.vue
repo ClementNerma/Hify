@@ -42,7 +42,7 @@ const genres = computed(() => data.value?.genres)
             label: 'Mix me some magic ✨',
             onPress: () => {
               generateAndPlayMix({
-                source: { allTracks: null },
+                source: { allTracks: true },
                 ordering: MixOrdering.Random,
                 minRating: MIN_GREAT_RATING,
                 fromGenres: [genre.id],

@@ -13,8 +13,8 @@ export default {
 				useTypeImports: true,
 				scalars: {
 					Empty: {
-						input: 'null',
-						output: 'null',
+						input: 'boolean',
+						output: 'boolean',
 					},
 				},
 			},
