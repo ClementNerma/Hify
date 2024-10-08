@@ -24,7 +24,7 @@ onUpdated(() => {
   const rect = focusedDomEl.getBoundingClientRect()
 
   const top = rect ? (rect.top + rect.bottom) / 2 : 0
-  const left = rect ? (rect.left + rect.right) / 2 : 0
+  const left = rect ? rect.left + Math.min(30, rect.width / 2) : 0
 
   ctxTop.value = top + ctxMenuContainer.clientHeight > window.innerHeight ? window.innerHeight - ctxMenuContainer.clientHeight - 5 : top
   ctxLeft.value = left + ctxMenuContainer.clientWidth > window.innerWidth ? window.innerWidth - ctxMenuContainer.clientWidth - 5 : left
