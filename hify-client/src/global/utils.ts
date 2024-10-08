@@ -112,3 +112,8 @@ export function bindRef<T extends object>(container: T, key: keyof T): VNodeRef 
 		container[key] = value as any
 	}
 }
+
+export function assertUnreachable(unreachable: never): never {
+	console.error({ unreachable })
+	logFatal('Internal error: reached theorically unreachable statement')
+}
