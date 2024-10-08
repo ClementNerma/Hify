@@ -8,7 +8,7 @@ use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use super::{
     routes::{album_art, artist_art, stream},
-    AppState,
+    HttpState,
 };
 use crate::{
     graphql::{get_graphql_schema, SaveIndexFn},
@@ -35,7 +35,7 @@ pub async fn launch(
         .allow_origin(AllowOrigin::any())
         .allow_headers(AllowHeaders::any());
 
-    let app_state = Arc::new(AppState::new(index, user_data, res_manager));
+    let app_state = Arc::new(HttpState::new(index, user_data, res_manager));
 
     let graphql_schema = get_graphql_schema(Arc::clone(&app_state), save_index);
 

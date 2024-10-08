@@ -3,14 +3,21 @@ use std::{collections::HashMap, time::Instant};
 use async_graphql::SimpleObject;
 use log::debug;
 
-use super::{AlbumInfos, ArtistInfos, Index, Track};
+use super::{AlbumInfos, ArtistInfos, Index, Rating, Track};
 
 static SEARCH_CACHE_CAPACITY: usize = 100;
 static SEARCH_CHARS_THRESOLD: usize = 3;
 
+pub struct SearchOptions<'a, 'b> {
+    pub search_cache: Option<&'a mut SearchCache>,
+    pub tracks_user_score: Option<AltScoreFn<'b, Track>>,
+}
+
+pub type AltScoreFn<'a, T> = &'a dyn Fn(&T) -> Option<Rating>;
+
 pub fn search_index(
     index: &Index,
-    search_cache: &mut SearchCache,
+    mut opts: SearchOptions,
     input: &str,
     limit: usize,
 ) -> IndexSearchResults {
@@ -21,7 +28,11 @@ pub fn search_index(
         .filter(|str| !str.is_empty())
         .collect();
 
-    if let Some(cached) = search_cache.content.get_mut(&words) {
+    if let Some(cached) = opts
+        .search_cache
+        .as_mut()
+        .and_then(|cache| cache.content.get_mut(&words))
+    {
         cached.last_usage = Instant::now();
 
         debug!("|> Served cached search results.");
@@ -29,32 +40,47 @@ pub fn search_index(
     }
 
     let results = IndexSearchResults {
-        tracks: search_and_score(index.tracks.values(), &words, limit),
-        albums: search_and_score(index.cache.albums_infos.values(), &words, limit),
-        artists: search_and_score(index.cache.artists_infos.values(), &words, limit),
+        tracks: search_and_score(index.tracks.values(), &words, limit, opts.tracks_user_score),
+        albums: search_and_score(
+            index.cache.albums_infos.values(),
+            &words,
+            limit,
+            // TODO
+            None,
+        ),
+        artists: search_and_score(
+            index.cache.artists_infos.values(),
+            &words,
+            limit,
+            // TODO
+            None,
+        ),
     };
 
-    if input.trim().len() >= SEARCH_CHARS_THRESOLD {
-        if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
-            let min = search_cache.least_recently_used().unwrap().clone();
-            search_cache.content.remove(&min);
+    if let Some(search_cache) = opts.search_cache.as_mut() {
+        if input.trim().len() >= SEARCH_CHARS_THRESOLD {
+            if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
+                let min = search_cache.least_recently_used().unwrap().clone();
+                search_cache.content.remove(&min);
+            }
+
+            search_cache.content.insert(
+                words,
+                SearchCacheEntry {
+                    last_usage: Instant::now(),
+                    results: results.clone(),
+                },
+            );
+
+            let fill_percent =
+                search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
+
+            debug!(
+                "|> Search cache now contains {} entries ({:.1}% of total capacity).",
+                search_cache.content.len(),
+                fill_percent
+            );
         }
-
-        search_cache.content.insert(
-            words,
-            SearchCacheEntry {
-                last_usage: Instant::now(),
-                results: results.clone(),
-            },
-        );
-
-        let fill_percent = search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
-
-        debug!(
-            "|> Search cache now contains {} entries ({:.1}% of total capacity).",
-            search_cache.content.len(),
-            fill_percent
-        );
     }
 
     results
@@ -64,6 +90,7 @@ fn search_and_score<'t, T: Clone + Send + Ord + SearchScoring + 't>(
     items: impl Iterator<Item = &'t T> + Send,
     words: &[String],
     limit: usize,
+    alt_score: Option<AltScoreFn<T>>,
 ) -> Vec<T>
 where
     &'t T: Send,
@@ -77,6 +104,16 @@ where
                     0 => return None,
                     word_score => score += word_score,
                 }
+            }
+
+            if let Some(rating) = alt_score.and_then(|alt_score| alt_score(item)) {
+                score = match rating.value() {
+                    0..=4 => score / 2,
+                    5..=7 => score,
+                    8..=9 => score * 2,
+                    10 => score * 3,
+                    _ => unreachable!(),
+                };
             }
 
             Some(SearchResult {
@@ -105,10 +142,12 @@ fn contains_with_multiplier(input: &str, word: &str) -> Option<usize> {
 
     if !lower.contains(word) {
         None
+    } else if lower.split_whitespace().next() == Some(word) {
+        return Some(20);
     } else if lower.starts_with(word) {
-        Some(2)
+        Some(15)
     } else {
-        Some(1)
+        Some(10)
     }
 }
 
@@ -123,7 +162,7 @@ impl SearchScoring for Track {
         let tags = &self.metadata.tags;
 
         if let Some(mul) = contains_with_multiplier(&tags.title, word) {
-            score += word.len() * 10 * mul;
+            score += word.len() * mul;
         }
 
         let album_infos = tags.get_album_infos();

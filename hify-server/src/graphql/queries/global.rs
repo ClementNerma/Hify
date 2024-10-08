@@ -5,7 +5,7 @@ use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
     index::{
         search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos,
-        IndexSearchResults, Track, TrackID,
+        IndexSearchResults, SearchOptions, Track, TrackID,
     },
     library::{
         feed::{self, Feed, FeedParams},
@@ -181,9 +181,24 @@ impl QueryRoot {
         limit: usize,
     ) -> Result<IndexSearchResults> {
         let index = graphql_index!(ctx);
-        let mut search_cache = graphql_ctx_member!(ctx, app_state.search_cache, write);
+        let user_data = graphql_user_data!(ctx);
+        let mut search_cache = graphql_ctx_member!(ctx, search_cache, write);
 
-        Ok(search_index(&index, &mut search_cache, &input, limit))
+        Ok(search_index(
+            &index,
+            SearchOptions {
+                search_cache: Some(&mut search_cache),
+                tracks_user_score: Some(&|track| {
+                    track
+                        .metadata
+                        .tags
+                        .rating
+                        .or_else(|| user_data.track_ratings().get(&track.id).copied())
+                }),
+            },
+            &input,
+            limit,
+        ))
     }
 
     async fn generate_feed(&self, ctx: &Context<'_>, input: FeedParams) -> Feed {

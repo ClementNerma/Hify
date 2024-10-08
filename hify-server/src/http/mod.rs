@@ -5,4 +5,4 @@ mod server;
 mod state;
 
 pub use server::launch;
-pub use state::AppState;
+pub use state::HttpState;

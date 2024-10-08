@@ -1,20 +1,27 @@
 use std::sync::Arc;
 
-use crate::{http::AppState, index::Index};
+use tokio::sync::RwLock;
+
+use crate::{
+    http::HttpState,
+    index::{Index, SearchCache},
+};
 
 /// Context shared by all GraphQL queries and mutations
 pub struct GraphQLContext {
-    pub app_state: Arc<AppState>,
+    pub app_state: Arc<HttpState>,
     pub save_index: SaveIndexFn,
+    pub search_cache: Arc<RwLock<SearchCache>>,
 }
 
 pub type SaveIndexFn = Box<dyn Fn(&Index) -> Result<(), String> + Send + Sync + 'static>;
 
 impl GraphQLContext {
-    pub fn new(app_state: Arc<AppState>, save_index: SaveIndexFn) -> Self {
+    pub fn new(app_state: Arc<HttpState>, save_index: SaveIndexFn) -> Self {
         Self {
             app_state,
             save_index,
+            search_cache: Arc::new(RwLock::new(SearchCache::new())),
         }
     }
 }

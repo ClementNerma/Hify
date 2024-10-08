@@ -15,10 +15,10 @@ use crate::{
     resources::ArtistArt,
 };
 
-use super::AppState;
+use super::HttpState;
 
 pub async fn album_art(
-    Extension(state): Extension<Arc<AppState>>,
+    Extension(state): Extension<Arc<HttpState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
@@ -43,7 +43,7 @@ pub async fn album_art(
 }
 
 pub async fn artist_art(
-    Extension(state): Extension<Arc<AppState>>,
+    Extension(state): Extension<Arc<HttpState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
@@ -69,7 +69,7 @@ pub async fn artist_art(
 }
 
 pub async fn stream(
-    Extension(state): Extension<Arc<AppState>>,
+    Extension(state): Extension<Arc<HttpState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
