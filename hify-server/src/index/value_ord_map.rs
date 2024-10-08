@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::graphql::Paginable;
 
-/// An immutable ordered map, iteration order is values comparison order
+/// A key-value dictionary, whose iteration order is based on values' ordering
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ValueOrdMap<K: Eq + Hash, V: Ord> {
     keys: Vec<K>,
@@ -18,6 +18,27 @@ pub struct ValueOrdMap<K: Eq + Hash, V: Ord> {
 }
 
 impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
+    pub fn new(iter: impl Iterator<Item = (K, V)>) -> Self {
+        let mut from_entries: Vec<_> = iter.into_iter().collect();
+        from_entries.sort_by(|(_, a), (_, b)| a.cmp(b));
+
+        let mut keys = Vec::with_capacity(from_entries.len());
+        let mut values = Vec::with_capacity(from_entries.len());
+        let mut keys_by_hash = HashMap::with_capacity(from_entries.len());
+
+        for (i, (key, value)) in from_entries.into_iter().enumerate() {
+            keys_by_hash.insert(Self::hash_key(&key), i);
+            keys.push(key);
+            values.push(value);
+        }
+
+        Self {
+            keys,
+            values,
+            keys_by_hash,
+        }
+    }
+
     pub fn empty() -> Self {
         Self {
             keys: vec![],
@@ -26,18 +47,18 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
         }
     }
 
-    fn key_hash(key: &K) -> u64 {
+    fn hash_key(key: &K) -> u64 {
         let mut hasher = DefaultHasher::new();
         key.hash(&mut hasher);
         hasher.finish()
     }
 
     pub fn contains_key(&self, key: &K) -> bool {
-        self.keys_by_hash.contains_key(&Self::key_hash(key))
+        self.keys_by_hash.contains_key(&Self::hash_key(key))
     }
 
     pub fn get_key_index(&self, key: &K) -> Option<usize> {
-        self.keys_by_hash.get(&Self::key_hash(key)).copied()
+        self.keys_by_hash.get(&Self::hash_key(key)).copied()
     }
 
     pub fn get<'a>(&'a self, key: &K) -> Option<&'a V> {
@@ -57,12 +78,12 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
         self.values.iter_mut()
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
-        self.keys().zip(self.values())
-    }
-
     pub fn into_values(self) -> Vec<V> {
         self.values
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
+        self.keys().zip(self.values())
     }
 
     pub fn len(&self) -> usize {
@@ -72,29 +93,11 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
 
 impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for ValueOrdMap<K, V> {
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
-        let mut from_entries: Vec<_> = iter.into_iter().collect();
-        from_entries.sort_by(|(_, a), (_, b)| a.cmp(b));
-
-        let mut keys = Vec::with_capacity(from_entries.len());
-        let mut values = Vec::with_capacity(from_entries.len());
-        let mut keys_by_hash = HashMap::with_capacity(from_entries.len());
-
-        for (i, (key, value)) in from_entries.into_iter().enumerate() {
-            keys_by_hash.insert(Self::key_hash(&key), i);
-            keys.push(key);
-            values.push(value);
-        }
-
-        Self {
-            keys,
-            values,
-            keys_by_hash,
-        }
+        Self::new(iter.into_iter())
     }
 }
 
-// TODO: remove reference?
-impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ ValueOrdMap<K, V> {
+impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for ValueOrdMap<K, V> {
     type By = K;
     type Item = V;
 

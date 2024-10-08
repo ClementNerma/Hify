@@ -33,7 +33,7 @@ pub fn paginate<
     E: EdgeNameType,
 >(
     pagination: PaginationInput,
-    items: impl Paginable<By = C, Item = T>,
+    items: &impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T) -> C,
 ) -> Paginated<C, T, N, E> {
     raw_paginate(
@@ -50,7 +50,7 @@ pub fn paginate_mapped_slice<T, U: OutputType, N: ConnectionNameType, E: EdgeNam
     items: &[T],
     mapper: impl Fn(&T) -> U,
 ) -> Paginated<usize, U, N, E> {
-    raw_paginate(pagination, items, |_, i| i, |item| mapper(item))
+    raw_paginate(pagination, &items, |_, i| i, |item| mapper(item))
 }
 
 /// Compute raw pagination
@@ -62,7 +62,7 @@ pub fn raw_paginate<
     E: EdgeNameType,
 >(
     pagination: PaginationInput,
-    items: impl Paginable<By = C, Item = T>,
+    items: &impl Paginable<By = C, Item = T>,
     item_cursor: impl Fn(&T, usize) -> C,
     mapper: impl Fn(&T) -> U,
 ) -> Paginated<C, U, N, E> {
