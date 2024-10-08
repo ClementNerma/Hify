@@ -22,7 +22,7 @@ const dropdownRef = ref<DropdownSelectExposeType | null>(null)
 
   <AlbumsFetcher :sort-by="sortBy" v-slot="{ albums, feedMore }">
     <NavigableGrid :columns="GRID_ALBUMS_PER_ROW">
-      <AlbumCard v-for="album, i in albums" :key="album.id" :album
+      <AlbumCard v-for="album, i in albums" :key="`${sortBy}/${album.id}`" :album
         @focus="isApproachingGridEnd(i, GRID_ALBUMS_PER_ROW, albums.length) && feedMore()" />
     </NavigableGrid>
   </AlbumsFetcher>
