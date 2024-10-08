@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     body::Body,
     extract::Path,
@@ -16,7 +18,7 @@ use crate::{
 use super::AppState;
 
 pub async fn album_art(
-    Extension(state): Extension<AppState>,
+    Extension(state): Extension<Arc<AppState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
@@ -41,7 +43,7 @@ pub async fn album_art(
 }
 
 pub async fn artist_art(
-    Extension(state): Extension<AppState>,
+    Extension(state): Extension<Arc<AppState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
@@ -67,7 +69,7 @@ pub async fn artist_art(
 }
 
 pub async fn stream(
-    Extension(state): Extension<AppState>,
+    Extension(state): Extension<Arc<AppState>>,
     Path(id): Path<String>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, (StatusCode, &'static str)> {

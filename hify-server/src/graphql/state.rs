@@ -1,14 +1,17 @@
+use std::sync::Arc;
+
 use crate::{http::AppState, index::Index};
 
+/// Context shared by all GraphQL queries and mutations
 pub struct GraphQLContext {
-    pub app_state: AppState,
+    pub app_state: Arc<AppState>,
     pub save_index: SaveIndexFn,
 }
 
 pub type SaveIndexFn = Box<dyn Fn(&Index) -> Result<(), String> + Send + Sync + 'static>;
 
 impl GraphQLContext {
-    pub fn new(app_state: AppState, save_index: SaveIndexFn) -> Self {
+    pub fn new(app_state: Arc<AppState>, save_index: SaveIndexFn) -> Self {
         Self {
             app_state,
             save_index,

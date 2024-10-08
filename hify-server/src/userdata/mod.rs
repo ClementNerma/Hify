@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::index::{Rating, TrackID};
 
+use self::history::History;
 pub use self::{
     config::UserDataConfig,
     history::OneListening,
@@ -18,8 +19,6 @@ pub use self::{
     playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistID},
     wrapper::UserDataWrapper,
 };
-
-use self::history::History;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct UserData {

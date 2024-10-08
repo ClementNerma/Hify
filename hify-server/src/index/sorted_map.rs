@@ -98,11 +98,7 @@ impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ S
     type By = K;
     type Item = V;
 
-    fn len(&self) -> usize {
-        SortedMap::len(self)
-    }
-
-    fn get_index(&self, cursor: &Self::By) -> Option<usize> {
+    fn find_pos(&self, cursor: &Self::By) -> Option<usize> {
         SortedMap::get_key_index(self, cursor)
     }
 

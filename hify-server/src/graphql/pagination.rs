@@ -105,37 +105,39 @@ pub fn raw_paginate<
     let count = usize::try_from(count).map_err(|_| "Invalid count number provided")?;
 
     // Compute index of the first element to get from the index cache
-    let index = match cursor {
+    let pos = match cursor {
         None => 0,
         Some(ref cursor) => {
             let cursor = C::decode_cursor(cursor)
                 .map_err(|e| format!("Failed to decode provided cursor: {}", e))?;
 
             items
-                .get_index(&cursor)
+                .find_pos(&cursor)
                 .ok_or("Provided cursor was not found")?
         }
     };
 
     // Compute index of the first element to retrieve, considering the direction
     let start_at = match direction {
-        Direction::After => index + usize::from(cursor.is_some()),
+        Direction::After => pos + usize::from(cursor.is_some()),
         Direction::Before => {
-            if index >= count {
-                index - count
+            if pos >= count {
+                pos - count
             } else {
                 0
             }
         }
     };
 
+    // Get ordered item values
+    let ordered_items = items.ordered_values();
+
     // Create a Relay value
     let mut connection =
-        Connection::<C, U, _, _, N, E>::new(start_at > 0, start_at + count < items.len());
+        Connection::<C, U, _, _, N, E>::new(start_at > 0, start_at + count < ordered_items.len());
 
     // Compute the paginated results' edges lazily
-    let edges = items
-        .ordered_values()
+    let edges = ordered_items
         .iter()
         .skip(start_at)
         .take(count)
@@ -156,8 +158,7 @@ pub trait Paginable {
     type By;
     type Item;
 
-    fn len(&self) -> usize;
-    fn get_index(&self, cursor: &Self::By) -> Option<usize>;
+    fn find_pos(&self, cursor: &Self::By) -> Option<usize>;
     fn ordered_values(&self) -> &[Self::Item];
 }
 
@@ -165,11 +166,7 @@ impl<T> Paginable for &[T] {
     type By = usize;
     type Item = T;
 
-    fn len(&self) -> usize {
-        (self as &[T]).len()
-    }
-
-    fn get_index(&self, cursor: &Self::By) -> Option<usize> {
+    fn find_pos(&self, cursor: &Self::By) -> Option<usize> {
         if *cursor >= self.len() {
             None
         } else {

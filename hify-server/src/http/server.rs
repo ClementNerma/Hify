@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, sync::Arc};
 
 use anyhow::Result;
 use axum::{middleware, routing::get, Extension, Router};
@@ -35,9 +35,9 @@ pub async fn launch(
         .allow_origin(AllowOrigin::any())
         .allow_headers(AllowHeaders::any());
 
-    let app_state = AppState::new(index, user_data, res_manager);
+    let app_state = Arc::new(AppState::new(index, user_data, res_manager));
 
-    let graphql_schema = get_graphql_schema(app_state.clone(), save_index);
+    let graphql_schema = get_graphql_schema(Arc::clone(&app_state), save_index);
 
     let app = Router::new()
         // Define all routes

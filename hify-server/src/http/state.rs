@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use tokio::sync::RwLock;
 
 use crate::{
@@ -8,12 +6,11 @@ use crate::{
     userdata::UserDataWrapper,
 };
 
-#[derive(Clone)]
 pub struct AppState {
-    pub index: Arc<RwLock<Index>>,
-    pub user_data: Arc<RwLock<UserDataWrapper>>,
-    pub search_cache: Arc<RwLock<SearchCache>>,
-    pub resource_manager: Arc<ResourceManager>,
+    pub index: RwLock<Index>,
+    pub user_data: RwLock<UserDataWrapper>,
+    pub search_cache: RwLock<SearchCache>,
+    pub resource_manager: ResourceManager,
 }
 
 impl AppState {
@@ -23,10 +20,10 @@ impl AppState {
         resource_manager: ResourceManager,
     ) -> Self {
         Self {
-            index: Arc::new(RwLock::new(index)),
-            user_data: Arc::new(RwLock::new(user_data)),
-            search_cache: Arc::new(RwLock::new(SearchCache::new())),
-            resource_manager: Arc::new(resource_manager),
+            index: RwLock::new(index),
+            user_data: RwLock::new(user_data),
+            search_cache: RwLock::new(SearchCache::new()),
+            resource_manager,
         }
     }
 }

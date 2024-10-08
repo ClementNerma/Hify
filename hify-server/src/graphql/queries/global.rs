@@ -2,7 +2,7 @@ use anyhow::{Context as _, Result};
 use async_graphql::{Context, Object};
 
 use crate::{
-    declare_gql_connection, graphql_ctx_member, graphql_index, graphql_user_data,
+    graphql_ctx_member, graphql_index, graphql_user_data,
     index::{
         search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos,
         IndexSearchResults, Track, TrackID,
@@ -16,8 +16,9 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
-    queries_on_types::*,
+    super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
+    on_types::*,
+    TrackIDConnection, TrackIDEdge, TrackUsizeConnection, TrackUsizeEdge,
 };
 
 transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);
@@ -84,6 +85,7 @@ impl QueryRoot {
         pagination: PaginationInput,
     ) -> Paginated<AlbumID, AlbumInfos> {
         let index = graphql_index!(ctx);
+
         paginate(pagination, &index.cache.albums_infos, |album| {
             album.get_id()
         })
@@ -179,8 +181,3 @@ impl QueryRoot {
         stats::generate_stats(&*graphql_index!(ctx), &*graphql_user_data!(ctx))
     }
 }
-
-declare_gql_connection!(
-    TrackIDConnection => TrackIDEdge,
-    TrackUsizeConnection => TrackUsizeEdge
-);

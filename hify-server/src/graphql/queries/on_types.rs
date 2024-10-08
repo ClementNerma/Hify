@@ -13,8 +13,8 @@ use crate::{
 };
 
 use super::{
-    pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
-    queries::{TrackUsizeConnection, TrackUsizeEdge},
+    super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
+    TrackUsizeConnection, TrackUsizeEdge,
 };
 
 #[derive(SimpleObject)]
