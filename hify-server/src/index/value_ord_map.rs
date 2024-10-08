@@ -11,25 +11,25 @@ use crate::graphql::Paginable;
 
 /// An immutable ordered map, iteration order is values comparison order
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SortedMap<K: Eq + Hash, V: Ord> {
+pub struct ValueOrdMap<K: Eq + Hash, V: Ord> {
     keys: Vec<K>,
     values: Vec<V>,
     keys_by_hash: HashMap<u64, usize>,
 }
 
-impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
-    pub fn key_hash(key: &K) -> u64 {
-        let mut hasher = DefaultHasher::new();
-        key.hash(&mut hasher);
-        hasher.finish()
-    }
-
+impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
     pub fn empty() -> Self {
         Self {
             keys: vec![],
             values: vec![],
             keys_by_hash: HashMap::new(),
         }
+    }
+
+    fn key_hash(key: &K) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        key.hash(&mut hasher);
+        hasher.finish()
     }
 
     pub fn contains_key(&self, key: &K) -> bool {
@@ -70,7 +70,7 @@ impl<K: Eq + Hash, V: Ord> SortedMap<K, V> {
     }
 }
 
-impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for SortedMap<K, V> {
+impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for ValueOrdMap<K, V> {
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         let mut from_entries: Vec<_> = iter.into_iter().collect();
         from_entries.sort_by(|(_, a), (_, b)| a.cmp(b));
@@ -94,7 +94,7 @@ impl<K: Eq + Hash, V: Ord> FromIterator<(K, V)> for SortedMap<K, V> {
 }
 
 // TODO: remove reference?
-impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ SortedMap<K, V> {
+impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ ValueOrdMap<K, V> {
     type By = K;
     type Item = V;
 
@@ -103,7 +103,7 @@ impl<K: CursorType + Eq + Hash, V: OutputType + Clone + Ord> Paginable for &'_ S
     }
 
     fn find_pos(&self, cursor: &Self::By) -> Option<usize> {
-        SortedMap::get_key_index(self, cursor)
+        ValueOrdMap::get_key_index(self, cursor)
     }
 
     fn iter_ordered(

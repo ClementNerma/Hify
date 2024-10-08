@@ -12,14 +12,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
 
-use super::{builder::FileTimes, sorted_map::SortedMap};
+use super::{builder::FileTimes, value_ord_map::ValueOrdMap};
 
 /// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
-    pub tracks: SortedMap<TrackID, Track>,
+    pub tracks: ValueOrdMap<TrackID, Track>,
     pub album_arts: HashMap<AlbumID, PathBuf>,
     pub cache: IndexCache,
 }
@@ -34,13 +34,13 @@ pub struct IndexCache {
     pub tracks_all_artists: HashMap<TrackID, HashSet<ArtistID>>,
 
     /// Albums where the artist is listed in the "album artists" tag
-    pub artists_albums: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+    pub artists_albums: HashMap<ArtistID, ValueOrdMap<AlbumID, AlbumInfos>>,
 
     /// Albums where the artist is listed in one of the tracks but not in the "album artists" tag
-    pub artists_album_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+    pub artists_album_participations: HashMap<ArtistID, ValueOrdMap<AlbumID, AlbumInfos>>,
 
     /// Combination of "artists_albums" and "artists_album_participations"
-    pub artists_albums_and_participations: HashMap<ArtistID, SortedMap<AlbumID, AlbumInfos>>,
+    pub artists_albums_and_participations: HashMap<ArtistID, ValueOrdMap<AlbumID, AlbumInfos>>,
 
     /// Tracks where the artist is listed in
     pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
@@ -64,19 +64,19 @@ pub struct IndexCache {
     pub album_artists_mean_score: HashMap<ArtistID, f64>,
 
     /// Informations about artists
-    pub artists_infos: SortedMap<ArtistID, ArtistInfos>,
+    pub artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
 
     /// Informations about album arists
-    pub album_artists_infos: SortedMap<ArtistID, ArtistInfos>,
+    pub album_artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
 
     /// Informations about albums
-    pub albums_infos: SortedMap<AlbumID, AlbumInfos>,
+    pub albums_infos: ValueOrdMap<AlbumID, AlbumInfos>,
 
     /// Informations about genres
-    pub genre_infos: SortedMap<GenreID, GenreInfos>,
+    pub genre_infos: ValueOrdMap<GenreID, GenreInfos>,
 
     /// List of album for each genre
-    pub genres_albums: HashMap<GenreID, SortedMap<AlbumID, AlbumInfos>>,
+    pub genres_albums: HashMap<GenreID, ValueOrdMap<AlbumID, AlbumInfos>>,
 
     /// List of tracks for each genre
     pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,

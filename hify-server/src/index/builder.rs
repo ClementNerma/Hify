@@ -21,7 +21,7 @@ use super::{
     cache::build_index_cache,
     data::{Index, Track},
     metadata,
-    sorted_map::SortedMap,
+    value_ord_map::ValueOrdMap,
     IndexCache,
 };
 
@@ -38,7 +38,7 @@ pub async fn build_index(
         from: dir.clone(),
 
         fingerprint: String::new(),
-        tracks: SortedMap::empty(),
+        tracks: ValueOrdMap::empty(),
 
         album_arts: HashMap::new(),
 
@@ -60,10 +60,10 @@ pub async fn build_index(
             albums_tracks: HashMap::new(),
             albums_mean_score: HashMap::new(),
 
-            artists_infos: SortedMap::empty(),
-            album_artists_infos: SortedMap::empty(),
-            albums_infos: SortedMap::empty(),
-            genre_infos: SortedMap::empty(),
+            artists_infos: ValueOrdMap::empty(),
+            album_artists_infos: ValueOrdMap::empty(),
+            albums_infos: ValueOrdMap::empty(),
+            genre_infos: ValueOrdMap::empty(),
 
             genres_albums: HashMap::new(),
             genres_tracks: HashMap::new(),

@@ -22,7 +22,7 @@ use crate::{
     resources::{ArtistArt, ResourceManager},
 };
 
-use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, SortedMap, Track, TrackID};
+use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, ValueOrdMap, Track, TrackID};
 
 static COVER_FILENAMES: &[&str] = &["cover", "folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
@@ -30,7 +30,7 @@ static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
 pub async fn find_albums_arts(
     albums: impl ExactSizeIterator<Item = AlbumInfos>,
     base_dir: &Path,
-    tracks: SortedMap<TrackID, Track>,
+    tracks: ValueOrdMap<TrackID, Track>,
     cache: IndexCache,
 ) -> Result<Vec<(AlbumID, PathBuf)>> {
     let mut set = JoinSet::<Result<Option<(AlbumID, PathBuf)>>>::new();
@@ -101,7 +101,7 @@ pub async fn find_albums_arts(
 async fn find_album_art(
     album_id: AlbumID,
     base_dir: &Path,
-    tracks: &SortedMap<TrackID, Track>,
+    tracks: &ValueOrdMap<TrackID, Track>,
     cache: &IndexCache,
 ) -> Result<Option<PathBuf>> {
     let album_tracks_ids = cache.albums_tracks.get(&album_id).unwrap();

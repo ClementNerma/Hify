@@ -5,8 +5,8 @@ use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 use crate::{
     graphql_ctx, graphql_index, graphql_user_data,
     index::{
-        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating, SortedMap, Track,
-        TrackTags,
+        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating, Track, TrackTags,
+        ValueOrdMap,
     },
     resources::ArtistArt,
     userdata::{Playlist, PlaylistEntry},
@@ -164,7 +164,7 @@ impl ArtistInfos {
                 .cache
                 .artists_albums
                 .get(&self.get_id())
-                .unwrap_or(&SortedMap::empty()),
+                .unwrap_or(&ValueOrdMap::empty()),
             |album| album.get_id(),
         )
     }
@@ -181,7 +181,7 @@ impl ArtistInfos {
                 .cache
                 .artists_album_participations
                 .get(&self.get_id())
-                .unwrap_or(&SortedMap::empty()),
+                .unwrap_or(&ValueOrdMap::empty()),
             |album| album.get_id(),
         )
     }
@@ -254,7 +254,7 @@ impl GenreInfos {
                 .cache
                 .genres_albums
                 .get(&self.get_id())
-                .unwrap_or(&SortedMap::empty()),
+                .unwrap_or(&ValueOrdMap::empty()),
             |genre| genre.get_id(),
         )
     }

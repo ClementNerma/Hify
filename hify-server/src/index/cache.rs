@@ -3,12 +3,12 @@ use std::collections::{BTreeSet, HashMap, HashSet};
 use log::debug;
 
 use super::{
-    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, SortedMap, Track,
+    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexCache, ValueOrdMap, Track,
     TrackID,
 };
 
 // TODO: lots of optimization to perform here
-pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
+pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
     debug!("Building index cache...");
 
     let mut tracks_files_mtime = HashMap::new();
@@ -118,7 +118,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
                 k,
                 v.into_iter()
                     .map(|album| (album.get_id(), album))
-                    .collect::<SortedMap<_, _>>(),
+                    .collect::<ValueOrdMap<_, _>>(),
             )
         })
         .collect::<HashMap<_, _>>();
@@ -130,7 +130,7 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
                 k,
                 v.into_iter()
                     .map(|album| (album.get_id(), album))
-                    .collect::<SortedMap<_, _>>(),
+                    .collect::<ValueOrdMap<_, _>>(),
             )
         })
         .collect::<HashMap<_, _>>();
@@ -176,16 +176,16 @@ pub fn build_index_cache(tracks: &SortedMap<TrackID, Track>) -> IndexCache {
                 *artist_id,
                 artists_albums
                     .get(artist_id)
-                    .unwrap_or(&SortedMap::empty())
+                    .unwrap_or(&ValueOrdMap::empty())
                     .iter()
                     .chain(
                         artists_album_participations
                             .get(artist_id)
-                            .unwrap_or(&SortedMap::empty())
+                            .unwrap_or(&ValueOrdMap::empty())
                             .iter(),
                     )
                     .map(|(album_id, album_infos)| (*album_id, album_infos.clone()))
-                    .collect::<SortedMap<_, _>>(),
+                    .collect::<ValueOrdMap<_, _>>(),
             )
         })
         .collect();
