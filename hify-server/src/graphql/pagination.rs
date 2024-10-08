@@ -96,9 +96,7 @@ pub fn raw_paginate<
         }
         (Some(c), None, Some(i), None) => (Some(c), i, Direction::After),
         (None, None, Some(i), None) => (None, i, Direction::After),
-        (None, None, None, Some(_)) => {
-            return Err("Please provide a cursor to paginate from".into())
-        }
+        (None, None, None, Some(i)) => (None, i, Direction::Before),
     };
 
     // Ensure the count is valid
@@ -106,7 +104,10 @@ pub fn raw_paginate<
 
     // Compute index of the first element to get from the index cache
     let pos = match cursor {
-        None => 0,
+        None => match direction {
+            Direction::Before => items.len(),
+            Direction::After => 0,
+        },
         Some(ref cursor) => {
             let cursor = C::decode_cursor(cursor)
                 .map_err(|e| format!("Failed to decode provided cursor: {}", e))?;
