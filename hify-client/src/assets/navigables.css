@@ -15,7 +15,10 @@ navigable-item-wrapper.fullHeight> :first-child {
     min-height: 100%;
 }
 
+navigable-item-wrapper:not(.unstyled)[data-nav-focused] {
+    text-decoration: underline;
+}
+
 navigable-item-wrapper:not(.unstyled)[data-nav-focused]> :first-child {
     outline: none;
-    text-decoration: underline;
 }
