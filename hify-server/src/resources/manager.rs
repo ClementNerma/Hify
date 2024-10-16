@@ -40,7 +40,10 @@ impl ResourceManager {
         let resource_dir = path.parent().unwrap();
 
         if !resource_dir.is_dir() {
-            fs::create_dir(&resource_dir).await.with_context(|| {
+            // NOTE: using 'create_dir_all' avoids getting filesystem data races
+            // where the directory doesn't exist during the first check but does
+            // just before actually calling the creation function
+            fs::create_dir_all(&resource_dir).await.with_context(|| {
                 format!(
                     "Failed to create directory for resource '{}' at path '{}'",
                     R::ID,
