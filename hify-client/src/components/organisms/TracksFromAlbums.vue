@@ -17,7 +17,7 @@ defineProps<{
 
 <template>
   <NavigableList>
-    <table class="mt-2.5 w-3/4 border-collapse whitespace-nowrap">
+    <table class="mt-2.5 border-collapse whitespace-nowrap">
       <tbody>
         <tr v-for="track, i in tracks" :key="track.id" class="[&>td]:p-2.5"
           :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">

@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import Button from '@/components/atoms/Button.vue';
+import Checkbox from '@/components/atoms/Checkbox.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue';
+import { showContextMenu } from '@/global/stores/context-menu';
 import { logFatal } from '@/global/stores/debugger';
+import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue';
 import { gqlClient } from '@/global/urql-client';
-import { getRouteParam, noParallel } from '@/global/utils';
+import { getRouteParam, hasMinimumRating, noParallel, shuffle } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { ArtistAllTracksQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
-import { onMounted, ref } from 'vue';
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
+import router from '@/router';
+import { computed, onMounted, ref } from 'vue';
 
 const artistId = getRouteParam('id')
 
@@ -51,13 +57,16 @@ const feedMore = noParallel(async () => {
 
   authorName.value = data.artist.name
   currentPageInfo.value = data.artist.allTracks.pageInfo
-  tracks.value.push(...data.artist.allTracks.nodes)
+  unfilteredTracks.value.push(...data.artist.allTracks.nodes)
 })
 
 const currentPageInfo = ref<NonNullable<ArtistAllTracksQuery['artist']>['allTracks']['pageInfo'] | null>(null)
 const authorName = ref<string | null>(null)
 
-const tracks = ref<AudioTrackFragment[]>([])
+const unfilteredTracks = ref<AudioTrackFragment[]>([])
+
+const onlyShowGreatSongs = ref(false)
+const filteredTracks = computed(() => onlyShowGreatSongs.value ? unfilteredTracks.value.filter((track) => hasMinimumRating(track, 8)) : unfilteredTracks.value)
 
 onMounted(feedMore)
 </script>
@@ -65,9 +74,32 @@ onMounted(feedMore)
 <template>
   <LoadingIndicator v-if="!currentPageInfo || !authorName" :error="null /* TODO */" />
 
-  <template v-else-if="tracks.length > 0">
-    <h1>All tracks from {{ authorName }} ({{ tracks.length }})</h1>
+  <div class="mt-2.5" v-else-if="unfilteredTracks.length > 0">
+    <h1>All tracks from {{ authorName }} ({{ unfilteredTracks.length }})</h1>
 
-    <TracksFromAlbums :tracks :has-more="currentPageInfo.hasNextPage" :feed-more />
-  </template>
+    <div class="flex flex-row items-center">
+      <NavigableRow>
+        <Checkbox v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
+
+        <Button @press="enqueue(filteredTracks, 'next')" @long-press="showContextMenu([
+          {
+            label: 'Queue at the end',
+            onPress: () => enqueue(filteredTracks, 'end'),
+          }
+        ])">
+          <Emoji>▶️</Emoji> Play next
+        </Button>
+
+        <Button @press="() => {
+          playNewQueueFromBeginning(shuffle(filteredTracks), null)
+          router.push({ name: 'now-playing' })
+        }">
+          <Emoji>🔀</Emoji> Shuffle
+        </Button>
+      </NavigableRow>
+    </div>
+
+    <TracksFromAlbums :tracks="filteredTracks" :has-more="currentPageInfo.hasNextPage && !onlyShowGreatSongs"
+      :feed-more />
+  </div>
 </template>
