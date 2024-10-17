@@ -50,35 +50,33 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
     <NavigableList>
       <NavigableList v-if="currentTrack">
         <With :data="{ currentTrack, tags: currentTrack.metadata.tags }" v-slot="{ data: { currentTrack, tags } }">
-          <div class="buttons">
-            <NavigableRow>
-              <NavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
-                <div class="track-info">🎵 {{ tags.title }}</div>
-              </NavigableItem>
+          <NavigableRow class="buttons">
+            <NavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
+              <div class="track-info">🎵 {{ tags.title }}</div>
+            </NavigableItem>
 
-              <NavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
-                <div class="track-info">💿 {{ tags.album.name }}</div>
-              </NavigableItem>
+            <NavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
+              <div class="track-info">💿 {{ tags.album.name }}</div>
+            </NavigableItem>
 
-              <NavigableItem v-if="tags.date" just-for-style>
-                <div class="track-info">🕒 {{ formatDate(tags.date) }}</div>
-              </NavigableItem>
+            <NavigableItem v-if="tags.date" just-for-style>
+              <div class="track-info">🕒 {{ formatDate(tags.date) }}</div>
+            </NavigableItem>
 
-              <NavigableItem v-for="artist in tags.artists" :key="artist.id"
-                @press="router.push({ name: 'artist', params: { id: artist.id } })">
-                <div class="track-info">🎤 {{ artist.name }}</div>
-              </NavigableItem>
+            <NavigableItem v-for="artist in tags.artists" :key="artist.id"
+              @press="router.push({ name: 'artist', params: { id: artist.id } })">
+              <div class="track-info">🎤 {{ artist.name }}</div>
+            </NavigableItem>
 
-              <NavigableItem @press="enableOpacitor = !enableOpacitor">
-                <div class="option-button">
-                  <span v-if="enableOpacitor">🔲</span>
-                  <span v-else>🔳</span>
-                </div>
-              </NavigableItem>
+            <ModifiableTrackRating :track="currentTrack" />
 
-              <ModifiableTrackRating :track="currentTrack" />
-            </NavigableRow>
-          </div>
+            <NavigableItem @press="enableOpacitor = !enableOpacitor">
+              <div class="option-button">
+                <span v-if="enableOpacitor">🔲</span>
+                <span v-else>🔳</span>
+              </div>
+            </NavigableItem>
+          </NavigableRow>
 
           <div class="player-time">
             <div class="track-progress">
@@ -145,10 +143,14 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
 }
 
 .buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  font-size: 1.2rem;
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.buttons * {
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .track-info,
