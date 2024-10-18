@@ -121,13 +121,7 @@ pub fn raw_paginate<
     // Compute index of the first element to retrieve, considering the direction
     let start_at = match direction {
         Direction::After => pos + usize::from(cursor.is_some()),
-        Direction::Before => {
-            if pos >= count {
-                pos - count
-            } else {
-                0
-            }
-        }
+        Direction::Before => pos.saturating_sub(count),
     };
 
     // Create a Relay value
