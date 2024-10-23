@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue';
 import Checkbox from '@/components/atoms/Checkbox.vue';
+import Emoji from '@/components/atoms/Emoji.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue';
 import { showContextMenu } from '@/global/stores/context-menu';
@@ -99,7 +100,10 @@ onMounted(feedMore)
       </NavigableRow>
     </div>
 
-    <TracksFromAlbums :tracks="filteredTracks" :has-more="currentPageInfo.hasNextPage && !onlyShowGreatSongs"
-      :feed-more />
+    <!-- TODO: if we fetch some e.g. 20 tracks and e.g. 10 have great rating,
+         we press 'load more' and the next 20 don't contain any great rating,
+         it will give the impression that the request didn't worked or that
+         there is no additional well-rated track, which is a problem -->
+    <TracksFromAlbums :tracks="filteredTracks" :has-more="currentPageInfo.hasNextPage" :feed-more />
   </div>
 </template>
