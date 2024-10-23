@@ -25,7 +25,7 @@ use crate::{
 use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, Track, TrackID, ValueOrdMap};
 
 static COVER_FILENAMES: &[&str] = &["cover", "folder"];
-static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png"];
+static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "jfif", "png"];
 
 pub async fn find_albums_arts(
     albums: impl ExactSizeIterator<Item = AlbumInfos>,
