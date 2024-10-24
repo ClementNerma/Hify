@@ -216,6 +216,7 @@ fn generate_artist_art(
     albums_and_participations: impl Iterator<Item = AlbumID>,
     album_arts: &HashMap<AlbumID, PathBuf>,
 ) -> Result<Option<Vec<u8>>> {
+    // Only 4 arts are needed but we analyze them all to ensure every image is correct on disk
     let album_arts = albums_and_participations
         .filter_map(|album_id| album_arts.get(&album_id))
         .map(|relative_path| {
@@ -224,7 +225,6 @@ fn generate_artist_art(
             image::open(&path)
                 .with_context(|| format!("Failed to open art file at path '{}'", path.display()))
         })
-        .take(4)
         .collect::<Result<Vec<_>, _>>()?;
 
     if album_arts.is_empty() {
@@ -254,7 +254,7 @@ fn generate_artist_art(
                     (top_left, top_right, bottom_left, top_left)
                 }
 
-                [ref top_left, ref top_right, ref bottom_left, ref bottom_right] => {
+                [ref top_left, ref top_right, ref bottom_left, ref bottom_right, ..] => {
                     (top_left, top_right, bottom_left, bottom_right)
                 }
 
