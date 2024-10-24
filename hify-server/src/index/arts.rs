@@ -221,15 +221,10 @@ fn generate_artist_art(
         .map(|relative_path| {
             let path = base_dir.join(relative_path);
 
-            image::open(&path).map(Some).map_err(|err| {
-                anyhow!(
-                    "Failed to open art file at path '{}': {err}",
-                    path.display()
-                )
-            })
+            image::open(&path)
+                .with_context(|| format!("Failed to open art file at path '{}'", path.display()))
         })
         .take(4)
-        .filter_map(|result| result.transpose())
         .collect::<Result<Vec<_>, _>>()?;
 
     if album_arts.is_empty() {
