@@ -171,8 +171,14 @@ pub fn generate_artists_art<'a>(
             Err(err) => {
                 pb.suspend(|| {
                     error!(
-                        "Failed to generate cover art for artist '{}': {err}",
-                        artist.name
+                        "Failed to generate cover art for artist '{}': {}",
+                        artist.name,
+                        format!("{err:?}")
+                            .lines()
+                            .map(str::trim)
+                            .filter(|line| !line.is_empty())
+                            .collect::<Vec<_>>()
+                            .join(" > ")
                     );
                 });
 
@@ -223,7 +229,7 @@ fn generate_artist_art(
             let path = base_dir.join(relative_path);
 
             image::open(&path)
-                .with_context(|| format!("Failed to open art file at path '{}'", path.display()))
+                .with_context(|| format!("Failed to open image file at path '{}'", path.display()))
         })
         .collect::<Result<Vec<_>, _>>()?;
 
