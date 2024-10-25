@@ -6,12 +6,13 @@ import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 import NavigableTrack from '../atoms/NavigableTrack.vue';
 import TrackRating from '../atoms/TrackRating.vue';
 import Button from '../atoms/Button.vue';
+import LoadMoreButton from '../atoms/LoadMoreButton.vue';
 
 defineProps<{
   tracks: AudioTrackFragment[]
   hasMore: boolean
   showArtistsName?: boolean
-  feedMore: () => void
+  feedMore: () => Promise<void>
 }>()
 </script>
 
@@ -47,7 +48,6 @@ defineProps<{
     </table>
   </NavigableList>
 
-  <Button v-if="hasMore" @press="feedMore()">
-    Load more
-  </Button>
+  <!-- TODO: jump to latest track -->
+  <LoadMoreButton :has-more :feed-more />
 </template>

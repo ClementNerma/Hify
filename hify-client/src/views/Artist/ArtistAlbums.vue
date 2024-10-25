@@ -2,6 +2,7 @@
 import Button from '@/components/atoms/Button.vue';
 import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
+import LoadMoreButton from '@/components/atoms/LoadMoreButton.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
@@ -76,8 +77,6 @@ onMounted(feedMore)
       <AlbumCard v-for="album in albums" :key="album.id" :album enforce-max-width />
     </NavigableGrid>
 
-    <Button v-if="currentPageInfo.hasNextPage" @press="feedMore()">
-      Load more
-    </Button>
+    <LoadMoreButton :has-more="currentPageInfo.hasNextPage" :feed-more />
   </template>
 </template>

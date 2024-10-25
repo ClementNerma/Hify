@@ -17,7 +17,7 @@ import { computed, onMounted, ref } from 'vue';
 
 const artistId = getRouteParam('id')
 
-const TRACKS_PER_PAGE = 30
+const TRACKS_PER_PAGE = 100
 
 const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
@@ -100,10 +100,6 @@ onMounted(feedMore)
       </NavigableRow>
     </div>
 
-    <!-- TODO: if we fetch some e.g. 20 tracks and e.g. 10 have great rating,
-         we press 'load more' and the next 20 don't contain any great rating,
-         it will give the impression that the request didn't worked or that
-         there is no additional well-rated track, which is a problem -->
     <TracksFromAlbums :tracks="filteredTracks" :has-more="currentPageInfo.hasNextPage" :feed-more />
   </div>
 </template>
