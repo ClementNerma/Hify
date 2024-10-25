@@ -76,7 +76,7 @@ onMounted(feedMore)
   <LoadingIndicator v-if="!currentPageInfo || !authorName" :error="null /* TODO */" />
 
   <div class="mt-2.5" v-else-if="unfilteredTracks.length > 0">
-    <h1>All tracks from {{ authorName }} ({{ unfilteredTracks.length }})</h1>
+    <h1>All tracks from {{ authorName }}</h1>
 
     <div class="flex flex-row items-center">
       <NavigableRow>
