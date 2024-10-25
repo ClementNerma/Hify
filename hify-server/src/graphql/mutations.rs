@@ -45,11 +45,10 @@ impl MutationRoot {
         ctx: &Context<'_>,
         track_id: TrackID,
         duration_s: u32,
-    ) -> EmptyScalar {
+    ) -> Result<EmptyScalar, String> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
-            .log_listening(OneListening::new_now(track_id, duration_s));
-
-        EmptyScalar
+            .log_listening(OneListening::new_now(track_id, duration_s))
+            .map(|()| EmptyScalar)
     }
 
     async fn set_track_rating(

@@ -52,15 +52,26 @@ impl UserData {
         (self.on_change)(&self.inner);
     }
 
-    pub fn log_listening(&mut self, entry: OneListening) {
+    pub fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
+        if let Some(last) = self.inner.history.entries().last() {
+            if let Some(overlapping_for) = entry.is_overlapping_prev(*last) {
+                return Err(format!(
+                    "Entries overlap in listening history (of about {:.2}s):\n* {:?}\n* {entry:?}",
+                    overlapping_for.as_seconds_f32(),
+                    last,
+                ));
+            }
+        }
+
         if entry.duration_s < self.inner.config.listening_duration_thresold {
-            return;
+            return Ok(());
         }
 
         self.cache.update_with(&entry);
         self.inner.history.push(entry);
 
         (self.on_change)(&self.inner);
+        Ok(())
     }
 
     pub fn create_playlist(&mut self, name: String, tracks: Vec<TrackID>) -> PlaylistID {

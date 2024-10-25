@@ -43,4 +43,14 @@ impl OneListening {
             duration_s,
         }
     }
+
+    pub fn is_overlapping_prev(&self, other: OneListening) -> Option<time::Duration> {
+        let against = other.at + (time::Duration::SECOND * other.duration_s);
+
+        if self.at < against && against - self.at > time::Duration::SECOND {
+            Some(against - self.at)
+        } else {
+            None
+        }
+    }
 }

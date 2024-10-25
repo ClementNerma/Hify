@@ -50,13 +50,11 @@ pub fn check_correctness(index: &Index, user_data: &UserData) -> Result<(), Vec<
     let history = user_data.history().entries();
 
     for (i, entry) in history.iter().enumerate().skip(1) {
-        let against = history[i - 1].at + (time::Duration::SECOND * entry.duration_s);
-
-        if entry.at < against && against - entry.at > time::Duration::SECOND {
+        if let Some(overlapping_for) = entry.is_overlapping_prev(history[i - 1]) {
             error!(
                 "Entries {i} and {} overlap in listening history (of about {:.2}s):\n* {:?}\n* {entry:?}",
                 i + 1,
-                (against - entry.at).as_seconds_f32(),
+                overlapping_for.as_seconds_f32(),
                 history[i - 1],
             );
         }
