@@ -12,6 +12,9 @@ export const GRID_ALBUMS_PER_ROW = 6
 export const GRID_ALBUMS_PRELOAD_ROWS = 5
 export const GRID_ARTISTS_PER_ROW = 6
 export const GRID_ARTISTS_PRELOAD_ROWS = 5
+export const GRID_FETCH_AHEAD_ROWS = 3
+
+export const LIST_FETCH_AHEAD_ROWS = 5
 
 export const IMG_FALLBACK_URL = 'about:blank'
 

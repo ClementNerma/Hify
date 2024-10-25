@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { getAlbumArtUrl } from '@/global/constants';
+import { getAlbumArtUrl, } from '@/global/constants';
 import { humanReadableDuration } from '@/global/stores/audio-player';
 import type { AudioTrackFragment } from '@/graphql/generated/graphql';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 import NavigableTrack from '../atoms/NavigableTrack.vue';
 import TrackRating from '../atoms/TrackRating.vue';
-import Button from '../atoms/Button.vue';
-import LoadMoreButton from '../atoms/LoadMoreButton.vue';
+import { isApproachingListEnd } from '@/global/utils';
 
-defineProps<{
+const props = defineProps<{
   tracks: AudioTrackFragment[]
   hasMore: boolean
   showArtistsName?: boolean
@@ -26,7 +25,8 @@ defineProps<{
             <img :width="50" :height="50" :src="getAlbumArtUrl(track.metadata.tags.album)" />
           </td>
           <td class="w-full">
-            <NavigableTrack :tracks :context="{ context: 'album' }" :track>
+            <NavigableTrack :tracks :context="{ context: 'album' }" :track
+              @focus="isApproachingListEnd(i, tracks.length) && feedMore()">
               <span>{{ track.metadata.tags.title }}</span>
             </NavigableTrack>
           </td>
@@ -47,7 +47,4 @@ defineProps<{
       </tbody>
     </table>
   </NavigableList>
-
-  <!-- TODO: jump to latest track -->
-  <LoadMoreButton :has-more :feed-more />
 </template>

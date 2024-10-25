@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import Button from '@/components/atoms/Button.vue';
 import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import LoadMoreButton from '@/components/atoms/LoadMoreButton.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
-import { noParallel } from '@/global/utils';
+import { isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { AlbumFragment, ArtistAlbumsQuery } from '@/graphql/generated/graphql';
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
@@ -74,9 +72,8 @@ onMounted(feedMore)
     </Centered>
 
     <NavigableGrid :columns="ALBUMS_PER_LINE">
-      <AlbumCard v-for="album in albums" :key="album.id" :album enforce-max-width />
+      <AlbumCard v-for="album, i in albums" :key="album.id" :album enforce-max-width
+        @focus="isApproachingGridEnd(i, ALBUMS_PER_LINE, albums.length) && feedMore()" />
     </NavigableGrid>
-
-    <LoadMoreButton :has-more="currentPageInfo.hasNextPage" :feed-more />
   </template>
 </template>

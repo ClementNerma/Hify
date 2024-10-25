@@ -1,6 +1,7 @@
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import type { VNodeRef } from 'vue'
 import { useRoute } from 'vue-router'
+import { GRID_FETCH_AHEAD_ROWS, LIST_FETCH_AHEAD_ROWS } from './constants'
 import { logFatal } from './stores/debugger'
 
 export function getRouteParam(name: string, fallback?: string): string {
@@ -84,9 +85,10 @@ export function swapInArray<T>(array: T[], index: number, newIndex: number): T[]
 	return newArray
 }
 
-export function noParallel<F extends (...args: Args) => Promise<unknown>, Args extends unknown[]>(
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export function noParallel<F extends (...args: any[]) => Promise<unknown>>(
 	value: F,
-): (...args: Args) => Promise<void> {
+): (...args: Parameters<F>) => Promise<void> {
 	let isRunning = false
 
 	return async (...args) => {
@@ -103,7 +105,11 @@ export function noParallel<F extends (...args: Args) => Promise<unknown>, Args e
 }
 
 export function isApproachingGridEnd(itemIndex: number, columnsPerRow: number, totalItems: number): boolean {
-	return itemIndex + columnsPerRow * 3 >= totalItems
+	return itemIndex + columnsPerRow * GRID_FETCH_AHEAD_ROWS >= totalItems
+}
+
+export function isApproachingListEnd(itemIndex: number, totalItems: number): boolean {
+	return itemIndex + LIST_FETCH_AHEAD_ROWS >= totalItems
 }
 
 export function bindRef<T extends object>(container: T, key: keyof T): VNodeRef {
