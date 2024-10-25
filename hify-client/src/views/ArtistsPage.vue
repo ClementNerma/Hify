@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ArtistCard from '@/components/molecules/ArtistCard.vue';
+import { GRID_ARTISTS_PER_ROW, GRID_ARTISTS_PRELOAD_ROWS } from '@/global/constants';
 import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { isApproachingGridEnd, noParallel } from '@/global/utils';
@@ -7,9 +8,6 @@ import { graphql } from '@/graphql/generated';
 import type { ArtistFragment, ArtistsPageQuery } from '@/graphql/generated/graphql';
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
 import { onMounted, ref } from 'vue';
-
-const ARTISTS_PER_LINE = 6
-const LINES_PER_PAGE = 5
 
 const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
@@ -34,7 +32,7 @@ const feedMore = noParallel(async () => {
     {
       pagination: {
         after: currentPageInfo.value?.endCursor,
-        first: ARTISTS_PER_LINE * LINES_PER_PAGE
+        first: GRID_ARTISTS_PER_ROW * GRID_ARTISTS_PRELOAD_ROWS
       }
     }
   )
