@@ -131,9 +131,9 @@ pub fn raw_paginate<
     // Compute the paginated results' edges lazily
     let edges = items
         .iter_ordered()
+        .enumerate()
         .skip(start_at)
         .take(count)
-        .enumerate()
         .map(|(i, item)| Edge::new(item_cursor(item, i), mapper(item)));
 
     // Produce the paginated results
