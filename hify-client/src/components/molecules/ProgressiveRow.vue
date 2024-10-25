@@ -103,7 +103,7 @@ const columnSize = computed(() => `${100 / COLUMNS}%`)
 <template>
   <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)" :disable-scroll>
     <div class="flex flex-row py-2 overflow-hidden w-full">
-      <div class="gallery-item" v-for="[item, newPosition], i in visibleTracksWithPosition" :key="item[idProp as K]">
+      <div class="gallery-item" v-for="[item, newPosition] in visibleTracksWithPosition" :key="item[idProp as K]">
         <NavigableItem :ref="bindRef(itemsById as any, (item as any)[idProp])"
           @left-key="onSelect(newPosition - 1, true)" @right-key="onSelect(newPosition + 1, true)"
           @focus="onSelect(newPosition, false)" @press="onItemPress?.(item, newPosition)"
