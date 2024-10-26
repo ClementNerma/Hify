@@ -1,4 +1,4 @@
-use jiff::{Span, Zoned};
+use jiff::{SignedDuration, Timestamp};
 use serde::{Deserialize, Serialize};
 
 use crate::index::{Index, TrackID};
@@ -25,9 +25,9 @@ impl History {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct OneListening {
-    pub at: Zoned,
+    pub at: Timestamp,
     pub track_id: TrackID,
     pub duration_s: u32,
 }
@@ -35,22 +35,19 @@ pub struct OneListening {
 impl OneListening {
     pub fn new_now(track_id: TrackID, duration_s: u32) -> Self {
         Self {
-            at: Zoned::now(),
+            at: Timestamp::now(),
             track_id,
             duration_s,
         }
     }
 
-    pub fn is_overlapping_prev(&self, prev: &OneListening) -> Option<Span> {
+    pub fn is_overlapping_prev(&self, prev: &OneListening) -> Option<SignedDuration> {
         assert!(self.at >= prev.at);
 
-        let against = prev
-            .at
-            .checked_add(Span::new().seconds(prev.duration_s))
-            .unwrap();
+        let against = prev.at + SignedDuration::from_secs(prev.duration_s.into());
 
         if self.at < against {
-            Some(against.since(&self.at).unwrap())
+            Some(against.duration_since(self.at))
         } else {
             None
         }

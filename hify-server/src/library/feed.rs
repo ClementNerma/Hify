@@ -4,7 +4,7 @@ use std::{
 };
 
 use async_graphql::{Enum, InputObject, SimpleObject};
-use jiff::{Span, Zoned};
+use jiff::{Span, Timestamp};
 use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
@@ -157,7 +157,7 @@ fn get_periodically_popular_tracks(
         PopularityPeriod::Yearly => Span::new().years(1),
     };
 
-    let start_period = Zoned::now().checked_sub(period).unwrap();
+    let start_period = Timestamp::now() - period;
 
     let listenings = user_data
         .history()
