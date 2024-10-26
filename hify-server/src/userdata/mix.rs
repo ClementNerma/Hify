@@ -1,17 +1,16 @@
+use jiff::Zoned;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
 use crate::{
     define_id_type,
-    helpers::time::get_now,
     index::{Index, TrackID},
 };
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Mix {
     id: MixID,
-    last_use: OffsetDateTime,
+    last_use: Zoned,
     selection: Vec<TrackID>,
 }
 
@@ -20,7 +19,7 @@ impl Mix {
         Self {
             id: MixID(thread_rng().gen()),
             selection,
-            last_use: get_now(),
+            last_use: Zoned::now(),
         }
     }
 
@@ -28,13 +27,8 @@ impl Mix {
         self.id
     }
 
-    // pub fn last_use(&self) -> OffsetDateTime {
-    // TODO
-    //     self.last_use
-    // }
-
     pub fn next_tracks<T>(&mut self, max_tracks: usize, mapper: impl Fn(TrackID) -> T) -> Vec<T> {
-        self.last_use = get_now();
+        self.last_use = Zoned::now();
         self.selection
             .drain(..max_tracks.min(self.selection.len()))
             .map(mapper)

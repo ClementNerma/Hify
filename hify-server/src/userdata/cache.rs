@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use jiff::Zoned;
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
 use crate::index::{Index, TrackID};
 
@@ -16,7 +16,7 @@ pub struct UserDataCache {
     dedup_history: Vec<OneListening>,
     listenings: HashMap<TrackID, u32>,
     listening_durations: HashMap<TrackID, u32>,
-    last_listening: HashMap<TrackID, OffsetDateTime>,
+    last_listening: HashMap<TrackID, Zoned>,
 }
 
 impl UserDataCache {
@@ -56,8 +56,8 @@ impl UserDataCache {
             }
         }
 
-        self.last_listening.insert(entry.track_id, entry.at);
-        self.dedup_history.insert(0, *entry);
+        self.last_listening.insert(entry.track_id, entry.at.clone());
+        self.dedup_history.insert(0, entry.clone());
     }
 
     pub fn dedup_history(&self) -> &[OneListening] {
@@ -68,7 +68,7 @@ impl UserDataCache {
         &self.listening_durations
     }
 
-    pub fn last_listening(&self) -> &HashMap<TrackID, OffsetDateTime> {
+    pub fn last_listening(&self) -> &HashMap<TrackID, Zoned> {
         &self.last_listening
     }
 

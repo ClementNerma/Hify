@@ -4,11 +4,10 @@ use std::{
 };
 
 use async_graphql::{Enum, InputObject, SimpleObject};
+use jiff::{Span, Zoned};
 use rand::{seq::SliceRandom, thread_rng};
-use time::Duration;
 
 use crate::{
-    helpers::time::get_now,
     index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
     userdata::UserData,
 };
@@ -152,13 +151,13 @@ fn get_periodically_popular_tracks(
     let mut popular_tracks = HashMap::new();
 
     let period = match period {
-        PopularityPeriod::Daily => Duration::DAY,
-        PopularityPeriod::Weekly => Duration::WEEK,
-        PopularityPeriod::Monthly => Duration::DAY * 31, // Approx.
-        PopularityPeriod::Yearly => Duration::DAY * 365, // Approx.
+        PopularityPeriod::Daily => Span::new(),
+        PopularityPeriod::Weekly => Span::new().weeks(1),
+        PopularityPeriod::Monthly => Span::new().months(1),
+        PopularityPeriod::Yearly => Span::new().years(1),
     };
 
-    let start_period = get_now() - period;
+    let start_period = Zoned::now().checked_sub(period).unwrap();
 
     let listenings = user_data
         .history()

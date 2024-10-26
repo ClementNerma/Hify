@@ -20,23 +20,13 @@ use log::{error, info};
 
 use crate::{check::check_correctness, cmd::Args};
 
-use self::{
-    helpers::{logging::setup_logger, time::OFFSET},
-    resources::ResourceManager,
-};
+use self::{helpers::logging::setup_logger, resources::ResourceManager};
 
 #[tokio::main]
 async fn main() -> ExitCode {
     let args = Args::parse();
 
-    // Trigger offset fetching
-    let _ = *OFFSET;
-
     setup_logger(args.logging_level, args.display_timestamps_in_tty);
-
-    if OFFSET.is_none() {
-        error!("Failed to determine local offset, falling back to UTC.");
-    }
 
     match inner_main(args).await {
         Ok(()) => ExitCode::SUCCESS,

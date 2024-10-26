@@ -54,10 +54,9 @@ impl UserData {
 
     pub fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
         if let Some(last) = self.inner.history.entries().last() {
-            if let Some(overlapping_for) = entry.is_overlapping_prev(*last) {
+            if let Some(overlapping_for) = entry.is_overlapping_prev(last) {
                 return Err(format!(
-                    "Entries overlap in listening history (of about {:.2}s):\n* {:?}\n* {entry:?}",
-                    overlapping_for.as_seconds_f32(),
+                    "Entries overlap in listening history (of about {overlapping_for}):\n* {:?}\n* {entry:?}",
                     last,
                 ));
             }

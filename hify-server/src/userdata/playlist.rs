@@ -1,13 +1,12 @@
 use std::collections::HashSet;
 
 use async_graphql::{InputObject, OneofObject, SimpleObject};
+use jiff::Zoned;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
 use crate::{
     define_id_type,
-    helpers::time::get_now,
     index::{Index, TrackID},
 };
 
@@ -16,21 +15,23 @@ use crate::{
 pub struct Playlist {
     pub id: PlaylistID,
     pub name: String,
-    pub created_at: OffsetDateTime,
-    pub last_updated_at: OffsetDateTime,
 
+    #[graphql(skip)] // TODO
+    pub created_at: Zoned,
+    #[graphql(skip)] // TODO
+    pub last_updated_at: Zoned,
     #[graphql(skip)]
     pub entries: Vec<PlaylistEntry>,
 }
 
 impl Playlist {
     pub fn new(name: String, tracks: Vec<TrackID>) -> Self {
-        let now = get_now();
+        let now = Zoned::now();
 
         Self {
             id: PlaylistID(thread_rng().gen()),
             name,
-            created_at: now,
+            created_at: now.clone(),
             last_updated_at: now,
             entries: tracks.into_iter().map(PlaylistEntry::new).collect(),
         }

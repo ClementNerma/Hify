@@ -1,10 +1,7 @@
+use jiff::{Span, Zoned};
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
-use crate::{
-    helpers::time::get_now,
-    index::{Index, TrackID},
-};
+use crate::index::{Index, TrackID};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct History(Vec<OneListening>);
@@ -28,9 +25,9 @@ impl History {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OneListening {
-    pub at: OffsetDateTime,
+    pub at: Zoned,
     pub track_id: TrackID,
     pub duration_s: u32,
 }
@@ -38,17 +35,22 @@ pub struct OneListening {
 impl OneListening {
     pub fn new_now(track_id: TrackID, duration_s: u32) -> Self {
         Self {
-            at: get_now(),
+            at: Zoned::now(),
             track_id,
             duration_s,
         }
     }
 
-    pub fn is_overlapping_prev(&self, other: OneListening) -> Option<time::Duration> {
-        let against = other.at + (time::Duration::SECOND * other.duration_s);
+    pub fn is_overlapping_prev(&self, prev: &OneListening) -> Option<Span> {
+        assert!(self.at >= prev.at);
 
-        if self.at < against && against - self.at > time::Duration::SECOND {
-            Some(against - self.at)
+        let against = prev
+            .at
+            .checked_add(Span::new().seconds(prev.duration_s))
+            .unwrap();
+
+        if self.at < against {
+            Some(against.since(&self.at).unwrap())
         } else {
             None
         }
