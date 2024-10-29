@@ -10,8 +10,7 @@ const props = defineProps<ButtonProps>()
     <Button v-bind="props" @press="model = !model">
         <span>
             <Emoji>
-                <template v-if="model">☑️</template>
-                <template v-else>🔲</template>
+                {{ model ? '☑️' : '🔲' }}
             </Emoji>
         </span>
 
