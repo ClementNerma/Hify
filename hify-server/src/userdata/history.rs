@@ -27,27 +27,29 @@ impl History {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct OneListening {
-    pub at: Timestamp,
     pub track_id: TrackID,
+    pub ended_at: Timestamp,
     pub duration_s: u32,
 }
 
 impl OneListening {
     pub fn new_now(track_id: TrackID, duration_s: u32) -> Self {
         Self {
-            at: Timestamp::now(),
-            track_id,
             duration_s,
+            ended_at: Timestamp::now(),
+            track_id,
         }
     }
 
     pub fn is_overlapping_prev(&self, prev: &OneListening) -> Option<SignedDuration> {
-        assert!(self.at >= prev.at);
+        assert!(self.ended_at >= prev.ended_at);
 
-        let against = prev.at + SignedDuration::from_secs(prev.duration_s.into());
+        let curr_start = self.ended_at - SignedDuration::from_secs(self.duration_s.into());
 
-        if self.at < against {
-            Some(against.duration_since(self.at))
+        let overlap = prev.ended_at.duration_since(curr_start);
+
+        if overlap > SignedDuration::from_secs(1) {
+            Some(overlap)
         } else {
             None
         }

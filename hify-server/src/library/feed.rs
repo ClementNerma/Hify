@@ -164,7 +164,7 @@ fn get_periodically_popular_tracks(
         .entries()
         .iter()
         .rev()
-        .filter(|pred| pred.at >= start_period);
+        .filter(|pred| pred.ended_at >= start_period);
 
     for listening in listenings {
         match popular_tracks.entry(&listening.track_id) {

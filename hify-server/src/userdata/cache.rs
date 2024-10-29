@@ -56,7 +56,7 @@ impl UserDataCache {
             }
         }
 
-        self.last_listening.insert(entry.track_id, entry.at);
+        self.last_listening.insert(entry.track_id, entry.ended_at);
         self.dedup_history.insert(0, *entry);
     }
 
