@@ -8,7 +8,7 @@ import ContextMenu from '@/components/organisms/ContextMenu.vue'
 import { InputHandlingResult, LogLevel, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
 import Notifications from '@/components/molecules/Notifications.vue'
 import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
-import { playNextTrack, playPreviousTrackOrRewind } from '@/global/stores/play-queue'
+import { playNextTrack, playPreviousTrackOrRewind, restorePlayQueue } from '@/global/stores/play-queue'
 import { NotificationLevel, showNotification } from '@/global/stores/notifications'
 import { log } from './global/stores/debugger'
 
@@ -35,6 +35,8 @@ onMounted(() => {
     window.addEventListener('unhandledrejection', (e) => {
         showNotification(NotificationLevel.Error, `JavaScript unhandled Promise rejection:\n\n${typeof e === 'string' ? e : e instanceof Error ? e.message : '<no specified message>'}`)
     })
+
+    restorePlayQueue()
 })
 
 watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])

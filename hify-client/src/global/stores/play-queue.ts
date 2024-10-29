@@ -272,9 +272,13 @@ export async function getNextTracksOfMix(mixId: string): Promise<AudioTrackFragm
 	return mix.data.getNextTracksOfMix
 }
 
-const persistedPlayQueue = loadPlayQueue()
+export function restorePlayQueue() {
+	const persistedPlayQueue = loadPlayQueue()
 
-if (persistedPlayQueue) {
+	if (persistedPlayQueue === null) {
+		return
+	}
+
 	const { tracksId, position, fromMixId, isMixFinished } = persistedPlayQueue
 
 	gqlClient
