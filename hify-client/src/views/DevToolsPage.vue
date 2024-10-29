@@ -31,7 +31,7 @@ const win = window
 
   <NavigableList>
     <NavigableItem v-for="logEntry in slicedAppLogs">
-      <div class="log-entry" :class="[logEntry.level]">
+      <div class="log-entry" :class="[logEntry.level.toLocaleLowerCase()]">
         <u>{{ logEntry.level.toLocaleUpperCase() }}</u>
         <strong>{{ logEntry.at.toLocaleTimeString() }}</strong>: {{ logEntry.message }}
       </div>
