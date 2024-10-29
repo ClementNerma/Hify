@@ -3,7 +3,7 @@ import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import MixButton from '@/components/atoms/MixButton.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import { MIN_GREAT_RATING } from '@/global/constants';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { getRouteParam, isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

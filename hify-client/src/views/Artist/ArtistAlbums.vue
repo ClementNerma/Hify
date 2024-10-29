@@ -2,7 +2,7 @@
 import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

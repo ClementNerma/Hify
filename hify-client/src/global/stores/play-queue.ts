@@ -5,6 +5,7 @@ import {
 	type AudioTrackFragment,
 	type MixParams,
 } from '@/graphql/generated/graphql'
+import { log, logFatal, LogLevel } from '@/navigable'
 import router from '@/router'
 import { computed, ref, watch } from 'vue'
 import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'
@@ -12,7 +13,6 @@ import { loadPlayQueue, persistPlayQueue } from '../persistence'
 import { gqlClient } from '../urql-client'
 import { swapInArray } from '../utils'
 import { readableAudioProgress, replayTrack, startAudioPlayer, stopAudioPlayer } from './audio-player'
-import { logError, logFatal, logInfo, logWarn } from './debugger'
 import { NotificationLevel, showNotification } from './notifications'
 
 export type PlayQueue = {
@@ -95,7 +95,7 @@ export function playTrackFromCurrentQueue(position: number): void {
 }
 
 export function playPreviousTrackOrRewind(): void {
-	logInfo('Going to play previous track or rewind...')
+	log(LogLevel.Info, 'Going to play previous track or rewind...')
 
 	const progress = readableAudioProgress.value
 
@@ -117,9 +117,9 @@ export function playPreviousTrackOrRewind(): void {
 
 		if (newPosition !== null) {
 			startAudioPlayer(tracks[newPosition], playNextTrack)
-			logInfo(`Playing previous track at position: ${newPosition.toString()}`)
+			log(LogLevel.Info, `Playing previous track at position: ${newPosition.toString()}`)
 		} else {
-			logInfo('No previous track to play')
+			log(LogLevel.Info, 'No previous track to play')
 		}
 
 		playQueue.value = {
@@ -132,7 +132,7 @@ export function playPreviousTrackOrRewind(): void {
 }
 
 export function playNextTrack(): void {
-	logInfo('Going to play next track...')
+	log(LogLevel.Info, 'Going to play next track...')
 
 	const { tracks, position, fromMixId, isMixFinished } = playQueue.value
 
@@ -149,16 +149,16 @@ export function playNextTrack(): void {
 
 	if (newPosition !== null) {
 		startAudioPlayer(tracks[newPosition], playNextTrack)
-		logInfo(`Playing next track at position: ${newPosition.toString()}`)
+		log(LogLevel.Info, `Playing next track at position: ${newPosition.toString()}`)
 	} else {
-		logInfo('No more track to play')
+		log(LogLevel.Info, 'No more track to play')
 	}
 
 	playQueue.value = { tracks, position: newPosition, fromMixId, isMixFinished }
 }
 
 export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void {
-	logInfo(`Queuing ${list.length} tracks as ${where}`)
+	log(LogLevel.Info, `Queuing ${list.length} tracks as ${where}`)
 
 	const { position, tracks, fromMixId, isMixFinished } = playQueue.value
 
@@ -188,17 +188,17 @@ export function enqueue(list: AudioTrackFragment[], where: 'next' | 'end'): void
 }
 
 export function removeFromQueue(index: number): void {
-	logInfo(`Removing track n°${index + 1} from queue`)
+	log(LogLevel.Info, `Removing track n°${index + 1} from queue`)
 
 	const { position, tracks, fromMixId, isMixFinished } = playQueue.value
 
 	if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
-		logWarn('Cannot remove track from queue as the provided position does not exist')
+		log(LogLevel.Warn, 'Cannot remove track from queue as the provided position does not exist')
 		return
 	}
 
 	if (index === position) {
-		logWarn('Cannot remove track from queue as it is the currently-playing track')
+		log(LogLevel.Warn, 'Cannot remove track from queue as it is the currently-playing track')
 		return
 	}
 
@@ -211,17 +211,17 @@ export function removeFromQueue(index: number): void {
 }
 
 export function moveTrackPositionInQueue(index: number, newIndex: number): void {
-	logInfo(`Moving track n°${index + 1} to position ${newIndex + 1} in queue`)
+	log(LogLevel.Info, `Moving track n°${index + 1} to position ${newIndex + 1} in queue`)
 
 	const { position, tracks, fromMixId, isMixFinished } = playQueue.value
 
 	if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
-		logWarn('Cannot move track in  queue as the provided position does not exist')
+		log(LogLevel.Warn, 'Cannot move track in  queue as the provided position does not exist')
 		return
 	}
 
 	if (!Object.prototype.hasOwnProperty.call(tracks, newIndex)) {
-		logWarn('Cannot move track in queue as the provided target position does not exist')
+		log(LogLevel.Warn, 'Cannot move track in queue as the provided target position does not exist')
 		return
 	}
 
@@ -283,7 +283,7 @@ if (persistedPlayQueue) {
 		})
 		.then(({ data, error }) => {
 			if (!data) {
-				logError('Failed to get tracks from persisted play queue', error)
+				log(LogLevel.Error, 'Failed to get tracks from persisted play queue', error)
 				return
 			}
 

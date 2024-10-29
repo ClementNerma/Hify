@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import TracksGrid from '@/components/molecules/TracksGrid.vue';
-import { logFatal } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { AudioTrackFragment, HistoryPageQuery } from '@/graphql/generated/graphql';
+import { logFatal } from '@/navigable';
 import { onMounted, ref } from 'vue';
 
 const TRACKS_PER_LINE = 6

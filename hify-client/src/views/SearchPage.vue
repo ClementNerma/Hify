@@ -2,12 +2,11 @@
 import AlbumsRow from '@/components/molecules/AlbumsRow.vue';
 import ArtistsRow from '@/components/molecules/ArtistsRow.vue';
 import TracksRow from '@/components/molecules/TracksRow.vue';
-import { logFatal, logInfo } from '@/global/stores/debugger';
 import { gqlClient } from '@/global/urql-client';
 import { getRouteParam } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { SearchPageQuery } from '@/graphql/generated/graphql';
-import { requestFocusOnItem, } from '@/navigable';
+import { log, logFatal, LogLevel, requestFocusOnItem, } from '@/navigable';
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
 import { onMounted, ref } from 'vue';
 
@@ -20,7 +19,7 @@ async function onInput() {
     return
   }
 
-  logInfo(`Performing search "${searchTerms}"...`)
+  log(LogLevel.Debug, `Performing search "${searchTerms}"...`)
 
   const start = Date.now()
 
@@ -46,7 +45,7 @@ async function onInput() {
     }
   )
 
-  logInfo(`Performed search "${searchTerms}" in ${Date.now() - start} ms`)
+  log(LogLevel.Debug, `Performed search "${searchTerms}" in ${Date.now() - start} ms`)
 
   if (!data) {
     logFatal('Failed to perform search', error)

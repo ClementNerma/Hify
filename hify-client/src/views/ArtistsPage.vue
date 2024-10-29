@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArtistCard from '@/components/molecules/ArtistCard.vue';
 import { GRID_ARTISTS_PER_ROW, GRID_ARTISTS_PRELOAD_ROWS } from '@/global/constants';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

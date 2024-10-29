@@ -5,7 +5,7 @@ import Emoji from '@/components/atoms/Emoji.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue';
 import { showContextMenu } from '@/global/stores/context-menu';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue';
 import { gqlClient } from '@/global/urql-client';
 import { getRouteParam, hasMinimumRating, noParallel, shuffle } from '@/global/utils';

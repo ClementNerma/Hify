@@ -1,5 +1,5 @@
-import { ref } from "vue"
-import { logFatal } from "./debugger"
+import { logFatal } from '@/navigable'
+import { ref } from 'vue'
 
 export type ContextMenuOption = {
 	label: string

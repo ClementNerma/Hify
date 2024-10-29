@@ -5,23 +5,26 @@ import router from '@/router'
 import { onMounted } from 'vue'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import ContextMenu from '@/components/organisms/ContextMenu.vue'
-import { InputHandlingResult, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
+import { InputHandlingResult, LogLevel, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
 import Notifications from '@/components/molecules/Notifications.vue'
 import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
 import { playNextTrack, playPreviousTrackOrRewind } from '@/global/stores/play-queue'
 import { NotificationLevel, showNotification } from '@/global/stores/notifications'
+import { log } from './global/stores/debugger'
 
 onMounted(() => {
     setupNavigable({
-        logFatal(message) {
-            showNotification(NotificationLevel.Error, message)
-            throw new Error(message)
-        },
+        log(level, message, error) {
+            log(level, message, error)
 
-        logWarn(message) {
-            showNotification(NotificationLevel.Warn, message)
-            console.warn(message)
-        }
+            if (level === LogLevel.Warn) {
+                showNotification(NotificationLevel.Warn, message)
+            }
+
+            if (level === LogLevel.Error || level === LogLevel.Fatal) {
+                showNotification(NotificationLevel.Error, message)
+            }
+        },
     })
 
     window.addEventListener('error', (err) => {

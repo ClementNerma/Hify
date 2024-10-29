@@ -1,8 +1,8 @@
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import type { VNodeRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { GRID_FETCH_AHEAD_ROWS, LIST_FETCH_AHEAD_ROWS } from './constants'
-import { logFatal } from './stores/debugger'
 
 export function getRouteParam(name: string, fallback?: string): string {
 	const { params } = useRoute()

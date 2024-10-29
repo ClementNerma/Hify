@@ -8,7 +8,7 @@ export type OneListSelectExposeType = { buttonRef: ButtonExposeType | null }
 import NavigableItem, { type NavigableItemExposeType, type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
 import { computed, onBeforeMount, onBeforeUpdate, onUpdated, ref } from 'vue';
 import { type ButtonExposeType } from '../atoms/Button.vue';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { NavigationDirection } from '@/navigable';
 
 const props = defineProps<{

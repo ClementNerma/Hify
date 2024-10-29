@@ -2,7 +2,7 @@
 import Centered from '@/components/atoms/Centered.vue';
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
 import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

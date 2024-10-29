@@ -1,8 +1,8 @@
 import { LogListeningDocument, type AudioTrackFragment } from '@/graphql/generated/graphql'
+import { log, logFatal, LogLevel } from '@/navigable'
 import { readonly, ref, shallowRef } from 'vue'
 import { getStreamUrl } from '../constants'
 import { gqlClient } from '../urql-client'
-import { logDebug, logError, logFatal, logInfo, logWarn } from './debugger'
 
 const audioPlayer = shallowRef<HTMLAudioElement | null>(null)
 const audioProgress = shallowRef<number | null>(null)
@@ -17,14 +17,15 @@ async function _newListeningSession(resetAs: AudioTrackFragment | null): Promise
 		const { track, duration_s: prevDurationS } = audioListeningDuration.value
 		const duration_s = Math.floor(prevDurationS)
 
-		logInfo(
+		log(
+			LogLevel.Info,
 			`Registering listening duration of ${duration_s} seconds for track with ID: ${track.id} | ${track.metadata.tags.title}`,
 		)
 
 		const { error } = await gqlClient.mutation(LogListeningDocument, { trackId: track.id, duration_s })
 
 		if (error) {
-			logError('Failed to register listening duration', error)
+			log(LogLevel.Error, 'Failed to register listening duration', error)
 		}
 
 		audioListeningDuration.value = { track: resetAs ?? track, duration_s: 0 }
@@ -51,13 +52,13 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 
 	_newListeningSession(track)
 
-	logInfo(`Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
+	log(LogLevel.Info, `Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
 
 	let lastTimeUpdate = 0
 
 	const newAudio = new Audio(getStreamUrl(track.id))
 
-	newAudio.addEventListener('error', (e) => logError('Failed to load audio track', e))
+	newAudio.addEventListener('error', (e) => log(LogLevel.Error, 'Failed to load audio track', e))
 	newAudio.addEventListener('play', () => {
 		audioPaused.value = false
 	})
@@ -87,7 +88,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 	})
 
 	if (play !== false) {
-		newAudio.play().catch((e: unknown) => logError('Failed to play audio', e))
+		newAudio.play().catch((e: unknown) => log(LogLevel.Error, 'Failed to play audio', e))
 	}
 
 	audioPlayer.value = newAudio
@@ -97,20 +98,20 @@ export function setPlayingAudioProgress(seconds: number) {
 	const player = audioPlayer.value
 
 	if (!player) {
-		logWarn('Tried to set audio progress while no audio is playing')
+		log(LogLevel.Warn, 'Tried to set audio progress while no audio is playing')
 		return
 	}
 
 	player.currentTime = seconds
 
-	logDebug(`Set absolute audio progress: ${humanReadableDuration(seconds)}`)
+	log(LogLevel.Debug, `Set absolute audio progress: ${humanReadableDuration(seconds)}`)
 }
 
 export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 	const player = audioPlayer.value
 
 	if (!player) {
-		logWarn('Tried to set audio progress while no audio is playing')
+		log(LogLevel.Warn, 'Tried to set audio progress while no audio is playing')
 		return
 	}
 
@@ -118,7 +119,8 @@ export function setPlayingAudioProgressRelative(relativeSeconds: number) {
 
 	player.currentTime = player.currentTime + relativeSeconds
 
-	logDebug(
+	log(
+		LogLevel.Debug,
 		`Set relative audio progress: ${relativeSeconds >= 0 ? '+' : ''}${relativeSeconds}s (${prevTime}s => ${
 			player.currentTime
 		}s)`,
@@ -129,11 +131,11 @@ export function toggleAudioPlayback() {
 	const player = audioPlayer.value
 
 	if (!player) {
-		logWarn('Tried to toggle audio playback while no audio is playing')
+		log(LogLevel.Warn, 'Tried to toggle audio playback while no audio is playing')
 		return
 	}
 
-	logInfo('Toggled audio playback')
+	log(LogLevel.Info, 'Toggled audio playback')
 
 	if (player.paused) {
 		player.play().catch((e) => alert(`Failed to resume audio: ${e instanceof Error ? e.message : '<unknown error>'}`))
@@ -157,7 +159,7 @@ export function stopAudioPlayer({ justPause, ignoreAlreadyPaused, ignoreNoPlayer
 
 	if (!player) {
 		if (ignoreNoPlayer !== true) {
-			logWarn('Tried to stop audio playback while no audio is playing')
+			log(LogLevel.Warn, 'Tried to stop audio playback while no audio is playing')
 		}
 
 		return
@@ -166,10 +168,10 @@ export function stopAudioPlayer({ justPause, ignoreAlreadyPaused, ignoreNoPlayer
 	_newListeningSession(null)
 
 	if (!player.paused) {
-		logInfo('Stopped audio playback')
+		log(LogLevel.Info, 'Stopped audio playback')
 		player.pause()
 	} else if (ignoreAlreadyPaused !== true) {
-		logInfo('Tried to stop audio playback, but it was already paused')
+		log(LogLevel.Info, 'Tried to stop audio playback, but it was already paused')
 	}
 
 	if (!justPause) {

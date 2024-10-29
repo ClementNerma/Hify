@@ -7,9 +7,9 @@ export type DropdownSelectExposeType = { buttonRef: ButtonExposeType | null }
 <script setup lang="ts" generic="T extends string">
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import Button, { type ButtonExposeType } from '../atoms/Button.vue';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { NavigationDirection, requestFocusOnItem } from '@/navigable';
 
 const props = defineProps<{

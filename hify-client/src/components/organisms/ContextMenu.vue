@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { logFatal } from '@/global/stores/debugger'
+import { logFatal } from '@/navigable';
 import { onUpdated, ref } from 'vue'
 import { NavigationDirection, getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';

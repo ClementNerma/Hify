@@ -4,10 +4,10 @@ import {
 	type AudioTrackFragment,
 	type PlaylistEntryFragment,
 } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import router from '@/router'
 import { MIN_GREAT_RATING } from './constants'
 import type { ContextMenuOption } from './stores/context-menu'
-import { logFatal } from './stores/debugger'
 import {
 	enqueue,
 	generateAndPlayMix,

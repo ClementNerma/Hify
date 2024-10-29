@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ArtistCard from '@/components/molecules/ArtistCard.vue';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

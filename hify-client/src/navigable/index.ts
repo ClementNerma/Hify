@@ -1,8 +1,15 @@
 export type SetupNavigableOptions = {
-	logFatal?: (message: string) => never
-	logWarn?: (message: string) => void
+	log: (level: LogLevel, message: string, error?: unknown) => void
 	inputHandler?: (keyDownListener: (e: KeyboardEvent) => void, keyUpListener: (e: KeyboardEvent) => void) => void
 	keyLongPressThresholdMs?: number
+}
+
+export enum LogLevel {
+	Debug = 'Debug',
+	Info = 'Info',
+	Warn = 'Warn',
+	Error = 'Error',
+	Fatal = 'Fatal',
 }
 
 let setupOptions: SetupNavigableOptions | null = null
@@ -11,24 +18,13 @@ function assertNever(value: never): never {
 	logFatal(`Reached theorically unreachable statement with value "${value}"`)
 }
 
-function logFatal(message: string): never {
-	const options = getSetupOptions()
-
-	if (options.logFatal) {
-		return options.logFatal(message)
-	}
-
-	throw new Error(`[Navigable] ${message}`)
+export function log(level: LogLevel, message: string, error?: unknown) {
+	getSetupOptions()?.log?.(level, message, error)
 }
 
-function logWarn(message: string): void {
-	const options = getSetupOptions()
-
-	if (options.logWarn) {
-		options.logWarn(message)
-	} else {
-		console.warn(`[Navigable] ${message}`)
-	}
+export function logFatal(message: string, error?: unknown): never {
+	console.error(error)
+	throw new Error(`[Navigable] ${message}`)
 }
 
 export function setupNavigable(options: SetupNavigableOptions) {
@@ -834,7 +830,7 @@ function __handleKeyPress(key: string, longPress: boolean): void {
 	let parent = getNavigableParent(focusedItem)
 
 	if (!parent) {
-		logWarn(`Navigable item "${focusedItem.navEl.id}" does not have a parent!`)
+		getSetupOptions().log(LogLevel.Warn, `Navigable item "${focusedItem.navEl.id}" does not have a parent!`)
 		return
 	}
 
@@ -869,7 +865,7 @@ export function findFirstFocusableItem(): NavigableItem | null {
 		}
 	}
 
-	logWarn('No navigable item found in page!')
+	getSetupOptions().log(LogLevel.Warn, 'No navigable item found in page!')
 	return null
 }
 
@@ -961,7 +957,10 @@ export function requestFocusOnElement(navEl: NavigableElement): void {
 		isHandlingInteraction = false
 		requestFocusOnItem(result.item)
 	} else {
-		logWarn('Failed to request focus on provided container as it returned no item to focus on')
+		getSetupOptions().log(
+			LogLevel.Warn,
+			'Failed to request focus on provided container as it returned no item to focus on',
+		)
 	}
 }
 
@@ -1111,7 +1110,11 @@ export function unregisterNavigableElementHandlers<ElementType extends Navigable
 	ELEMENTS_CUSTOM_EVT_HANDLERS.delete(element.id)
 
 	if (focusedItemId === element.id) {
-		logWarn(`Navigable item with ID '${element.id}' has been removed while still being focused`)
+		getSetupOptions().log(
+			LogLevel.Warn,
+			`Navigable item with ID '${element.id}' has been removed while still being focused`,
+		)
+
 		focusedItemId = null
 	}
 }

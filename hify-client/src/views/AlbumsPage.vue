@@ -2,7 +2,7 @@
 import AlbumCard from '@/components/molecules/AlbumCard.vue';
 import DropdownSelect, { type DropdownSelectExposeType, type DropdownChoices } from '@/components/molecules/DropdownSelect.vue';
 import { GRID_ALBUMS_PER_ROW, GRID_ALBUMS_PRELOAD_ROWS } from '@/global/constants';
-import { logFatal } from '@/global/stores/debugger';
+import { logFatal } from '@/navigable';
 import { gqlClient } from '@/global/urql-client';
 import { assertUnreachable, isApproachingGridEnd, noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';

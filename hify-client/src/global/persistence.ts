@@ -1,5 +1,5 @@
+import { log, LogLevel } from '@/navigable'
 import * as v from 'valibot'
-import { logDebug, logError, logInfo } from './stores/debugger'
 import type { PlayQueue } from './stores/play-queue'
 
 const PLAY_QUEUE_LOCAL_STORAGE_KEY = 'hifyClient-playQueue'
@@ -23,11 +23,11 @@ export function persistPlayQueue(playQueue: PlayQueue) {
 
 	localStorage.setItem(PLAY_QUEUE_LOCAL_STORAGE_KEY, JSON.stringify(state))
 
-	logDebug('Persisted play queue')
+	log(LogLevel.Debug, 'Persisted play queue')
 }
 
 export function loadPlayQueue(): PersistedPlayQueue | null {
-	logInfo('Loading play queue...')
+	log(LogLevel.Debug, 'Loading play queue...')
 
 	const saved = localStorage.getItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 
@@ -40,7 +40,7 @@ export function loadPlayQueue(): PersistedPlayQueue | null {
 	try {
 		parsed = JSON.parse(saved)
 	} catch (e: unknown) {
-		logError(`Failed to parse persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		log(LogLevel.Error, `Failed to parse persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
 		console.error(saved)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null
@@ -51,13 +51,16 @@ export function loadPlayQueue(): PersistedPlayQueue | null {
 	try {
 		validated = v.parse(PersistedPlayQueueSchema, parsed)
 	} catch (e) {
-		logError(`Failed to destructurize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		log(
+			LogLevel.Error,
+			`Failed to destructurize persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`,
+		)
 		console.error(parsed)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null
 	}
 
-	logInfo('Successfully loaded persisted play queue')
+	log(LogLevel.Debug, 'Successfully loaded persisted play queue')
 
 	return validated
 }
