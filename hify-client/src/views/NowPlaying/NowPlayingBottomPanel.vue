@@ -17,6 +17,7 @@ import NavigableList from '@/navigable/vue/components/NavigableList.vue';
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 import { showContextMenu } from '@/global/stores/context-menu';
+import OneLineList from '@/components/molecules/OneLineList.vue';
 
 const isQueueFocused = ref(false)
 
@@ -51,33 +52,27 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
       <NavigableList v-if="currentTrack">
         <With :data="currentTrack.metadata.tags" v-slot="{ data: tags }">
           <NavigableRow class="items-center">
-            <NavigableItem class="track-button" @press="router.push({ name: 'search', params: { query: tags.title } })">
+            <NavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
               <div>🎵 {{ tags.title }}</div>
             </NavigableItem>
 
-            <NavigableItem class="track-button" @press="router.push({ name: 'album', params: { id: tags.album.id } })">
+            <NavigableItem @press="router.push({ name: 'album', params: { id: tags.album.id } })">
               <div>💿 {{ tags.album.name }}</div>
             </NavigableItem>
 
             <!-- TODO: implement "just-for-style" -->
-            <NavigableItem class="track-button" v-if="tags.date" just-for-style>
+            <NavigableItem v-if="tags.date" just-for-style>
               <div>🕒 {{ formatDate(tags.date) }}</div>
             </NavigableItem>
 
-            <NavigableItem class="track-button" v-for="artist in tags.artists" :key="artist.id"
-              @press="router.push({ name: 'artist', params: { id: artist.id } })">
-              <div>🎤 {{ artist.name }}</div>
-            </NavigableItem>
+            <OneLineList prefix="🎤" :items="tags.artists.map(artist => ({ id: artist.id, label: artist.name }))"
+              @press="artistId => router.push({ name: 'artist', params: { id: artistId } })" />
 
-            <ModifiableTrackRating class="track-button" :track="currentTrack" />
+            <ModifiableTrackRating :track="currentTrack" />
 
-            <NavigableItem class="track-button" @press="enableOpacitor = !enableOpacitor">
+            <NavigableItem @press="enableOpacitor = !enableOpacitor">
               <div>
-                <span v-if="enableOpacitor">🔲</span>
-                <span v-else>🔳</span>
-
-                <!-- HACK: align the emoji above with other track infos elements -->
-                &nbsp;
+                {{ enableOpacitor ? '🔲' : '🔳' }}
               </div>
             </NavigableItem>
           </NavigableRow>
@@ -144,15 +139,6 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
   bottom: 0px;
 
   transition: bottom 0.3s;
-}
-
-.track-button {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .progress-range {
