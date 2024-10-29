@@ -6,7 +6,7 @@ export type OneListSelectExposeType = { buttonRef: ButtonExposeType | null }
 
 <script setup lang="ts" generic="T extends string">
 import NavigableItem, { type NavigableItemExposeType, type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, onBeforeUpdate, onUpdated, ref } from 'vue';
 import { type ButtonExposeType } from '../atoms/Button.vue';
 import { logFatal } from '@/global/stores/debugger';
 import { NavigationDirection } from '@/navigable';
@@ -21,16 +21,14 @@ defineEmits<{
   longPress: [T]
 }>()
 
-const activeId = defineModel<T>()
+const activeId = defineModel<T | null>()
 
-const activeIndex = computed(() => (activeId.value && props.items.findIndex(item => item.id === activeId.value)) ?? null)
+const activeIndex = computed(() => {
+  const active = props.items.findIndex(item => item.id === activeId.value)
+  return active !== -1 ? active : null
+})
 
 const expectActiveId = (): T => activeId.value ?? logFatal('Expected a selected item in OneLineList')
-
-function select(itemId: string) {
-  const item = props.items.find(item => item.id === itemId) ?? logFatal('Item not foudn in OneLineList')
-  activeId.value = item.id
-}
 
 const onKeyPress: NavigableItemProps['onKeyPress'] = key => {
   if (activeIndex.value === null || activeIndex.value === -1) {
@@ -38,12 +36,12 @@ const onKeyPress: NavigableItemProps['onKeyPress'] = key => {
   }
 
   if (key === NavigationDirection.Up && !isFirst.value) {
-    select(props.items[activeIndex.value - 1].id)
+    activeId.value = props.items[activeIndex.value - 1].id
     return true
   }
 
   if (key === NavigationDirection.Down && !isLast.value) {
-    select(props.items[activeIndex.value + 1].id)
+    activeId.value = props.items[activeIndex.value + 1].id
     return true
   }
 
@@ -51,7 +49,15 @@ const onKeyPress: NavigableItemProps['onKeyPress'] = key => {
 }
 
 onBeforeMount(() => {
-  if (props.items.length > 0) { select(props.items[0].id) }
+  if (props.items.length > 0) {
+    activeId.value = props.items[0].id
+  }
+})
+
+onBeforeUpdate(() => {
+  if (activeId.value !== null && activeIndex.value === null) {
+    activeId.value = props.items.length > 0 ? props.items[0].id : null
+  }
 })
 
 const isFirst = computed(() => activeIndex.value === null || activeIndex.value === 0)

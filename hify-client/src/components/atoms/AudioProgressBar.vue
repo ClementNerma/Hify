@@ -14,7 +14,7 @@ const focused = ref(false)
 </script>
 
 <template>
-    <NavigableItem :intercept-key-press="dir => dir === NavigationDirection.Left || dir === NavigationDirection.Right"
+    <NavigableItem @key-press="dir => dir === NavigationDirection.Left || dir === NavigationDirection.Right"
         @focus="focused = true" @unfocus="focused = false" @left-key="onDirection('left')"
         @right-key="onDirection('right')" :on-press v-slot="{ focused }">
         <div class="border border-solid border-transparent" v-bind="$attrs">
