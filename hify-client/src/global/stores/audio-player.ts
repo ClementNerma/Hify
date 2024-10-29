@@ -12,32 +12,34 @@ const audioListeningDuration = ref<{ track: AudioTrackFragment; duration_s: numb
 export const readableAudioProgress = readonly(audioProgress)
 export const readableAudioPaused = readonly(audioPaused)
 
-async function _newListeningSession(resetAs: AudioTrackFragment | null): Promise<void> {
-	if (audioListeningDuration.value !== null) {
-		const { track, duration_s: prevDurationS } = audioListeningDuration.value
-		const duration_s = Math.floor(prevDurationS)
-
-		log(
-			LogLevel.Info,
-			`Registering listening duration of ${duration_s} seconds for track with ID: ${track.id} | ${track.metadata.tags.title}`,
-		)
-
-		const { error } = await gqlClient.mutation(LogListeningDocument, { trackId: track.id, duration_s })
-
-		if (error) {
-			log(LogLevel.Error, 'Failed to register listening duration', error)
+async function _changeCurrentPlayingTrack(resetAs: AudioTrackFragment | null): Promise<void> {
+	if (audioListeningDuration.value === null) {
+		if (!resetAs) {
+			logFatal('Got no initial track')
 		}
 
-		audioListeningDuration.value = { track: resetAs ?? track, duration_s: 0 }
+		audioListeningDuration.value = { track: resetAs, duration_s: 0 }
 
 		return
 	}
 
-	if (!resetAs) {
-		logFatal('Got no track to reset as in duration watcher')
-	}
+	const { track, duration_s: prevDurationS } = audioListeningDuration.value
 
-	audioListeningDuration.value = { track: resetAs, duration_s: 0 }
+	// Reset immediately to avoid skipping it accidentally if an error occurs below
+	audioListeningDuration.value = { track: resetAs ?? track, duration_s: 0 }
+
+	const duration_s = Math.floor(prevDurationS)
+
+	log(
+		LogLevel.Info,
+		`Registering listening duration of ${duration_s} seconds for track with ID: ${track.id} | ${track.metadata.tags.title}`,
+	)
+
+	const { error } = await gqlClient.mutation(LogListeningDocument, { trackId: track.id, duration_s })
+
+	if (error) {
+		log(LogLevel.Error, 'Failed to register listening duration', error)
+	}
 }
 
 export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => void, play = true) {
@@ -50,7 +52,7 @@ export function startAudioPlayer(track: AudioTrackFragment, nextHandler: () => v
 	audioPaused.value = false
 	audioProgress.value = 0
 
-	_newListeningSession(track)
+	_changeCurrentPlayingTrack(track)
 
 	log(LogLevel.Info, `Started playing track with ID: ${track.id} | ${track.metadata.tags.title}`)
 
@@ -165,7 +167,7 @@ export function stopAudioPlayer({ justPause, ignoreAlreadyPaused, ignoreNoPlayer
 		return
 	}
 
-	_newListeningSession(null)
+	_changeCurrentPlayingTrack(null)
 
 	if (!player.paused) {
 		log(LogLevel.Info, 'Stopped audio playback')
