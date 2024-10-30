@@ -30,7 +30,7 @@ const activeIndex = computed(() => {
 
 const expectActiveId = (): T => activeId.value ?? logFatal('Expected a selected item in OneLineList')
 
-const onKeyPress: NavigableItemProps['onKeyPress'] = key => {
+const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = key => {
   if (activeIndex.value === null || activeIndex.value === -1) {
     return false
   }
@@ -69,7 +69,7 @@ defineExpose({ itemRef })
 </script>
 
 <template>
-  <NavigableItem ref="itemRef" :on-key-press @press="$emit('press', expectActiveId())"
+  <NavigableItem ref="itemRef" :intercept-key-press @press="$emit('press', expectActiveId())"
     @long-press="$emit('longPress', expectActiveId())">
     {{ prefix ?? '' }}
     {{ isFirst && isLast ? '' : isFirst ? '⏷' : isLast ? '⏶' : '⏶⏷' }}

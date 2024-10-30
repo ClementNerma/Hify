@@ -21,7 +21,7 @@ const setDistractionFree = setupDistractionFreeListener({
   dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape', 'F4'],
 })
 
-function onKeyPress(dir: NavigationDirection | null): boolean {
+function interceptKeyPress(dir: NavigationDirection | null): boolean {
   const dfMode = distractionFreeMode.value
 
   if (!dfMode && dir === NavigationDirection.Back) {
@@ -73,7 +73,7 @@ watch(currentTrack, track => {
     :src="getAlbumArtUrl(currentTrack.metadata.tags.album)" />
 
   <DistractionFreeTogglable>
-    <NavigableList :intercept-key-press="onKeyPress">
+    <NavigableList :intercept-key-press>
       <NowPlayingBottomPanel />
     </NavigableList>
   </DistractionFreeTogglable>
