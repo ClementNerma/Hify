@@ -1,5 +1,5 @@
 use jiff::Zoned;
-use rand::{thread_rng, Rng};
+use rand::random;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -17,7 +17,7 @@ pub struct Mix {
 impl Mix {
     pub fn new(selection: Vec<TrackID>) -> Self {
         Self {
-            id: MixID(thread_rng().gen()),
+            id: MixID(random()),
             selection,
             last_use: Zoned::now(),
         }

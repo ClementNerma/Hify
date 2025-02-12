@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use async_graphql::{Enum, InputObject, OneofObject};
-use rand::{seq::SliceRandom, thread_rng};
+use rand::{rng, seq::SliceRandom};
 
 use crate::{
     graphql::EmptyScalar,
@@ -87,7 +87,7 @@ pub fn generate_mix(
         .collect::<Vec<_>>();
 
     match ordering {
-        MixOrdering::Random => tracks.shuffle(&mut thread_rng()),
+        MixOrdering::Random => tracks.shuffle(&mut rng()),
 
         MixOrdering::ListeningDuration => {
             tracks.sort_by_key(|track_id| {

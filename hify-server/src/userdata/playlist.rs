@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use async_graphql::{InputObject, OneofObject, SimpleObject};
 use jiff::Zoned;
-use rand::{thread_rng, Rng};
+use rand::random;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -29,7 +29,7 @@ impl Playlist {
         let now = Zoned::now();
 
         Self {
-            id: PlaylistID(thread_rng().gen()),
+            id: PlaylistID(random()),
             name,
             created_at: now.clone(),
             last_updated_at: now,
@@ -122,7 +122,7 @@ pub struct PlaylistEntry {
 impl PlaylistEntry {
     fn new(track_id: TrackID) -> Self {
         Self {
-            id: PlaylistEntryID(thread_rng().gen()),
+            id: PlaylistEntryID(random()),
             track_id,
         }
     }

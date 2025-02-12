@@ -7,30 +7,30 @@ edition = "2021"
 async-graphql = { default-features = false, features = [
     "graphiql",
     "time",
-], version = "7.0.11" }
-anyhow = "1.0.89"
-async-graphql-axum = "7.0.11"
-axum = "0.7.7"
-clap = { version = "4.5.18", features = ["derive"] }
-colored = "2.1.0"
-dirs = "5.0.1"
-env_logger = "0.11.5"
-log = "0.4.22"
+], version = "7.0.15" }
+anyhow = "1.0.95"
+async-graphql-axum = "7.0.15"
+axum = "0.8.1"
+clap = { version = "4.5.29", features = ["derive"] }
+colored = "3.0.0"
+dirs = "6.0.0"
+env_logger = "0.11.6"
+log = "0.4.25"
 pomsky-macro = "0.11.0"
-rand = "0.8.5"
-regex = "1.11.0"
-serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
-tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread", "fs"] }
-tower = { version = "0.5.1", features = ["util"] }
-tower-http = { version = "0.6.1", features = ["cors", "fs"] }
+rand = "0.9.0"
+regex = "1.11.1"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.138"
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread", "fs"] }
+tower = { version = "0.5.2", features = ["util"] }
+tower-http = { version = "0.6.2", features = ["cors", "fs"] }
 walkdir = "2.5.0"
-indicatif = "0.17.8"
+indicatif = "0.17.11"
 symphonia = { version = "0.5.4", features = ["all"] }
-image = { version = "0.25.2", default-features = false, features = [
+image = { version = "0.25.5", default-features = false, features = [
     "jpeg",
     "png",
     "webp",
 ] }
 rayon = "1.10.0"
-jiff = { version = "0.1.13", features = ["serde"] }
+jiff = { version = "0.2.0", features = ["serde"] }

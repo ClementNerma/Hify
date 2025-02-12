@@ -5,7 +5,7 @@ use std::{
 
 use async_graphql::{Enum, InputObject, SimpleObject};
 use jiff::{Span, Zoned};
-use rand::{seq::SliceRandom, thread_rng};
+use rand::{rng, seq::SliceRandom};
 
 use crate::{
     index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
@@ -202,7 +202,7 @@ fn get_random_great<T: Copy + Eq + Hash, U>(
 
     let mut great = out.into_iter().map(mapper).collect::<Vec<_>>();
 
-    great.shuffle(&mut thread_rng());
+    great.shuffle(&mut rng());
     great
 }
 

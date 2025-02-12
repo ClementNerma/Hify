@@ -42,9 +42,9 @@ pub async fn launch(
     let app = Router::new()
         // Define all routes
         .route(GRAPHQL_ENDPOINT, get(graphiql).post(graphql_handler))
-        .route("/art/album/:id", get(album_art))
-        .route("/art/artist/:id", get(artist_art))
-        .route("/stream/:id", get(stream))
+        .route("/art/album/{id}", get(album_art))
+        .route("/art/artist/{id}", get(artist_art))
+        .route("/stream/{id}", get(stream))
         // Define extensions
         .layer(Extension(app_state))
         .layer(Extension(graphql_schema))
