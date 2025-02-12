@@ -15,27 +15,27 @@
 	},
 	"dependencies": {
 		"@graphql-typed-document-node/core": "^3.2.0",
-		"@urql/vue": "^1.4.1",
+		"@urql/vue": "^1.4.2",
 		"valibot": "^0.42.1",
-		"vue": "^3.5.10",
-		"vue-router": "^4.4.5"
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.2",
-		"@graphql-codegen/cli": "^5.0.2",
-		"@graphql-codegen/client-preset": "^4.3.3",
+		"@biomejs/biome": "^1.9.4",
+		"@graphql-codegen/cli": "^5.0.4",
+		"@graphql-codegen/client-preset": "^4.6.2",
+		"@tailwindcss/vite": "^4.0.6",
 		"@tsconfig/node20": "^20.1.4",
-		"@types/node": "^22.7.4",
-		"@vitejs/plugin-vue": "^5.1.4",
-		"@vue/tsconfig": "^0.5.1",
+		"@types/node": "^22.13.1",
+		"@vitejs/plugin-vue": "^5.2.1",
+		"@vue/tsconfig": "^0.7.0",
 		"autoprefixer": "^10.4.20",
-		"graphql": "^16.9.0",
-		"npm-run-all2": "^6.2.3",
-		"postcss": "^8.4.47",
-		"tailwindcss": "^3.4.13",
+		"graphql": "^16.10.0",
+		"npm-run-all2": "^7.0.2",
+		"tailwindcss": "^4.0.6",
 		"ts-node": "^10.9.2",
-		"typescript": "~5.6.2",
-		"vite": "^5.4.8",
-		"vue-tsc": "^2.1.6"
+		"typescript": "~5.7.3",
+		"vite": "^6.1.0",
+		"vue-tsc": "^2.2.0"
 	}
 }

@@ -1,22 +1,25 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
 html {
-    height: 100%;
-    font-size: 12px;
+	height: 100%;
+	font-size: 12px;
 }
 
 body {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    color: rgb(230, 230, 230);
-    overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	color: rgb(230, 230, 230);
+	overflow: hidden;
 
-    /* HACK: Elements disappear when scrolling on WebKit, this fixes it */
-    /* Removed for now as it doesn't seem to be required anymore on my system */
-    /* perspective: 1px; */
+	/* HACK: Elements disappear when scrolling on WebKit, this fixes it */
+	/* Removed for now as it doesn't seem to be required anymore on my system */
+	/* perspective: 1px; */
 
-    /* These properties are required as simply using "bottom: 0" causes problems with the hack above */
-    min-height: 100%;
-    margin: 0;
-    padding: 8px;
+	/* These properties are required as simply using "bottom: 0" causes problems with the hack above */
+	min-height: 100%;
+	margin: 0;
+	padding: 8px;
 }
