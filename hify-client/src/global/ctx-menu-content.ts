@@ -16,10 +16,12 @@ import {
 	removeFromQueue,
 } from './stores/play-queue'
 import { gqlClient } from './urql-client'
+import { assertUnreachable } from './utils'
 
 export type TrackContext =
 	| { context: 'normal' }
 	| { context: 'album' }
+	| { context: 'artist' }
 	| { context: 'playlist'; entry: EntryInPlaylist }
 	| { context: 'queue'; isCurrent: boolean; position: number; totalTracks: number; onQueueEdition?: () => void }
 
@@ -37,6 +39,7 @@ export const ctxMenuOptions = {
 		switch (ctx.context) {
 			case 'normal':
 			case 'album':
+			case 'artist':
 				break
 
 			case 'queue': {
@@ -133,6 +136,9 @@ export const ctxMenuOptions = {
 
 				break
 			}
+
+			default:
+				assertUnreachable(ctx)
 		}
 
 		if (ctx.context !== 'album') {

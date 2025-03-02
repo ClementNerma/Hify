@@ -7,7 +7,7 @@ import NavigableTrack from '../atoms/NavigableTrack.vue';
 import TrackRating from '../atoms/TrackRating.vue';
 import { isApproachingListEnd } from '@/global/utils';
 
-const props = defineProps<{
+defineProps<{
   tracks: AudioTrackFragment[]
   hasMore: boolean
   showArtistsName?: boolean
@@ -25,7 +25,7 @@ const props = defineProps<{
             <img :width="50" :height="50" :src="getAlbumArtUrl(track.metadata.tags.album)" />
           </td>
           <td class="w-full">
-            <NavigableTrack :tracks :context="{ context: 'album' }" :track
+            <NavigableTrack :tracks :context="{ context: 'artist' }" :track
               @focus="isApproachingListEnd(i, tracks.length) && feedMore()">
               <span>{{ track.metadata.tags.title }}</span>
             </NavigableTrack>
@@ -40,7 +40,7 @@ const props = defineProps<{
             {{ track.metadata.tags.album.name }}
 
             <span v-if="showArtistsName">
-              ({{ track.metadata.tags.album.albumArtists.map(artist => artist.name).join(', ') }})
+              ({{track.metadata.tags.album.albumArtists.map(artist => artist.name).join(', ')}})
             </span>
           </td>
         </tr>
