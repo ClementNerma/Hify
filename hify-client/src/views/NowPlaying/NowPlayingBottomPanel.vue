@@ -6,11 +6,11 @@ import With from '@/components/atoms/With.vue'
 import Card from '@/components/molecules/Card.vue'
 import { ctxMenuOptions } from '@/global/ctx-menu-content'
 import {
-	humanReadableDuration,
-	readableAudioPaused,
-	readableAudioProgress,
-	setPlayingAudioProgressRelative,
-	toggleAudioPlayback,
+  humanReadableDuration,
+  readableAudioPaused,
+  readableAudioProgress,
+  setPlayingAudioProgressRelative,
+  toggleAudioPlayback,
 } from '@/global/stores/audio-player'
 import { enableOpacitor } from '@/global/stores/opacitor'
 import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue'
@@ -28,30 +28,35 @@ import OneLineList from '@/components/molecules/OneLineList.vue'
 const isQueueFocused = ref(false)
 
 function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
-	showContextMenu(
-		ctxMenuOptions.forTrack(
-			track,
-			{ fromMixId: null },
-			{
-				context: 'queue',
-				isCurrent: readablePlayQueue.value.position === position,
-				position,
-				totalTracks: readablePlayQueue.value.tracks.length,
-				onQueueEdition: () => queueGalleryRef.value?.requestFocus(position),
-			},
-		),
-	)
+  showContextMenu(
+    ctxMenuOptions.forTrack(
+      track,
+      { fromMixId: null },
+      {
+        context: 'queue',
+        isCurrent: readablePlayQueue.value.position === position,
+        position,
+        totalTracks: readablePlayQueue.value.tracks.length,
+        onQueueEdition: () => queueGalleryRef.value?.requestFocus(position),
+      },
+    ),
+  )
+}
+
+function moveInTrack(dir: 'left' | 'right', shiftKey: boolean) {
+  const amount = shiftKey ? 10 : 30
+  setPlayingAudioProgressRelative(dir === 'left' ? -amount : amount)
 }
 
 const queueGalleryRef = ref<ProgressiveRowExposeType | null>(null)
 
 watch(
-	() => [queueGalleryRef.value, readablePlayQueue.value.position] as const,
-	([gallery, position]) => {
-		if (gallery !== null && position !== null) {
-			gallery.jumpUnfocusedPosition(position)
-		}
-	},
+  () => [queueGalleryRef.value, readablePlayQueue.value.position] as const,
+  ([gallery, position]) => {
+    if (gallery !== null && position !== null) {
+      gallery.jumpUnfocusedPosition(position)
+    }
+  },
 )
 </script>
 
@@ -105,8 +110,7 @@ watch(
 
           <div class="progress-range">
             <AudioProgressBar class="w-full" :max="currentTrack.metadata.duration" :value="readableAudioProgress ?? 0"
-              @press="toggleAudioPlayback"
-              @direction="dir => setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)" />
+              @press="toggleAudioPlayback" @direction="moveInTrack" />
           </div>
         </With>
       </NavigableList>

@@ -3,35 +3,36 @@
 type NavigableItem = NavigableCommonElementProps & { type: 'item'; hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
-	disabled?: boolean
+  disabled?: boolean
 
-	interceptKeyPress?: (
-		navigationKey: NavigationDirection | null,
-		key: string,
-		longPress: boolean,
-		item: NavigableItem,
-	) => boolean
+  interceptKeyPress?: (
+    navigationKey: NavigationDirection | null,
+    key: string,
+    longPress: boolean,
+    modifiers: KeyModifiers,
+    item: NavigableItem,
+  ) => boolean
 
-	onFocus?: (item: NavigableItem) => void
-	onUnfocus?: (item: NavigableItem) => void
-	onPress?: (item: NavigableItem) => void
-	onLongPress?: (item: NavigableItem) => void
-	onLeftKey?: (item: NavigableItem) => void
-	onRightKey?: (item: NavigableItem) => void
-	onUpKey?: (item: NavigableItem) => void
-	onDownKey?: (item: NavigableItem) => void
-	onBackKey?: (item: NavigableItem) => void
+  onFocus?: (item: NavigableItem) => void
+  onUnfocus?: (item: NavigableItem) => void
+  onPress?: (item: NavigableItem) => void
+  onLongPress?: (item: NavigableItem) => void
+  onLeftKey?: (item: NavigableItem) => void
+  onRightKey?: (item: NavigableItem) => void
+  onUpKey?: (item: NavigableItem) => void
+  onDownKey?: (item: NavigableItem) => void
+  onBackKey?: (item: NavigableItem) => void
 } & Omit<NavigableItem, 'id' | 'type'>
 
 export type NavigableItemExposeType = {
-	item: NavigableItem
-	focused: boolean
+  item: NavigableItem
+  focused: boolean
 }
 </script>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type DefineComponent, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyModifiers, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 
@@ -57,7 +58,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
     }
   },
 
-  interceptKeyPress(item, key, longPress) {
+  interceptKeyPress(item, key, longPress, modifiers) {
     const dir = longPress ? null : translateNavigationKey(key)
 
     if (dir === NavigationDirection.Up) {
@@ -72,7 +73,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
       props.onBackKey?.(item)
     }
 
-    return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, item) ? { type: 'trap' } : { type: 'native' }
+    return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, item) ? { type: 'trap' } : { type: 'native' }
   },
 
 

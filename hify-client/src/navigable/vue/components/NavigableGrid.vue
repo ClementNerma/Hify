@@ -3,33 +3,34 @@
 type NavigableGrid = NavigableCommonElementProps & { type: 'grid'; columns: number }
 
 export type NavigableGridProps = {
-	interceptKeyPress?: (
-		navigationKey: NavigationDirection | null,
-		key: string,
-		longPress: boolean,
-		grid: NavigableGrid,
-	) => boolean
+    interceptKeyPress?: (
+        navigationKey: NavigationDirection | null,
+        key: string,
+        longPress: boolean,
+        modifiers: KeyModifiers,
+        grid: NavigableGrid,
+    ) => boolean
 
-	onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
-	onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
-	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
-	onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
-	onLeftKey?: (grid: NavigableGrid) => void
-	onRightKey?: (grid: NavigableGrid) => void
-	onUpKey?: (grid: NavigableGrid) => void
-	onDownKey?: (grid: NavigableGrid) => void
-	onBackKey?: (grid: NavigableGrid) => void
+    onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
+    onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
+    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
+    onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
+    onLeftKey?: (grid: NavigableGrid) => void
+    onRightKey?: (grid: NavigableGrid) => void
+    onUpKey?: (grid: NavigableGrid) => void
+    onDownKey?: (grid: NavigableGrid) => void
+    onBackKey?: (grid: NavigableGrid) => void
 } & Omit<NavigableGrid, 'id' | 'type'>
 
 export type NavigableGridExposeType = {
-	grid: NavigableGrid
-	focused: boolean
+    grid: NavigableGrid
+    focused: boolean
 }
 </script>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyModifiers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableGridProps>()
 
@@ -54,7 +55,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>
         return { type: 'native' }
     },
 
-    interceptKeyPress(grid, key, longPress, currentlyFocusedChild) {
+    interceptKeyPress(grid, key, longPress, modifiers) {
         const dir = longPress ? null : translateNavigationKey(key)
 
         if (dir === NavigationDirection.Up) {
@@ -69,7 +70,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>
             props.onBackKey?.(grid)
         }
 
-        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, grid) ? { type: 'trap' } : { type: 'native' }
+        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, grid) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(grid, focusedChild) {

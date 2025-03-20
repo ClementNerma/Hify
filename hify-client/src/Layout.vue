@@ -44,37 +44,41 @@ onMounted(() => {
 
 watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])
 
-handleInput((key, long) => {
-	switch (key) {
-		case 'MediaPlayPause':
-			if (!long) {
-				toggleAudioPlayback()
-			} else {
-				router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
-			}
+handleInput((key, long, { shiftKey }) => {
+	if (key === 'MediaPlayPause') {
+		if (!long) {
+			toggleAudioPlayback()
+		} else {
+			router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
+		}
+	}
 
-			break
+	else if (key === 'MediaRewind') {
+		if (!long) {
+			setPlayingAudioProgressRelative(-10)
+		} else {
+			playPreviousTrackOrRewind()
+		}
+	}
 
-		case 'MediaRewind':
-			if (!long) {
-				setPlayingAudioProgressRelative(-10)
-			} else {
-				playPreviousTrackOrRewind()
-			}
+	else if (key === 'MediaFastForward') {
+		if (!long) {
+			setPlayingAudioProgressRelative(+10)
+		} else {
+			playNextTrack()
+		}
+	}
 
-			break
+	else if (key === 'ArrowUp' && shiftKey) {
+		playPreviousTrackOrRewind()
+	}
 
-		case 'MediaFastForward':
-			if (!long) {
-				setPlayingAudioProgressRelative(+10)
-			} else {
-				playNextTrack()
-			}
+	else if (key === 'ArrowDown' && shiftKey) {
+		playNextTrack()
+	}
 
-			break
-
-		default:
-			return InputHandlingResult.Propagate
+	else {
+		return InputHandlingResult.Propagate
 	}
 
 	return InputHandlingResult.Intercepted
@@ -82,37 +86,37 @@ handleInput((key, long) => {
 </script>
 
 <template>
-    <div class="background fixed inset-0 -z-30" />
+	<div class="background fixed inset-0 -z-30" />
 
-    <NavigableList @back-key="router.back()">
-        <ContextMenu />
-        <Notifications />
+	<NavigableList @back-key="router.back()">
+		<ContextMenu />
+		<Notifications />
 
-        <DistractionFreeTogglable>
-            <NavBar :tabs="[
-                { label: 'Home', routeName: 'home' },
-                { label: 'History', routeName: 'history' },
-                { label: 'Now Playing', routeName: 'now-playing' },
-                {
-                    label: 'Albums',
-                    routeName: 'albums',
-                    subMenu: [
-                        { label: 'Album artists', routeName: 'album-artists' },
-                        { label: 'Artists', routeName: 'artists' },
-                        { label: 'Genres', routeName: 'genres' }
-                    ],
-                },
-                { label: 'Playlists', routeName: 'playlists' },
-                { label: 'Search', routeName: 'search' }]" />
-        </DistractionFreeTogglable>
+		<DistractionFreeTogglable>
+			<NavBar :tabs="[
+				{ label: 'Home', routeName: 'home' },
+				{ label: 'History', routeName: 'history' },
+				{ label: 'Now Playing', routeName: 'now-playing' },
+				{
+					label: 'Albums',
+					routeName: 'albums',
+					subMenu: [
+						{ label: 'Album artists', routeName: 'album-artists' },
+						{ label: 'Artists', routeName: 'artists' },
+						{ label: 'Genres', routeName: 'genres' }
+					],
+				},
+				{ label: 'Playlists', routeName: 'playlists' },
+				{ label: 'Search', routeName: 'search' }]" />
+		</DistractionFreeTogglable>
 
-        <slot />
-    </NavigableList>
+		<slot />
+	</NavigableList>
 
 </template>
 
 <style scoped>
 .background {
-    background: linear-gradient(to bottom, #363636 0vh, #080808 33vh);
+	background: linear-gradient(to bottom, #363636 0vh, #080808 33vh);
 }
 </style>
