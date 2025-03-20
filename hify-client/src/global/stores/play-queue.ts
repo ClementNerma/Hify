@@ -63,6 +63,8 @@ watch(playQueue, async ({ tracks, position, fromMixId, isMixFinished }) => {
 		fromMixId,
 		isMixFinished: tracks.length === 0,
 	}
+}, {
+	deep: true
 })
 
 function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
