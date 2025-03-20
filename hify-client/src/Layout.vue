@@ -13,70 +13,72 @@ import { NotificationLevel, showNotification } from '@/global/stores/notificatio
 import { log } from './global/stores/debugger'
 
 onMounted(() => {
-    setupNavigable({
-        log(level, message, error) {
-            log(level, message, error)
+	setupNavigable({
+		log(level, message, error) {
+			log(level, message, error)
 
-            if (level === LogLevel.Warn) {
-                showNotification(NotificationLevel.Warn, message)
-            }
+			if (level === LogLevel.Warn) {
+				showNotification(NotificationLevel.Warn, message)
+			}
 
-            if (level === LogLevel.Error || level === LogLevel.Fatal) {
-                showNotification(NotificationLevel.Error, message)
-            }
-        },
-    })
+			if (level === LogLevel.Error || level === LogLevel.Fatal) {
+				showNotification(NotificationLevel.Error, message)
+			}
+		},
+	})
 
-    window.addEventListener('error', (err) => {
-        showNotification(NotificationLevel.Error, `JavaScript runtime error:\n\n${err.message}`)
-        console.error(err)
-    })
+	window.addEventListener('error', (err) => {
+		showNotification(NotificationLevel.Error, `JavaScript runtime error:\n\n${err.message}`)
+		console.error(err)
+	})
 
-    window.addEventListener('unhandledrejection', (e) => {
-        showNotification(NotificationLevel.Error, `JavaScript unhandled Promise rejection:\n\n${typeof e === 'string' ? e : e instanceof Error ? e.message : '<no specified message>'}`)
-    })
+	window.addEventListener('unhandledrejection', (e) => {
+		showNotification(
+			NotificationLevel.Error,
+			`JavaScript unhandled Promise rejection:\n\n${typeof e === 'string' ? e : e instanceof Error ? e.message : '<no specified message>'}`,
+		)
+	})
 
-    restorePlayQueue()
+	restorePlayQueue()
 })
 
 watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])
 
 handleInput((key, long) => {
-    switch (key) {
-        case 'MediaPlayPause':
-            if (!long) {
-                toggleAudioPlayback()
-            } else {
-                router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
-            }
+	switch (key) {
+		case 'MediaPlayPause':
+			if (!long) {
+				toggleAudioPlayback()
+			} else {
+				router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
+			}
 
-            break
+			break
 
-        case 'MediaRewind':
-            if (!long) {
-                setPlayingAudioProgressRelative(-10)
-            } else {
-                playPreviousTrackOrRewind()
-            }
+		case 'MediaRewind':
+			if (!long) {
+				setPlayingAudioProgressRelative(-10)
+			} else {
+				playPreviousTrackOrRewind()
+			}
 
-            break
+			break
 
-        case 'MediaFastForward':
-            if (!long) {
-                setPlayingAudioProgressRelative(+10)
-            } else {
-                playNextTrack()
-            }
+		case 'MediaFastForward':
+			if (!long) {
+				setPlayingAudioProgressRelative(+10)
+			} else {
+				playNextTrack()
+			}
 
-            break
+			break
 
-        default:
-            return InputHandlingResult.Propagate
-    }
+		default:
+			return InputHandlingResult.Propagate
+	}
 
-    return InputHandlingResult.Intercepted
+	return InputHandlingResult.Intercepted
 })
-
 </script>
 
 <template>

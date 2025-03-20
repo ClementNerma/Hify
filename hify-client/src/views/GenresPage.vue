@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import { MIN_GREAT_RATING } from '@/global/constants';
-import { showContextMenu } from '@/global/stores/context-menu';
-import { generateAndPlayMix } from '@/global/stores/play-queue';
-import { graphql } from '@/graphql/generated';
-import { MixOrdering } from '@/graphql/generated/graphql';
-import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import router from '@/router';
-import { useQuery } from '@urql/vue';
-import { computed, } from 'vue';
+import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
+import { MIN_GREAT_RATING } from '@/global/constants'
+import { showContextMenu } from '@/global/stores/context-menu'
+import { generateAndPlayMix } from '@/global/stores/play-queue'
+import { graphql } from '@/graphql/generated'
+import { MixOrdering } from '@/graphql/generated/graphql'
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import router from '@/router'
+import { useQuery } from '@urql/vue'
+import { computed } from 'vue'
 
 const GENRES_PER_LINE = 6
 
 const { data, fetching, error } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query GenresPage {
       genres {
         id
@@ -23,7 +23,7 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-  variables: {}
+	variables: {},
 })
 
 const genres = computed(() => data.value?.genres)

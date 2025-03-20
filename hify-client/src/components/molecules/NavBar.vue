@@ -1,8 +1,8 @@
 <script lang="ts">
 export type Tab = {
-  label: string
-  routeName: string
-  subMenu?: TabDropdownItem[]
+	label: string
+	routeName: string
+	subMenu?: TabDropdownItem[]
 }
 
 export type TabDropdownItem = Omit<Tab, 'subMenu'>

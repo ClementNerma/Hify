@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Button, { type ButtonProps } from './Button.vue';
-import Emoji from './Emoji.vue';
+import Button, { type ButtonProps } from './Button.vue'
+import Emoji from './Emoji.vue'
 
 const model = defineModel<boolean>()
 const props = defineProps<ButtonProps>()

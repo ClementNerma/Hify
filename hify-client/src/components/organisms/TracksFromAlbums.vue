@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { getAlbumArtUrl, } from '@/global/constants';
-import { humanReadableDuration } from '@/global/stores/audio-player';
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import NavigableTrack from '../atoms/NavigableTrack.vue';
-import TrackRating from '../atoms/TrackRating.vue';
-import { isApproachingListEnd } from '@/global/utils';
+import { getAlbumArtUrl } from '@/global/constants'
+import { humanReadableDuration } from '@/global/stores/audio-player'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableTrack from '../atoms/NavigableTrack.vue'
+import TrackRating from '../atoms/TrackRating.vue'
+import { isApproachingListEnd } from '@/global/utils'
 
 defineProps<{
-  tracks: AudioTrackFragment[]
-  hasMore: boolean
-  showArtistsName?: boolean
-  feedMore: () => Promise<void>
+	tracks: AudioTrackFragment[]
+	hasMore: boolean
+	showArtistsName?: boolean
+	feedMore: () => Promise<void>
 }>()
 </script>
 

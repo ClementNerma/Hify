@@ -9,21 +9,21 @@ import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import { showContextMenu, type ContextMenuOption } from '@/global/stores/context-menu'
 
 const { artist } = defineProps<{
-    artist: ArtistFragment
+	artist: ArtistFragment
 }>()
 
 const contextMenuOptions = computed<ContextMenuOption[]>(() => [
-    {
-        label: 'Mix me some magic ✨',
-        onPress() {
-            generateAndPlayMix({
-                source: { allTracks: true },
-                ordering: MixOrdering.Random,
-                minRating: MIN_GREAT_RATING,
-                fromArtists: [artist.id]
-            })
-        }
-    }
+	{
+		label: 'Mix me some magic ✨',
+		onPress() {
+			generateAndPlayMix({
+				source: { allTracks: true },
+				ordering: MixOrdering.Random,
+				minRating: MIN_GREAT_RATING,
+				fromArtists: [artist.id],
+			})
+		},
+	},
 ])
 </script>
 

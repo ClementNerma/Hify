@@ -1,9 +1,9 @@
 fragment Album on AlbumInfos {
-  id
-  name
-  albumArtists {
-    id
-    name
-  }
-  hasArt
+	id
+	name
+	albumArtists {
+		id
+		name
+	}
+	hasArt
 }

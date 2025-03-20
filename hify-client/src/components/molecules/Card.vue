@@ -1,12 +1,12 @@
 <script lang="ts">
 export type CardProps = {
-    title: string,
-    artUrl: string
+	title: string
+	artUrl: string
 
-    subtitle?: string,
-    boxSize?: number,
-    circle?: boolean,
-    opacity?: number,
+	subtitle?: string
+	boxSize?: number
+	circle?: boolean
+	opacity?: number
 }
 </script>
 

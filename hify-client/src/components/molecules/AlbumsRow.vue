@@ -2,11 +2,11 @@
 import type { AlbumFragment } from '@/graphql/generated/graphql'
 import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
-import router from '@/router';
-import { getAlbumArtUrl } from '@/global/constants';
+import router from '@/router'
+import { getAlbumArtUrl } from '@/global/constants'
 
 defineProps<{
-    albums: AlbumFragment[]
+	albums: AlbumFragment[]
 }>()
 </script>
 

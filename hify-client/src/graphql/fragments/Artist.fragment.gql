@@ -1,5 +1,5 @@
 fragment Artist on ArtistInfos {
-  id
-  name
-  hasArt
+	id
+	name
+	hasArt
 }

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Button from '@/components/atoms/Button.vue'
 import { UpdateIndexDocument } from '@/graphql/generated/graphql'
-import { useMutation } from '@urql/vue';
-import { watch } from 'vue';
-import Emoji from './Emoji.vue';
+import { useMutation } from '@urql/vue'
+import { watch } from 'vue'
+import Emoji from './Emoji.vue'
 
 const emit = defineEmits<{
-    updated: []
+	updated: []
 }>()
 
 const { data, error, fetching, executeMutation } = useMutation(UpdateIndexDocument)

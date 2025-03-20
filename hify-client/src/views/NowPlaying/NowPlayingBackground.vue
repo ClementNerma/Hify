@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { getAlbumArtUrl } from '@/global/constants';
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import { computed } from 'vue';
+import { getAlbumArtUrl } from '@/global/constants'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { computed } from 'vue'
 
 const props = defineProps<{
-  track: AudioTrackFragment | null,
-  dim: boolean
+	track: AudioTrackFragment | null
+	dim: boolean
 }>()
 
 const album = computed(() => props.track?.metadata.tags.album)
-const background = computed(() => album.value?.hasArt ? `url("${getAlbumArtUrl(album.value)}")` : 'transparent')
+const background = computed(() => (album.value?.hasArt ? `url("${getAlbumArtUrl(album.value)}")` : 'transparent'))
 const backdropFilter = computed(() => `blur(20px) brightness(${props.dim ? 0.3 : 0.4})`)
 </script>
 

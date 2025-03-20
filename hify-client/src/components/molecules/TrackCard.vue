@@ -2,16 +2,15 @@
 import NavigableTrack from '../atoms/NavigableTrack.vue'
 import type { EntryInPlaylist } from '@/global/ctx-menu-content'
 import Card from './Card.vue'
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import { getAlbumArtUrl } from '@/global/constants';
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { getAlbumArtUrl } from '@/global/constants'
 
 defineProps<{
-    track: AudioTrackFragment,
-    tracks: AudioTrackFragment[],
-    inPlaylist?: EntryInPlaylist,
-    onFocus?: () => void
+	track: AudioTrackFragment
+	tracks: AudioTrackFragment[]
+	inPlaylist?: EntryInPlaylist
+	onFocus?: () => void
 }>()
-
 </script>
 
 <template>

@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import Button from '@/components/atoms/Button.vue';
-import Checkbox from '@/components/atoms/Checkbox.vue';
-import { hifyInterface } from '@/global/injected';
-import { appLogs } from '@/global/stores/debugger';
-import { LogLevel } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
+import Button from '@/components/atoms/Button.vue'
+import Checkbox from '@/components/atoms/Checkbox.vue'
+import { hifyInterface } from '@/global/injected'
+import { appLogs } from '@/global/stores/debugger'
+import { LogLevel } from '@/navigable'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import { computed, ref } from 'vue'
 
 const hideDebugLogs = ref(true)
 
-const slicedAppLogs = computed(() => appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)))
+const slicedAppLogs = computed(() =>
+	appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)),
+)
 
 const win = window
 </script>

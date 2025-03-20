@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import Centered from '@/components/atoms/Centered.vue';
-import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue';
-import { logFatal } from '@/navigable';
-import { gqlClient } from '@/global/urql-client';
-import { noParallel } from '@/global/utils';
-import { graphql } from '@/graphql/generated';
-import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql';
-import { onMounted, ref } from 'vue';
+import Centered from '@/components/atoms/Centered.vue'
+import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
+import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue'
+import { logFatal } from '@/navigable'
+import { gqlClient } from '@/global/urql-client'
+import { noParallel } from '@/global/utils'
+import { graphql } from '@/graphql/generated'
+import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql'
+import { onMounted, ref } from 'vue'
 
 const { artistId } = defineProps<{ artistId: string }>()
 
@@ -15,12 +15,12 @@ const TRACKS_PER_LINE = 6
 const LINES_PER_PAGE = 5
 
 const feedMore = noParallel(async () => {
-  if (currentPageInfo.value?.hasNextPage === false) {
-    return
-  }
+	if (currentPageInfo.value?.hasNextPage === false) {
+		return
+	}
 
-  const { data, error } = await gqlClient.query(
-    graphql(`
+	const { data, error } = await gqlClient.query(
+		graphql(`
       query ArtistTrackParticipations($artistId: String!, $pagination: PaginationInput!) {
         artist(id: $artistId) {
           trackParticipations(pagination: $pagination) {
@@ -36,24 +36,26 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-    {
-      artistId,
-      pagination: {
-        after: currentPageInfo.value?.endCursor,
-        first: TRACKS_PER_LINE * LINES_PER_PAGE
-      }
-    }
-  )
+		{
+			artistId,
+			pagination: {
+				after: currentPageInfo.value?.endCursor,
+				first: TRACKS_PER_LINE * LINES_PER_PAGE,
+			},
+		},
+	)
 
-  if (!data?.artist) {
-    logFatal('Failed to fetch track participations', error)
-  }
+	if (!data?.artist) {
+		logFatal('Failed to fetch track participations', error)
+	}
 
-  currentPageInfo.value = data.artist.trackParticipations.pageInfo
-  tracks.value.push(...data.artist.trackParticipations.nodes)
+	currentPageInfo.value = data.artist.trackParticipations.pageInfo
+	tracks.value.push(...data.artist.trackParticipations.nodes)
 })
 
-const currentPageInfo = ref<NonNullable<ArtistTrackParticipationsQuery['artist']>['trackParticipations']['pageInfo'] | null>(null)
+const currentPageInfo = ref<
+	NonNullable<ArtistTrackParticipationsQuery['artist']>['trackParticipations']['pageInfo'] | null
+>(null)
 
 const tracks = ref<AudioTrackFragment[]>([])
 

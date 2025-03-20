@@ -1,24 +1,24 @@
-navigable-item-wrapper:not(.noPadding)> :first-child {
-    padding: 5px;
+navigable-item-wrapper:not(.noPadding) > :first-child {
+	padding: 5px;
 }
 
 navigable-item-wrapper.fullHeight {
-    /* -10px for the 2x 6px padding */
-    height: calc(100% - 12px);
+	/* -10px for the 2x 6px padding */
+	height: calc(100% - 12px);
 }
 
 navigable-item-wrapper.fullHeight.noPadding {
-    height: 100%;
+	height: 100%;
 }
 
-navigable-item-wrapper.fullHeight> :first-child {
-    min-height: 100%;
+navigable-item-wrapper.fullHeight > :first-child {
+	min-height: 100%;
 }
 
 navigable-item-wrapper:not(.unstyled)[data-nav-focused] {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
-navigable-item-wrapper:not(.unstyled)[data-nav-focused]> :first-child {
-    outline: none;
+navigable-item-wrapper:not(.unstyled)[data-nav-focused] > :first-child {
+	outline: none;
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-export type OneListItemChoices<T> = Array<{ id: T, label: string }>
+export type OneListItemChoices<T> = Array<{ id: T; label: string }>
 
 export type OneListSelectExposeType = { buttonRef: ButtonExposeType | null }
 </script>
@@ -73,7 +73,7 @@ defineExpose({ itemRef })
     @long-press="$emit('longPress', expectActiveId())">
     {{ prefix ?? '' }}
     {{ isFirst && isLast ? '' : isFirst ? '⏷' : isLast ? '⏶' : '⏶⏷' }}
-    {{ activeId && items.find(item => item.id === activeId)?.label || '' }}
+    {{activeId && items.find(item => item.id === activeId)?.label || ''}}
   </NavigableItem>
 </template>
 

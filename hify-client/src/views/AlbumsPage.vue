@@ -1,24 +1,27 @@
 <script setup lang="ts">
-import AlbumCard from '@/components/molecules/AlbumCard.vue';
-import DropdownSelect, { type DropdownSelectExposeType, type DropdownChoices } from '@/components/molecules/DropdownSelect.vue';
-import { GRID_ALBUMS_PER_ROW, GRID_ALBUMS_PRELOAD_ROWS } from '@/global/constants';
-import { logFatal } from '@/navigable';
-import { gqlClient } from '@/global/urql-client';
-import { assertUnreachable, isApproachingGridEnd, noParallel } from '@/global/utils';
-import { graphql } from '@/graphql/generated';
-import type { AlbumFragment, AlbumsByNameQuery, MostRecentAlbumsQuery } from '@/graphql/generated/graphql';
-import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue';
-import { onMounted, ref, watch } from 'vue';
+import AlbumCard from '@/components/molecules/AlbumCard.vue'
+import DropdownSelect, {
+	type DropdownSelectExposeType,
+	type DropdownChoices,
+} from '@/components/molecules/DropdownSelect.vue'
+import { GRID_ALBUMS_PER_ROW, GRID_ALBUMS_PRELOAD_ROWS } from '@/global/constants'
+import { logFatal } from '@/navigable'
+import { gqlClient } from '@/global/urql-client'
+import { assertUnreachable, isApproachingGridEnd, noParallel } from '@/global/utils'
+import { graphql } from '@/graphql/generated'
+import type { AlbumFragment, AlbumsByNameQuery, MostRecentAlbumsQuery } from '@/graphql/generated/graphql'
+import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
+import { onMounted, ref, watch } from 'vue'
 
 const feedMore = noParallel(async () => {
-  switch (sortBy.value) {
-    case 'name': {
-      if (fetchState.value.sortBy === 'name' && fetchState.value.pageInfo?.hasNextPage === false) {
-        return
-      }
+	switch (sortBy.value) {
+		case 'name': {
+			if (fetchState.value.sortBy === 'name' && fetchState.value.pageInfo?.hasNextPage === false) {
+				return
+			}
 
-      const { data, error } = await gqlClient.query(
-        graphql(`
+			const { data, error } = await gqlClient.query(
+				graphql(`
           query AlbumsByName($pagination: PaginationInput!) {
             albums(pagination: $pagination) {
               nodes {
@@ -32,36 +35,36 @@ const feedMore = noParallel(async () => {
             }
           }
         `),
-        {
-          pagination: {
-            after: fetchState.value.sortBy === 'name' ? fetchState.value.pageInfo?.endCursor : null,
-            first: GRID_ALBUMS_PER_ROW * GRID_ALBUMS_PRELOAD_ROWS
-          }
-        }
-      )
+				{
+					pagination: {
+						after: fetchState.value.sortBy === 'name' ? fetchState.value.pageInfo?.endCursor : null,
+						first: GRID_ALBUMS_PER_ROW * GRID_ALBUMS_PRELOAD_ROWS,
+					},
+				},
+			)
 
-      if (!data) {
-        logFatal('Failed to fetch albums list', error)
-      }
+			if (!data) {
+				logFatal('Failed to fetch albums list', error)
+			}
 
-      if (fetchState.value.sortBy === 'name') {
-        albums.value.push(...data.albums.nodes)
-      } else {
-        albums.value = data.albums.nodes
-      }
+			if (fetchState.value.sortBy === 'name') {
+				albums.value.push(...data.albums.nodes)
+			} else {
+				albums.value = data.albums.nodes
+			}
 
-      fetchState.value = { sortBy: 'name', pageInfo: data.albums.pageInfo }
+			fetchState.value = { sortBy: 'name', pageInfo: data.albums.pageInfo }
 
-      break
-    }
+			break
+		}
 
-    case 'date': {
-      if (fetchState.value.sortBy === 'date' && fetchState.value.pageInfo?.hasNextPage === false) {
-        return
-      }
+		case 'date': {
+			if (fetchState.value.sortBy === 'date' && fetchState.value.pageInfo?.hasNextPage === false) {
+				return
+			}
 
-      const { data, error } = await gqlClient.query(
-        graphql(`
+			const { data, error } = await gqlClient.query(
+				graphql(`
           query MostRecentAlbums($pagination: PaginationInput!) {
             mostRecentAlbums(pagination: $pagination) {
               nodes {
@@ -75,44 +78,44 @@ const feedMore = noParallel(async () => {
             }
           }
         `),
-        {
-          pagination: {
-            after: fetchState.value.sortBy === 'date' ? fetchState.value.pageInfo?.endCursor : null,
-            first: GRID_ALBUMS_PER_ROW * GRID_ALBUMS_PRELOAD_ROWS
-          }
-        }
-      )
+				{
+					pagination: {
+						after: fetchState.value.sortBy === 'date' ? fetchState.value.pageInfo?.endCursor : null,
+						first: GRID_ALBUMS_PER_ROW * GRID_ALBUMS_PRELOAD_ROWS,
+					},
+				},
+			)
 
-      if (!data) {
-        logFatal('Failed to fetch albums list', error)
-      }
+			if (!data) {
+				logFatal('Failed to fetch albums list', error)
+			}
 
-      if (fetchState.value.sortBy === 'date') {
-        albums.value.push(...data.mostRecentAlbums.nodes)
-      } else {
-        albums.value = data.mostRecentAlbums.nodes
-      }
+			if (fetchState.value.sortBy === 'date') {
+				albums.value.push(...data.mostRecentAlbums.nodes)
+			} else {
+				albums.value = data.mostRecentAlbums.nodes
+			}
 
-      fetchState.value = { sortBy: 'date', pageInfo: data.mostRecentAlbums.pageInfo }
+			fetchState.value = { sortBy: 'date', pageInfo: data.mostRecentAlbums.pageInfo }
 
-      break
-    }
+			break
+		}
 
-    default:
-      assertUnreachable(sortBy.value)
-  }
+		default:
+			assertUnreachable(sortBy.value)
+	}
 })
 
 type SortBy = 'name' | 'date'
 
 const sortByItems: DropdownChoices<SortBy> = [
-  { id: 'name', label: 'Name' },
-  { id: 'date', label: 'Last update date' },
+	{ id: 'name', label: 'Name' },
+	{ id: 'date', label: 'Last update date' },
 ]
 
 const fetchState = ref<
-  { sortBy: 'name', pageInfo: AlbumsByNameQuery['albums']['pageInfo'] | null } |
-  { sortBy: 'date', pageInfo: MostRecentAlbumsQuery['mostRecentAlbums']['pageInfo'] | null }
+	| { sortBy: 'name'; pageInfo: AlbumsByNameQuery['albums']['pageInfo'] | null }
+	| { sortBy: 'date'; pageInfo: MostRecentAlbumsQuery['mostRecentAlbums']['pageInfo'] | null }
 >({ sortBy: 'name', pageInfo: null })
 
 const albums = ref<AlbumFragment[]>([])
@@ -122,11 +125,11 @@ const sortBy = ref<SortBy>('name')
 const dropdownRef = ref<DropdownSelectExposeType | null>(null)
 
 onMounted(() => {
-  feedMore()
+	feedMore()
 
-  watch(sortBy, () => {
-    feedMore()
-  })
+	watch(sortBy, () => {
+		feedMore()
+	})
 })
 </script>
 

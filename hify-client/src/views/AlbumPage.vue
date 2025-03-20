@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import Button from '@/components/atoms/Button.vue';
-import Checkbox from '@/components/atoms/Checkbox.vue';
-import Emoji from '@/components/atoms/Emoji.vue';
-import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import NavigableTrack from '@/components/atoms/NavigableTrack.vue';
-import TrackRating from '@/components/atoms/TrackRating.vue';
-import { getAlbumArtUrl } from '@/global/constants';
-import { humanReadableDuration } from '@/global/stores/audio-player';
-import { showContextMenu } from '@/global/stores/context-menu';
-import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue';
-import { dedup, filterMap, getRouteParam, hasMinimumRating, isDefined, shuffle } from '@/global/utils';
-import { graphql } from '@/graphql/generated';
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
-import router from '@/router';
-import { useQuery } from '@urql/vue';
-import { computed, ref } from 'vue';
+import Button from '@/components/atoms/Button.vue'
+import Checkbox from '@/components/atoms/Checkbox.vue'
+import Emoji from '@/components/atoms/Emoji.vue'
+import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
+import NavigableTrack from '@/components/atoms/NavigableTrack.vue'
+import TrackRating from '@/components/atoms/TrackRating.vue'
+import { getAlbumArtUrl } from '@/global/constants'
+import { humanReadableDuration } from '@/global/stores/audio-player'
+import { showContextMenu } from '@/global/stores/context-menu'
+import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue'
+import { dedup, filterMap, getRouteParam, hasMinimumRating, isDefined, shuffle } from '@/global/utils'
+import { graphql } from '@/graphql/generated'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
+import router from '@/router'
+import { useQuery } from '@urql/vue'
+import { computed, ref } from 'vue'
 
 const albumId = getRouteParam('id')
 
 function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
-  const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
-    number: num.toString(),
-    tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
-  }))
+	const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
+		number: num.toString(),
+		tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+	}))
 
-  const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
+	const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
 
-  if (tracksWithoutDisc.length > 0) {
-    discs.unshift({ number: '?', tracks: tracksWithoutDisc })
-  }
+	if (tracksWithoutDisc.length > 0) {
+		discs.unshift({ number: '?', tracks: tracksWithoutDisc })
+	}
 
-  return {
-    totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
-    discs,
-  }
+	return {
+		totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
+		discs,
+	}
 }
 
 const { data, fetching, error } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query AlbumPage($albumId: String!) {
       album(id: $albumId) {
         ...Album
@@ -55,13 +55,17 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-  variables: { albumId }
+	variables: { albumId },
 })
 
 const onlyShowGreatSongs = ref(false)
 
 const album = computed(() => data.value?.album)
-const filteredTracks = computed(() => album.value && onlyShowGreatSongs.value ? album.value.tracks.filter((track) => hasMinimumRating(track, 8)) : album.value?.tracks)
+const filteredTracks = computed(() =>
+	album.value && onlyShowGreatSongs.value
+		? album.value.tracks.filter((track) => hasMinimumRating(track, 8))
+		: album.value?.tracks,
+)
 const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTracks.value))
 </script>
 

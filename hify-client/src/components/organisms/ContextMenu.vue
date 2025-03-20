@@ -1,46 +1,59 @@
 <script setup lang="ts">
-import { logFatal } from '@/navigable';
+import { logFatal } from '@/navigable'
 import { onUpdated, ref } from 'vue'
-import { NavigationDirection, getFocusedItemId, getNavigableDOMElementById, requestFocusById, requestFocusOnElement, type NavigableElementByType } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import { contextMenuStore } from '@/global/stores/context-menu';
-import NavigableList, { type NavigableListExposeType } from '@/navigable/vue/components/NavigableList.vue';
+import {
+	NavigationDirection,
+	getFocusedItemId,
+	getNavigableDOMElementById,
+	requestFocusById,
+	requestFocusOnElement,
+	type NavigableElementByType,
+} from '@/navigable'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import { contextMenuStore } from '@/global/stores/context-menu'
+import NavigableList, { type NavigableListExposeType } from '@/navigable/vue/components/NavigableList.vue'
 
 onUpdated(() => {
-  if (!containerRef.value) {
-    return
-  }
+	if (!containerRef.value) {
+		return
+	}
 
-  const ctxMenuContainer = containerRef.value
-  const column = listRef.value ?? logFatal('Column reference not initialized yet')
+	const ctxMenuContainer = containerRef.value
+	const column = listRef.value ?? logFatal('Column reference not initialized yet')
 
-  const focusedItemId = getFocusedItemId()
+	const focusedItemId = getFocusedItemId()
 
-  if (!contextMenuStore.value || !contextMenuStore.value.options.length || !focusedItemId) {
-    return
-  }
+	if (!contextMenuStore.value || !contextMenuStore.value.options.length || !focusedItemId) {
+		return
+	}
 
-  const focusedDomEl = getNavigableDOMElementById(focusedItemId) ?? logFatal('Focused DOM element not found')
-  const rect = focusedDomEl.getBoundingClientRect()
+	const focusedDomEl = getNavigableDOMElementById(focusedItemId) ?? logFatal('Focused DOM element not found')
+	const rect = focusedDomEl.getBoundingClientRect()
 
-  const top = rect ? (rect.top + rect.bottom) / 2 : 0
-  const left = rect ? rect.left + Math.min(30, rect.width / 2) : 0
+	const top = rect ? (rect.top + rect.bottom) / 2 : 0
+	const left = rect ? rect.left + Math.min(30, rect.width / 2) : 0
 
-  ctxTop.value = top + ctxMenuContainer.clientHeight > window.innerHeight ? window.innerHeight - ctxMenuContainer.clientHeight - 5 : top
-  ctxLeft.value = left + ctxMenuContainer.clientWidth > window.innerWidth ? window.innerWidth - ctxMenuContainer.clientWidth - 5 : left
+	ctxTop.value =
+		top + ctxMenuContainer.clientHeight > window.innerHeight
+			? window.innerHeight - ctxMenuContainer.clientHeight - 5
+			: top
+	ctxLeft.value =
+		left + ctxMenuContainer.clientWidth > window.innerWidth
+			? window.innerWidth - ctxMenuContainer.clientWidth - 5
+			: left
 
-  prevFocusItemId.value = focusedItemId
+	prevFocusItemId.value = focusedItemId
 
-  requestFocusOnElement(column.list)
+	requestFocusOnElement(column.list)
 })
 
 function closeContextMenu() {
-  if (prevFocusItemId.value) {
-    requestFocusById(prevFocusItemId.value)
-    prevFocusItemId.value = null
-  }
+	if (prevFocusItemId.value) {
+		requestFocusById(prevFocusItemId.value)
+		prevFocusItemId.value = null
+	}
 
-  contextMenuStore.value = null
+	contextMenuStore.value = null
 }
 
 const prevFocusItemId = ref<string | null>(null)

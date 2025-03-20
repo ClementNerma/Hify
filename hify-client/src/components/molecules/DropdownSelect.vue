@@ -1,5 +1,5 @@
 <script lang="ts">
-export type DropdownChoices<T> = Array<{ id: T, label: string }>
+export type DropdownChoices<T> = Array<{ id: T; label: string }>
 
 export type DropdownSelectExposeType = { buttonRef: ButtonExposeType | null }
 </script>

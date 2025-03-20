@@ -1,10 +1,10 @@
 <script setup lang="ts" generic="T">
 const { data } = defineProps<{
-  data: T
+	data: T
 }>()
 
 defineSlots<{
-  default(props: { data: T }): unknown
+	default(props: { data: T }): unknown
 }>()
 </script>
 

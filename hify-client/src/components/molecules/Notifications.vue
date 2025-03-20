@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NotificationLevel, pendingNotifications } from '@/global/stores/notifications';
+import { NotificationLevel, pendingNotifications } from '@/global/stores/notifications'
 </script>
 
 <template>

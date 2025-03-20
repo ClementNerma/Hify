@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import Button from '@/components/atoms/Button.vue';
-import Centered from '@/components/atoms/Centered.vue';
-import IndexUpdater from '@/components/atoms/IndexUpdater.vue';
-import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue';
-import MixButton from '@/components/atoms/MixButton.vue';
-import AlbumsRow from '@/components/molecules/AlbumsRow.vue';
-import StatsBox from '@/components/molecules/StatsBox.vue';
-import TracksRow from '@/components/molecules/TracksRow.vue';
-import { MIN_GREAT_RATING } from '@/global/constants';
-import { graphql } from '@/graphql/generated';
-import { MixOrdering, } from '@/graphql/generated/graphql';
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
-import router from '@/router';
-import { useQuery } from '@urql/vue';
-import { computed, ref } from 'vue';
+import Button from '@/components/atoms/Button.vue'
+import Centered from '@/components/atoms/Centered.vue'
+import IndexUpdater from '@/components/atoms/IndexUpdater.vue'
+import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
+import MixButton from '@/components/atoms/MixButton.vue'
+import AlbumsRow from '@/components/molecules/AlbumsRow.vue'
+import StatsBox from '@/components/molecules/StatsBox.vue'
+import TracksRow from '@/components/molecules/TracksRow.vue'
+import { MIN_GREAT_RATING } from '@/global/constants'
+import { graphql } from '@/graphql/generated'
+import { MixOrdering } from '@/graphql/generated/graphql'
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
+import router from '@/router'
+import { useQuery } from '@urql/vue'
+import { computed, ref } from 'vue'
 
 const { data, error, executeQuery } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query HomePage($randomItemsParams: FeedParams!) {
       generateFeed(input: $randomItemsParams) {
         lastListenedTo {
@@ -33,14 +33,13 @@ const { data, error, executeQuery } = useQuery({
       }
     }
   `),
-  variables: {
-    randomItemsParams: {
-      maxItems: 100,
-      minRating: 8,
-    }
-  }
+	variables: {
+		randomItemsParams: {
+			maxItems: 100,
+			minRating: 8,
+		},
+	},
 })
-
 
 const feed = computed(() => data.value?.generateFeed)
 const statsBox = ref(false)

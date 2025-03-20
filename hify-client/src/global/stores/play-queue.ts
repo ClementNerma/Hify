@@ -40,32 +40,36 @@ export const currentTrack = computed(() => {
 
 export const PREVIOUS_TRACK_OR_REWIND_THRESOLD_SECONDS = 5
 
-watch(playQueue, async ({ tracks, position, fromMixId, isMixFinished }) => {
-	const currentTracks = tracks.map((track) => track.id)
+watch(
+	playQueue,
+	async ({ tracks, position, fromMixId, isMixFinished }) => {
+		const currentTracks = tracks.map((track) => track.id)
 
-	if (fromMixId === null || position === null || position <= tracks.length - 3 || isMixFinished) {
-		return
-	}
+		if (fromMixId === null || position === null || position <= tracks.length - 3 || isMixFinished) {
+			return
+		}
 
-	// Generate a new mix from the previous settings, but exclude the tracks that are already in the current queue
-	// to avoid getting duplicate tracks
-	const nextTracks = await getNextTracksOfMix(fromMixId)
+		// Generate a new mix from the previous settings, but exclude the tracks that are already in the current queue
+		// to avoid getting duplicate tracks
+		const nextTracks = await getNextTracksOfMix(fromMixId)
 
-	// If playlist has changed, don't modify it
-	if (tracks.length !== currentTracks.length || tracks.find((track, i) => currentTracks[i] !== track.id)) {
-		return
-	}
+		// If playlist has changed, don't modify it
+		if (tracks.length !== currentTracks.length || tracks.find((track, i) => currentTracks[i] !== track.id)) {
+			return
+		}
 
-	// Otherwise, append the new tracks!
-	playQueue.value = {
-		tracks: tracks.concat(nextTracks.map(makeQueuedTrack)),
-		position,
-		fromMixId,
-		isMixFinished: tracks.length === 0,
-	}
-}, {
-	deep: true
-})
+		// Otherwise, append the new tracks!
+		playQueue.value = {
+			tracks: tracks.concat(nextTracks.map(makeQueuedTrack)),
+			position,
+			fromMixId,
+			isMixFinished: tracks.length === 0,
+		}
+	},
+	{
+		deep: true,
+	},
+)
 
 function makeQueuedTrack(track: AudioTrackFragment): QueuedTrack {
 	return { ...track, idInQueue: Math.random().toString() }

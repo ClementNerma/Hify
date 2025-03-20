@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue'
 
-const { delayMillis = 1000 } = defineProps<{ delayMillis?: number, error: string | null | undefined }>()
+const { delayMillis = 1000 } = defineProps<{ delayMillis?: number; error: string | null | undefined }>()
 
 const visible = ref(false)
 
 onMounted(() => {
-    setTimeout(() => {
-        visible.value = true
-    }, delayMillis)
+	setTimeout(() => {
+		visible.value = true
+	}, delayMillis)
 })
 </script>
 

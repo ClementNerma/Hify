@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import type { AlbumFragment } from '@/graphql/generated/graphql'
-import router from '@/router';
-import Card from './Card.vue';
-import { getAlbumArtUrl } from '@/global/constants';
-import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
+import router from '@/router'
+import Card from './Card.vue'
+import { getAlbumArtUrl } from '@/global/constants'
+import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue'
 
-const props = defineProps<{
-    album: AlbumFragment,
-} & NavigableItemProps>()
+const props = defineProps<
+	{
+		album: AlbumFragment
+	} & NavigableItemProps
+>()
 </script>
 
 <template>

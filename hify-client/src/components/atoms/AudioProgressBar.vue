@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { NavigationDirection } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import { ref } from 'vue';
+import { NavigationDirection } from '@/navigable'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import { ref } from 'vue'
 
 defineProps<{
-    max: number,
-    value: number,
-    onDirection: (direction: 'left' | 'right') => void,
-    onPress?: () => void
+	max: number
+	value: number
+	onDirection: (direction: 'left' | 'right') => void
+	onPress?: () => void
 }>()
 
 const focused = ref(false)

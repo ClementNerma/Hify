@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { ctxMenuCallbacks, ctxMenuOptions, type TrackContext } from '@/global/ctx-menu-content';
-import { showContextMenu } from '@/global/stores/context-menu';
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import type { NavigableItem as NavigableItemType } from '@/navigable';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
+import { ctxMenuCallbacks, ctxMenuOptions, type TrackContext } from '@/global/ctx-menu-content'
+import { showContextMenu } from '@/global/stores/context-menu'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import type { NavigableItem as NavigableItemType } from '@/navigable'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 
 defineProps<{
-    track: AudioTrackFragment,
-    tracks: AudioTrackFragment[],
-    context: TrackContext,
-    fromMixId?: string,
-    onFocus?: () => void
+	track: AudioTrackFragment
+	tracks: AudioTrackFragment[]
+	context: TrackContext
+	fromMixId?: string
+	onFocus?: () => void
 }>()
 
 defineSlots<{
-    default(props: {
-        item: NavigableItemType,
-        focused: boolean
-    }): unknown
+	default(props: {
+		item: NavigableItemType
+		focused: boolean
+	}): unknown
 }>()
 </script>
 

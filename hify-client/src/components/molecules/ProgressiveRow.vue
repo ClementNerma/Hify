@@ -1,8 +1,7 @@
 <script lang="ts">
 export type ProgressiveRowExposeType = {
-  jumpUnfocusedPosition(newPosition: number): void
-  requestFocus(position: number): void
-
+	jumpUnfocusedPosition(newPosition: number): void
+	requestFocus(position: number): void
 }
 </script>
 

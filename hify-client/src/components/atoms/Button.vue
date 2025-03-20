@@ -1,6 +1,6 @@
 <script lang="ts">
 export type ButtonProps = NavigableItemProps & {
-    borderNone?: boolean
+	borderNone?: boolean
 }
 
 export type ButtonExposeType = { itemRef: NavigableItemExposeType | null }

@@ -1,26 +1,31 @@
 <script lang="ts">
 // TODO: required because Vue's compiler is not smart enough yet
-type NavigableItem = NavigableCommonElementProps & { type: 'item', hasFocusPriority?: boolean }
+type NavigableItem = NavigableCommonElementProps & { type: 'item'; hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
-  disabled?: boolean
+	disabled?: boolean
 
-  interceptKeyPress?: (navigationKey: NavigationDirection | null, key: string, longPress: boolean, item: NavigableItem) => boolean
+	interceptKeyPress?: (
+		navigationKey: NavigationDirection | null,
+		key: string,
+		longPress: boolean,
+		item: NavigableItem,
+	) => boolean
 
-  onFocus?: (item: NavigableItem) => void,
-  onUnfocus?: (item: NavigableItem) => void,
-  onPress?: (item: NavigableItem) => void,
-  onLongPress?: (item: NavigableItem) => void,
-  onLeftKey?: (item: NavigableItem) => void,
-  onRightKey?: (item: NavigableItem) => void,
-  onUpKey?: (item: NavigableItem) => void,
-  onDownKey?: (item: NavigableItem) => void
-  onBackKey?: (item: NavigableItem) => void
+	onFocus?: (item: NavigableItem) => void
+	onUnfocus?: (item: NavigableItem) => void
+	onPress?: (item: NavigableItem) => void
+	onLongPress?: (item: NavigableItem) => void
+	onLeftKey?: (item: NavigableItem) => void
+	onRightKey?: (item: NavigableItem) => void
+	onUpKey?: (item: NavigableItem) => void
+	onDownKey?: (item: NavigableItem) => void
+	onBackKey?: (item: NavigableItem) => void
 } & Omit<NavigableItem, 'id' | 'type'>
 
 export type NavigableItemExposeType = {
-  item: NavigableItem
-  focused: boolean
+	item: NavigableItem
+	focused: boolean
 }
 </script>
 

@@ -1,49 +1,58 @@
 <script setup lang="ts">
-import ProgressiveRow, { type ProgressiveRowExposeType } from '@/components/molecules/ProgressiveRow.vue';
-import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue';
-import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue';
-import With from '@/components/atoms/With.vue';
-import Card from '@/components/molecules/Card.vue';
-import { ctxMenuOptions } from '@/global/ctx-menu-content';
-import { humanReadableDuration, readableAudioPaused, readableAudioProgress, setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player';
-import { enableOpacitor } from '@/global/stores/opacitor';
-import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue';
-import { formatDate } from '@/global/utils';
-import type { AudioTrackFragment } from '@/graphql/generated/graphql';
-import router from '@/router';
-import { ref, watch } from 'vue';
-import { getAlbumArtUrl } from '@/global/constants';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
-import { showContextMenu } from '@/global/stores/context-menu';
-import OneLineList from '@/components/molecules/OneLineList.vue';
+import ProgressiveRow, { type ProgressiveRowExposeType } from '@/components/molecules/ProgressiveRow.vue'
+import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue'
+import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue'
+import With from '@/components/atoms/With.vue'
+import Card from '@/components/molecules/Card.vue'
+import { ctxMenuOptions } from '@/global/ctx-menu-content'
+import {
+	humanReadableDuration,
+	readableAudioPaused,
+	readableAudioProgress,
+	setPlayingAudioProgressRelative,
+	toggleAudioPlayback,
+} from '@/global/stores/audio-player'
+import { enableOpacitor } from '@/global/stores/opacitor'
+import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue'
+import { formatDate } from '@/global/utils'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import router from '@/router'
+import { ref, watch } from 'vue'
+import { getAlbumArtUrl } from '@/global/constants'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import { showContextMenu } from '@/global/stores/context-menu'
+import OneLineList from '@/components/molecules/OneLineList.vue'
 
 const isQueueFocused = ref(false)
 
 function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
-  showContextMenu(
-    ctxMenuOptions.forTrack(
-      track,
-      { fromMixId: null },
-      {
-        context: 'queue',
-        isCurrent: readablePlayQueue.value.position === position,
-        position,
-        totalTracks: readablePlayQueue.value.tracks.length,
-        onQueueEdition: () => queueGalleryRef.value?.requestFocus(position)
-      },
-    ),
-  )
+	showContextMenu(
+		ctxMenuOptions.forTrack(
+			track,
+			{ fromMixId: null },
+			{
+				context: 'queue',
+				isCurrent: readablePlayQueue.value.position === position,
+				position,
+				totalTracks: readablePlayQueue.value.tracks.length,
+				onQueueEdition: () => queueGalleryRef.value?.requestFocus(position),
+			},
+		),
+	)
 }
 
 const queueGalleryRef = ref<ProgressiveRowExposeType | null>(null)
 
-watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, ([gallery, position]) => {
-  if (gallery !== null && position !== null) {
-    gallery.jumpUnfocusedPosition(position)
-  }
-})
+watch(
+	() => [queueGalleryRef.value, readablePlayQueue.value.position] as const,
+	([gallery, position]) => {
+		if (gallery !== null && position !== null) {
+			gallery.jumpUnfocusedPosition(position)
+		}
+	},
+)
 </script>
 
 <template>
