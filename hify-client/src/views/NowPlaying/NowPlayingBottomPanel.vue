@@ -61,7 +61,7 @@ watch(() => [queueGalleryRef.value, readablePlayQueue.value.position] as const, 
             </NavigableItem>
 
             <!-- TODO: implement "just-for-style" -->
-            <NavigableItem v-if="tags.date" just-for-style>
+            <NavigableItem v-if="tags.date">
               <div>🕒 {{ formatDate(tags.date) }}</div>
             </NavigableItem>
 

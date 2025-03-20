@@ -84,14 +84,14 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           </navigable-item-wrapper>
 
           <NavigableRow>
-            <NavigableItem v-for="artist in album.albumArtists" :key="artist.id" display="inline"
+            <NavigableItem v-for="artist in album.albumArtists" :key="artist.id"
               @press="router.push({ name: 'artist', params: { id: artist.id } })">
               🎤 {{ artist.name }}
             </NavigableItem>
           </NavigableRow>
 
           <NavigableRow>
-            <NavigableItem v-for="genre in album.genres" :key="genre.id" display="inline"
+            <NavigableItem v-for="genre in album.genres" :key="genre.id"
               @press="router.push({ name: 'genre', params: { id: genre.id } })">
               🎵 {{ genre.name }}
             </NavigableItem>

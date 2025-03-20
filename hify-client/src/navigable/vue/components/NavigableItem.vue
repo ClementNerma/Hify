@@ -25,7 +25,7 @@ export type NavigableItemExposeType = {
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type DefineComponent, } from 'vue';
 import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
@@ -99,6 +99,7 @@ defineExpose({ item, focused })
 defineSlots<{
   default(props: { item: NavigableItem, focused: boolean }): unknown
 }>()
+
 </script>
 
 <template>

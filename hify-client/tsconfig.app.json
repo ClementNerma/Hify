@@ -17,5 +17,10 @@
 		"noImplicitOverride": true,
 		"noImplicitReturns": true,
 		"noPropertyAccessFromIndexSignature": true
+	},
+	"vueCompilerOptions": {
+		"checkUnknownDirectives": true,
+		"checkUnknownEvents": true,
+		"checkUnknownProps": true
 	}
 }

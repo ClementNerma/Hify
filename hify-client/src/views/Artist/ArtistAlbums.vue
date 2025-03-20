@@ -72,7 +72,8 @@ onMounted(feedMore)
     </Centered>
 
     <NavigableGrid :columns="ALBUMS_PER_LINE">
-      <AlbumCard v-for="album, i in albums" :key="album.id" :album enforce-max-width
+      <!-- TODO: enforce-max-width -->
+      <AlbumCard v-for="album, i in albums" :key="album.id" :album
         @focus="isApproachingGridEnd(i, ALBUMS_PER_LINE, albums.length) && feedMore()" />
     </NavigableGrid>
   </template>
