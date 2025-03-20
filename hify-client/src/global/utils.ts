@@ -92,14 +92,16 @@ export function noParallel<F extends (...args: any[]) => Promise<unknown>>(
 	let isRunning = false
 
 	return async (...args) => {
-		if (!isRunning) {
-			isRunning = true
+		if (isRunning) {
+			return
+		}
 
-			try {
-				value(...args)
-			} finally {
-				isRunning = false
-			}
+		isRunning = true
+
+		try {
+			value(...args)
+		} finally {
+			isRunning = false
 		}
 	}
 }

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import TracksGrid from '@/components/molecules/TracksGrid.vue';
+import { GRID_TRACKS_PER_ROW, GRID_TRACKS_PRELOAD_ROWS } from '@/global/constants';
 import { gqlClient } from '@/global/urql-client';
 import { noParallel } from '@/global/utils';
 import { graphql } from '@/graphql/generated';
 import type { AudioTrackFragment, HistoryPageQuery } from '@/graphql/generated/graphql';
 import { logFatal } from '@/navigable';
 import { onMounted, ref } from 'vue';
-
-const TRACKS_PER_LINE = 6
-const LINES_PER_PAGE = 5
 
 const feedMore = noParallel(async () => {
   if (currentPageInfo.value?.hasNextPage === false) {
@@ -33,7 +31,7 @@ const feedMore = noParallel(async () => {
     {
       pagination: {
         after: currentPageInfo.value?.endCursor,
-        first: TRACKS_PER_LINE * LINES_PER_PAGE
+        first: GRID_TRACKS_PER_ROW * GRID_TRACKS_PRELOAD_ROWS
       }
     }
   )
@@ -54,5 +52,5 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <TracksGrid :tracks :feed-more />
+  <TracksGrid :tracks @feed-more="feedMore" />
 </template>
