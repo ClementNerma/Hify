@@ -44,7 +44,7 @@ onMounted(() => {
 
 watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])
 
-handleInput((key, long, { shiftKey }) => {
+handleInput((key, long, { shiftKey, ctrlKey }) => {
 	if (key === 'MediaPlayPause') {
 		if (!long) {
 			toggleAudioPlayback()
@@ -75,6 +75,14 @@ handleInput((key, long, { shiftKey }) => {
 
 	else if (key === 'ArrowDown' && shiftKey) {
 		playNextTrack()
+	}
+
+	else if (key === 'F' && shiftKey && ctrlKey) {
+		if (document.fullscreenElement) {
+			document.exitFullscreen?.()
+		} else {
+			document.body.requestFullscreen()
+		}
 	}
 
 	else {
