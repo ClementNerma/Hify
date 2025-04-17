@@ -43,9 +43,8 @@ function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
   )
 }
 
-function moveInTrack(dir: 'left' | 'right', shiftKey: boolean) {
-  const amount = shiftKey ? 10 : 30
-  setPlayingAudioProgressRelative(dir === 'left' ? -amount : amount)
+function moveInTrack(dir: 'left' | 'right') {
+  setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)
 }
 
 const queueGalleryRef = ref<ProgressiveRowExposeType | null>(null)

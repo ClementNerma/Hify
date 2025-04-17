@@ -53,7 +53,7 @@ handleInput((key, long, { shiftKey, ctrlKey }) => {
 		}
 	}
 
-	else if (key === 'MediaRewind') {
+	else if (key === 'MediaRewind' || (key === 'ArrowLeft' && shiftKey)) {
 		if (!long) {
 			setPlayingAudioProgressRelative(-10)
 		} else {
@@ -61,7 +61,7 @@ handleInput((key, long, { shiftKey, ctrlKey }) => {
 		}
 	}
 
-	else if (key === 'MediaFastForward') {
+	else if (key === 'MediaFastForward' || (key === 'ArrowRight' && shiftKey)) {
 		if (!long) {
 			setPlayingAudioProgressRelative(+10)
 		} else {

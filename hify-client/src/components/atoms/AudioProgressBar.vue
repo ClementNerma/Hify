@@ -6,18 +6,18 @@ import { ref } from 'vue'
 const props = defineProps<{
     max: number
     value: number
-    onDirection: (direction: 'left' | 'right', shiftKey: boolean) => void
+    onDirection: (direction: 'left' | 'right') => void
     onPress?: () => void
 }>()
 
-const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = (dir, _, __, { shiftKey }) => {
+const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = (dir) => {
     if (dir === NavigationDirection.Left) {
-        props.onDirection('left', shiftKey)
+        props.onDirection('left')
         return true
     }
 
     if (dir === NavigationDirection.Right) {
-        props.onDirection('right', shiftKey)
+        props.onDirection('right')
         return true
     }
 
@@ -28,7 +28,7 @@ const focused = ref(false)
 </script>
 
 <template>
-    <NavigableItem :intercept-key-press @focus="focused = true" @unfocus="focused = false" :on-press
+    <NavigableItem :intercept-key-press :on-press @focus="focused = true" @unfocus="focused = false"
         v-slot="{ focused }">
         <div class="border border-solid border-transparent" v-bind="$attrs">
             <input type="range" class="h-2.5 w-full" :max :value :class="{ 'accent-orange-400': focused }" />
