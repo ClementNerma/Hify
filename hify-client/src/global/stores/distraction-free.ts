@@ -1,6 +1,8 @@
 import { InputHandlingResult, handleInput } from '@/navigable'
 import { onUnmounted, readonly, ref } from 'vue'
 
+const NEVER_WAKE_UP_FOR_KEYS = ['Control', 'Shift', 'Alt']
+
 const _distractionFreeMode = ref(false)
 
 export const distractionFreeMode = readonly(_distractionFreeMode)
@@ -56,7 +58,7 @@ export function setupDistractionFreeListener({
 	let destroyed = false
 
 	handleInput((key) => {
-		if (!destroyed && !dontWakeUpForKeys?.includes(key)) {
+		if (!destroyed && !dontWakeUpForKeys?.includes(key) && !NEVER_WAKE_UP_FOR_KEYS.includes(key)) {
 			if (_distractionFreeMode.value) {
 				resetDistractionFreeMode()
 				return InputHandlingResult.Intercepted
