@@ -5,9 +5,7 @@ type NavigableGrid = NavigableCommonElementProps & { type: 'grid'; columns: numb
 export type NavigableGridProps = {
     interceptKeyPress?: (
         navigationKey: NavigationDirection | null,
-        key: string,
-        longPress: boolean,
-        modifiers: KeyModifiers,
+        key: KeyPress,
         grid: NavigableGrid,
     ) => boolean
 
@@ -29,8 +27,8 @@ export type NavigableGridExposeType = {
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyModifiers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableGridProps>()
 
@@ -55,8 +53,8 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>
         return { type: 'native' }
     },
 
-    interceptKeyPress(grid, key, longPress, modifiers) {
-        const dir = longPress ? null : translateNavigationKey(key)
+    interceptKeyPress(grid, key) {
+        const dir = key.longPress ? null : translateNavigationKey(key.key)
 
         if (dir === NavigationDirection.Up) {
             props.onUpKey?.(grid)
@@ -70,7 +68,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>
             props.onBackKey?.(grid)
         }
 
-        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, grid) ? { type: 'trap' } : { type: 'native' }
+        return props.interceptKeyPress?.(key.longPress ? null : dir, key, grid) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(grid, focusedChild) {

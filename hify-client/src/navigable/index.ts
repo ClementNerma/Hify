@@ -65,21 +65,21 @@ function handleKeyDownEvent(e: KeyboardEvent): void {
 		e.preventDefault()
 	}
 
-	const modifiers: KeyModifiers = { ctrlKey, shiftKey, altKey }
+	const modifiers = { ctrlKey, shiftKey, altKey } satisfies Partial<KeyPress>
 
 	if (watchingLongPressForKeys.has(key)) {
 		if (!pendingKeyLongPresses.has(key) && !triggeredKeyLongPress.has(key)) {
 			pendingKeyLongPresses.set(key, {
 				at: performance.now(),
 				timeout: window.setTimeout(() => {
-					dispatchKeyInput(key, true, modifiers)
+					dispatchKeyInput({ key, longPress: true, ...modifiers })
 					triggeredKeyLongPress.add(key)
 					pendingKeyLongPresses.delete(key)
 				}, setupOptions?.keyLongPressThresholdMs ?? DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS),
 			})
 		}
 	} else {
-		dispatchKeyInput(key, false, modifiers)
+		dispatchKeyInput({ key, longPress: false, ...modifiers })
 	}
 }
 
@@ -104,9 +104,9 @@ function handleKeyUpEvent(e: KeyboardEvent): void {
 	pendingKeyLongPresses.delete(key)
 
 	const longPressThresholdMs = setupOptions?.keyLongPressThresholdMs ?? DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS
-	const longPressed = performance.now() - pending.at > longPressThresholdMs
+	const longPress = performance.now() - pending.at > longPressThresholdMs
 
-	dispatchKeyInput(key, longPressed, { ctrlKey, shiftKey, altKey })
+	dispatchKeyInput({ key, longPress, ctrlKey, shiftKey, altKey })
 }
 
 export function watchLongPressForKeys(keys: string[]): void {
@@ -115,19 +115,21 @@ export function watchLongPressForKeys(keys: string[]): void {
 	}
 }
 
-export type KeyModifiers = {
-	shiftKey: boolean
+export type KeyPress = {
+	key: string
+	longPress: boolean
 	ctrlKey: boolean
+	shiftKey: boolean
 	altKey: boolean
 }
 
-export type InputHandler = (key: string, long: boolean, modifiers: KeyModifiers) => InputHandlingResult | void
+export type InputHandler = (key: KeyPress) => InputHandlingResult | void
 
 const inputHandlers: InputHandler[] = []
 
-function dispatchKeyInput(key: string, longPress: boolean, modifiers: KeyModifiers): InputHandlingResult {
+function dispatchKeyInput(key: KeyPress): InputHandlingResult {
 	for (const handler of inputHandlers) {
-		const result = handler(key, longPress, modifiers)
+		const result = handler(key)
 
 		if (result === InputHandlingResult.Intercepted) {
 			return result
@@ -244,7 +246,7 @@ export type NavigableItemInteractionHandlers = {
 	unfocus(item: NavigableItem): void
 	press(item: NavigableItem): void
 	longPress(item: NavigableItem): void
-	interceptKeyPress(item: NavigableItem, key: string, longPress: boolean, modifiers: KeyModifiers): NavigationResult
+	interceptKeyPress(item: NavigableItem, key: KeyPress): NavigationResult
 }
 
 export type NavigableContainerInteractionHandlers<T extends NavigableContainerType> = {
@@ -258,9 +260,7 @@ export type NavigableContainerInteractionHandlers<T extends NavigableContainerTy
 	enterFrom(navEl: NavigableElementByType<T>, from: NavigationDirection): NavigationResult
 	interceptKeyPress(
 		navEl: NavigableElementByType<T>,
-		key: string,
-		longPress: boolean,
-		modifiers: KeyModifiers,
+		key: KeyPress,
 		currentlyFocusedChild: NavigableElement,
 	): NavigationResult
 }
@@ -742,7 +742,7 @@ export function translateNavigationKey(key: string): NavigationDirection | null 
 	return Object.prototype.hasOwnProperty.call(keys, key) ? keys[key] : null
 }
 
-export function handleKeyPress(key: string, longPress: boolean, modifiers: KeyModifiers): void {
+export function handleKeyPress(key: KeyPress): void {
 	if (isHandlingInteraction) {
 		logFatal('[DATA RACE] Got a DOM event to handle while already handling one')
 	}
@@ -750,7 +750,7 @@ export function handleKeyPress(key: string, longPress: boolean, modifiers: KeyMo
 	isHandlingInteraction = true
 
 	try {
-		__handleKeyPress(key, longPress, modifiers)
+		__handleKeyPress(key)
 	} finally {
 		isHandlingInteraction = false
 	}
@@ -760,7 +760,7 @@ function _oneShiftedList<T>(array: T[], withFirst: T): [T, T][] {
 	return array.map((value, i) => [value, i === 0 ? withFirst : array[i - 1]])
 }
 
-function __handleKeyPress(key: string, longPress: boolean, modifiers: KeyModifiers): void {
+function __handleKeyPress(key: KeyPress): void {
 	if (focusedItemId === null) {
 		const firstItem = findFirstFocusableItem()
 
@@ -803,35 +803,28 @@ function __handleKeyPress(key: string, longPress: boolean, modifiers: KeyModifie
 		}
 	}
 
-	const interception = triggerNavigableEvent(focusedNavEl, 'interceptKeyPress', key, longPress, modifiers)
+	const interception = triggerNavigableEvent(focusedNavEl, 'interceptKeyPress', key)
 
 	if (handleNavigationResult(interception)) {
 		return
 	}
 
 	for (const [ancestor, focusedChild] of _oneShiftedList(getNavigableAncestors(focusedItem), focusedItem)) {
-		const interception = triggerNavigableEvent(
-			ancestor.navEl,
-			'interceptKeyPress',
-			key,
-			longPress,
-			modifiers,
-			focusedChild.navEl,
-		)
+		const interception = triggerNavigableEvent(ancestor.navEl, 'interceptKeyPress', key, focusedChild.navEl)
 
 		if (handleNavigationResult(interception)) {
 			return
 		}
 	}
 
-	if (key === 'Enter') {
-		triggerNavigableEvent(focusedNavEl, longPress ? 'longPress' : 'press')
+	if (key.key === 'Enter') {
+		triggerNavigableEvent(focusedNavEl, key.longPress ? 'longPress' : 'press')
 		return
 	}
 
-	const direction = translateNavigationKey(key)
+	const direction = translateNavigationKey(key.key)
 
-	if (longPress || !direction) {
+	if (key.longPress || !direction) {
 		return
 	}
 

@@ -30,17 +30,17 @@ const activeIndex = computed(() => {
 
 const expectActiveId = (): T => activeId.value ?? logFatal('Expected a selected item in OneLineList')
 
-const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = key => {
+const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = dir => {
   if (activeIndex.value === null || activeIndex.value === -1) {
     return false
   }
 
-  if (key === NavigationDirection.Up && !isFirst.value) {
+  if (dir === NavigationDirection.Up && !isFirst.value) {
     activeId.value = props.items[activeIndex.value - 1].id
     return true
   }
 
-  if (key === NavigationDirection.Down && !isLast.value) {
+  if (dir === NavigationDirection.Down && !isLast.value) {
     activeId.value = props.items[activeIndex.value + 1].id
     return true
   }

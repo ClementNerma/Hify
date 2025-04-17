@@ -16,49 +16,54 @@ import { NavigationDirection } from '@/navigable'
 const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 
 const setDistractionFree = setupDistractionFreeListener({
-	delayMillis: 3000,
-	darkeningCondition: () => readableAudioPaused.value === false,
-	dontWakeUpForKeys: ['MediaPlayPause', 'MediaRewind', 'MediaFastForward', 'Escape', 'F4'],
+  delayMillis: 3000,
+  darkeningCondition: () => readableAudioPaused.value === false,
+  dontWakeUpForKeys: [
+    { key: 'MediaPlayPause' },
+    { key: 'MediaRewind' },
+    { key: 'MediaFastForward' },
+    { key: 'Escape' },
+    { key: 'F4' },
+    { key: 'ArrowLeft', shiftKey: true },
+    { key: 'ArrowRight', shiftKey: true },
+    { key: 'ArrowUp', shiftKey: true },
+    { key: 'ArrowDown', shiftKey: true }
+  ],
 })
 
 function interceptKeyPress(dir: NavigationDirection | null): boolean {
-	const dfMode = distractionFreeMode.value
+  const dfMode = distractionFreeMode.value
 
-	if (!dfMode && dir === NavigationDirection.Back) {
-		setDistractionFree(true)
-		return true
-	}
+  if (!dfMode && dir === NavigationDirection.Back) {
+    setDistractionFree(true)
+    return true
+  }
 
-	if (dfMode) {
-		setDistractionFree(false)
-		return true
-	}
-
-	return false
+  return false
 }
 
 const newTrackDisplay = ref<{ timeout: number; track: AudioTrackFragment } | null>(null)
 
 // TODO: improve this mess
 watch(currentTrack, (track) => {
-	if (!track) {
-		if (newTrackDisplay.value !== null) {
-			clearTimeout(newTrackDisplay.value.timeout)
-		}
+  if (!track) {
+    if (newTrackDisplay.value !== null) {
+      clearTimeout(newTrackDisplay.value.timeout)
+    }
 
-		newTrackDisplay.value = null
-	} else if (distractionFreeMode.value) {
-		if (newTrackDisplay.value !== null) {
-			clearTimeout(newTrackDisplay.value.timeout)
-		}
+    newTrackDisplay.value = null
+  } else if (distractionFreeMode.value) {
+    if (newTrackDisplay.value !== null) {
+      clearTimeout(newTrackDisplay.value.timeout)
+    }
 
-		newTrackDisplay.value = {
-			track,
-			timeout: setTimeout(() => {
-				newTrackDisplay.value = null
-			}, NEW_TRACK_DISPLAY_TIMEOUT),
-		}
-	}
+    newTrackDisplay.value = {
+      track,
+      timeout: setTimeout(() => {
+        newTrackDisplay.value = null
+      }, NEW_TRACK_DISPLAY_TIMEOUT),
+    }
+  }
 })
 </script>
 

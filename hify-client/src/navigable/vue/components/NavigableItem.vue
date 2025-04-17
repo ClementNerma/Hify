@@ -7,9 +7,7 @@ export type NavigableItemProps = {
 
   interceptKeyPress?: (
     navigationKey: NavigationDirection | null,
-    key: string,
-    longPress: boolean,
-    modifiers: KeyModifiers,
+    key: KeyPress,
     item: NavigableItem,
   ) => boolean
 
@@ -31,8 +29,8 @@ export type NavigableItemExposeType = {
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type DefineComponent, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyModifiers, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 
@@ -58,8 +56,8 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
     }
   },
 
-  interceptKeyPress(item, key, longPress, modifiers) {
-    const dir = longPress ? null : translateNavigationKey(key)
+  interceptKeyPress(item, key) {
+    const dir = key.longPress ? null : translateNavigationKey(key.key)
 
     if (dir === NavigationDirection.Up) {
       props.onUpKey?.(item)
@@ -73,7 +71,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
       props.onBackKey?.(item)
     }
 
-    return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, item) ? { type: 'trap' } : { type: 'native' }
+    return props.interceptKeyPress?.(key.longPress ? null : dir, key, item) ? { type: 'trap' } : { type: 'native' }
   },
 
 

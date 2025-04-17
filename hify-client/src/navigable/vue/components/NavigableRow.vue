@@ -5,9 +5,7 @@ type NavigableRow = NavigableCommonElementProps & { type: 'row' }
 export type NavigableRowProps = {
     interceptKeyPress?: (
         navigationKey: NavigationDirection | null,
-        key: string,
-        longPress: boolean,
-        modifiers: KeyModifiers,
+        key: KeyPress,
         row: NavigableRow,
     ) => boolean
 
@@ -30,7 +28,7 @@ export type NavigableRowExposeType = {
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
-import { NavigationDirection, generateNavigableElementId, type NavigableCommonElementProps, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers, type KeyModifiers } from '../..';
+import { NavigationDirection, generateNavigableElementId, type NavigableCommonElementProps, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers, type KeyPress } from '../..';
 
 const props = defineProps<NavigableRowProps>()
 
@@ -54,8 +52,8 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>
         return { type: 'native' }
     },
 
-    interceptKeyPress(row, key, longPress, modifiers) {
-        const dir = longPress ? null : translateNavigationKey(key)
+    interceptKeyPress(row, key) {
+        const dir = key.longPress ? null : translateNavigationKey(key.key)
 
         if (dir === NavigationDirection.Up) {
             props.onUpKey?.(row)
@@ -69,7 +67,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>
             props.onBackKey?.(row)
         }
 
-        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, row) ? { type: 'trap' } : { type: 'native' }
+        return props.interceptKeyPress?.(key.longPress ? null : dir, key, row) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(row, focusedChild) {

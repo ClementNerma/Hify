@@ -1,4 +1,4 @@
-import { InputHandlingResult, handleInput } from '@/navigable'
+import { InputHandlingResult, handleInput, type KeyPress } from '@/navigable'
 import { onUnmounted, readonly, ref } from 'vue'
 
 const NEVER_WAKE_UP_FOR_KEYS = ['Control', 'Shift', 'Alt']
@@ -9,7 +9,7 @@ export const distractionFreeMode = readonly(_distractionFreeMode)
 
 export type DistractionFreeListenerOptions = {
 	delayMillis: number
-	dontWakeUpForKeys?: string[]
+	dontWakeUpForKeys?: Partial<Omit<KeyPress, 'longPress'>>[]
 	darkeningCondition?: () => boolean
 }
 
@@ -58,7 +58,17 @@ export function setupDistractionFreeListener({
 	let destroyed = false
 
 	handleInput((key) => {
-		if (!destroyed && !dontWakeUpForKeys?.includes(key) && !NEVER_WAKE_UP_FOR_KEYS.includes(key)) {
+		if (
+			!destroyed &&
+			!dontWakeUpForKeys?.find(
+				(c) =>
+					c.key === key.key &&
+					(c.ctrlKey === undefined || c.ctrlKey === key.ctrlKey) &&
+					(c.altKey === undefined || c.altKey === key.altKey) &&
+					(c.shiftKey === undefined || c.shiftKey === key.shiftKey),
+			) &&
+			!NEVER_WAKE_UP_FOR_KEYS.includes(key.key)
+		) {
 			if (_distractionFreeMode.value) {
 				resetDistractionFreeMode()
 				return InputHandlingResult.Intercepted

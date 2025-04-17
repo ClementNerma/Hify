@@ -44,9 +44,9 @@ onMounted(() => {
 
 watchLongPressForKeys(['MediaPlayPause', 'MediaRewind', 'MediaFastForward'])
 
-handleInput((key, long, { shiftKey, ctrlKey }) => {
+handleInput(({ key, longPress, ctrlKey, shiftKey }) => {
 	if (key === 'MediaPlayPause') {
-		if (!long) {
+		if (!longPress) {
 			toggleAudioPlayback()
 		} else {
 			router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
@@ -54,7 +54,7 @@ handleInput((key, long, { shiftKey, ctrlKey }) => {
 	}
 
 	else if (key === 'MediaRewind' || (key === 'ArrowLeft' && shiftKey)) {
-		if (!long) {
+		if (!longPress) {
 			setPlayingAudioProgressRelative(-10)
 		} else {
 			playPreviousTrackOrRewind()
@@ -62,7 +62,7 @@ handleInput((key, long, { shiftKey, ctrlKey }) => {
 	}
 
 	else if (key === 'MediaFastForward' || (key === 'ArrowRight' && shiftKey)) {
-		if (!long) {
+		if (!longPress) {
 			setPlayingAudioProgressRelative(+10)
 		} else {
 			playNextTrack()

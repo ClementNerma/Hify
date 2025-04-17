@@ -5,9 +5,7 @@ type NavigableList = NavigableCommonElementProps & { type: 'list' }
 export type NavigableListProps = {
     interceptKeyPress?: (
         navigationKey: NavigationDirection | null,
-        key: string,
-        longPress: boolean,
-        modifiers: KeyModifiers,
+        key: KeyPress,
         list: NavigableList,
     ) => boolean
 
@@ -31,8 +29,8 @@ export type NavigableListExposeType = {
 </script>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, type CSSProperties, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyModifiers, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
+import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableListProps>()
 
@@ -56,8 +54,8 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
         return { type: 'native' }
     },
 
-    interceptKeyPress(list, key, longPress, modifiers) {
-        const dir = longPress ? null : translateNavigationKey(key)
+    interceptKeyPress(list, key) {
+        const dir = key.longPress ? null : translateNavigationKey(key.key)
 
         if (dir === NavigationDirection.Up) {
             props.onUpKey?.(list)
@@ -71,7 +69,7 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'list'>
             props.onBackKey?.(list)
         }
 
-        return props.interceptKeyPress?.(longPress ? null : dir, key, longPress, modifiers, list) ? { type: 'trap' } : { type: 'native' }
+        return props.interceptKeyPress?.(key.longPress ? null : dir, key, list) ? { type: 'trap' } : { type: 'native' }
     },
 
     focus(list, focusedChild) {
