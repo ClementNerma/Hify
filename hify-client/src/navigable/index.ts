@@ -34,8 +34,6 @@ export function setupNavigable(options: SetupNavigableOptions) {
 
 	watchLongPressForKeys(['Enter'])
 
-	handleInput(handleKeyPress)
-
 	if (options.inputHandler) {
 		options.inputHandler(handleKeyDownEvent, handleKeyUpEvent)
 	} else {
@@ -125,27 +123,37 @@ export type KeyPress = {
 
 export type InputHandler = (key: KeyPress) => InputHandlingResult | void
 
-const inputHandlers: InputHandler[] = []
+const inputHandlers: { handler: InputHandler; priority: number }[] = []
 
-function dispatchKeyInput(key: KeyPress): InputHandlingResult {
-	for (const handler of inputHandlers) {
+function dispatchKeyInput(key: KeyPress) {
+	let propagateToElements = true
+
+	// Run handlers by priority order (descending)
+	for (const { priority, handler } of inputHandlers.toSorted((a, b) => b.priority - a.priority)) {
 		const result = handler(key)
 
 		if (result === InputHandlingResult.Intercepted) {
-			return result
+			break
+		}
+
+		if (result === InputHandlingResult.PropagateToHandlersOnly) {
+			propagateToElements = false
 		}
 	}
 
-	return InputHandlingResult.Propagate
+	if (propagateToElements) {
+		handleKeyPress(key)
+	}
 }
 
-export function handleInput(handler: InputHandler): void {
-	inputHandlers.push(handler)
+export function handleInput(handler: InputHandler, priority: number): void {
+	inputHandlers.push({ handler, priority })
 }
 
 export enum InputHandlingResult {
 	Intercepted = 'INTERCEPTED',
 	Propagate = 'PROPAGATE',
+	PropagateToHandlersOnly = 'PROPAGATE_TO_HANDLERS_ONLY',
 }
 
 export enum NavigationDirection {

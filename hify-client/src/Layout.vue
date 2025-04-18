@@ -90,7 +90,7 @@ handleInput(({ key, longPress, ctrlKey, shiftKey }) => {
 	}
 
 	return InputHandlingResult.Intercepted
-})
+}, 1)
 </script>
 
 <template>

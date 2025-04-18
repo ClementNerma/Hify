@@ -71,14 +71,14 @@ export function setupDistractionFreeListener({
 		) {
 			if (_distractionFreeMode.value) {
 				resetDistractionFreeMode()
-				return InputHandlingResult.Intercepted
+				return InputHandlingResult.PropagateToHandlersOnly
 			}
 
 			restartDistractionFreeTimeout()
 		}
 
 		return InputHandlingResult.Propagate
-	})
+	}, Number.POSITIVE_INFINITY)
 
 	let distractionModeTimeout: number | null = null
 	restartDistractionFreeTimeout()
