@@ -129,11 +129,11 @@ function dispatchKeyInput(key: KeyPress) {
 	let propagateToElements = true
 
 	// Run handlers by priority order (descending)
-	for (const { priority, handler } of inputHandlers.toSorted((a, b) => b.priority - a.priority)) {
+	for (const { handler } of inputHandlers.toSorted((a, b) => b.priority - a.priority)) {
 		const result = handler(key)
 
 		if (result === InputHandlingResult.Intercepted) {
-			break
+			return
 		}
 
 		if (result === InputHandlingResult.PropagateToHandlersOnly) {
