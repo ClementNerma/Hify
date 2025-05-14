@@ -110,7 +110,7 @@ pub fn raw_paginate<
         },
         Some(ref cursor) => {
             let cursor = C::decode_cursor(cursor)
-                .map_err(|e| format!("Failed to decode provided cursor: {}", e))?;
+                .map_err(|e| format!("Failed to decode provided cursor: {e}"))?;
 
             items
                 .find_pos(&cursor)

@@ -56,8 +56,7 @@ impl UserData {
         if let Some(last) = self.inner.history.entries().last() {
             if let Some(overlapping_for) = entry.is_overlapping_prev(last) {
                 return Err(format!(
-                    "Entries overlap in listening history (of about {overlapping_for}):\n* {:?}\n* {entry:?}",
-                    last,
+                    "Entries overlap in listening history (of about {overlapping_for}):\n* {last:?}\n* {entry:?}",
                 ));
             }
         }

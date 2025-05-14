@@ -165,7 +165,7 @@ impl QueryRoot {
                     .tracks
                     .get(&track_id)
                     .cloned()
-                    .with_context(|| format!("Track not found for ID: {:?}", track_id))
+                    .with_context(|| format!("Track not found for ID: {track_id:?}"))
             })
             .collect::<Result<Vec<_>>>()
     }
