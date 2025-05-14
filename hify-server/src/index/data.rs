@@ -409,13 +409,6 @@ impl ScalarType for Rating {
     }
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize, SimpleObject)]
-pub struct ArtRgb {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-}
-
 pub trait IdType:
     std::fmt::Debug + Clone + Copy + Hash + PartialEq + Serialize + Deserialize<'static>
 {
