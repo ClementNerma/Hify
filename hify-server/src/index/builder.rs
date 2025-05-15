@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    arts::detect_deleted_arts,
+    arts::detect_deleted_album_arts,
     cache::build_index_cache,
     data::{Index, Track},
     metadata,
@@ -201,7 +201,7 @@ pub async fn build_index(
     );
 
     // TODO: remove deleted albums from this
-    let deleted_arts = detect_deleted_arts(&dir, &album_arts).await?;
+    let deleted_arts = detect_deleted_album_arts(&dir, &album_arts).await?;
 
     if !deleted_arts.is_empty() {
         log(

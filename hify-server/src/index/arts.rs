@@ -295,7 +295,7 @@ fn generate_artist_art(
     Ok(Some(image_buf))
 }
 
-pub async fn detect_deleted_arts(
+pub async fn detect_deleted_album_arts(
     base_dir: &Path,
     album_arts: &HashMap<AlbumID, PathBuf>,
 ) -> Result<Vec<AlbumID>> {
