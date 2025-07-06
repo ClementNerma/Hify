@@ -72,15 +72,15 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
             .map(|index| self.values.get(index).unwrap())
     }
 
-    pub fn keys(&self) -> Iter<K> {
+    pub fn keys(&self) -> Iter<'_, K> {
         self.keys.iter()
     }
 
-    pub fn values(&self) -> Iter<V> {
+    pub fn values(&self) -> Iter<'_, V> {
         self.values.iter()
     }
 
-    pub fn values_mut(&mut self) -> IterMut<V> {
+    pub fn values_mut(&mut self) -> IterMut<'_, V> {
         self.values.iter_mut()
     }
 

@@ -290,10 +290,3 @@ impl PlaylistEntry {
             .clone()
     }
 }
-
-#[derive(SimpleObject)]
-pub struct SearchResults {
-    tracks: Vec<Track>,
-    albums: Vec<AlbumInfos>,
-    artists: Vec<ArtistInfos>,
-}

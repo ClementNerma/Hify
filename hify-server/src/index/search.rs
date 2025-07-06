@@ -143,7 +143,7 @@ fn contains_with_multiplier(input: &str, word: &str) -> Option<usize> {
     if !lower.contains(word) {
         None
     } else if lower.split_whitespace().next() == Some(word) {
-        return Some(20);
+        Some(20)
     } else if lower.starts_with(word) {
         Some(15)
     } else {
