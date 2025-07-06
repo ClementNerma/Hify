@@ -638,7 +638,7 @@ function getNavigableAncestors(el: ConcreteNavigable<NavigableElement>): Concret
 }
 
 export function isValidElementType(type: string): type is keyof typeof ELEMENTS_PARSER {
-	return Object.prototype.hasOwnProperty.call(ELEMENTS_PARSER, type)
+	return Object.hasOwn(ELEMENTS_PARSER, type)
 }
 
 function parseNavigableElementData(data: string): NavigableElement {
@@ -665,7 +665,7 @@ function parseNavigableElementData(data: string): NavigableElement {
 
 	const navigableElt: object = parseParams(params, { ...COMMON_ELEMENTS_PROPS_PARSER, ...ELEMENTS_PARSER[type] }, type)
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: -
 	return { ...(navigableElt as any), id, type }
 }
 
@@ -675,7 +675,7 @@ function parseParams<V extends Record<string, ParamParser<unknown>>>(
 	elementType: NavigableElementType,
 ): { [Key in keyof V]: Exclude<ReturnType<V[Key]>, Error> } {
 	for (const paramName of params.keys()) {
-		if (!Object.prototype.hasOwnProperty.call(parsers, paramName)) {
+		if (!Object.hasOwn(parsers, paramName)) {
 			logFatal(`Unkown parameter "${paramName}" supplied for element type "${elementType}"`)
 		}
 	}
@@ -692,7 +692,7 @@ function parseParams<V extends Record<string, ParamParser<unknown>>>(
 		out[paramName] = parsed
 	}
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: -
 	return out as any
 }
 
@@ -747,7 +747,7 @@ export function translateNavigationKey(key: string): NavigationDirection | null 
 		F4: NavigationDirection.Back,
 	}
 
-	return Object.prototype.hasOwnProperty.call(keys, key) ? keys[key] : null
+	return Object.hasOwn(keys, key) ? keys[key] : null
 }
 
 export function handleKeyPress(key: KeyPress): void {
@@ -1049,15 +1049,15 @@ export function triggerNavigableEvent<
 ): ReturnType<NavigableElementInteractionHandlers<ElementType>[EventType]> {
 	const customHandler = ELEMENTS_CUSTOM_EVT_HANDLERS.get(navEl.id)?.[event as keyof _AllCustomInteractionHandlers]
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: -
 	const nativeHandler = (ELEMENTS_EVENT_HANDLERS[navEl.type] as any)[event as any]
 
 	if (customHandler) {
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: -
 		const ret = customHandler(navEl as any, ...(params as any as [never]))
 
 		if (ret === undefined) {
-			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: -
 			return undefined as any
 		}
 
@@ -1065,7 +1065,7 @@ export function triggerNavigableEvent<
 			case 'focusItem':
 			case 'propagate':
 			case 'trap':
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				// biome-ignore lint/suspicious/noExplicitAny: -
 				return ret as any
 
 			case 'native':

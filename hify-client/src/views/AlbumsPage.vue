@@ -5,11 +5,11 @@ import DropdownSelect, {
 	type DropdownChoices,
 } from '@/components/molecules/DropdownSelect.vue'
 import { GRID_ALBUMS_PER_ROW, GRID_ALBUMS_PRELOAD_ROWS } from '@/global/constants'
-import { logFatal } from '@/navigable'
 import { gqlClient } from '@/global/urql-client'
 import { assertUnreachable, isApproachingGridEnd, noParallel } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { AlbumFragment, AlbumsByNameQuery, MostRecentAlbumsQuery } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
 import { onMounted, ref, watch } from 'vue'
 

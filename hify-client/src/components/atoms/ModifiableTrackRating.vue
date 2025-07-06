@@ -3,7 +3,7 @@ import { gqlClient } from '@/global/urql-client'
 import { noParallel } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
-import { NavigationDirection, type InputHandlingResult } from '@/navigable'
+import { type InputHandlingResult, NavigationDirection } from '@/navigable'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import { computed, onBeforeUpdate, onMounted, ref } from 'vue'
 

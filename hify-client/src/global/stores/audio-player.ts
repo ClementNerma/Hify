@@ -1,5 +1,5 @@
-import { LogListeningDocument, type AudioTrackFragment } from '@/graphql/generated/graphql'
-import { log, logFatal, LogLevel } from '@/navigable'
+import { type AudioTrackFragment, LogListeningDocument } from '@/graphql/generated/graphql'
+import { LogLevel, log, logFatal } from '@/navigable'
 import { readonly, ref, shallowRef } from 'vue'
 import { getStreamUrl } from '../constants'
 import { gqlClient } from '../urql-client'

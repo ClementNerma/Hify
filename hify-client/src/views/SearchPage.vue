@@ -6,7 +6,7 @@ import { gqlClient } from '@/global/urql-client'
 import { getRouteParam } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { SearchPageQuery } from '@/graphql/generated/graphql'
-import { log, logFatal, LogLevel, requestFocusOnItem } from '@/navigable'
+import { LogLevel, log, logFatal, requestFocusOnItem } from '@/navigable'
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
 import { onMounted, ref } from 'vue'
 

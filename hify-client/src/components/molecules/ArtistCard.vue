@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { MixOrdering, type ArtistFragment } from '@/graphql/generated/graphql'
 import { MIN_GREAT_RATING, getArtistArtUrl } from '@/global/constants'
+import { type ContextMenuOption, showContextMenu } from '@/global/stores/context-menu'
 import { generateAndPlayMix } from '@/global/stores/play-queue'
-import { computed } from 'vue'
-import router from '@/router'
-import Card from './Card.vue'
+import { type ArtistFragment, MixOrdering } from '@/graphql/generated/graphql'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import { showContextMenu, type ContextMenuOption } from '@/global/stores/context-menu'
+import router from '@/router'
+import { computed } from 'vue'
+import Card from './Card.vue'
 
 const { artist } = defineProps<{
 	artist: ArtistFragment

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
 import NavBar from '@/components/molecules/NavBar.vue'
+import Notifications from '@/components/molecules/Notifications.vue'
+import ContextMenu from '@/components/organisms/ContextMenu.vue'
+import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
+import { NotificationLevel, showNotification } from '@/global/stores/notifications'
+import { playNextTrack, playPreviousTrackOrRewind, restorePlayQueue } from '@/global/stores/play-queue'
+import { InputHandlingResult, LogLevel, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import router from '@/router'
 import { onMounted } from 'vue'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
-import ContextMenu from '@/components/organisms/ContextMenu.vue'
-import { InputHandlingResult, LogLevel, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
-import Notifications from '@/components/molecules/Notifications.vue'
-import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
-import { playNextTrack, playPreviousTrackOrRewind, restorePlayQueue } from '@/global/stores/play-queue'
-import { NotificationLevel, showNotification } from '@/global/stores/notifications'
 import { log } from './global/stores/debugger'
 
 onMounted(() => {
@@ -51,41 +51,29 @@ handleInput(({ key, longPress, ctrlKey, shiftKey }) => {
 		} else {
 			router.push(router.currentRoute.value.name === 'now-playing' ? 'search' : 'now-playing')
 		}
-	}
-
-	else if (key === 'MediaRewind' || (key === 'ArrowLeft' && shiftKey)) {
+	} else if (key === 'MediaRewind' || (key === 'ArrowLeft' && shiftKey)) {
 		if (!longPress) {
 			setPlayingAudioProgressRelative(-10)
 		} else {
 			playPreviousTrackOrRewind()
 		}
-	}
-
-	else if (key === 'MediaFastForward' || (key === 'ArrowRight' && shiftKey)) {
+	} else if (key === 'MediaFastForward' || (key === 'ArrowRight' && shiftKey)) {
 		if (!longPress) {
 			setPlayingAudioProgressRelative(+10)
 		} else {
 			playNextTrack()
 		}
-	}
-
-	else if (key === 'ArrowUp' && shiftKey) {
+	} else if (key === 'ArrowUp' && shiftKey) {
 		playPreviousTrackOrRewind()
-	}
-
-	else if (key === 'ArrowDown' && shiftKey) {
+	} else if (key === 'ArrowDown' && shiftKey) {
 		playNextTrack()
-	}
-
-	else if (key === 'F' && shiftKey && ctrlKey) {
+	} else if (key === 'F' && shiftKey && ctrlKey) {
 		if (document.fullscreenElement) {
 			document.exitFullscreen?.()
 		} else {
 			document.body.requestFullscreen()
 		}
-	}
-
-	else {
+	} else {
 		return InputHandlingResult.Propagate
 	}
 

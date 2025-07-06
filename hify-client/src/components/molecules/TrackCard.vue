@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import NavigableTrack from '../atoms/NavigableTrack.vue'
-import type { EntryInPlaylist } from '@/global/ctx-menu-content'
-import Card from './Card.vue'
-import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import { getAlbumArtUrl } from '@/global/constants'
+import type { EntryInPlaylist } from '@/global/ctx-menu-content'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import NavigableTrack from '../atoms/NavigableTrack.vue'
+import Card from './Card.vue'
 
 defineProps<{
 	track: AudioTrackFragment

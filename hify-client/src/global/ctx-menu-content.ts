@@ -1,7 +1,7 @@
 import {
+	type AudioTrackFragment,
 	EditPlaylistDocument,
 	MixOrdering,
-	type AudioTrackFragment,
 	type PlaylistEntryFragment,
 } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'

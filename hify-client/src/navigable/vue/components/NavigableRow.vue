@@ -3,26 +3,22 @@
 type NavigableRow = NavigableCommonElementProps & { type: 'row' }
 
 export type NavigableRowProps = {
-    interceptKeyPress?: (
-        navigationKey: NavigationDirection | null,
-        key: KeyPress,
-        row: NavigableRow,
-    ) => boolean
+	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, row: NavigableRow) => boolean
 
-    onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void
-    onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void
-    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, row: NavigableRow) => void
-    onEnter?: (from: NavigationDirection, row: NavigableRow) => void
-    onLeftKey?: (row: NavigableRow) => void
-    onRightKey?: (row: NavigableRow) => void
-    onUpKey?: (row: NavigableRow) => void
-    onDownKey?: (row: NavigableRow) => void
-    onBackKey?: (row: NavigableRow) => void
+	onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void
+	onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void
+	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, row: NavigableRow) => void
+	onEnter?: (from: NavigationDirection, row: NavigableRow) => void
+	onLeftKey?: (row: NavigableRow) => void
+	onRightKey?: (row: NavigableRow) => void
+	onUpKey?: (row: NavigableRow) => void
+	onDownKey?: (row: NavigableRow) => void
+	onBackKey?: (row: NavigableRow) => void
 } & Omit<NavigableRow, 'id' | 'type'>
 
 export type NavigableRowExposeType = {
-    row: NavigableRow
-    focused: boolean
+	row: NavigableRow
+	focused: boolean
 }
 </script>
 

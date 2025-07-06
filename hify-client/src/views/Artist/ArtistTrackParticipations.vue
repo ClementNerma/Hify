@@ -2,11 +2,11 @@
 import Centered from '@/components/atoms/Centered.vue'
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
 import TracksFromAlbums from '@/components/organisms/TracksFromAlbums.vue'
-import { logFatal } from '@/navigable'
 import { gqlClient } from '@/global/urql-client'
 import { noParallel } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { ArtistTrackParticipationsQuery, AudioTrackFragment } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import { onMounted, ref } from 'vue'
 
 const { artistId } = defineProps<{ artistId: string }>()

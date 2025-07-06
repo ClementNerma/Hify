@@ -1,4 +1,4 @@
-import { log, LogLevel } from '@/navigable'
+import { LogLevel, log } from '@/navigable'
 import * as v from 'valibot'
 import type { PlayQueue } from './stores/play-queue'
 

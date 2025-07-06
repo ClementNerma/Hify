@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { getAlbumArtUrl } from '@/global/constants'
 import { ctxMenuCallbacks, ctxMenuOptions } from '@/global/ctx-menu-content'
+import { showContextMenu } from '@/global/stores/context-menu'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
-import { getAlbumArtUrl } from '@/global/constants'
-import { showContextMenu } from '@/global/stores/context-menu'
 
 defineProps<{ tracks: AudioTrackFragment[] }>()
 </script>

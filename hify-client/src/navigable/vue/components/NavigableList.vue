@@ -3,28 +3,24 @@
 type NavigableList = NavigableCommonElementProps & { type: 'list' }
 
 export type NavigableListProps = {
-    interceptKeyPress?: (
-        navigationKey: NavigationDirection | null,
-        key: KeyPress,
-        list: NavigableList,
-    ) => boolean
+	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, list: NavigableList) => boolean
 
-    onFocus?: (list: NavigableList, focusedChild: NavigableElement) => void
-    onUnfocus?: (list: NavigableList, unfocusedChild: NavigableElement) => void
-    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, list: NavigableList) => void
-    onEnter?: (from: NavigationDirection, list: NavigableList) => void
-    onLeftKey?: (list: NavigableList) => void
-    onRightKey?: (list: NavigableList) => void
-    onUpKey?: (list: NavigableList) => void
-    onDownKey?: (list: NavigableList) => void
-    onBackKey?: (list: NavigableList) => void
+	onFocus?: (list: NavigableList, focusedChild: NavigableElement) => void
+	onUnfocus?: (list: NavigableList, unfocusedChild: NavigableElement) => void
+	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, list: NavigableList) => void
+	onEnter?: (from: NavigationDirection, list: NavigableList) => void
+	onLeftKey?: (list: NavigableList) => void
+	onRightKey?: (list: NavigableList) => void
+	onUpKey?: (list: NavigableList) => void
+	onDownKey?: (list: NavigableList) => void
+	onBackKey?: (list: NavigableList) => void
 
-    trapped?: boolean
+	trapped?: boolean
 } & Omit<NavigableList, 'id' | 'type'>
 
 export type NavigableListExposeType = {
-    list: NavigableList
-    focused: boolean
+	list: NavigableList
+	focused: boolean
 }
 </script>
 

@@ -1,11 +1,11 @@
 import {
+	type AudioTrackFragment,
 	GenerateMixDocument,
 	GetNextTracksOfMixDocument,
-	SelectTracksDocument,
-	type AudioTrackFragment,
 	type MixParams,
+	SelectTracksDocument,
 } from '@/graphql/generated/graphql'
-import { log, logFatal, LogLevel } from '@/navigable'
+import { LogLevel, log, logFatal } from '@/navigable'
 import router from '@/router'
 import { computed, ref, watch } from 'vue'
 import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'

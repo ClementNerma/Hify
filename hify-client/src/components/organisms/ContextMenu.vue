@@ -1,17 +1,17 @@
 <script setup lang="ts">
+import { contextMenuStore } from '@/global/stores/context-menu'
 import { logFatal } from '@/navigable'
-import { onUpdated, ref } from 'vue'
 import {
+	type NavigableElementByType,
 	NavigationDirection,
 	getFocusedItemId,
 	getNavigableDOMElementById,
 	requestFocusById,
 	requestFocusOnElement,
-	type NavigableElementByType,
 } from '@/navigable'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import { contextMenuStore } from '@/global/stores/context-menu'
 import NavigableList, { type NavigableListExposeType } from '@/navigable/vue/components/NavigableList.vue'
+import { onUpdated, ref } from 'vue'
 
 onUpdated(() => {
 	if (!containerRef.value) {

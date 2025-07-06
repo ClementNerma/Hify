@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ArtistCard from '@/components/molecules/ArtistCard.vue'
-import { logFatal } from '@/navigable'
 import { gqlClient } from '@/global/urql-client'
 import { isApproachingGridEnd, noParallel } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { AlbumArtistsPageQuery, ArtistFragment } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
 import { onMounted, ref } from 'vue'
 

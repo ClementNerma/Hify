@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { showContextMenu } from '@/global/stores/context-menu'
+import { generateAndPlayMix } from '@/global/stores/play-queue'
 import type { MixParams } from '@/graphql/generated/graphql'
 import Button from './Button.vue'
-import { generateAndPlayMix } from '@/global/stores/play-queue'
-import { showContextMenu } from '@/global/stores/context-menu'
 
 defineProps<{
 	mixParams: MixParams

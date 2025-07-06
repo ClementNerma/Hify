@@ -20,5 +20,13 @@
 			"quoteStyle": "single",
 			"semicolons": "asNeeded"
 		}
-	}
+	},
+	"overrides": [
+		{
+			"include": ["src/graphql/generated"],
+			"linter": {
+				"enabled": false
+			}
+		}
+	]
 }

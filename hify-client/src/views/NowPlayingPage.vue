@@ -1,69 +1,69 @@
 <script setup lang="ts">
+import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
+import Emoji from '@/components/atoms/Emoji.vue'
+import { getAlbumArtUrl } from '@/global/constants'
 import { readableAudioPaused } from '@/global/stores/audio-player'
 import { distractionFreeMode, setupDistractionFreeListener } from '@/global/stores/distraction-free'
 import { currentTrack } from '@/global/stores/play-queue'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { NavigationDirection } from '@/navigable'
+import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import { ref, watch } from 'vue'
 import NowPlayingBackground from './NowPlaying/NowPlayingBackground.vue'
-import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
 import NowPlayingBottomPanel from './NowPlaying/NowPlayingBottomPanel.vue'
 import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue'
-import Emoji from '@/components/atoms/Emoji.vue'
-import { getAlbumArtUrl } from '@/global/constants'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
-import { NavigationDirection } from '@/navigable'
 
 const NEW_TRACK_DISPLAY_TIMEOUT = 2000
 
 const setDistractionFree = setupDistractionFreeListener({
-  delayMillis: 3000,
-  darkeningCondition: () => readableAudioPaused.value === false,
-  dontWakeUpForKeys: [
-    { key: 'MediaPlayPause' },
-    { key: 'MediaRewind' },
-    { key: 'MediaFastForward' },
-    { key: 'Escape' },
-    { key: 'F4' },
-    { key: 'ArrowLeft', shiftKey: true },
-    { key: 'ArrowRight', shiftKey: true },
-    { key: 'ArrowUp', shiftKey: true },
-    { key: 'ArrowDown', shiftKey: true }
-  ],
+	delayMillis: 3000,
+	darkeningCondition: () => readableAudioPaused.value === false,
+	dontWakeUpForKeys: [
+		{ key: 'MediaPlayPause' },
+		{ key: 'MediaRewind' },
+		{ key: 'MediaFastForward' },
+		{ key: 'Escape' },
+		{ key: 'F4' },
+		{ key: 'ArrowLeft', shiftKey: true },
+		{ key: 'ArrowRight', shiftKey: true },
+		{ key: 'ArrowUp', shiftKey: true },
+		{ key: 'ArrowDown', shiftKey: true },
+	],
 })
 
 function interceptKeyPress(dir: NavigationDirection | null): boolean {
-  const dfMode = distractionFreeMode.value
+	const dfMode = distractionFreeMode.value
 
-  if (!dfMode && dir === NavigationDirection.Back) {
-    setDistractionFree(true)
-    return true
-  }
+	if (!dfMode && dir === NavigationDirection.Back) {
+		setDistractionFree(true)
+		return true
+	}
 
-  return false
+	return false
 }
 
 const newTrackDisplay = ref<{ timeout: number; track: AudioTrackFragment } | null>(null)
 
 // TODO: improve this mess
 watch(currentTrack, (track) => {
-  if (!track) {
-    if (newTrackDisplay.value !== null) {
-      clearTimeout(newTrackDisplay.value.timeout)
-    }
+	if (!track) {
+		if (newTrackDisplay.value !== null) {
+			clearTimeout(newTrackDisplay.value.timeout)
+		}
 
-    newTrackDisplay.value = null
-  } else if (distractionFreeMode.value) {
-    if (newTrackDisplay.value !== null) {
-      clearTimeout(newTrackDisplay.value.timeout)
-    }
+		newTrackDisplay.value = null
+	} else if (distractionFreeMode.value) {
+		if (newTrackDisplay.value !== null) {
+			clearTimeout(newTrackDisplay.value.timeout)
+		}
 
-    newTrackDisplay.value = {
-      track,
-      timeout: setTimeout(() => {
-        newTrackDisplay.value = null
-      }, NEW_TRACK_DISPLAY_TIMEOUT),
-    }
-  }
+		newTrackDisplay.value = {
+			track,
+			timeout: setTimeout(() => {
+				newTrackDisplay.value = null
+			}, NEW_TRACK_DISPLAY_TIMEOUT),
+		}
+	}
 })
 </script>
 

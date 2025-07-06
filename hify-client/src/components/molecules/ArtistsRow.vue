@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import router from '@/router'
-import { ctxMenuOptions } from '@/global/ctx-menu-content'
-import type { ArtistFragment } from '@/graphql/generated/graphql'
 import Card from '@/components/molecules/Card.vue'
 import ProgressiveRow from '@/components/molecules/ProgressiveRow.vue'
 import { getArtistArtUrl } from '@/global/constants'
+import { ctxMenuOptions } from '@/global/ctx-menu-content'
 import { showContextMenu } from '@/global/stores/context-menu'
+import type { ArtistFragment } from '@/graphql/generated/graphql'
+import router from '@/router'
 
 defineProps<{ artists: ArtistFragment[] }>()
 </script>

@@ -1,6 +1,12 @@
 import type { App, Directive, Plugin } from 'vue'
 import {
 	DATA_NAV_ATTR_NAME,
+	type NavigableElement,
+	type NavigableElementByType,
+	type NavigableElementInteractionHandlers,
+	type NavigableElementType,
+	type OptionalUndefined,
+	type SetupNavigableOptions,
 	encodeNavigableElement,
 	generateNavigableElementId,
 	parseNavigableDataFromElement,
@@ -8,12 +14,6 @@ import {
 	setupNavigable,
 	unregisterNavigableElementHandlers,
 	updateNavigableElementHandlers,
-	type NavigableElement,
-	type NavigableElementByType,
-	type NavigableElementInteractionHandlers,
-	type NavigableElementType,
-	type OptionalUndefined,
-	type SetupNavigableOptions,
 } from '..'
 
 export type NavDirectiveParamsByElementType<ElementType extends NavigableElementType> = OptionalUndefined<

@@ -4,24 +4,24 @@ import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/componen
 import { ref } from 'vue'
 
 const props = defineProps<{
-    max: number
-    value: number
-    onDirection: (direction: 'left' | 'right') => void
-    onPress?: () => void
+	max: number
+	value: number
+	onDirection: (direction: 'left' | 'right') => void
+	onPress?: () => void
 }>()
 
 const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = (dir) => {
-    if (dir === NavigationDirection.Left) {
-        props.onDirection('left')
-        return true
-    }
+	if (dir === NavigationDirection.Left) {
+		props.onDirection('left')
+		return true
+	}
 
-    if (dir === NavigationDirection.Right) {
-        props.onDirection('right')
-        return true
-    }
+	if (dir === NavigationDirection.Right) {
+		props.onDirection('right')
+		return true
+	}
 
-    return false
+	return false
 }
 
 const focused = ref(false)

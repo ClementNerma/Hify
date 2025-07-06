@@ -3,26 +3,22 @@
 type NavigableGrid = NavigableCommonElementProps & { type: 'grid'; columns: number }
 
 export type NavigableGridProps = {
-    interceptKeyPress?: (
-        navigationKey: NavigationDirection | null,
-        key: KeyPress,
-        grid: NavigableGrid,
-    ) => boolean
+	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, grid: NavigableGrid) => boolean
 
-    onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
-    onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
-    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
-    onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
-    onLeftKey?: (grid: NavigableGrid) => void
-    onRightKey?: (grid: NavigableGrid) => void
-    onUpKey?: (grid: NavigableGrid) => void
-    onDownKey?: (grid: NavigableGrid) => void
-    onBackKey?: (grid: NavigableGrid) => void
+	onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
+	onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
+	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
+	onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
+	onLeftKey?: (grid: NavigableGrid) => void
+	onRightKey?: (grid: NavigableGrid) => void
+	onUpKey?: (grid: NavigableGrid) => void
+	onDownKey?: (grid: NavigableGrid) => void
+	onBackKey?: (grid: NavigableGrid) => void
 } & Omit<NavigableGrid, 'id' | 'type'>
 
 export type NavigableGridExposeType = {
-    grid: NavigableGrid
-    focused: boolean
+	grid: NavigableGrid
+	focused: boolean
 }
 </script>
 
