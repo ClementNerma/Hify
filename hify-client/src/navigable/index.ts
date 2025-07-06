@@ -52,7 +52,6 @@ function getSetupOptions(): SetupNavigableOptions {
 
 const pendingKeyLongPresses = new Map<string, { at: number; timeout: number } | null>()
 const watchingLongPressForKeys = new Set<string>()
-const triggeredKeyLongPress = new Set<string>()
 
 const DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS = 250
 
@@ -66,12 +65,11 @@ function handleKeyDownEvent(e: KeyboardEvent): void {
 	const modifiers = { ctrlKey, shiftKey, altKey } satisfies Partial<KeyPress>
 
 	if (watchingLongPressForKeys.has(key)) {
-		if (!pendingKeyLongPresses.has(key) && !triggeredKeyLongPress.has(key)) {
+		if (!pendingKeyLongPresses.has(key)) {
 			pendingKeyLongPresses.set(key, {
 				at: performance.now(),
 				timeout: window.setTimeout(() => {
 					dispatchKeyInput({ key, longPress: true, ...modifiers })
-					triggeredKeyLongPress.add(key)
 					pendingKeyLongPresses.delete(key)
 				}, setupOptions?.keyLongPressThresholdMs ?? DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS),
 			})
@@ -88,14 +86,10 @@ function handleKeyUpEvent(e: KeyboardEvent): void {
 		return
 	}
 
-	if (triggeredKeyLongPress.delete(key)) {
-		return
-	}
-
 	const pending = pendingKeyLongPresses.get(key)
 
-	if (pending === null || pending === undefined) {
-		logFatal(`Internal error: timeout of keydown event for key "${key}" is not initialized`)
+	if (!pending) {
+		return
 	}
 
 	clearTimeout(pending.timeout)
