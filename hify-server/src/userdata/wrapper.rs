@@ -118,6 +118,17 @@ impl UserData {
         (self.on_change)(&self.inner);
     }
 
+    pub fn delete_mix(&mut self, mix_id: MixID) -> Result<(), &'static str> {
+        self.inner
+            .mixes
+            .remove(&mix_id)
+            .ok_or("Mix was not found")?;
+
+        (self.on_change)(&self.inner);
+
+        Ok(())
+    }
+
     pub fn get_next_tracks_of_mix<T>(
         &mut self,
         mix_id: MixID,

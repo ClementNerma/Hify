@@ -1,6 +1,6 @@
-import { computed, ref, watch } from 'vue'
 import {
 	type AudioTrackFragment,
+	DeleteMixDocument,
 	GenerateMixDocument,
 	GetNextTracksOfMixDocument,
 	type MixParams,
@@ -8,6 +8,7 @@ import {
 } from '@/graphql/generated/graphql'
 import { LogLevel, log, logFatal } from '@/navigable'
 import router from '@/router'
+import { computed, ref, watch } from 'vue'
 import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'
 import { loadPlayQueue, persistPlayQueue } from '../persistence'
 import { gqlClient } from '../urql-client'
@@ -249,6 +250,14 @@ export function moveTrackPositionInQueue(index: number, newIndex: number): void 
 }
 
 export async function generateAndPlayMix(params: MixParams): Promise<void> {
+	if (playQueue.value.fromMixId !== null) {
+		gqlClient
+			.mutation(DeleteMixDocument, {
+				mixId: playQueue.value.fromMixId,
+			})
+			.then(() => log(LogLevel.Debug, `Deleted previous mix with ID "${playQueue.value.fromMixId}"`))
+	}
+
 	const { data, error } = await gqlClient.mutation(GenerateMixDocument, {
 		params,
 		maxTracks: LARGE_MIX_TRACKS_QTY,

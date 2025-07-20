@@ -115,7 +115,9 @@ impl MutationRoot {
 
         let mix_id = mix.id();
 
-        graphql_ctx_member!(ctx, app_state.user_data, write).register_mix(mix);
+        let mut user_data = graphql_ctx_member!(ctx, app_state.user_data, write);
+
+        user_data.register_mix(mix);
 
         Ok(CreatedMix {
             mix_id,
@@ -136,6 +138,17 @@ impl MutationRoot {
             max_tracks,
             |track_id| index.tracks.get(&track_id).unwrap().clone(),
         )
+    }
+
+    async fn delete_mix(
+        &self,
+        ctx: &Context<'_>,
+        mix_id: MixID,
+    ) -> Result<EmptyScalar, &'static str> {
+        let mut user_data = graphql_ctx_member!(ctx, app_state.user_data, write);
+        user_data.delete_mix(mix_id)?;
+
+        Ok(EmptyScalar)
     }
 }
 
