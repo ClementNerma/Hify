@@ -23,9 +23,27 @@
 	},
 	"overrides": [
 		{
-			"include": ["src/graphql/generated"],
+			"includes": ["src/graphql/generated/*.ts"],
 			"linter": {
 				"enabled": false
+			}
+		},
+		{
+			"includes": ["**/*.vue"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off",
+
+						"useImportType": "off"
+					},
+
+					"correctness": {
+						"noUnusedVariables": "off",
+
+						"noUnusedImports": "off"
+					}
+				}
 			}
 		}
 	]
