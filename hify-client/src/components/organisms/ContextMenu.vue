@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUpdated, ref } from 'vue'
+import { onUpdated, ref, watch } from 'vue'
 import { contextMenuStore } from '@/global/stores/context-menu'
 import {
 	getFocusedItemId,
@@ -66,26 +66,25 @@ const containerRef = ref<HTMLDivElement | null>(null)
 </script>
 
 <template>
-  <NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0"
-    :intercept-key-press="dir => dir === NavigationDirection.Back" @back-key="closeContextMenu">
-    <div
-      class="ctxmenu fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
-      ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
-      <!-- TODO: implement "trapped" -->
-      <NavigableList trapped ref="listRef">
-        <NavigableItem v-for="option in contextMenuStore.options" :key="option.label"
-          @press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
-          <div :class="{ 'bg-gray-400': focused }">
-            <div class="p-1.5 option">{{ option.label }}</div>
-          </div>
-        </NavigableItem>
-      </NavigableList>
-    </div>
-  </NavigableList>
+	<NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0"
+		:intercept-key-press="dir => dir === NavigationDirection.Back" @back-key="closeContextMenu">
+		<div class="ctxmenu fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
+			ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
+			<!-- TODO: implement "trapped" -->
+			<NavigableList trapped ref="listRef">
+				<NavigableItem v-for="option in contextMenuStore.options" :key="option.label"
+					@press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
+					<div :class="{ 'bg-gray-400': focused }">
+						<div class="p-1.5 option">{{ option.label }}</div>
+					</div>
+				</NavigableItem>
+			</NavigableList>
+		</div>
+	</NavigableList>
 </template>
 
 <style scoped>
 .option:not(:last-child) {
-  border-bottom: 1px solid black;
+	border-bottom: 1px solid black;
 }
 </style>

@@ -7,7 +7,7 @@ export type DropdownSelectExposeType = { buttonRef: ButtonExposeType | null }
 <script setup lang="ts" generic="T extends string">
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
 import NavigableList from '@/navigable/vue/components/NavigableList.vue';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onUpdated, ref, watch } from 'vue';
 import Button, { type ButtonExposeType } from '../atoms/Button.vue';
 import { logFatal } from '@/navigable';
 import { NavigationDirection, requestFocusOnItem } from '@/navigable';
@@ -25,6 +25,25 @@ onBeforeMount(() => {
 })
 
 const opened = ref(false)
+const wasOpened = ref(false)
+
+onUpdated(() => {
+  if (!opened.value || wasOpened.value) {
+    return
+  }
+
+  wasOpened.value = true
+
+  const toSelect: T = selectedId.value ?? props.items[0].id
+
+  const { item } = itemsRef.value[toSelect]
+
+  if (!item) {
+    logFatal('Missing dropdown element reference')
+  }
+
+  requestFocusOnItem(item)
+})
 
 function toggle() {
   if (!togglerRef.value || !togglerRef.value.itemRef) {
@@ -33,19 +52,10 @@ function toggle() {
 
   if (opened.value) {
     opened.value = false
+    wasOpened.value = false
     requestFocusOnItem(togglerRef.value.itemRef.item)
   } else {
     opened.value = true
-
-    const toSelect: T = selectedId.value ?? props.items[0].id
-
-    const { item } = itemsRef.value[toSelect]
-
-    if (!item) {
-      logFatal('Missing dropdown element reference')
-    }
-
-    requestFocusOnItem(item)
   }
 }
 
@@ -71,12 +81,12 @@ defineExpose({ buttonRef: togglerRef })
   <Button @press="toggle()" ref="togglerRef">
     {{ prefixLabel ?? '' }}
     <template v-if="selectedId !== null">
-      {{ items.find(item => item.id === selectedId)?.label ?? '' }}
+      {{items.find(item => item.id === selectedId)?.label ?? ''}}
     </template>
   </Button>
 
-  <div class="relative">
-    <div class="absolute top-0 border border-solid bg-slate-700" :class="{ 'hidden': !opened }">
+  <div class="relative" v-if="opened">
+    <div class="absolute top-0 border border-solid bg-slate-700">
       <NavigableList trapped ref="menuRef" @back-key="toggle()"
         :intercept-key-press="dir => dir === NavigationDirection.Back">
         <NavigableItem v-for="item in items" :key="item.id" @press="select(item.id)"
