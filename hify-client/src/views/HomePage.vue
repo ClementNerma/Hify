@@ -16,7 +16,7 @@ import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
 
 const { data, error, executeQuery } = useQuery({
-	query: graphql(`
+  query: graphql(`
     query HomePage($randomItemsParams: FeedParams!) {
       generateFeed(input: $randomItemsParams) {
         lastListenedTo {
@@ -33,12 +33,12 @@ const { data, error, executeQuery } = useQuery({
       }
     }
   `),
-	variables: {
-		randomItemsParams: {
-			maxItems: 100,
-			minRating: 8,
-		},
-	},
+  variables: {
+    randomItemsParams: {
+      maxItems: 100,
+      minRating: 8,
+    },
+  },
 })
 
 const feed = computed(() => data.value?.generateFeed)
@@ -70,12 +70,6 @@ const statsBox = ref(false)
     </Centered>
 
     <TracksRow :tracks="feed.lastListenedTo" />
-
-    <Centered>
-      <h3>Last albums to collection:</h3>
-    </Centered>
-
-    <AlbumsRow :albums="feed.mostRecentAlbums" />
 
     <Centered>
       <h3>Tools</h3>
