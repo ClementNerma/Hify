@@ -33,7 +33,11 @@ export type EntryInPlaylist = {
 }
 
 export const ctxMenuOptions = {
-	forTrack(track: AudioTrackFragment, settings: { fromMixId: string | null }, ctx: TrackContext): ContextMenuOption[] {
+	forTrack(
+		track: AudioTrackFragment,
+		settings: { fromMixId: string | null },
+		ctx: TrackContext,
+	): ContextMenuOption[] {
 		const options: ContextMenuOption[] = []
 
 		switch (ctx.context) {
@@ -98,7 +102,10 @@ export const ctxMenuOptions = {
 								.mutation(EditPlaylistDocument, {
 									playlistId,
 									action: {
-										move: { entries: [trackEntry.id], putAfter: position === 0 ? null : allEntries[position - 1].id },
+										move: {
+											entries: [trackEntry.id],
+											putAfter: position === 0 ? null : allEntries[position - 1].id,
+										},
 									},
 								})
 								.then(reloadPlaylist, (err) => logFatal('Failed to move track up in playlist', err))

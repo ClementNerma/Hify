@@ -393,7 +393,11 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 		enterFrom(navEl, from) {
 			const children = getChildrenOf(navEl)
 
-			return navigateToFirstDescendantIn(from === NavigationDirection.Down ? children.reverse() : children, from, true)
+			return navigateToFirstDescendantIn(
+				from === NavigationDirection.Down ? children.reverse() : children,
+				from,
+				true,
+			)
 		},
 
 		interceptKeyPress: () => ({ type: 'propagate' }),
@@ -445,7 +449,11 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 		enterFrom(navEl, from) {
 			const children = getChildrenOf(navEl)
 
-			return navigateToFirstDescendantIn(from === NavigationDirection.Right ? children.reverse() : children, from, true)
+			return navigateToFirstDescendantIn(
+				from === NavigationDirection.Right ? children.reverse() : children,
+				from,
+				true,
+			)
 		},
 
 		interceptKeyPress: () => ({ type: 'propagate' }),
@@ -518,7 +526,10 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 							? row.slice(0, childIndex % grid.columns).reverse()
 							: row.slice((childIndex % grid.columns) + 1)
 
-						return navigateToFirstDescendantIn(sliced, isLeft ? NavigationDirection.Right : NavigationDirection.Left)
+						return navigateToFirstDescendantIn(
+							sliced,
+							isLeft ? NavigationDirection.Right : NavigationDirection.Left,
+						)
 					}
 
 					case NavigationDirection.Beginning:
@@ -676,7 +687,11 @@ function parseNavigableElementData(data: string): NavigableElement {
 		}),
 	)
 
-	const navigableElt: object = parseParams(params, { ...COMMON_ELEMENTS_PROPS_PARSER, ...ELEMENTS_PARSER[type] }, type)
+	const navigableElt: object = parseParams(
+		params,
+		{ ...COMMON_ELEMENTS_PROPS_PARSER, ...ELEMENTS_PARSER[type] },
+		type,
+	)
 
 	// biome-ignore lint/suspicious/noExplicitAny: -
 	return { ...(navigableElt as any), id, type }

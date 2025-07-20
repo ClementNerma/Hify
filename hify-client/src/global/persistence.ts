@@ -40,7 +40,10 @@ export function loadPlayQueue(): PersistedPlayQueue | null {
 	try {
 		parsed = JSON.parse(saved)
 	} catch (e: unknown) {
-		log(LogLevel.Error, `Failed to parse persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`)
+		log(
+			LogLevel.Error,
+			`Failed to parse persisted play queue: ${e instanceof Error ? e.message : '<unknown error>'}`,
+		)
 		console.error(saved)
 		localStorage.removeItem(PLAY_QUEUE_LOCAL_STORAGE_KEY)
 		return null

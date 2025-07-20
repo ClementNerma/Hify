@@ -140,7 +140,9 @@ export function toggleAudioPlayback() {
 	log(LogLevel.Info, 'Toggled audio playback')
 
 	if (player.paused) {
-		player.play().catch((e) => alert(`Failed to resume audio: ${e instanceof Error ? e.message : '<unknown error>'}`))
+		player
+			.play()
+			.catch((e) => alert(`Failed to resume audio: ${e instanceof Error ? e.message : '<unknown error>'}`))
 	} else {
 		player.pause()
 	}

@@ -13,7 +13,9 @@
 		}
 	},
 	"formatter": {
-		"lineWidth": 120
+		"lineWidth": 120,
+		"indentStyle": "tab",
+		"indentWidth": 4
 	},
 	"javascript": {
 		"formatter": {
