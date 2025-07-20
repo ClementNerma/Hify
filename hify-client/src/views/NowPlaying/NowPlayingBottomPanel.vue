@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import AudioProgressBar from '@/components/atoms/AudioProgressBar.vue'
 import ModifiableTrackRating from '@/components/atoms/ModifiableTrackRating.vue'
 import With from '@/components/atoms/With.vue'
@@ -23,7 +24,6 @@ import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
-import { ref, watch } from 'vue'
 
 const isQueueFocused = ref(false)
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
 import MixButton from '@/components/atoms/MixButton.vue'
 import AlbumCard from '@/components/molecules/AlbumCard.vue'
@@ -9,7 +10,6 @@ import { graphql } from '@/graphql/generated'
 import { type AlbumFragment, type GenrePageQuery, MixOrdering } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
-import { onMounted, ref } from 'vue'
 
 const ALBUMS_PER_LINE = 6
 const LINES_PER_PAGE = 5

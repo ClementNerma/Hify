@@ -1,13 +1,13 @@
-import type { AudioTrackFragment } from '@/graphql/generated/graphql'
-import { logFatal } from '@/navigable'
 import type { VNodeRef } from 'vue'
 import { useRoute } from 'vue-router'
+import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import { logFatal } from '@/navigable'
 import { GRID_FETCH_AHEAD_ROWS, LIST_FETCH_AHEAD_ROWS } from './constants'
 
 export function getRouteParam(name: string, fallback?: string): string {
 	const { params } = useRoute()
 
-	if (!Object.prototype.hasOwnProperty.call(params, name)) {
+	if (!Object.hasOwn(params, name)) {
 		if (fallback !== undefined) {
 			return fallback
 		}
@@ -73,7 +73,7 @@ export function shuffle<T>(array: T[]): T[] {
 }
 
 export function swapInArray<T>(array: T[], index: number, newIndex: number): T[] {
-	if (!Object.prototype.hasOwnProperty.call(array, index) || !Object.prototype.hasOwnProperty.call(array, newIndex)) {
+	if (!Object.hasOwn(array, index) || !Object.hasOwn(array, newIndex)) {
 		throw new Error('Invalid indexes provided')
 	}
 

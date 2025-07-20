@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { useQuery } from '@urql/vue'
+import { computed, onUpdated, ref } from 'vue'
 import { humanReadableDuration } from '@/global/stores/audio-player'
 import { UsageStatsDocument } from '@/graphql/generated/graphql'
 import { requestFocusById } from '@/navigable'
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
-import { useQuery } from '@urql/vue'
-import { computed, onUpdated, ref } from 'vue'
 
 const { data } = useQuery({
 	query: UsageStatsDocument,

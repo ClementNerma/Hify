@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
 import Emoji from '@/components/atoms/Emoji.vue'
 import { getAlbumArtUrl } from '@/global/constants'
@@ -8,7 +9,6 @@ import { currentTrack } from '@/global/stores/play-queue'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import { NavigationDirection } from '@/navigable'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
-import { ref, watch } from 'vue'
 import NowPlayingBackground from './NowPlaying/NowPlayingBackground.vue'
 import NowPlayingBottomPanel from './NowPlaying/NowPlayingBottomPanel.vue'
 import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue'

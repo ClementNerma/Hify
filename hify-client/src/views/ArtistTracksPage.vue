@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import Button from '@/components/atoms/Button.vue'
 import Checkbox from '@/components/atoms/Checkbox.vue'
 import Emoji from '@/components/atoms/Emoji.vue'
@@ -13,7 +14,6 @@ import type { ArtistAllTracksQuery, AudioTrackFragment } from '@/graphql/generat
 import { logFatal } from '@/navigable'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
-import { computed, onMounted, ref } from 'vue'
 
 const artistId = getRouteParam('id')
 

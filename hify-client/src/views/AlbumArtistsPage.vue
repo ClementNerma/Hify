@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import ArtistCard from '@/components/molecules/ArtistCard.vue'
 import { gqlClient } from '@/global/urql-client'
 import { isApproachingGridEnd, noParallel } from '@/global/utils'
@@ -6,7 +7,6 @@ import { graphql } from '@/graphql/generated'
 import type { AlbumArtistsPageQuery, ArtistFragment } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
-import { onMounted, ref } from 'vue'
 
 const ARTISTS_PER_LINE = 6
 const LINES_PER_PAGE = 5

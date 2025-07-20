@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useQuery } from '@urql/vue'
+import { computed } from 'vue'
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
 import { MIN_GREAT_RATING } from '@/global/constants'
 import { showContextMenu } from '@/global/stores/context-menu'
@@ -8,8 +10,6 @@ import { MixOrdering } from '@/graphql/generated/graphql'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import router from '@/router'
-import { useQuery } from '@urql/vue'
-import { computed } from 'vue'
 
 const GENRES_PER_LINE = 6
 

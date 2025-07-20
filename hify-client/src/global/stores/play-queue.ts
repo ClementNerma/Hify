@@ -1,3 +1,4 @@
+import { computed, ref, watch } from 'vue'
 import {
 	type AudioTrackFragment,
 	GenerateMixDocument,
@@ -7,7 +8,6 @@ import {
 } from '@/graphql/generated/graphql'
 import { LogLevel, log, logFatal } from '@/navigable'
 import router from '@/router'
-import { computed, ref, watch } from 'vue'
 import { EXTEND_MIX_TRACKS_QTY, LARGE_MIX_TRACKS_QTY } from '../constants'
 import { loadPlayQueue, persistPlayQueue } from '../persistence'
 import { gqlClient } from '../urql-client'
@@ -198,7 +198,7 @@ export function removeFromQueue(index: number): void {
 
 	const { position, tracks, fromMixId, isMixFinished } = playQueue.value
 
-	if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
+	if (!Object.hasOwn(tracks, index)) {
 		log(LogLevel.Warn, 'Cannot remove track from queue as the provided position does not exist')
 		return
 	}
@@ -221,12 +221,12 @@ export function moveTrackPositionInQueue(index: number, newIndex: number): void 
 
 	const { position, tracks, fromMixId, isMixFinished } = playQueue.value
 
-	if (!Object.prototype.hasOwnProperty.call(tracks, index)) {
+	if (!Object.hasOwn(tracks, index)) {
 		log(LogLevel.Warn, 'Cannot move track in  queue as the provided position does not exist')
 		return
 	}
 
-	if (!Object.prototype.hasOwnProperty.call(tracks, newIndex)) {
+	if (!Object.hasOwn(tracks, newIndex)) {
 		log(LogLevel.Warn, 'Cannot move track in queue as the provided target position does not exist')
 		return
 	}

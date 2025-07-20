@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { getAlbumArtUrl } from '@/global/constants'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
-import { computed } from 'vue'
 
 const props = defineProps<{
 	track: AudioTrackFragment | null

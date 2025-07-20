@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type TrackContext, ctxMenuCallbacks, ctxMenuOptions } from '@/global/ctx-menu-content'
+import { ctxMenuCallbacks, ctxMenuOptions, type TrackContext } from '@/global/ctx-menu-content'
 import { showContextMenu } from '@/global/stores/context-menu'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import type { NavigableItem as NavigableItemType } from '@/navigable'
@@ -14,10 +14,7 @@ defineProps<{
 }>()
 
 defineSlots<{
-	default(props: {
-		item: NavigableItemType
-		focused: boolean
-	}): unknown
+	default(props: { item: NavigableItemType; focused: boolean }): unknown
 }>()
 </script>
 

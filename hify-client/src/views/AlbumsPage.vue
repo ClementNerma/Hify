@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
 import AlbumCard from '@/components/molecules/AlbumCard.vue'
 import DropdownSelect, {
-	type DropdownSelectExposeType,
 	type DropdownChoices,
+	type DropdownSelectExposeType,
 } from '@/components/molecules/DropdownSelect.vue'
 import { GRID_ALBUMS_PER_ROW, GRID_ALBUMS_PRELOAD_ROWS } from '@/global/constants'
 import { gqlClient } from '@/global/urql-client'
@@ -11,7 +12,6 @@ import { graphql } from '@/graphql/generated'
 import type { AlbumFragment, AlbumsByNameQuery, MostRecentAlbumsQuery } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
-import { onMounted, ref, watch } from 'vue'
 
 const feedMore = noParallel(async () => {
 	switch (sortBy.value) {

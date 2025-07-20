@@ -1,5 +1,5 @@
-import { logFatal } from '@/navigable'
 import { readonly, ref } from 'vue'
+import { logFatal } from '@/navigable'
 
 export enum NotificationLevel {
 	Info = 'INFO',

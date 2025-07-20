@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import AlbumsRow from '@/components/molecules/AlbumsRow.vue'
 import ArtistsRow from '@/components/molecules/ArtistsRow.vue'
 import TracksRow from '@/components/molecules/TracksRow.vue'
@@ -8,7 +9,6 @@ import { graphql } from '@/graphql/generated'
 import type { SearchPageQuery } from '@/graphql/generated/graphql'
 import { LogLevel, log, logFatal, requestFocusOnItem } from '@/navigable'
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
-import { onMounted, ref } from 'vue'
 
 const MAX_RESULTS_PER_CATEGORY = 50
 

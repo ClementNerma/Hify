@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import Button from '@/components/atoms/Button.vue'
 import Checkbox from '@/components/atoms/Checkbox.vue'
 import { hifyInterface } from '@/global/injected'
@@ -7,7 +8,6 @@ import { LogLevel } from '@/navigable'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
-import { computed, ref } from 'vue'
 
 const hideDebugLogs = ref(true)
 

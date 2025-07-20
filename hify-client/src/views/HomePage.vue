@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useQuery } from '@urql/vue'
+import { computed, ref } from 'vue'
 import Button from '@/components/atoms/Button.vue'
 import Centered from '@/components/atoms/Centered.vue'
 import IndexUpdater from '@/components/atoms/IndexUpdater.vue'
@@ -12,8 +14,6 @@ import { graphql } from '@/graphql/generated'
 import { MixOrdering } from '@/graphql/generated/graphql'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
-import { useQuery } from '@urql/vue'
-import { computed, ref } from 'vue'
 
 const { data, error, executeQuery } = useQuery({
 	query: graphql(`

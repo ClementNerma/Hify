@@ -1,5 +1,5 @@
-import { LogLevel, log } from '@/navigable'
 import * as v from 'valibot'
+import { LogLevel, log } from '@/navigable'
 import type { PlayQueue } from './stores/play-queue'
 
 const PLAY_QUEUE_LOCAL_STORAGE_KEY = 'hifyClient-playQueue'

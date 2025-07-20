@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import Centered from '@/components/atoms/Centered.vue'
 import LoadingIndicator from '@/components/atoms/LoadingIndicator.vue'
 import AlbumCard from '@/components/molecules/AlbumCard.vue'
@@ -8,7 +9,6 @@ import { graphql } from '@/graphql/generated'
 import type { AlbumFragment, ArtistAlbumsQuery } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'
 import NavigableGrid from '@/navigable/vue/components/NavigableGrid.vue'
-import { onMounted, ref } from 'vue'
 
 const { artistId } = defineProps<{ artistId: string }>()
 

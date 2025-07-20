@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import DistractionFreeTogglable from '@/components/atoms/DistractionFreeTogglable.vue'
 import NavBar from '@/components/molecules/NavBar.vue'
 import Notifications from '@/components/molecules/Notifications.vue'
@@ -6,10 +7,9 @@ import ContextMenu from '@/components/organisms/ContextMenu.vue'
 import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/stores/audio-player'
 import { NotificationLevel, showNotification } from '@/global/stores/notifications'
 import { playNextTrack, playPreviousTrackOrRewind, restorePlayQueue } from '@/global/stores/play-queue'
-import { InputHandlingResult, LogLevel, handleInput, setupNavigable, watchLongPressForKeys } from '@/navigable'
+import { handleInput, InputHandlingResult, LogLevel, setupNavigable, watchLongPressForKeys } from '@/navigable'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import router from '@/router'
-import { onMounted } from 'vue'
 import { log } from './global/stores/debugger'
 
 onMounted(() => {

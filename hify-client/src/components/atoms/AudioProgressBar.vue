@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { NavigationDirection } from '@/navigable'
 import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue'
-import { ref } from 'vue'
 
 const props = defineProps<{
 	max: number

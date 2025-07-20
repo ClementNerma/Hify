@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useQuery } from '@urql/vue'
+import { computed, ref } from 'vue'
 import Button from '@/components/atoms/Button.vue'
 import Checkbox from '@/components/atoms/Checkbox.vue'
 import Emoji from '@/components/atoms/Emoji.vue'
@@ -16,8 +18,6 @@ import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
-import { useQuery } from '@urql/vue'
-import { computed, ref } from 'vue'
 
 const albumId = getRouteParam('id')
 

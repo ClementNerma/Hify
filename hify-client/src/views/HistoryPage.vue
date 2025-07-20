@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import TracksGrid from '@/components/molecules/TracksGrid.vue'
 import { GRID_TRACKS_PER_ROW, GRID_TRACKS_PRELOAD_ROWS } from '@/global/constants'
 import { gqlClient } from '@/global/urql-client'
@@ -6,7 +7,6 @@ import { noParallel } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment, HistoryPageQuery } from '@/graphql/generated/graphql'
 import { logFatal } from '@/navigable'
-import { onMounted, ref } from 'vue'
 
 const feedMore = noParallel(async () => {
 	if (currentPageInfo.value?.hasNextPage === false) {

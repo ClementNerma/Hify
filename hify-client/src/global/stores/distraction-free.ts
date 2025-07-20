@@ -1,5 +1,5 @@
-import { InputHandlingResult, type KeyPress, handleInput } from '@/navigable'
 import { onUnmounted, readonly, ref } from 'vue'
+import { handleInput, InputHandlingResult, type KeyPress } from '@/navigable'
 
 const NEVER_WAKE_UP_FOR_KEYS = ['Control', 'Shift', 'Alt']
 

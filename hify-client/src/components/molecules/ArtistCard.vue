@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { MIN_GREAT_RATING, getArtistArtUrl } from '@/global/constants'
+import { computed } from 'vue'
+import { getArtistArtUrl, MIN_GREAT_RATING } from '@/global/constants'
 import { type ContextMenuOption, showContextMenu } from '@/global/stores/context-menu'
 import { generateAndPlayMix } from '@/global/stores/play-queue'
 import { type ArtistFragment, MixOrdering } from '@/graphql/generated/graphql'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
 import router from '@/router'
-import { computed } from 'vue'
 import Card from './Card.vue'
 
 const { artist } = defineProps<{

@@ -1,5 +1,5 @@
-import type { LogLevel } from '@/navigable'
 import { computed, reactive } from 'vue'
+import type { LogLevel } from '@/navigable'
 
 type LogEntry = {
 	at: Date
