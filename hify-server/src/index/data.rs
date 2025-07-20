@@ -3,7 +3,7 @@ use std::{
     collections::{hash_map::DefaultHasher, HashMap, HashSet},
     hash::{Hash, Hasher},
     num::ParseIntError,
-    path::{Path, PathBuf},
+    path::PathBuf,
     time::SystemTime,
 };
 
@@ -178,23 +178,27 @@ pub struct Track {
 
 impl Track {
     pub fn new(
-        path: PathBuf,
+        relative_path: PathBuf,
         FileTimes { ctime, mtime }: FileTimes,
         metadata: TrackMetadata,
     ) -> Self {
         Self {
-            id: TrackID(Self::compute_raw_id(&path)),
-            relative_path: path,
+            id: Self::compute_id(&metadata),
+            relative_path,
             metadata,
             ctime,
             mtime,
         }
     }
 
-    fn compute_raw_id(path: &Path) -> u64 {
-        let mut hasher = DefaultHasher::new();
-        path.hash(&mut hasher);
-        hasher.finish()
+    pub fn compute_id(metadata: &TrackMetadata) -> TrackID {
+        let mut id_hasher = DefaultHasher::new();
+
+        metadata.tags.artists.hash(&mut id_hasher);
+        metadata.tags.album.hash(&mut id_hasher);
+        metadata.tags.title.hash(&mut id_hasher);
+
+        TrackID(id_hasher.finish())
     }
 }
 
