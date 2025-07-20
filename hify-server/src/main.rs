@@ -20,7 +20,11 @@ use log::{error, info};
 
 use crate::{check::check_correctness, cmd::Args};
 
-use self::{helpers::logging::setup_logger, resources::ResourceManager};
+use self::{
+    helpers::logging::setup_logger,
+    resources::ResourceManager,
+    userdata::{UserData, UserDataInner},
+};
 
 #[tokio::main]
 async fn main() -> ExitCode {
@@ -85,14 +89,13 @@ async fn inner_main(args: Args) -> Result<()> {
     let user_data_file = data_dir.join("userdata.json");
     let index_file = data_dir.join("index.json");
 
-    let user_data = match user_data_file.is_file() {
-        true => {
-            helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
-        }
-        false => userdata::UserDataInner::with_default_config(),
+    let user_data = if user_data_file.is_file() {
+        helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
+    } else {
+        UserDataInner::with_default_config()
     };
 
-    let mut user_data = userdata::UserData::new(
+    let mut user_data = UserData::new(
         user_data,
         Box::new(move |user_data| {
             // TODO: error handling
@@ -102,76 +105,71 @@ async fn inner_main(args: Args) -> Result<()> {
 
     ensure!(!index_file.is_dir(), "Index file must not be a directory");
 
-    let index = match index_file.is_file() && !rebuild_index {
-        true => {
-            info!("> Loading index from disk...");
-            let mut index =
-                helpers::save::load_index(&index_file).context("Failed to load index")?;
+    let index = if index_file.is_file() && !rebuild_index {
+        info!("> Loading index from disk...");
+        let mut index = helpers::save::load_index(&index_file).context("Failed to load index")?;
 
-            if update_index {
-                info!("> Updating index as requested...");
+        if update_index {
+            info!("> Updating index as requested...");
 
-                index = index::build_index(music_dir.clone(), Some(index), &res_manager)
-                    .await
-                    .context("Failed to rebuild index")?;
-
-                helpers::save::save_index(&index_file, &index)
-                    .context("Failed to save index file with rebuilt cache")?;
-
-                user_data.cleanup(&index);
-            } else if refetch_file_times {
-                info!("> Re-fetching file times...");
-                index::refetch_file_times(&mut index)?;
-
-                info!("> Rebuilding cache...");
-                index::rebuild_cache(&mut index);
-
-                helpers::save::save_index(&index_file, &index)
-                    .context("Failed to save index file with rebuilt cache")?;
-            } else if rebuild_cache {
-                info!("> Rebuilding cache as requested...");
-                index::rebuild_cache(&mut index);
-
-                helpers::save::save_index(&index_file, &index)
-                    .context("Failed to save index file with rebuilt cache")?;
-            }
-
-            if music_dir.exists() != index.from.exists()
-                || fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)?
-            {
-                bail!(
-                    "Provided music directory is {} but current index references {}",
-                    music_dir.display(),
-                    index.from.display()
-                );
-            }
-
-            if rebuild_resources {
-                info!("> Rebuilding resources as requested...");
-
-                index::rebuild_resources(&mut index, &res_manager).await?;
-
-                helpers::save::save_index(&index_file, &index)
-                    .context("Failed to save index file with rebuilt arts")?;
-            }
-
-            info!("> Done.");
-
-            index
-        }
-
-        false => {
-            info!("> Generating index...");
-
-            let index = index::build_index(music_dir.clone(), None, &res_manager)
+            index = index::build_index(music_dir.clone(), Some(index), &res_manager)
                 .await
-                .context("Failed to build index")?;
+                .context("Failed to rebuild index")?;
 
-            helpers::save::save_index(&index_file, &index).context("Failed to save index file")?;
-            info!("> Index saved on disk.");
+            helpers::save::save_index(&index_file, &index)
+                .context("Failed to save index file with rebuilt cache")?;
 
-            index
+            user_data.cleanup(&index);
+        } else if refetch_file_times {
+            info!("> Re-fetching file times...");
+            index::refetch_file_times(&mut index)?;
+
+            info!("> Rebuilding cache...");
+            index::rebuild_cache(&mut index);
+
+            helpers::save::save_index(&index_file, &index)
+                .context("Failed to save index file with rebuilt cache")?;
+        } else if rebuild_cache {
+            info!("> Rebuilding cache as requested...");
+            index::rebuild_cache(&mut index);
+
+            helpers::save::save_index(&index_file, &index)
+                .context("Failed to save index file with rebuilt cache")?;
         }
+
+        if music_dir.exists() != index.from.exists()
+            || fs::canonicalize(&music_dir)? != fs::canonicalize(&index.from)?
+        {
+            bail!(
+                "Provided music directory is {} but current index references {}",
+                music_dir.display(),
+                index.from.display()
+            );
+        }
+
+        if rebuild_resources {
+            info!("> Rebuilding resources as requested...");
+
+            index::rebuild_resources(&mut index, &res_manager).await?;
+
+            helpers::save::save_index(&index_file, &index)
+                .context("Failed to save index file with rebuilt arts")?;
+        }
+
+        info!("> Done.");
+
+        index
+    } else {
+        info!("> Generating index...");
+
+        let index = index::build_index(music_dir.clone(), None, &res_manager)
+            .await
+            .context("Failed to build index")?;
+
+        helpers::save::save_index(&index_file, &index).context("Failed to save index file")?;
+        info!("> Index saved on disk.");
+
+        index
     };
 
     info!("> Checking data correctness...");
