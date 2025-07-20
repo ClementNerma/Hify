@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "Vue.volar",
-    "biomejs.biome"
+    "biomejs.biome",
+    "GraphQL.vscode-graphql"
   ]
 }
