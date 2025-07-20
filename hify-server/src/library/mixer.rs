@@ -6,12 +6,12 @@ use rand::{rng, seq::SliceRandom};
 use crate::{
     graphql::EmptyScalar,
     index::{ArtistID, GenreID, Index, Rating},
-    userdata::{Mix, PlaylistID, UserData},
+    userdata::{Mix, PlaylistID, UserDataWrapper},
 };
 
 pub fn generate_mix(
     index: &Index,
-    user_data: &UserData,
+    user_data: &UserDataWrapper,
     params: MixParams,
 ) -> Result<Mix, &'static str> {
     let MixParams {

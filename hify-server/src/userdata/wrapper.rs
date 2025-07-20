@@ -4,17 +4,17 @@ use crate::index::{Index, Rating, TrackID};
 
 use super::{
     cache::UserDataCache, history::History, playlist::PlaylistEditAction, Mix, MixID, OneListening,
-    Playlist, PlaylistID, UserDataInner,
+    Playlist, PlaylistID, UserData,
 };
 
-pub struct UserData {
-    inner: UserDataInner,
+pub struct UserDataWrapper {
+    inner: UserData,
     cache: UserDataCache,
-    on_change: Box<dyn Fn(&UserDataInner) + Send + Sync>,
+    on_change: Box<dyn Fn(&UserData) + Send + Sync>,
 }
 
-impl UserData {
-    pub fn new(inner: UserDataInner, on_change: Box<dyn Fn(&UserDataInner) + Send + Sync>) -> Self {
+impl UserDataWrapper {
+    pub fn new(inner: UserData, on_change: Box<dyn Fn(&UserData) + Send + Sync>) -> Self {
         Self {
             cache: UserDataCache::new(&inner.history, inner.config),
             inner,

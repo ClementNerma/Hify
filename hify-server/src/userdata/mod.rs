@@ -17,11 +17,11 @@ pub use self::{
     history::OneListening,
     mix::{Mix, MixID},
     playlist::{Playlist, PlaylistEditAction, PlaylistEntry, PlaylistID},
-    wrapper::UserData,
+    wrapper::UserDataWrapper,
 };
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct UserDataInner {
+pub struct UserData {
     config: UserDataConfig,
     history: History,
     track_ratings: HashMap<TrackID, Rating>,
@@ -29,7 +29,7 @@ pub struct UserDataInner {
     mixes: HashMap<MixID, Mix>,
 }
 
-impl UserDataInner {
+impl UserData {
     pub fn new(config: UserDataConfig) -> Self {
         Self {
             config,

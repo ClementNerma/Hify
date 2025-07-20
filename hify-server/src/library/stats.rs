@@ -1,6 +1,6 @@
 use async_graphql::SimpleObject;
 
-use crate::{index::Index, userdata::UserData};
+use crate::{index::Index, userdata::UserDataWrapper};
 
 #[derive(SimpleObject)]
 pub struct LibraryStats {
@@ -12,7 +12,7 @@ pub struct LibraryStats {
     pub total_listening_time: u64,
 }
 
-pub fn generate_stats(index: &Index, user_data: &UserData) -> LibraryStats {
+pub fn generate_stats(index: &Index, user_data: &UserDataWrapper) -> LibraryStats {
     LibraryStats {
         tracks_count: index.tracks.len(),
         album_artists_count: index.cache.album_artists_infos.len(),

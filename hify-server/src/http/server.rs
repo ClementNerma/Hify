@@ -18,14 +18,14 @@ use crate::{
     },
     resources::ResourceManager,
 };
-use crate::{index::Index, userdata::UserData};
+use crate::{index::Index, userdata::UserDataWrapper};
 
 pub static GRAPHQL_ENDPOINT: &str = "/graphql";
 
 pub async fn launch(
     addr: SocketAddr,
     index: Index,
-    user_data: UserData,
+    user_data: UserDataWrapper,
     res_manager: ResourceManager,
     save_index: SaveIndexFn,
 ) -> Result<()> {

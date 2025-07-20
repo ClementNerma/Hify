@@ -23,7 +23,7 @@ use crate::{check::check_correctness, cmd::Args};
 use self::{
     helpers::logging::setup_logger,
     resources::ResourceManager,
-    userdata::{UserData, UserDataInner},
+    userdata::{UserData, UserDataWrapper},
 };
 
 #[tokio::main]
@@ -92,10 +92,10 @@ async fn inner_main(args: Args) -> Result<()> {
     let user_data = if user_data_file.is_file() {
         helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
     } else {
-        UserDataInner::with_default_config()
+        UserData::with_default_config()
     };
 
-    let mut user_data = UserData::new(
+    let mut user_data = UserDataWrapper::new(
         user_data,
         Box::new(move |user_data| {
             // TODO: error handling
