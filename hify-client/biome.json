@@ -24,6 +24,9 @@
 	"overrides": [
 		{
 			"includes": ["src/graphql/generated/*.ts"],
+			"formatter": {
+				"enabled": false
+			},
 			"linter": {
 				"enabled": false
 			}
