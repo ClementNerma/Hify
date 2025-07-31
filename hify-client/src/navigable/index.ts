@@ -50,9 +50,8 @@ function getSetupOptions(): SetupNavigableOptions {
 	return setupOptions
 }
 
-const pendingKeyLongPresses = new Map<string, { at: number; timeout: number } | null>()
+const pendingKeyLongPresses = new Map<string, { at: number; timeout: number } | 'dispatched'>()
 const watchingLongPressForKeys = new Set<string>()
-const triggeredKeyLongPress = new Set<string>()
 
 const DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS = 250
 
@@ -74,17 +73,13 @@ function handleKeyDownEvent(e: KeyboardEvent): void {
 	// For long-pressable keys, start a timer if the key isn't already being held
 	// This is important because long-pressing a key will fire the 'keydown' JS event
 	// multiple times.
-	if (!pendingKeyLongPresses.has(key) && !triggeredKeyLongPress.has(key)) {
+	if (!pendingKeyLongPresses.has(key)) {
 		pendingKeyLongPresses.set(key, {
 			at: performance.now(),
 			// If the key is pressed for long enough...
 			timeout: window.setTimeout(() => {
-				// -> Remove the now uneeded timeout
-				pendingKeyLongPresses.delete(key)
-				// -> Mark the event as triggered in order to notify the keyup handler
-				//    that this key has already been taken care of
-				//    (otherwise it will fire a non-long press event)
-				triggeredKeyLongPress.add(key)
+				// -> Show the key up event handler that the key press was dispatched
+				pendingKeyLongPresses.set(key, 'dispatched')
 				// -> Dispatch the long press event
 				dispatchKeyInput({ key, longPress: true, ...modifiers })
 			}, setupOptions?.keyLongPressThresholdMs ?? DEFAULT_KEY_LONG_PRESS_THRESHOLD_MS),
@@ -95,26 +90,22 @@ function handleKeyDownEvent(e: KeyboardEvent): void {
 function handleKeyUpEvent(e: KeyboardEvent): void {
 	const { key, ctrlKey, shiftKey, altKey } = e
 
-	// This function only checks keyup events for long-pressable keys
-	// Non-long-pressable keys have an event dispatched immediately
-	if (!watchingLongPressForKeys.has(key)) {
-		return
-	}
-
-	// If the long press event was triggered already, do nothing
-	if (triggeredKeyLongPress.delete(key)) {
-		return
-	}
-
+	// Check if we have a pending long press
 	const pending = pendingKeyLongPresses.get(key)
 
 	if (!pending) {
-		logFatal(`Internal error: timeout of keydown event for key "${key}" is not initialized`)
+		return
+	}
+
+	pendingKeyLongPresses.delete(key)
+
+	// If the press was already dispatched, ignore it
+	if (pending === 'dispatched') {
+		return
 	}
 
 	// Remove the timeout as the key has been freed
 	clearTimeout(pending.timeout)
-	pendingKeyLongPresses.delete(key)
 
 	// Dispatch the non-long press event
 	dispatchKeyInput({ key, longPress: false, ctrlKey, shiftKey, altKey })
