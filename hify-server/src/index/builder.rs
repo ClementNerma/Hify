@@ -44,7 +44,6 @@ pub async fn build_index(
 
         cache: IndexCache {
             tracks_files_mtime: HashMap::new(),
-            tracks_all_artists: HashMap::new(),
 
             artists_albums: HashMap::new(),
             artists_album_participations: HashMap::new(),

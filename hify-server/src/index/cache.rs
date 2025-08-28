@@ -14,7 +14,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
     let mut tracks_files_mtime = HashMap::new();
 
     let mut tracks_formats = HashMap::new();
-    let mut tracks_all_artists = HashMap::new();
 
     let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
     let mut artists_album_participations = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
@@ -72,7 +71,7 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
                 .push(track.id)
         }
 
-        for artist_infos in album_artists.iter().chain(non_album_artists.iter()) {
+        for artist_infos in track_artists {
             let artist_id = artist_infos.get_id();
 
             artists_infos.insert(artist_id, artist_infos.clone());
@@ -98,15 +97,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
                     .insert(album_infos.clone());
             }
         }
-
-        tracks_all_artists.insert(
-            track.id,
-            album_artists
-                .iter()
-                .chain(non_album_artists.iter())
-                .map(ArtistInfos::get_id)
-                .collect(),
-        );
     }
 
     debug!("| Building maps...");
@@ -296,7 +286,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
 
     IndexCache {
         tracks_files_mtime,
-        tracks_all_artists,
 
         artists_albums,
         artists_album_participations,
