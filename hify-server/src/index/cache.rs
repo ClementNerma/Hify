@@ -48,17 +48,23 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
         let track_artists = tags.get_artists_infos().collect::<HashSet<_>>();
         let non_album_artists = &track_artists - &album_artists;
 
-        for album_artist_infos in &album_artists {
-            album_artists_infos.insert(album_artist_infos.get_id(), album_artist_infos.clone());
+        for artist_infos in &album_artists {
+            let artist_id = artist_infos.get_id();
+
+            artists_infos.insert(artist_id, artist_infos.clone());
+
+            album_artists_infos.insert(artist_id, artist_infos.clone());
 
             artists_albums
-                .entry(album_artist_infos.get_id())
+                .entry(artist_id)
                 .or_default()
                 .insert(album_infos.clone());
         }
 
-        for non_album_artist_infos in &non_album_artists {
-            let artist_id = non_album_artist_infos.get_id();
+        for artist_infos in &non_album_artists {
+            let artist_id = artist_infos.get_id();
+
+            artists_infos.insert(artist_id, artist_infos.clone());
 
             artists_album_participations
                 .entry(artist_id)
