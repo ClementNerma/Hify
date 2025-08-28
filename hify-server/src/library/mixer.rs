@@ -18,12 +18,22 @@ pub fn generate_mix(
         source,
         ordering,
         min_rating,
-        from_artists,
         from_genres,
     } = &params;
 
     let source_tracks: Vec<_> = match source {
         MixSource::AllTracks(EmptyScalar) => index.tracks.values().map(|track| track.id).collect(),
+
+        MixSource::Artists(artists) => artists
+            .iter()
+            .flat_map(|artist| {
+                index
+                    .cache
+                    .artists_tracks_and_participations
+                    .get(artist)
+                    .map_or_else(Vec::new, Vec::clone)
+            })
+            .collect(),
 
         MixSource::History(EmptyScalar) => user_data
             .cache()
@@ -53,20 +63,6 @@ pub fn generate_mix(
 
             if let Some(min_rating) = min_rating {
                 if track.metadata.tags.rating.unwrap_or(Rating::Zero) < *min_rating {
-                    return false;
-                }
-            }
-
-            if let Some(ref artist_ids) = from_artists {
-                if index
-                    .cache
-                    .tracks_all_artists
-                    .get(&track.id)
-                    .unwrap()
-                    .intersection(artist_ids)
-                    .next()
-                    .is_none()
-                {
                     return false;
                 }
             }
@@ -114,7 +110,6 @@ pub struct MixParams {
     source: MixSource,
     ordering: MixOrdering,
     min_rating: Option<Rating>,
-    from_artists: Option<HashSet<ArtistID>>,
     from_genres: Option<HashSet<GenreID>>,
 }
 
@@ -123,6 +118,7 @@ pub enum MixSource {
     AllTracks(EmptyScalar),
     History(EmptyScalar),
     Playlist(PlaylistSourceParams),
+    Artists(HashSet<ArtistID>),
 }
 
 #[derive(Clone, InputObject)]

@@ -180,10 +180,9 @@ export const ctxMenuOptions = {
 				label: 'Mix me some magic ✨',
 				onPress: () => {
 					generateAndPlayMix({
-						source: { allTracks: true },
+						source: { artists: [artistId] },
 						ordering: MixOrdering.Random,
 						minRating: MIN_GREAT_RATING,
-						fromArtists: [artistId],
 					})
 				},
 			},

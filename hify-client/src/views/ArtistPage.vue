@@ -39,10 +39,9 @@ const { data, fetching, error } = useQuery({
 
       <NavigableRow>
         <MixButton :mix-params="{
-          source: { allTracks: true },
+          source: { artists: [artistId] },
           ordering: MixOrdering.Random,
           minRating: 8,
-          fromArtists: [artistId],
         }" />
 
         <Button @press="router.push({ name: 'artist-tracks', params: { id: artistId } })">

@@ -17,10 +17,9 @@ const contextMenuOptions = computed<ContextMenuOption[]>(() => [
 		label: 'Mix me some magic ✨',
 		onPress() {
 			generateAndPlayMix({
-				source: { allTracks: true },
+				source: { artists: [artist.id] },
 				ordering: MixOrdering.Random,
 				minRating: MIN_GREAT_RATING,
-				fromArtists: [artist.id],
 			})
 		},
 	},
