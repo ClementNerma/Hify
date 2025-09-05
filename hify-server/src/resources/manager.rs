@@ -17,6 +17,7 @@ use crate::index::IdType;
 pub struct ResourceManager {
     // TODO: manage generated arts
     // TODO: manage generated waveforms?
+    // TODO: manage lyrics?
     storage_path: Arc<PathBuf>,
 }
 
