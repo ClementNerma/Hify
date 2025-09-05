@@ -9,18 +9,14 @@ use std::{
 
 use anyhow::{anyhow, ensure, Context, Result};
 use image::{
-    codecs::webp::WebPEncoder,
     imageops::{resize, FilterType},
-    GenericImage, ImageBuffer,
+    GenericImage, ImageBuffer, Rgba,
 };
 use log::{error, warn};
 use rayon::iter::{ParallelBridge, ParallelIterator};
-use tokio::{fs, runtime::Handle, sync::Mutex, task::JoinSet};
+use tokio::{fs, sync::Mutex, task::JoinSet};
 
-use crate::{
-    logging::progress_bar,
-    resources::{ArtistArt, ResourceManager},
-};
+use crate::{logging::progress_bar, resources::ResourceManager};
 
 use super::{AlbumID, AlbumInfos, ArtistInfos, IndexCache, Track, TrackID, ValueOrdMap};
 
@@ -149,7 +145,6 @@ pub fn generate_artists_art<'a>(
     cache: IndexCache,
     res_manager: ResourceManager,
 ) -> Result<()> {
-    let rt = Handle::current();
     let pb = progress_bar(artists.len());
 
     let errors = AtomicUsize::new(0);
@@ -185,13 +180,9 @@ pub fn generate_artists_art<'a>(
                 errors.fetch_add(1, Ordering::SeqCst);
             }
 
-            Ok(img_buf) => {
-                if let Some(img_buf) = img_buf {
-                    let op = rt.block_on(async move {
-                        res_manager.store(artist_id, ArtistArt(img_buf)).await
-                    });
-
-                    if let Err(err) = op {
+            Ok(img) => {
+                if let Some(img) = img {
+                    if let Err(err) = res_manager.save_artist_art(artist_id, img) {
                         pb.suspend(|| {
                             error!(
                                 "Failed to save cover art for artist '{}' to disk: {err}",
@@ -221,7 +212,7 @@ fn generate_artist_art(
     base_dir: &Path,
     albums_and_participations: impl Iterator<Item = AlbumID>,
     album_arts: &HashMap<AlbumID, PathBuf>,
-) -> Result<Option<Vec<u8>>> {
+) -> Result<Option<ImageBuffer<Rgba<u8>, Vec<u8>>>> {
     // Only 4 arts are needed but we analyze them all to ensure every image is correct on disk
     let album_arts = albums_and_participations
         .filter_map(|album_id| album_arts.get(&album_id))
@@ -286,13 +277,7 @@ fn generate_artist_art(
         }
     };
 
-    let mut image_buf = vec![];
-
-    image
-        .write_with_encoder(WebPEncoder::new_lossless(&mut image_buf))
-        .context("Failed to encode artist's art image")?;
-
-    Ok(Some(image_buf))
+    Ok(Some(image))
 }
 
 pub async fn detect_deleted_album_arts(

@@ -8,7 +8,6 @@ use crate::{
         AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating, Track, TrackTags,
         ValueOrdMap,
     },
-    resources::ArtistArt,
     userdata::{Playlist, PlaylistEntry},
 };
 
@@ -228,7 +227,8 @@ impl ArtistInfos {
         graphql_ctx!(ctx)
             .app_state
             .resource_manager
-            .has::<ArtistArt>(self.get_id())
+            .artist_art_path(self.get_id())
+            .is_some()
     }
 }
 

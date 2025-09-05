@@ -10,10 +10,7 @@ use axum::{
 use tower::ServiceExt;
 use tower_http::services::ServeFile;
 
-use crate::{
-    index::{AlbumID, ArtistID, IdType, TrackID},
-    resources::ArtistArt,
-};
+use crate::index::{AlbumID, ArtistID, IdType, TrackID};
 
 use super::HttpState;
 
@@ -50,13 +47,10 @@ pub async fn artist_art(
     let artist_id = ArtistID::decode(&id)
         .map_err(|_| (StatusCode::BAD_REQUEST, "Invalid artist ID provided"))?;
 
-    let art_path = state
-        .resource_manager
-        .get_path_of::<ArtistArt>(artist_id)
-        .ok_or((
-            StatusCode::NOT_FOUND,
-            "The provided artist does not have an associated art",
-        ))?;
+    let art_path = state.resource_manager.artist_art_path(artist_id).ok_or((
+        StatusCode::NOT_FOUND,
+        "The provided artist does not have an associated art",
+    ))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
     let served = ServeFile::new(art_path)

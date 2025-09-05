@@ -82,7 +82,7 @@ async fn inner_main(args: Args) -> Result<()> {
             .context("Failed to create the data generation directory")?;
     }
 
-    let res_manager = ResourceManager::new(generation_dir);
+    let res_manager = ResourceManager::new(generation_dir)?;
 
     let user_data_file = data_dir.join("userdata.json");
     let index_file = data_dir.join("index.json");
