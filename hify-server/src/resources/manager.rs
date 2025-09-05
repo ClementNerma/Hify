@@ -12,7 +12,6 @@ use tokio::{
 use crate::index::IdType;
 
 // TODO: cleanup resources when they don't exist anymore in the index!
-// TODO: replace command-line flag '--rebuild-arts' with one to rebuild resources (e.g. '--rebuild-resources')
 #[derive(Clone)]
 pub struct ResourceManager {
     // TODO: manage generated arts
