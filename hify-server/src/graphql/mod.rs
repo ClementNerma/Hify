@@ -4,10 +4,12 @@ mod pagination;
 mod queries;
 mod state;
 
+pub use self::{
+    entrypoint::{get_graphql_schema, AppSchema},
+    pagination::Paginable,
+    state::{GraphQLContext, SaveIndexFn},
+};
 use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
-pub use entrypoint::{get_graphql_schema, AppSchema};
-pub use pagination::Paginable;
-pub use state::{GraphQLContext, SaveIndexFn};
 
 #[macro_export]
 macro_rules! define_scalar_string {

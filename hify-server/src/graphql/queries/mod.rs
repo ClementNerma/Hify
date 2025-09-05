@@ -9,4 +9,4 @@ declare_gql_connection!(
     AlbumUsizeConnection => AlbumUsizeEdge
 );
 
-pub use global::QueryRoot;
+pub use self::global::QueryRoot;
