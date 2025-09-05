@@ -39,8 +39,4 @@ impl UserData {
             mixes: HashMap::new(),
         }
     }
-
-    pub fn with_default_config() -> Self {
-        Self::new(UserDataConfig::default())
-    }
 }

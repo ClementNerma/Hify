@@ -11,8 +11,8 @@ use std::{
 use walkdir::WalkDir;
 
 use crate::{
-    helpers::logging::spinner,
     index::arts::{find_albums_arts, generate_artists_art},
+    logging::spinner,
     resources::ResourceManager,
 };
 

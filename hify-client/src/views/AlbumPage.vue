@@ -22,25 +22,25 @@ import router from '@/router'
 const albumId = getRouteParam('id')
 
 function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
-	const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
-		number: num.toString(),
-		tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
-	}))
+  const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
+    number: num.toString(),
+    tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+  }))
 
-	const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
+  const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
 
-	if (tracksWithoutDisc.length > 0) {
-		discs.unshift({ number: '?', tracks: tracksWithoutDisc })
-	}
+  if (tracksWithoutDisc.length > 0) {
+    discs.unshift({ number: '?', tracks: tracksWithoutDisc })
+  }
 
-	return {
-		totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
-		discs,
-	}
+  return {
+    totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
+    discs,
+  }
 }
 
 const { data, fetching, error } = useQuery({
-	query: graphql(`
+  query: graphql(`
     query AlbumPage($albumId: String!) {
       album(id: $albumId) {
         ...Album
@@ -55,27 +55,38 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-	variables: { albumId },
+  variables: { albumId },
 })
 
 const onlyShowGreatSongs = ref(false)
 
 const album = computed(() => data.value?.album)
 const filteredTracks = computed(() =>
-	album.value && onlyShowGreatSongs.value
-		? album.value.tracks.filter((track) => hasMinimumRating(track, 8))
-		: album.value?.tracks,
+  album.value && onlyShowGreatSongs.value
+    ? album.value.tracks.filter((track) => hasMinimumRating(track, 8))
+    : album.value?.tracks,
 )
 const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTracks.value))
 </script>
 
 <template>
-  <LoadingIndicator v-if="fetching" :error="error?.message" />
+  <LoadingIndicator
+    v-if="fetching"
+    :error="error?.message"
+  />
 
-  <div class="mt-2.5 ml-[15%] w-[70%]" v-if="album && filteredTracks && infos">
+  <div
+    class="mt-2.5 ml-[15%] w-[70%]"
+    v-if="album && filteredTracks && infos"
+  >
     <NavigableList>
       <div class="flex flex-row">
-        <img class="art" :width="192" :height="192" :src="getAlbumArtUrl(album)" />
+        <img
+          class="art"
+          :width="192"
+          :height="192"
+          :src="getAlbumArtUrl(album)"
+        />
 
         <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5 w-full">
           <div class="text-3xl">
@@ -88,15 +99,21 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           </navigable-item-wrapper>
 
           <NavigableRow>
-            <NavigableItem v-for="artist in album.albumArtists" :key="artist.id"
-              @press="router.push({ name: 'artist', params: { id: artist.id } })">
+            <NavigableItem
+              v-for="artist in album.albumArtists"
+              :key="artist.id"
+              @press="router.push({ name: 'artist', params: { id: artist.id } })"
+            >
               🎤 {{ artist.name }}
             </NavigableItem>
           </NavigableRow>
 
           <NavigableRow>
-            <NavigableItem v-for="genre in album.genres" :key="genre.id"
-              @press="router.push({ name: 'genre', params: { id: genre.id } })">
+            <NavigableItem
+              v-for="genre in album.genres"
+              :key="genre.id"
+              @press="router.push({ name: 'genre', params: { id: genre.id } })"
+            >
               🎵 {{ genre.name }}
             </NavigableItem>
           </NavigableRow>
@@ -111,12 +128,15 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           <NavigableRow>
             <Checkbox v-model="onlyShowGreatSongs">Only show great songs</Checkbox>
 
-            <Button @press="enqueue(filteredTracks!, 'next')" @long-press="showContextMenu([
-              {
-                label: 'Queue at the end',
-                onPress: () => enqueue(filteredTracks!, 'end'),
-              }
-            ])">
+            <Button
+              @press="enqueue(filteredTracks!, 'next')"
+              @long-press="showContextMenu([
+                {
+                  label: 'Queue at the end',
+                  onPress: () => enqueue(filteredTracks!, 'end'),
+                }
+              ])"
+            >
               <Emoji>▶️</Emoji> Play next
             </Button>
 
@@ -131,7 +151,10 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
       </div>
     </NavigableList>
 
-    <div v-for="disc in infos.discs" :key="disc.number">
+    <div
+      v-for="disc in infos.discs"
+      :key="disc.number"
+    >
       <h2 v-if="infos.discs.length > 1">
         Disc {{ disc.number }}
       </h2>
@@ -139,9 +162,17 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
       <table class="mt-2.5 w-full border-collapse">
         <tbody>
           <NavigableList>
-            <NavigableTrack v-for="track, i in disc.tracks" :key="track.id" :tracks="filteredTracks"
-              :context="{ context: 'album' }" :track>
-              <tr class="w-full [&>td]:p-2.5" :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
+            <NavigableTrack
+              v-for="track, i in disc.tracks"
+              :key="track.id"
+              :tracks="filteredTracks"
+              :context="{ context: 'album' }"
+              :track
+            >
+              <tr
+                class="w-full [&>td]:p-2.5"
+                :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []"
+              >
                 <td>{{ track.metadata.tags.trackNo }}</td>
                 <td class="w-full">{{ track.metadata.tags.title }}</td>
                 <td>

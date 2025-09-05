@@ -4,8 +4,8 @@ import { getAlbumArtUrl } from '@/global/constants'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 
 const props = defineProps<{
-	track: AudioTrackFragment | null
-	dim: boolean
+  track: AudioTrackFragment | null
+  dim: boolean
 }>()
 
 const album = computed(() => props.track?.metadata.tags.album)

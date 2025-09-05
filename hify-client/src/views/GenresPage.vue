@@ -14,7 +14,7 @@ import router from '@/router'
 const GENRES_PER_LINE = 6
 
 const { data, fetching, error } = useQuery({
-	query: graphql(`
+  query: graphql(`
     query GenresPage {
       genres {
         id
@@ -23,21 +23,27 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-	variables: {},
+  variables: {},
 })
 
 const genres = computed(() => data.value?.genres)
 </script>
 
 <template>
-  <LoadingIndicator v-if="fetching" :error="error?.message" />
+  <LoadingIndicator
+    v-if="fetching"
+    :error="error?.message"
+  />
 
   <template v-else-if="genres">
     <h2>List of all genres ({{ genres.length }}) and number of albums:</h2>
 
     <NavigableGrid :columns="GENRES_PER_LINE">
-      <NavigableItem v-for="genre in genres" :key="genre.id"
-        @press="router.push({ name: 'genre', params: { id: genre.id } })" @long-press="showContextMenu([
+      <NavigableItem
+        v-for="genre in genres"
+        :key="genre.id"
+        @press="router.push({ name: 'genre', params: { id: genre.id } })"
+        @long-press="showContextMenu([
           {
             label: 'Mix me some magic ✨',
             onPress: () => {
@@ -49,7 +55,8 @@ const genres = computed(() => data.value?.genres)
               })
             }
           },
-        ])">
+        ])"
+      >
         <div>
           <p>{{ genre.name }} ({{ genre.albumsCount }})</p>
         </div>

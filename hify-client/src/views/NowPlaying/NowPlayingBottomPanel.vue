@@ -9,11 +9,11 @@ import ProgressiveRow, { type ProgressiveRowExposeType } from '@/components/mole
 import { getAlbumArtUrl } from '@/global/constants'
 import { ctxMenuOptions } from '@/global/ctx-menu-content'
 import {
-	humanReadableDuration,
-	readableAudioPaused,
-	readableAudioProgress,
-	setPlayingAudioProgressRelative,
-	toggleAudioPlayback,
+  humanReadableDuration,
+  readableAudioPaused,
+  readableAudioProgress,
+  setPlayingAudioProgressRelative,
+  toggleAudioPlayback,
 } from '@/global/stores/audio-player'
 import { showContextMenu } from '@/global/stores/context-menu'
 import { enableOpacitor } from '@/global/stores/opacitor'
@@ -28,42 +28,48 @@ import router from '@/router'
 const isQueueFocused = ref(false)
 
 function showTrackCtxMenu(track: AudioTrackFragment, position: number) {
-	showContextMenu(
-		ctxMenuOptions.forTrack(
-			track,
-			{ fromMixId: null },
-			{
-				context: 'queue',
-				isCurrent: readablePlayQueue.value.position === position,
-				position,
-				totalTracks: readablePlayQueue.value.tracks.length,
-				onQueueEdition: () => queueGalleryRef.value?.requestFocus(position),
-			},
-		),
-	)
+  showContextMenu(
+    ctxMenuOptions.forTrack(
+      track,
+      { fromMixId: null },
+      {
+        context: 'queue',
+        isCurrent: readablePlayQueue.value.position === position,
+        position,
+        totalTracks: readablePlayQueue.value.tracks.length,
+        onQueueEdition: () => queueGalleryRef.value?.requestFocus(position),
+      },
+    ),
+  )
 }
 
 function moveInTrack(dir: 'left' | 'right') {
-	setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)
+  setPlayingAudioProgressRelative(dir === 'left' ? -30 : 30)
 }
 
 const queueGalleryRef = ref<ProgressiveRowExposeType | null>(null)
 
 watch(
-	() => [queueGalleryRef.value, readablePlayQueue.value.position] as const,
-	([gallery, position]) => {
-		if (gallery !== null && position !== null) {
-			gallery.jumpUnfocusedPosition(position)
-		}
-	},
+  () => [queueGalleryRef.value, readablePlayQueue.value.position] as const,
+  ([gallery, position]) => {
+    if (gallery !== null && position !== null) {
+      gallery.jumpUnfocusedPosition(position)
+    }
+  },
 )
 </script>
 
 <template>
-  <div class="player-bottom" :class="{ isQueueFocused, noCurrentTrack: !currentTrack }">
+  <div
+    class="player-bottom"
+    :class="{ isQueueFocused, noCurrentTrack: !currentTrack }"
+  >
     <NavigableList>
       <NavigableList v-if="currentTrack">
-        <With :data="currentTrack.metadata.tags" v-slot="{ data: tags }">
+        <With
+          :data="currentTrack.metadata.tags"
+          v-slot="{ data: tags }"
+        >
           <NavigableRow class="items-center">
             <NavigableItem @press="router.push({ name: 'search', params: { query: tags.title } })">
               <div>🎵 {{ tags.title }}</div>
@@ -78,8 +84,11 @@ watch(
               <div>🕒 {{ formatDate(tags.date) }}</div>
             </NavigableItem>
 
-            <OneLineList prefix="🎤" :items="tags.artists.map(artist => ({ id: artist.id, label: artist.name }))"
-              @press="artistId => router.push({ name: 'artist', params: { id: artistId } })" />
+            <OneLineList
+              prefix="🎤"
+              :items="tags.artists.map(artist => ({ id: artist.id, label: artist.name }))"
+              @press="artistId => router.push({ name: 'artist', params: { id: artistId } })"
+            />
 
             <ModifiableTrackRating :track="currentTrack" />
 
@@ -108,20 +117,36 @@ watch(
           </div>
 
           <div class="progress-range">
-            <AudioProgressBar class="w-full" :max="currentTrack.metadata.duration" :value="readableAudioProgress ?? 0"
-              @press="toggleAudioPlayback" @direction="moveInTrack" />
+            <AudioProgressBar
+              class="w-full"
+              :max="currentTrack.metadata.duration"
+              :value="readableAudioProgress ?? 0"
+              @press="toggleAudioPlayback"
+              @direction="moveInTrack"
+            />
           </div>
         </With>
       </NavigableList>
 
       <div class="play-queue-gallery">
         <NavigableList>
-          <ProgressiveRow ref="queueGalleryRef" :items="readablePlayQueue.tracks" idProp="idInQueue" disable-scroll
-            :initialPosition="readablePlayQueue.position ?? 0" @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
-            @item-long-press="showTrackCtxMenu" @focus-change="focused => { isQueueFocused = focused }"
-            v-slot="{ item: track, position, focused }">
-            <Card :title="track.metadata.tags.title" :box-size="80" :art-url="getAlbumArtUrl(track.metadata.tags.album)"
-              :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2" />
+          <ProgressiveRow
+            ref="queueGalleryRef"
+            :items="readablePlayQueue.tracks"
+            idProp="idInQueue"
+            disable-scroll
+            :initialPosition="readablePlayQueue.position ?? 0"
+            @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
+            @item-long-press="showTrackCtxMenu"
+            @focus-change="focused => { isQueueFocused = focused }"
+            v-slot="{ item: track, position, focused }"
+          >
+            <Card
+              :title="track.metadata.tags.title"
+              :box-size="80"
+              :art-url="getAlbumArtUrl(track.metadata.tags.album)"
+              :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2"
+            />
           </ProgressiveRow>
         </NavigableList>
       </div>

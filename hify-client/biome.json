@@ -25,7 +25,9 @@
 	},
 	"overrides": [
 		{
-			"includes": ["src/graphql/generated/*.ts"],
+			"includes": [
+				"src/graphql/generated/*.ts"
+			],
 			"formatter": {
 				"enabled": false
 			},
@@ -34,14 +36,15 @@
 			}
 		},
 		{
-			"includes": ["**/*.vue"],
+			"includes": [
+				"**/*.vue"
+			],
 			"linter": {
 				"rules": {
 					"style": {
 						"useConst": "off",
 						"useImportType": "off"
 					},
-
 					"correctness": {
 						"noUnusedVariables": "off",
 						"noUnusedImports": "off"

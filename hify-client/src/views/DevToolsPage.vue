@@ -12,7 +12,7 @@ import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 const hideDebugLogs = ref(true)
 
 const slicedAppLogs = computed(() =>
-	appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)),
+  appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)),
 )
 
 const win = window
@@ -26,14 +26,20 @@ const win = window
 
     <Checkbox v-model="hideDebugLogs">Hide debug logs</Checkbox>
 
-    <Button v-if="hifyInterface" @press="hifyInterface?.updateAppUrl()">
+    <Button
+      v-if="hifyInterface"
+      @press="hifyInterface?.updateAppUrl()"
+    >
       🛠️ Change the application's URL
     </Button>
   </NavigableRow>
 
   <NavigableList>
     <NavigableItem v-for="logEntry in slicedAppLogs">
-      <div class="log-entry" :class="[logEntry.level.toLocaleLowerCase()]">
+      <div
+        class="log-entry"
+        :class="[logEntry.level.toLocaleLowerCase()]"
+      >
         <u>{{ logEntry.level.toLocaleUpperCase() }}</u>
         <strong>{{ logEntry.at.toLocaleTimeString() }}</strong>: {{ logEntry.message }}
       </div>

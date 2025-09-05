@@ -13,18 +13,18 @@ import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/com
 const MAX_RESULTS_PER_CATEGORY = 50
 
 async function onInput() {
-	const searchTerms = query.value.trim()
+  const searchTerms = query.value.trim()
 
-	if (searchTerms.length === 0) {
-		return
-	}
+  if (searchTerms.length === 0) {
+    return
+  }
 
-	log(LogLevel.Debug, `Performing search "${searchTerms}"...`)
+  log(LogLevel.Debug, `Performing search "${searchTerms}"...`)
 
-	const start = Date.now()
+  const start = Date.now()
 
-	const { data, error } = await gqlClient.query(
-		graphql(`
+  const { data, error } = await gqlClient.query(
+    graphql(`
       query SearchPage($input: String!, $limit: Int!) {
         search(input: $input, limit: $limit) {
           tracks {
@@ -39,19 +39,19 @@ async function onInput() {
         }
       }
     `),
-		{
-			input: searchTerms,
-			limit: MAX_RESULTS_PER_CATEGORY,
-		},
-	)
+    {
+      input: searchTerms,
+      limit: MAX_RESULTS_PER_CATEGORY,
+    },
+  )
 
-	log(LogLevel.Debug, `Performed search "${searchTerms}" in ${Date.now() - start} ms`)
+  log(LogLevel.Debug, `Performed search "${searchTerms}" in ${Date.now() - start} ms`)
 
-	if (!data) {
-		logFatal('Failed to perform search', error)
-	}
+  if (!data) {
+    logFatal('Failed to perform search', error)
+  }
 
-	results.value = data.search
+  results.value = data.search
 }
 
 const query = ref(getRouteParam('query', ''))
@@ -60,23 +60,33 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const navItem = ref<NavigableItemExposeType | null>(null)
 
 onMounted(() => {
-	if (!navItem.value) {
-		logFatal('Nav item reference not initialized yet')
-	}
+  if (!navItem.value) {
+    logFatal('Nav item reference not initialized yet')
+  }
 
-	requestFocusOnItem(navItem.value.item)
+  requestFocusOnItem(navItem.value.item)
 
-	if (query.value) {
-		onInput()
-	}
+  if (query.value) {
+    onInput()
+  }
 })
 </script>
 
 <template>
   <div class="p-2.5 text-center">
-    <NavigableItem @focus="inputRef?.focus()" @unfocus="inputRef?.blur()" ref="navItem">
-      <input class="w-1/3 p-3 text-lg border-none rounded-lg outline-none" type="text" ref="inputRef" v-model="query"
-        @input="onInput" @change="onInput" />
+    <NavigableItem
+      @focus="inputRef?.focus()"
+      @unfocus="inputRef?.blur()"
+      ref="navItem"
+    >
+      <input
+        class="w-1/3 p-3 text-lg border-none rounded-lg outline-none"
+        type="text"
+        ref="inputRef"
+        v-model="query"
+        @input="onInput"
+        @change="onInput"
+      />
     </NavigableItem>
   </div>
 

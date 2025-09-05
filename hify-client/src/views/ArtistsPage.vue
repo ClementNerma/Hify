@@ -53,8 +53,12 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <NavigableGrid :columns="GRID_ARTISTS_PER_ROW">
-    <ArtistCard v-for="artist, i in artists" :key="artist.id" :artist
-      @focus="isApproachingGridEnd(i, GRID_ARTISTS_PER_ROW, artists.length) && feedMore()" />
-  </NavigableGrid>
+	<NavigableGrid :columns="GRID_ARTISTS_PER_ROW">
+		<ArtistCard
+			v-for="artist, i in artists"
+			:key="artist.id"
+			:artist
+			@focus="isApproachingGridEnd(i, GRID_ARTISTS_PER_ROW, artists.length) && feedMore()"
+		/>
+	</NavigableGrid>
 </template>

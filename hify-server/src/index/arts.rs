@@ -18,7 +18,7 @@ use rayon::iter::{ParallelBridge, ParallelIterator};
 use tokio::{fs, runtime::Handle, sync::Mutex, task::JoinSet};
 
 use crate::{
-    helpers::logging::progress_bar,
+    logging::progress_bar,
     resources::{ArtistArt, ResourceManager},
 };
 

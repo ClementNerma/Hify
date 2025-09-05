@@ -1,25 +1,41 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs, path::PathBuf};
+
+use anyhow::Result;
 
 use crate::index::{Index, Rating, TrackID};
 
 use super::{
     cache::UserDataCache, history::History, playlist::PlaylistEditAction, Mix, MixID, OneListening,
-    Playlist, PlaylistID, UserData,
+    Playlist, PlaylistID, UserData, UserDataConfig,
 };
 
 pub struct UserDataWrapper {
     inner: UserData,
     cache: UserDataCache,
-    on_change: Box<dyn Fn(&UserData) + Send + Sync>,
+    path: PathBuf,
 }
 
 impl UserDataWrapper {
-    pub fn new(inner: UserData, on_change: Box<dyn Fn(&UserData) + Send + Sync>) -> Self {
-        Self {
+    pub fn new_create(path: PathBuf) -> Result<Self> {
+        let inner = if path.exists() {
+            let content = fs::read(&path)?;
+            let json_str = std::str::from_utf8(&content)?;
+            serde_json::from_str::<UserData>(json_str)?
+        } else {
+            UserData::new(UserDataConfig::default())
+        };
+
+        Ok(Self {
             cache: UserDataCache::new(&inner.history, inner.config),
             inner,
-            on_change,
-        }
+            path,
+        })
+    }
+
+    fn _save(&self) {
+        // TODO: error handling
+        let json = serde_json::to_string(&self.inner).unwrap();
+        fs::write(&self.path, json).unwrap();
     }
 
     pub fn cache(&self) -> &UserDataCache {
@@ -49,7 +65,7 @@ impl UserDataWrapper {
             }
         }
 
-        (self.on_change)(&self.inner);
+        self._save();
     }
 
     pub fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
@@ -68,7 +84,7 @@ impl UserDataWrapper {
         self.cache.update_with(&entry);
         self.inner.history.push(entry);
 
-        (self.on_change)(&self.inner);
+        self._save();
         Ok(())
     }
 
@@ -78,7 +94,7 @@ impl UserDataWrapper {
 
         self.inner.playlists.insert(playlist.id, playlist);
 
-        (self.on_change)(&self.inner);
+        self._save();
 
         playlist_id
     }
@@ -96,7 +112,7 @@ impl UserDataWrapper {
 
         playlist.edit(action)?;
 
-        (self.on_change)(&self.inner);
+        self._save();
 
         Ok(())
     }
@@ -107,7 +123,7 @@ impl UserDataWrapper {
             .remove(&playlist_id)
             .ok_or("Playlist was not found")?;
 
-        (self.on_change)(&self.inner);
+        self._save();
 
         Ok(())
     }
@@ -115,7 +131,7 @@ impl UserDataWrapper {
     pub fn register_mix(&mut self, mix: Mix) {
         self.inner.mixes.insert(mix.id(), mix);
 
-        (self.on_change)(&self.inner);
+        self._save();
     }
 
     pub fn delete_mix(&mut self, mix_id: MixID) -> Result<(), &'static str> {
@@ -124,7 +140,7 @@ impl UserDataWrapper {
             .remove(&mix_id)
             .ok_or("Mix was not found")?;
 
-        (self.on_change)(&self.inner);
+        self._save();
 
         Ok(())
     }
@@ -143,7 +159,7 @@ impl UserDataWrapper {
 
         let tracks = mix.next_tracks(max_tracks, mapper);
 
-        (self.on_change)(&self.inner);
+        self._save();
 
         Ok(tracks)
     }
@@ -160,6 +176,6 @@ impl UserDataWrapper {
             mix.cleanup(new_index);
         }
 
-        (self.on_change)(&self.inner);
+        self._save();
     }
 }

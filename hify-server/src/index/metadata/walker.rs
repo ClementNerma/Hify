@@ -4,8 +4,8 @@ use anyhow::{Context, Result};
 use log::{error, info};
 
 use crate::{
-    helpers::logging::progress_bar,
     index::{metadata::analyzer::analyze_file, TrackMetadata},
+    logging::progress_bar,
 };
 
 pub async fn analyze_audio_files(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>> {

@@ -15,21 +15,24 @@ import ArtistTrackParticipations from './Artist/ArtistTrackParticipations.vue'
 const artistId = getRouteParam('id')
 
 const { data, fetching, error } = useQuery({
-	query: graphql(`
+  query: graphql(`
     query ArtistPage($artistId: String!) {
       artist(id: $artistId) {
         name
       }
     }
   `),
-	variables: {
-		artistId,
-	},
+  variables: {
+    artistId,
+  },
 })
 </script>
 
 <template>
-  <LoadingIndicator v-if="fetching" :error="error?.message" />
+  <LoadingIndicator
+    v-if="fetching"
+    :error="error?.message"
+  />
 
   <h2 v-else-if="data && !data.artist">Artist was not found</h2>
 

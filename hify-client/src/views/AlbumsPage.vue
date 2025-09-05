@@ -134,10 +134,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <DropdownSelect ref="dropdownRef" prefix-label="Sort by:" :items="sortByItems" v-model="sortBy" />
+	<DropdownSelect
+		ref="dropdownRef"
+		prefix-label="Sort by:"
+		:items="sortByItems"
+		v-model="sortBy"
+	/>
 
-  <NavigableGrid :columns="GRID_ALBUMS_PER_ROW">
-    <AlbumCard v-for="album, i in albums" :key="`${sortBy}/${album.id}`" :album
-      @focus="isApproachingGridEnd(i, GRID_ALBUMS_PER_ROW, albums.length) && feedMore()" />
-  </NavigableGrid>
+	<NavigableGrid :columns="GRID_ALBUMS_PER_ROW">
+		<AlbumCard
+			v-for="album, i in albums"
+			:key="`${sortBy}/${album.id}`"
+			:album
+			@focus="isApproachingGridEnd(i, GRID_ALBUMS_PER_ROW, albums.length) && feedMore()"
+		/>
+	</NavigableGrid>
 </template>

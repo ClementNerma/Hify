@@ -15,12 +15,12 @@ const TRACKS_PER_LINE = 6
 const LINES_PER_PAGE = 5
 
 const feedMore = noParallel(async () => {
-	if (currentPageInfo.value?.hasNextPage === false) {
-		return
-	}
+  if (currentPageInfo.value?.hasNextPage === false) {
+    return
+  }
 
-	const { data, error } = await gqlClient.query(
-		graphql(`
+  const { data, error } = await gqlClient.query(
+    graphql(`
       query ArtistTrackParticipations($artistId: String!, $pagination: PaginationInput!) {
         artist(id: $artistId) {
           trackParticipations(pagination: $pagination) {
@@ -36,25 +36,25 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-		{
-			artistId,
-			pagination: {
-				after: currentPageInfo.value?.endCursor,
-				first: TRACKS_PER_LINE * LINES_PER_PAGE,
-			},
-		},
-	)
+    {
+      artistId,
+      pagination: {
+        after: currentPageInfo.value?.endCursor,
+        first: TRACKS_PER_LINE * LINES_PER_PAGE,
+      },
+    },
+  )
 
-	if (!data?.artist) {
-		logFatal('Failed to fetch track participations', error)
-	}
+  if (!data?.artist) {
+    logFatal('Failed to fetch track participations', error)
+  }
 
-	currentPageInfo.value = data.artist.trackParticipations.pageInfo
-	tracks.value.push(...data.artist.trackParticipations.nodes)
+  currentPageInfo.value = data.artist.trackParticipations.pageInfo
+  tracks.value.push(...data.artist.trackParticipations.nodes)
 })
 
 const currentPageInfo = ref<
-	NonNullable<ArtistTrackParticipationsQuery['artist']>['trackParticipations']['pageInfo'] | null
+  NonNullable<ArtistTrackParticipationsQuery['artist']>['trackParticipations']['pageInfo'] | null
 >(null)
 
 const tracks = ref<AudioTrackFragment[]>([])
@@ -63,13 +63,21 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!currentPageInfo" :error="null /* TODO */" />
+  <LoadingIndicator
+    v-if="!currentPageInfo"
+    :error="null /* TODO */"
+  />
 
   <template v-else-if="tracks.length > 0">
     <Centered>
       <h3>Tracks from other artists' albums ({{ tracks.length }})</h3>
     </Centered>
 
-    <TracksFromAlbums :tracks :has-more="currentPageInfo.hasNextPage" :feed-more show-artists-name />
+    <TracksFromAlbums
+      :tracks
+      :has-more="currentPageInfo.hasNextPage"
+      :feed-more
+      show-artists-name
+    />
   </template>
 </template>

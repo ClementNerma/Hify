@@ -52,5 +52,8 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <TracksGrid :tracks @feed-more="feedMore" />
+	<TracksGrid
+		:tracks
+		@feed-more="feedMore"
+	/>
 </template>

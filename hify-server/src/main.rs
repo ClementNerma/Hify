@@ -5,14 +5,14 @@
 mod check;
 mod cmd;
 mod graphql;
-mod helpers;
 mod http;
 mod index;
 mod library;
+mod logging;
 mod resources;
 mod userdata;
 
-use std::{fs, net::SocketAddr, process::ExitCode};
+use std::{fs, net::SocketAddr, path::Path, process::ExitCode};
 
 use anyhow::{bail, ensure, Context, Result};
 use clap::Parser;
@@ -21,9 +21,7 @@ use log::{error, info};
 use crate::{check::check_correctness, cmd::Args};
 
 use self::{
-    helpers::logging::setup_logger,
-    resources::ResourceManager,
-    userdata::{UserData, UserDataWrapper},
+    index::Index, logging::setup_logger, resources::ResourceManager, userdata::UserDataWrapper,
 };
 
 #[tokio::main]
@@ -89,25 +87,17 @@ async fn inner_main(args: Args) -> Result<()> {
     let user_data_file = data_dir.join("userdata.json");
     let index_file = data_dir.join("index.json");
 
-    let user_data = if user_data_file.is_file() {
-        helpers::save::load_user_data(&user_data_file).context("Failed to load user data")?
-    } else {
-        UserData::with_default_config()
-    };
-
-    let mut user_data = UserDataWrapper::new(
-        user_data,
-        Box::new(move |user_data| {
-            // TODO: error handling
-            helpers::save::save_user_data(&user_data_file, user_data).unwrap();
-        }),
-    );
+    let mut user_data =
+        UserDataWrapper::new_create(user_data_file.clone()).context("Failed to load user data")?;
 
     ensure!(!index_file.is_dir(), "Index file must not be a directory");
 
     let index = if index_file.is_file() && !rebuild_index {
         info!("> Loading index from disk...");
-        let mut index = helpers::save::load_index(&index_file).context("Failed to load index")?;
+
+        let content = fs::read(&index_file)?;
+        let json_str = std::str::from_utf8(&content)?;
+        let mut index = serde_json::from_str(json_str).context("Failed to load index")?;
 
         if update_index {
             info!("> Updating index as requested...");
@@ -116,7 +106,7 @@ async fn inner_main(args: Args) -> Result<()> {
                 .await
                 .context("Failed to rebuild index")?;
 
-            helpers::save::save_index(&index_file, &index)
+            save_index(&index_file, &index)
                 .context("Failed to save index file with rebuilt cache")?;
 
             user_data.cleanup(&index);
@@ -127,13 +117,13 @@ async fn inner_main(args: Args) -> Result<()> {
             info!("> Rebuilding cache...");
             index::rebuild_cache(&mut index);
 
-            helpers::save::save_index(&index_file, &index)
+            save_index(&index_file, &index)
                 .context("Failed to save index file with rebuilt cache")?;
         } else if rebuild_cache {
             info!("> Rebuilding cache as requested...");
             index::rebuild_cache(&mut index);
 
-            helpers::save::save_index(&index_file, &index)
+            save_index(&index_file, &index)
                 .context("Failed to save index file with rebuilt cache")?;
         }
 
@@ -152,7 +142,7 @@ async fn inner_main(args: Args) -> Result<()> {
 
             index::rebuild_resources(&mut index, &res_manager).await?;
 
-            helpers::save::save_index(&index_file, &index)
+            save_index(&index_file, &index)
                 .context("Failed to save index file with rebuilt arts")?;
         }
 
@@ -166,7 +156,7 @@ async fn inner_main(args: Args) -> Result<()> {
             .await
             .context("Failed to build index")?;
 
-        helpers::save::save_index(&index_file, &index).context("Failed to save index file")?;
+        save_index(&index_file, &index).context("Failed to save index file")?;
         info!("> Index saved on disk.");
 
         index
@@ -196,10 +186,14 @@ async fn inner_main(args: Args) -> Result<()> {
         index,
         user_data,
         res_manager,
-        Box::new(move |index| {
-            helpers::save::save_index(&index_file, index).map_err(|err| format!("{err:?}"))
-        }),
+        Box::new(move |index| save_index(&index_file, index).map_err(|err| format!("{err:?}"))),
     )
     .await
     .context("Failed to launch HTTP server")
+}
+
+pub fn save_index(to: &Path, index: &Index) -> Result<()> {
+    let json = serde_json::to_string(index)?;
+    fs::write(to, json)?;
+    Ok(())
 }

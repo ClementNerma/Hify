@@ -17,12 +17,12 @@ const LINES_PER_PAGE = 5
 const genreId = getRouteParam('id')
 
 const feedMore = noParallel(async () => {
-	if (currentPageInfo.value?.hasNextPage === false) {
-		return
-	}
+  if (currentPageInfo.value?.hasNextPage === false) {
+    return
+  }
 
-	const { data, error } = await gqlClient.query(
-		graphql(`
+  const { data, error } = await gqlClient.query(
+    graphql(`
       query GenrePage($genreId: String!, $pagination: PaginationInput!) {
         genre(id: $genreId) {
           name
@@ -40,22 +40,22 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-		{
-			genreId,
-			pagination: {
-				after: currentPageInfo.value?.endCursor,
-				first: ALBUMS_PER_LINE * LINES_PER_PAGE,
-			},
-		},
-	)
+    {
+      genreId,
+      pagination: {
+        after: currentPageInfo.value?.endCursor,
+        first: ALBUMS_PER_LINE * LINES_PER_PAGE,
+      },
+    },
+  )
 
-	if (!data?.genre) {
-		logFatal('Failed to fetch albums list', error)
-	}
+  if (!data?.genre) {
+    logFatal('Failed to fetch albums list', error)
+  }
 
-	currentPageInfo.value = data.genre.albums.pageInfo
-	albums.value.push(...data.genre.albums.nodes)
-	genreName.value = data.genre.name
+  currentPageInfo.value = data.genre.albums.pageInfo
+  albums.value.push(...data.genre.albums.nodes)
+  genreName.value = data.genre.name
 })
 
 const currentPageInfo = ref<NonNullable<GenrePageQuery['genre']>['albums']['pageInfo'] | null>(null)
@@ -66,7 +66,10 @@ onMounted(feedMore)
 </script>
 
 <template>
-  <LoadingIndicator v-if="!genreName" :error="null /* TODO */" />
+  <LoadingIndicator
+    v-if="!genreName"
+    :error="null /* TODO */"
+  />
 
   <template v-else>
     <h2>Genre: {{ genreName }}</h2>
@@ -81,8 +84,12 @@ onMounted(feedMore)
     <h3>List of albums</h3>
 
     <NavigableGrid :columns="ALBUMS_PER_LINE">
-      <AlbumCard v-for="album, i in albums" :key="album.id" :album
-        @focus="isApproachingGridEnd(i, ALBUMS_PER_LINE, albums.length) && feedMore()" />
+      <AlbumCard
+        v-for="album, i in albums"
+        :key="album.id"
+        :album
+        @focus="isApproachingGridEnd(i, ALBUMS_PER_LINE, albums.length) && feedMore()"
+      />
     </NavigableGrid>
   </template>
 </template>
