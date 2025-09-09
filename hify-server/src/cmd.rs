@@ -66,7 +66,7 @@ pub struct Args {
     )]
     pub no_server: bool,
 
-    #[clap(short, long, help = "Logging level", default_value = "info")]
+    #[clap(short = 'v', long, help = "Logging level", default_value = "info")]
     pub logging_level: LevelFilter,
 
     #[clap(short, long, help = "Display timestamps in TTYs (disabled by default)")]
