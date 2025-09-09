@@ -11,7 +11,7 @@ use std::{
 use walkdir::WalkDir;
 
 use crate::{
-    index::arts::{find_albums_arts, generate_artists_art},
+    index::arts::{find_albums_arts, generate_artist_arts},
     logging::spinner,
     resources::ResourceManager,
 };
@@ -92,10 +92,23 @@ pub async fn build_index(
         &format!("...of which {} are audio files.", files.len()),
     );
 
+    // Remove deleted tracks
+    let (mut tracks, deleted_tracks) = from
+        .tracks
+        .into_values()
+        .into_iter()
+        .partition::<Vec<_>, _>(|track| files.contains_key(&dir.join(&track.relative_path)));
+
+    if !deleted_tracks.is_empty() {
+        log(
+            started,
+            &format!("...detected {} deleted tracks.", deleted_tracks.len()),
+        );
+    }
+
     let file_times = files
         .iter()
         .map(|(path, times)| (path.clone(), *times))
-        .filter(|(path, _)| metadata::is_audio_file(path))
         .filter(|(path, times)| {
             match from
                 .cache
@@ -111,7 +124,7 @@ pub async fn build_index(
 
     log(
         started,
-        &format!("...of which {} are new or modified.", file_times.len()),
+        &format!("...and {} new or modified tracks.", file_times.len()),
     );
 
     log(started, "Extracting audio metadata...");
@@ -135,36 +148,20 @@ pub async fn build_index(
         .collect::<Vec<_>>();
 
     // Remove previous versions of analyzed files
+    let analyzed_file_paths = analyzed
+        .iter()
+        .map(|track| &track.relative_path)
+        .collect::<HashSet<_>>();
+
+    tracks.retain(|track| !analyzed_file_paths.contains(&track.relative_path));
+
+    // Remove previous versions of analyzed tracks
     let analyzed_ids = analyzed
         .iter()
         .map(|track| &track.id)
         .collect::<HashSet<_>>();
 
-    let tracks = from
-        .tracks
-        .into_values()
-        .into_iter()
-        .filter(|track| !analyzed_ids.contains(&track.id))
-        .collect::<Vec<_>>();
-
-    // Remove deleted tracks
-    let before_deletion_count = tracks.len();
-
-    log(started, "Looking for deleted track(s)...");
-
-    let mut tracks = tracks
-        .into_iter()
-        .filter(|track| files.contains_key(&dir.join(&track.relative_path)))
-        .collect::<Vec<_>>();
-
-    let deleted_count = before_deletion_count - tracks.len();
-
-    if deleted_count > 0 {
-        log(
-            started,
-            &format!("Detected {deleted_count} deleted track(s)."),
-        );
-    }
+    tracks.retain(|track| !analyzed_ids.contains(&track.id));
 
     // Add new (or modified) tracks
     tracks.extend(analyzed);
@@ -264,7 +261,7 @@ pub async fn build_index(
             artists_new_or_diff_albums.len(),
         );
 
-        generate_artists_art(
+        generate_artist_arts(
             artists_new_or_diff_albums.into_iter(),
             &dir,
             &album_arts,
@@ -315,7 +312,7 @@ pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager)
         index.cache.artists_infos.len()
     );
 
-    generate_artists_art(
+    generate_artist_arts(
         index.cache.artists_infos.values(),
         &index.from,
         &index.album_arts,

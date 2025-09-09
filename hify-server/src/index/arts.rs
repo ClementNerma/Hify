@@ -12,7 +12,7 @@ use image::{
     imageops::{resize, FilterType},
     GenericImage, ImageBuffer, Rgba,
 };
-use log::{error, warn};
+use log::{debug, error, warn};
 use rayon::iter::{ParallelBridge, ParallelIterator};
 use tokio::{fs, sync::Mutex, task::JoinSet};
 
@@ -138,7 +138,7 @@ async fn find_album_art(
     Ok(None)
 }
 
-pub fn generate_artists_art<'a>(
+pub fn generate_artist_arts<'a>(
     artists: impl ExactSizeIterator<Item = &'a ArtistInfos> + ParallelBridge + Send,
     base_dir: &Path,
     album_arts: &HashMap<AlbumID, PathBuf>,
@@ -152,6 +152,8 @@ pub fn generate_artists_art<'a>(
     artists.par_bridge().for_each(|artist| {
         let res_manager = res_manager.clone();
         let artist_id = artist.get_id();
+
+        debug!("Generating art for artist '{}'...", artist.name);
 
         match generate_artist_art(
             base_dir,
