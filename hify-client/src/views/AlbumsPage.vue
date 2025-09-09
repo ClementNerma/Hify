@@ -109,8 +109,8 @@ const feedMore = noParallel(async () => {
 type SortBy = 'name' | 'date'
 
 const sortByItems: DropdownChoices<SortBy> = [
-	{ id: 'name', label: 'Name' },
 	{ id: 'date', label: 'Last update date' },
+	{ id: 'name', label: 'Name' },
 ]
 
 const fetchState = ref<
