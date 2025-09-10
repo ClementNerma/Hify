@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    collections::{hash_map::DefaultHasher, HashMap, HashSet},
+    collections::{HashMap, HashSet, hash_map::DefaultHasher},
     hash::{Hash, Hasher},
     num::ParseIntError,
     path::PathBuf,
@@ -413,24 +413,31 @@ impl ScalarType for Rating {
 pub trait IdType:
     std::fmt::Debug + Clone + Copy + Hash + PartialEq + Serialize + Deserialize<'static>
 {
-    fn encode(&self) -> String;
-    fn decode(input: &str) -> Result<Self, ParseIntError>;
+    fn encode(&self) -> u64;
+    fn decode(input: u64) -> Self;
+
+    fn decode_str(str: &str) -> Result<Self, ParseIntError> {
+        u64::from_str_radix(str, 10).map(Self::decode)
+    }
+
+    fn encode_str(&self) -> String {
+        self.encode().to_string()
+    }
 }
 
 #[macro_export]
 macro_rules! define_id_type {
     ($typename: ident) => {
-        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize)]
         pub struct $typename(pub u64);
 
         impl $crate::index::IdType for $typename {
-            fn encode(&self) -> String {
-                format!("{:x}", self.0)
+            fn encode(&self) -> u64 {
+                self.0
             }
 
-            fn decode(input: &str) -> Result<Self, ::std::num::ParseIntError> {
-                let id = u64::from_str_radix(input, 16)?;
-                Ok(Self(id))
+            fn decode(input: u64) -> Self {
+                Self(input)
             }
         }
 
