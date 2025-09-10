@@ -61,21 +61,20 @@ pub fn generate_mix(
         .filter(|track_id| {
             let track = index.tracks.get(track_id).unwrap();
 
-            if let Some(min_rating) = min_rating {
-                if track.metadata.tags.rating.unwrap_or(Rating::Zero) < *min_rating {
-                    return false;
-                }
+            if let Some(min_rating) = min_rating
+                && track.metadata.tags.rating.unwrap_or(Rating::Zero) < *min_rating
+            {
+                return false;
             }
 
-            if let Some(ref genre_ids) = from_genres {
-                if !track
+            if let Some(genre_ids) = &from_genres
+                && !track
                     .metadata
                     .tags
                     .get_genres_infos()
                     .any(|genre| genre_ids.contains(&genre.get_id()))
-                {
-                    return false;
-                }
+            {
+                return false;
             }
 
             true

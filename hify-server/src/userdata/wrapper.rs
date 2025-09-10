@@ -5,8 +5,8 @@ use anyhow::Result;
 use crate::index::{Index, Rating, TrackID};
 
 use super::{
-    cache::UserDataCache, history::History, playlist::PlaylistEditAction, Mix, MixID, OneListening,
-    Playlist, PlaylistID, UserData, UserDataConfig,
+    Mix, MixID, OneListening, Playlist, PlaylistID, UserData, UserDataConfig, cache::UserDataCache,
+    history::History, playlist::PlaylistEditAction,
 };
 
 pub struct UserDataWrapper {
@@ -69,12 +69,12 @@ impl UserDataWrapper {
     }
 
     pub fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
-        if let Some(last) = self.inner.history.entries().last() {
-            if let Some(overlapping_for) = entry.is_overlapping_prev(last) {
-                return Err(format!(
-                    "Entries overlap in listening history (of about {overlapping_for}):\n* {last:?}\n* {entry:?}",
-                ));
-            }
+        if let Some(last) = self.inner.history.entries().last()
+            && let Some(overlapping_for) = entry.is_overlapping_prev(last)
+        {
+            return Err(format!(
+                "Entries overlap in listening history (of about {overlapping_for}):\n* {last:?}\n* {entry:?}",
+            ));
         }
 
         if entry.duration_s < self.inner.config.listening_duration_thresold {

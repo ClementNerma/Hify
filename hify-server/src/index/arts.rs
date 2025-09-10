@@ -2,15 +2,15 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
     sync::{
-        atomic::{AtomicUsize, Ordering},
         Arc,
+        atomic::{AtomicUsize, Ordering},
     },
 };
 
-use anyhow::{anyhow, ensure, Context, Result};
+use anyhow::{Context, Result, anyhow, ensure};
 use image::{
-    imageops::{resize, FilterType},
     GenericImage, ImageBuffer, Rgba,
+    imageops::{FilterType, resize},
 };
 use log::{debug, error, warn};
 use rayon::iter::{ParallelBridge, ParallelIterator};
@@ -183,17 +183,17 @@ pub fn generate_artist_arts<'a>(
             }
 
             Ok(img) => {
-                if let Some(img) = img {
-                    if let Err(err) = res_manager.save_artist_art(artist_id, img) {
-                        pb.suspend(|| {
-                            error!(
-                                "Failed to save cover art for artist '{}' to disk: {err}",
-                                artist.name
-                            );
-                        });
+                if let Some(img) = img
+                    && let Err(err) = res_manager.save_artist_art(artist_id, img)
+                {
+                    pb.suspend(|| {
+                        error!(
+                            "Failed to save cover art for artist '{}' to disk: {err}",
+                            artist.name
+                        );
+                    });
 
-                        errors.fetch_add(1, Ordering::SeqCst);
-                    }
+                    errors.fetch_add(1, Ordering::SeqCst);
                 }
             }
         }
@@ -247,13 +247,11 @@ fn generate_artist_art(
 
         _ => {
             let (top_left, top_right, bottom_left, bottom_right) = match album_arts.as_slice() {
-                [ref left, ref right] => (left, right, right, left),
+                [left, right] => (left, right, right, left),
 
-                [ref top_left, ref top_right, ref bottom_left] => {
-                    (top_left, top_right, bottom_left, top_left)
-                }
+                [top_left, top_right, bottom_left] => (top_left, top_right, bottom_left, top_left),
 
-                [ref top_left, ref top_right, ref bottom_left, ref bottom_right, ..] => {
+                [top_left, top_right, bottom_left, bottom_right, ..] => {
                     (top_left, top_right, bottom_left, bottom_right)
                 }
 

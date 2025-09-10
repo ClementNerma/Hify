@@ -57,30 +57,29 @@ pub fn search_index(
         ),
     };
 
-    if let Some(search_cache) = opts.search_cache.as_mut() {
-        if input.trim().len() >= SEARCH_CHARS_THRESOLD {
-            if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
-                let min = search_cache.least_recently_used().unwrap().clone();
-                search_cache.content.remove(&min);
-            }
-
-            search_cache.content.insert(
-                words,
-                SearchCacheEntry {
-                    last_usage: Instant::now(),
-                    results: results.clone(),
-                },
-            );
-
-            let fill_percent =
-                search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
-
-            debug!(
-                "|> Search cache now contains {} entries ({:.1}% of total capacity).",
-                search_cache.content.len(),
-                fill_percent
-            );
+    if let Some(search_cache) = opts.search_cache.as_mut()
+        && input.trim().len() >= SEARCH_CHARS_THRESOLD
+    {
+        if search_cache.content.len() == SEARCH_CACHE_CAPACITY {
+            let min = search_cache.least_recently_used().unwrap().clone();
+            search_cache.content.remove(&min);
         }
+
+        search_cache.content.insert(
+            words,
+            SearchCacheEntry {
+                last_usage: Instant::now(),
+                results: results.clone(),
+            },
+        );
+
+        let fill_percent = search_cache.content.len() as f64 * 100.0 / SEARCH_CACHE_CAPACITY as f64;
+
+        debug!(
+            "|> Search cache now contains {} entries ({:.1}% of total capacity).",
+            search_cache.content.len(),
+            fill_percent
+        );
     }
 
     results

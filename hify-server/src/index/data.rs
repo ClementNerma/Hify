@@ -417,7 +417,7 @@ pub trait IdType:
     fn decode(input: u64) -> Self;
 
     fn decode_str(str: &str) -> Result<Self, ParseIntError> {
-        u64::from_str_radix(str, 10).map(Self::decode)
+        str.parse::<u64>().map(Self::decode)
     }
 
     fn encode_str(&self) -> String {
