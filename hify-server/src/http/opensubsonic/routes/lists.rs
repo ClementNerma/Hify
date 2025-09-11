@@ -1,0 +1,184 @@
+use std::sync::Arc;
+
+use axum::{Extension, extract::Query};
+use serde::Deserialize;
+
+use crate::{
+    http::{
+        HttpState,
+        opensubsonic::{
+            convert::{album_to_child, album_to_id3_with_songs, track_to_child},
+            types::{AlbumID3WithSongs, Artist, Child},
+        },
+    },
+    index::{AlbumInfos, Index},
+    os_struct,
+};
+
+use super::{
+    super::{OSCommonParams, OSNestedResponse},
+    OpenSubsonicRouter,
+};
+
+pub fn router() -> OpenSubsonicRouter {
+    OpenSubsonicRouter::new()
+        .route("/getAlbumList", get_album_list)
+        .route("/getAlbumList2", get_album_list2)
+        .route("/getStarred2", get_starred2)
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AlbumListParams {
+    #[serde(rename = "type")]
+    sort: AlbumListSort,
+    size: Option<usize>,
+    offset: Option<usize>,
+    from_year: Option<u16>,
+    to_year: Option<u16>,
+    genre: Option<String>,
+    // music_folder_id
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+enum AlbumListSort {
+    Random,
+    Newest,
+    Highest,
+    Frequent,
+    Recent,
+    AlphabeticalByName,
+    AlphabeticalByArtist,
+    Starred,
+    ByYear,
+    ByGenre,
+}
+
+fn _album_list<'a>(
+    params: &AlbumListParams,
+    index: &'a Index,
+) -> impl Iterator<Item = &'a AlbumInfos> {
+    let AlbumListParams {
+        sort,
+        size,
+        offset,
+        from_year,
+        to_year,
+        genre,
+    } = params;
+
+    // TODO: take sort into consideration
+    // TODO: take from_year + to_year into consideration
+    // TODO: takegenre into consideration
+
+    index
+        .cache
+        .albums_infos
+        .iter()
+        .skip(offset.unwrap_or(0))
+        .take(size.unwrap_or(50))
+        .map(|(_, album)| album)
+}
+
+os_struct!(pub struct GetAlbumListAnswer {
+    #[children] {
+        #[rename = "album"]
+        albums: Vec<Child>
+    }
+});
+
+async fn get_album_list(
+    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(params): Query<AlbumListParams>,
+    Extension(state): Extension<Arc<HttpState>>,
+) -> OSNestedResponse<GetAlbumListAnswer> {
+    let index = state.index.read().await;
+
+    OSNestedResponse(
+        f,
+        "albumList",
+        GetAlbumListAnswer {
+            albums: _album_list(&params, &index)
+                .map(|album| album_to_child(album, &index))
+                .collect(),
+        },
+    )
+}
+
+os_struct!(pub struct GetAlbumList2Answer {
+    #[children] {
+        #[rename = "album"]
+        // Technically should be `AlbumID3` but eh...
+        albums: Vec<AlbumID3WithSongs>
+    }
+});
+
+async fn get_album_list2(
+    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(params): Query<AlbumListParams>,
+    Extension(state): Extension<Arc<HttpState>>,
+) -> OSNestedResponse<GetAlbumList2Answer> {
+    let index = state.index.read().await;
+
+    OSNestedResponse(
+        f,
+        "albumList2",
+        GetAlbumList2Answer {
+            albums: _album_list(&params, &index)
+                .map(|album| album_to_id3_with_songs(album, &index, None))
+                .collect(),
+        },
+    )
+}
+
+os_struct!(pub struct GetStarred2Answer {
+    #[children] {
+        artist: Vec<Artist>,
+        album: Vec<Child>,
+        song: Vec<Child>
+    }
+});
+
+async fn get_starred2(
+    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Extension(state): Extension<Arc<HttpState>>,
+    // TODO: query
+) -> OSNestedResponse<GetStarred2Answer> {
+    let index = state.index.read().await;
+    let user_data = state.user_data.read().await;
+
+    OSNestedResponse(
+        f,
+        "starred2",
+        GetStarred2Answer {
+            // TODO: should return explicitly-starred artists, not artists who have starred songs
+            artist: index
+                .cache
+                .artists_mean_score
+                .iter()
+                .map(|(artist_id, mean_score)| {
+                    let artist = index.cache.artists_infos.get(artist_id).unwrap();
+
+                    Artist {
+                        id: *artist_id,
+                        name: artist.name.clone(),
+                        artist_image_url: None,
+                        starred_iso_8601: None,
+                        user_rating_1_to_5: None,
+                        average_rating_1_to_5: Some((*mean_score / 2.0) as f32),
+                    }
+                })
+                .collect(),
+
+            // TODO: should return explicitly-starred artists, not artists who have starred songs
+            album: vec![],
+
+            song: user_data
+                .track_ratings()
+                .keys()
+                .map(|track| track_to_child(index.tracks.get(track).unwrap(), &index, &user_data))
+                .collect(),
+        },
+    )
+}

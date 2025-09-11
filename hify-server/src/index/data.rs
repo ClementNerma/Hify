@@ -2,7 +2,6 @@ use std::{
     cmp::Ordering,
     collections::{HashMap, HashSet, hash_map::DefaultHasher},
     hash::{Hash, Hasher},
-    num::ParseIntError,
     path::PathBuf,
     time::SystemTime,
 };
@@ -16,6 +15,7 @@ use super::{builder::FileTimes, value_ord_map::ValueOrdMap};
 
 /// Global index, contains all data on the music files contained in a provided directory
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Index {
     pub from: PathBuf,
     pub fingerprint: String,
@@ -26,6 +26,7 @@ pub struct Index {
 
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct IndexCache {
     /// List of all tracks' audio files with their modification time
     pub tracks_files_mtime: HashMap<PathBuf, SystemTime>,
@@ -88,6 +89,7 @@ pub struct IndexCache {
 /// Album infos, identifying an album
 /// Mainly aimed to allow fetching album-related data (e.g. tracks) from the GraphQL API
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "camelCase")]
 pub struct AlbumInfos {
     pub name: String,
     pub album_artists: Vec<ArtistInfos>,
@@ -111,6 +113,7 @@ impl AlbumInfos {
 /// Artist infos, identifying an artist
 /// Mainly aimed to allow fetching artist-related data (e.g. albums) from the GraphQL API
 #[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "camelCase")]
 pub struct ArtistInfos {
     pub name: String,
 }
@@ -130,6 +133,7 @@ impl ArtistInfos {
 /// Genre infos, identifying a genre
 /// Mainly aimed to allow fetching genre-related data (e.g. albums) from the GraphQL API
 #[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "camelCase")]
 pub struct GenreInfos {
     pub name: String,
 }
@@ -151,6 +155,7 @@ define_id_type!(TrackID, AlbumID, ArtistID, GenreID);
 /// Full track informations
 /// Does not have a layer like ArtistInfos or AlbumInfos as most of the data will be fetched in GraphQL anyway
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 #[graphql(complex)]
 pub struct Track {
     /// Track's identifier
@@ -221,6 +226,7 @@ impl Ord for Track {
 
 /// List of audio-related metadata
 #[derive(Serialize, Deserialize, Clone, SimpleObject, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct TrackMetadata {
     /// Audio file format
     pub codec: AudioCodec,
@@ -237,6 +243,7 @@ pub struct TrackMetadata {
 
 /// List of audio tags
 #[derive(Serialize, Deserialize, Debug, Clone, SimpleObject, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 #[graphql(complex)]
 pub struct TrackTags {
     /// The track's title
@@ -306,6 +313,7 @@ impl TrackTags {
 /// List of supported audio formats
 /// Other formats may be supported by the extraction tool, but not listed here as not supported by web browsers
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Enum)]
+#[serde(rename_all = "UPPERCASE")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum AudioCodec {
     MP3,
@@ -318,6 +326,7 @@ pub enum AudioCodec {
 
 /// The release date of a track
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, SimpleObject, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct TrackDate {
     /// The full year
     pub year: u32,
@@ -330,6 +339,7 @@ pub struct TrackDate {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "camelCase")]
 pub enum Rating {
     Zero = 0, // Only for compatibility with existing tracks
     One = 1,
@@ -407,44 +417,5 @@ impl ScalarType for Rating {
 
     fn to_value(&self) -> async_graphql::Value {
         async_graphql::Value::Number(self.value().into())
-    }
-}
-
-pub trait IdType:
-    std::fmt::Debug + Clone + Copy + Hash + PartialEq + Serialize + Deserialize<'static>
-{
-    fn encode(&self) -> u64;
-    fn decode(input: u64) -> Self;
-
-    fn decode_str(str: &str) -> Result<Self, ParseIntError> {
-        str.parse::<u64>().map(Self::decode)
-    }
-
-    fn encode_str(&self) -> String {
-        self.encode().to_string()
-    }
-}
-
-#[macro_export]
-macro_rules! define_id_type {
-    ($typename: ident) => {
-        #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, ::serde::Serialize, ::serde::Deserialize)]
-        pub struct $typename(pub u64);
-
-        impl $crate::index::IdType for $typename {
-            fn encode(&self) -> u64 {
-                self.0
-            }
-
-            fn decode(input: u64) -> Self {
-                Self(input)
-            }
-        }
-
-        $crate::define_scalar_string!($typename);
-    };
-
-    ($($typename: ident),+) => {
-        $($crate::define_id_type!($typename);)+
     }
 }

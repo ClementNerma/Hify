@@ -5,7 +5,7 @@ mod queries;
 mod state;
 
 pub use self::{
-    entrypoint::{get_graphql_schema, AppSchema},
+    entrypoint::{AppSchema, get_graphql_schema},
     pagination::Paginable,
     state::{GraphQLContext, SaveIndexFn},
 };
@@ -14,19 +14,20 @@ use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value
 #[macro_export]
 macro_rules! define_scalar_string {
     ($typename: ident) => {
-        #[async_graphql::Scalar(name = "String")]
+        #[async_graphql::Scalar(name = "Number")]
         impl async_graphql::ScalarType for $typename {
             fn parse(value: async_graphql::Value) -> async_graphql::InputValueResult<Self> {
-                match value {
-                    async_graphql::Value::String(value) => {
-                        Ok(<Self as $crate::index::IdType>::decode_str(&value)?)
-                    }
-                    _ => Err(async_graphql::InputValueError::expected_type(value)),
+                if let async_graphql::Value::String(string) = &value
+                    && let Ok(id) = <Self as $crate::index::IdType>::decode(string)
+                {
+                    Ok(id)
+                } else {
+                    Err(async_graphql::InputValueError::expected_type(value))
                 }
             }
 
             fn to_value(&self) -> async_graphql::Value {
-                async_graphql::Value::String(<Self as $crate::index::IdType>::encode_str(self))
+                async_graphql::Value::String(<Self as $crate::index::IdType>::encode(self))
             }
         }
     };

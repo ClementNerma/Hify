@@ -22,6 +22,8 @@ use crate::{index::Index, userdata::UserDataWrapper};
 
 pub static GRAPHQL_ENDPOINT: &str = "/graphql";
 
+pub static OPENSUBSONIC_BASE_URI: &str = "/rest";
+
 pub async fn launch(
     addr: SocketAddr,
     index: Index,
@@ -45,6 +47,8 @@ pub async fn launch(
         .route("/art/album/{id}", get(album_art))
         .route("/art/artist/{id}", get(artist_art))
         .route("/stream/{id}", get(stream))
+        // Set up OpenSubsonic routes
+        .nest(OPENSUBSONIC_BASE_URI, super::opensubsonic::router())
         // Define extensions
         .layer(Extension(app_state))
         .layer(Extension(graphql_schema))
