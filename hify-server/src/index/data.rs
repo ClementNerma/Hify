@@ -327,7 +327,7 @@ pub struct TrackDate {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "PascalCase")]
 pub enum Rating {
     Zero = 0, // Only for compatibility with existing tracks
     One = 1,
