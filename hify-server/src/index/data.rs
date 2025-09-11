@@ -43,6 +43,9 @@ pub struct IndexCache {
     /// Tracks belonging to an album
     pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 
+    /// Genres of each album
+    pub albums_genres: HashMap<AlbumID, Vec<GenreID>>,
+
     /// Album IDs sorted by their most recent track file's timestamp
     pub most_recent_albums: Vec<AlbumID>,
 
@@ -95,6 +98,7 @@ impl IndexCache {
             tracks_files_mtime: Default::default(),
             albums_infos: ValueOrdMap::empty(),
             albums_tracks: Default::default(),
+            albums_genres: Default::default(),
             most_recent_albums: Default::default(),
             artists_infos: ValueOrdMap::empty(),
             album_artists_infos: ValueOrdMap::empty(),

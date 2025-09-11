@@ -24,6 +24,7 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
 
     let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
     let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
+    let mut albums_genres = HashMap::<AlbumID, Vec<GenreID>>::new();
 
     let mut genres_infos = HashMap::<GenreID, GenreInfos>::new();
     let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
@@ -101,6 +102,8 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
                     .entry(genre_id)
                     .or_default()
                     .insert(album_infos.clone());
+
+                albums_genres.entry(album_id).or_default().push(genre_id);
             }
         }
     }
@@ -144,6 +147,15 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
         .map(|(album_id, mut album_tracks)| {
             album_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
             (album_id, album_tracks)
+        })
+        .collect::<HashMap<_, _>>();
+
+    let albums_genres = albums_genres
+        .into_iter()
+        .map(|(album_id, mut genres)| {
+            let mut seen = HashSet::new();
+            genres.retain(|genre| seen.insert(*genre));
+            (album_id, genres)
         })
         .collect::<HashMap<_, _>>();
 
@@ -232,6 +244,11 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
     IndexCache {
         tracks_files_mtime,
 
+        albums_infos: albums_infos.into_iter().collect(),
+        albums_tracks,
+
+        albums_genres,
+
         artists_infos: artists_infos.into_iter().collect(),
         album_artists_infos: album_artists_infos.into_iter().collect(),
 
@@ -242,9 +259,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
         artists_tracks,
         artists_track_participations,
         artists_tracks_and_participations,
-
-        albums_infos: albums_infos.into_iter().collect(),
-        albums_tracks,
 
         genres_infos: genres_infos.into_iter().collect(),
         genres_albums,
