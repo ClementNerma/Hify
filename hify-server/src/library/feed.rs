@@ -1,14 +1,13 @@
 use std::{
-    collections::{hash_map::Entry, HashMap, HashSet},
+    collections::{HashMap, HashSet, hash_map::Entry},
     hash::Hash,
 };
 
 use async_graphql::{Enum, InputObject, SimpleObject};
 use jiff::{Span, Zoned};
-use rand::{rng, seq::SliceRandom};
 
 use crate::{
-    index::{AlbumInfos, ArtistInfos, Index, Rating, Track, TrackID},
+    index::{AlbumInfos, ArtistInfos, Index, Track, TrackID},
     userdata::UserDataWrapper,
 };
 
@@ -21,14 +20,11 @@ pub struct Feed {
     periodically_popular_tracks: Vec<Track>,
     periodically_popular_albums: Vec<AlbumInfos>,
     periodically_popular_artists: Vec<ArtistInfos>,
-    random_great_albums: Vec<AlbumInfos>,
-    random_great_artists: Vec<ArtistInfos>,
     most_recent_albums: Vec<AlbumInfos>,
 }
 
 #[derive(InputObject)]
 pub struct FeedParams {
-    min_rating: Rating,
     max_items: usize,
     popularity_period: Option<PopularityPeriod>,
 }
@@ -45,7 +41,6 @@ pub fn generate_feed(
     index: &Index,
     user_data: &UserDataWrapper,
     FeedParams {
-        min_rating,
         max_items,
         popularity_period,
     }: FeedParams,
@@ -102,20 +97,6 @@ pub fn generate_feed(
             .collect(),
     );
 
-    let random_great_albums = get_random_great(
-        &index.cache.albums_mean_score,
-        |album_id| index.cache.albums_infos.get(&album_id).unwrap().clone(),
-        min_rating,
-        max_items,
-    );
-
-    let random_great_artists = get_random_great(
-        &index.cache.album_artists_mean_score,
-        |artist_id| index.cache.artists_infos.get(&artist_id).unwrap().clone(),
-        min_rating,
-        max_items,
-    );
-
     let most_recent_albums = index
         .cache
         .most_recent_albums
@@ -132,8 +113,6 @@ pub fn generate_feed(
         periodically_popular_tracks,
         periodically_popular_albums,
         periodically_popular_artists,
-        random_great_albums,
-        random_great_artists,
         most_recent_albums,
     }
 }
@@ -179,31 +158,6 @@ fn get_periodically_popular_tracks(
 
     popular_tracks.sort_by_key(|(_, count)| u32::MAX - *count);
     popular_tracks.into_iter().map(|(id, _)| id)
-}
-
-fn get_random_great<T: Copy + Eq + Hash, U>(
-    mean_scores: &HashMap<T, f64>,
-    mapper: impl Fn(T) -> U,
-    min_rating: Rating,
-    max_items: usize,
-) -> Vec<U> {
-    let mut out = HashSet::with_capacity(max_items);
-    let min_rating = f64::from(min_rating.value());
-
-    for (item_id, mean_score) in mean_scores.iter() {
-        if *mean_score >= min_rating {
-            out.insert(*item_id);
-
-            if out.len() >= max_items {
-                break;
-            }
-        }
-    }
-
-    let mut great = out.into_iter().map(mapper).collect::<Vec<_>>();
-
-    great.shuffle(&mut rng());
-    great
 }
 
 fn dedup_clone<T: Eq + Hash + Clone>(mut v: Vec<T>) -> Vec<T> {

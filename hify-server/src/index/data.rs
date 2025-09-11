@@ -52,15 +52,6 @@ pub struct IndexCache {
     /// Tracks belonging to an album
     pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
 
-    /// Mean score of a score
-    pub albums_mean_score: HashMap<AlbumID, f64>,
-
-    /// Mean score of an artist
-    pub artists_mean_score: HashMap<ArtistID, f64>,
-
-    /// Mean score of an album artist (= artist who has at least 1 album)
-    pub album_artists_mean_score: HashMap<ArtistID, f64>,
-
     /// Informations about artists
     pub artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
 
@@ -280,9 +271,6 @@ pub struct TrackTags {
     /// Not shown in GraphQL as another method is present to fetch a list of GenreInfos instead
     #[graphql(skip)]
     pub genres: Vec<String>,
-
-    /// The track's rating
-    pub rating: Option<Rating>,
 }
 
 impl TrackTags {

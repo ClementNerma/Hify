@@ -59,13 +59,18 @@ pub fn generate_mix(
     let mut tracks = source_tracks
         .into_iter()
         .filter(|track_id| {
-            let track = index.tracks.get(track_id).unwrap();
-
             if let Some(min_rating) = min_rating
-                && track.metadata.tags.rating.unwrap_or(Rating::Zero) < *min_rating
+                && user_data
+                    .track_ratings()
+                    .get(track_id)
+                    .copied()
+                    .unwrap_or(Rating::Zero)
+                    < *min_rating
             {
                 return false;
             }
+
+            let track = index.tracks.get(track_id).unwrap();
 
             if let Some(genre_ids) = &from_genres
                 && !track

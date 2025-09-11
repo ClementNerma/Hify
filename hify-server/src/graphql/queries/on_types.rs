@@ -12,7 +12,7 @@ use crate::{
 };
 
 use super::{
-    super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
+    super::pagination::{Paginated, PaginationInput, paginate, paginate_mapped_slice},
     TrackUsizeConnection, TrackUsizeEdge,
 };
 
@@ -39,7 +39,6 @@ impl Track {
             .track_ratings()
             .get(&self.id)
             .copied()
-            .or(self.metadata.tags.rating)
     }
 }
 

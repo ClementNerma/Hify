@@ -153,23 +153,7 @@ async fn get_starred2(
         "starred2",
         GetStarred2Answer {
             // TODO: should return explicitly-starred artists, not artists who have starred songs
-            artist: index
-                .cache
-                .artists_mean_score
-                .iter()
-                .map(|(artist_id, mean_score)| {
-                    let artist = index.cache.artists_infos.get(artist_id).unwrap();
-
-                    Artist {
-                        id: *artist_id,
-                        name: artist.name.clone(),
-                        artist_image_url: None,
-                        starred_iso_8601: None,
-                        user_rating_1_to_5: None,
-                        average_rating_1_to_5: Some((*mean_score / 2.0) as f32),
-                    }
-                })
-                .collect(),
+            artist: vec![],
 
             // TODO: should return explicitly-starred artists, not artists who have starred songs
             album: vec![],

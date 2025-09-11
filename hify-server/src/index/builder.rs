@@ -17,12 +17,12 @@ use crate::{
 };
 
 use super::{
+    IndexCache,
     arts::detect_deleted_album_arts,
     cache::build_index_cache,
     data::{Index, Track},
     metadata,
     value_ord_map::ValueOrdMap,
-    IndexCache,
 };
 
 pub fn log(time: Instant, message: &str) {
@@ -53,11 +53,7 @@ pub async fn build_index(
             artists_track_participations: HashMap::new(),
             artists_tracks_and_participations: HashMap::new(),
 
-            artists_mean_score: HashMap::new(),
-            album_artists_mean_score: HashMap::new(),
-
             albums_tracks: HashMap::new(),
-            albums_mean_score: HashMap::new(),
 
             artists_infos: ValueOrdMap::empty(),
             album_artists_infos: ValueOrdMap::empty(),

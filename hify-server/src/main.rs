@@ -14,7 +14,7 @@ mod userdata;
 
 use std::{fs, net::SocketAddr, path::Path, process::ExitCode};
 
-use anyhow::{bail, ensure, Context, Result};
+use anyhow::{Context, Result, bail, ensure};
 use clap::Parser;
 use log::{error, info};
 

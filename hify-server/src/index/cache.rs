@@ -204,67 +204,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
 
     debug!("| Building statistics...");
 
-    debug!("| > Albums' mean score...");
-
-    let albums_mean_score = albums_tracks
-        .iter()
-        .filter_map(|(album_id, album_tracks)| {
-            let rated_tracks: Vec<_> = album_tracks
-                .iter()
-                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating.value() as f64)
-                .collect();
-
-            if rated_tracks.is_empty() {
-                return None;
-            }
-
-            let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((*album_id, mean))
-        })
-        .collect();
-
-    debug!("| > Artists' mean score...");
-
-    let artists_mean_score = artists_tracks
-        .iter()
-        .filter_map(|(artist_id, artist_tracks)| {
-            let rated_tracks: Vec<_> = artist_tracks
-                .iter()
-                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating.value() as f64)
-                .collect();
-
-            if rated_tracks.is_empty() {
-                return None;
-            }
-
-            let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((*artist_id, mean))
-        })
-        .collect();
-
-    debug!("| > Album artists' mean score...");
-
-    let album_artists_mean_score = artists_albums
-        .iter()
-        .filter_map(|(artist_id, artist_albums)| {
-            let rated_tracks: Vec<_> = artist_albums
-                .keys()
-                .flat_map(|album_id| albums_tracks.get(album_id).unwrap())
-                .filter_map(|track_id| tracks.get(track_id).unwrap().metadata.tags.rating)
-                .map(|rating| rating.value() as f64)
-                .collect();
-
-            if rated_tracks.is_empty() {
-                return None;
-            }
-
-            let mean = rated_tracks.iter().sum::<f64>() / (rated_tracks.len() as f64);
-            Some((*artist_id, mean))
-        })
-        .collect();
-
     debug!("| > Most recent albums...");
 
     let mut most_recent_albums = albums_infos.keys().cloned().collect::<Vec<_>>();
@@ -302,10 +241,6 @@ pub fn build_index_cache(tracks: &ValueOrdMap<TrackID, Track>) -> IndexCache {
         artists_tracks_and_participations,
 
         albums_tracks,
-
-        albums_mean_score,
-        artists_mean_score,
-        album_artists_mean_score,
 
         artists_infos: artists_infos.into_iter().collect(),
         album_artists_infos: album_artists_infos.into_iter().collect(),

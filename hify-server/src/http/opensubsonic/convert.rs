@@ -190,12 +190,8 @@ pub fn album_to_child(album: &AlbumInfos, index: &Index) -> Child {
         path: None, // TODO?
         is_video: Some(false),
         user_rating_1_to_5: None,
-        average_rating_1_to_5: index
-            .cache
-            .albums_mean_score
-            .get(&album.get_id())
-            .map(|rating| (*rating / 2.0) as f32),
-        play_count: None, // TODO (possible to compute?)
+        average_rating_1_to_5: None, // TODO (requires caching)
+        play_count: None,            // TODO (possible to compute?)
         disc_number: None,
         // TODO: optimize
         created_iso_8601: Some(to_iso_8601(

@@ -17,8 +17,8 @@ import router from '@/router'
 
 const { data, error, executeQuery } = useQuery({
   query: graphql(`
-    query HomePage($randomItemsParams: FeedParams!) {
-      generateFeed(input: $randomItemsParams) {
+    query HomePage($itemParams: FeedParams!) {
+      generateFeed(input: $itemParams) {
         lastListenedTo {
           ...AudioTrack
         }
@@ -34,9 +34,8 @@ const { data, error, executeQuery } = useQuery({
     }
   `),
   variables: {
-    randomItemsParams: {
+    itemParams: {
       maxItems: 100,
-      minRating: 8,
     },
   },
 })

@@ -4,8 +4,8 @@ use async_graphql::{Context, Object};
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
     index::{
-        search_index, AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos,
-        IndexSearchResults, SearchOptions, Track, TrackID,
+        AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, IndexSearchResults,
+        SearchOptions, Track, TrackID, search_index,
     },
     library::{
         feed::{self, Feed, FeedParams},
@@ -16,10 +16,10 @@ use crate::{
 };
 
 use super::{
-    super::pagination::{paginate, paginate_mapped_slice, Paginated, PaginationInput},
-    on_types::*,
+    super::pagination::{Paginated, PaginationInput, paginate, paginate_mapped_slice},
     AlbumUsizeConnection, AlbumUsizeEdge, TrackIDConnection, TrackIDEdge, TrackUsizeConnection,
     TrackUsizeEdge,
+    on_types::*,
 };
 
 transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);
@@ -188,13 +188,7 @@ impl QueryRoot {
             &index,
             SearchOptions {
                 search_cache: Some(&mut search_cache),
-                tracks_user_score: Some(&|track| {
-                    track
-                        .metadata
-                        .tags
-                        .rating
-                        .or_else(|| user_data.track_ratings().get(&track.id).copied())
-                }),
+                tracks_user_score: Some(&|track| user_data.track_ratings().get(&track.id).copied()),
             },
             &input,
             limit,

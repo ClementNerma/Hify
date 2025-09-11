@@ -1,11 +1,11 @@
 use std::{collections::HashMap, sync::LazyLock};
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use pomsky_macro::pomsky;
 use regex::Regex;
 use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
 
-use crate::index::{Rating, TrackDate, TrackTags};
+use crate::index::{TrackDate, TrackTags};
 
 pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
     let mut standard_tags = HashMap::new();
@@ -61,23 +61,16 @@ pub fn convert_symphonia_metadata(rev: MetadataRevision) -> Result<TrackTags> {
         track_no: get_tag_str(StandardTagKey::TrackNumber)?
             .map(|value| parse_set_number(&value, "track number"))
             .transpose()?,
-        date: get_first_tag_str(&[StandardTagKey::ReleaseDate, StandardTagKey::Date, StandardTagKey::OriginalDate])?
-            .map(|date| parse_date(&date))
-            .transpose()?,
+        date: get_first_tag_str(&[
+            StandardTagKey::ReleaseDate,
+            StandardTagKey::Date,
+            StandardTagKey::OriginalDate,
+        ])?
+        .map(|date| parse_date(&date))
+        .transpose()?,
         genres: get_tag_str(StandardTagKey::Genre)?
             .map(parse_array_tag)
             .unwrap_or_default(),
-        rating: get_tag_str(StandardTagKey::Rating)?
-            .map(parse_popularimeter)
-            .transpose()?
-            .flatten()
-            .map(|rating| {
-                Rating::parse(rating).map_err(|()| {
-                    anyhow!(
-                        "Invalid rating found in file: expected a value between 0 and 10, got {rating}")
-                    })
-            })
-            .transpose()?,
     };
 
     if tags.artists.is_empty() && tags.album_artists.is_empty() {
@@ -122,43 +115,6 @@ fn parse_date(input: &str) -> Result<TrackDate> {
             .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
             .transpose()?,
     })
-}
-
-fn parse_popularimeter(popm: impl AsRef<str>) -> Result<Option<u8>> {
-    match popm.as_ref() {
-        // No rating
-        "0" => Ok(None),
-
-        // Normal
-        "10" => Ok(Some(1)),
-        "20" => Ok(Some(2)),
-        "30" => Ok(Some(3)),
-        "40" => Ok(Some(4)),
-        "50" => Ok(Some(5)),
-        "60" => Ok(Some(6)),
-        "70" => Ok(Some(7)),
-        "80" => Ok(Some(8)),
-        "90" => Ok(Some(9)),
-        "100" => Ok(Some(10)),
-
-        // MusicBee
-        "1" => Ok(Some(2)),
-        "13" => Ok(Some(1)),
-        "54" => Ok(Some(3)),
-        "64" => Ok(Some(4)),
-        "118" => Ok(Some(5)),
-        "128" => Ok(Some(6)),
-        "186" => Ok(Some(7)),
-        "196" => Ok(Some(8)),
-        "242" => Ok(Some(9)),
-        "255" => Ok(Some(10)),
-
-        // Unknown
-        score => bail!(
-            "Failed to parse rating tag: found invalid value '{}'",
-            score
-        ),
-    }
 }
 
 fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {

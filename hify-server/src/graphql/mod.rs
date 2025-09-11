@@ -14,7 +14,7 @@ use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value
 #[macro_export]
 macro_rules! define_scalar_string {
     ($typename: ident) => {
-        #[async_graphql::Scalar(name = "Number")]
+        #[async_graphql::Scalar(name = "String")]
         impl async_graphql::ScalarType for $typename {
             fn parse(value: async_graphql::Value) -> async_graphql::InputValueResult<Self> {
                 if let async_graphql::Value::String(string) = &value
