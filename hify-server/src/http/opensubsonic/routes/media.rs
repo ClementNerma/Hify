@@ -46,9 +46,13 @@ async fn stream(
 ) -> Result<Response<ServeFileSystemResponseBody>, OSError> {
     let StreamParams {
         id,
+        #[allow(unused_variables)] //TODO
         max_bit_rate_kbps,
+        #[allow(unused_variables)] //TODO
         format,
+        #[allow(unused_variables)] //TODO
         time_offset_s,
+        #[allow(unused_variables)] //TODO
         estimate_content_length,
     } = params;
 
@@ -72,7 +76,11 @@ pub struct GetCovertArtParams {
 
 async fn get_cover_art(
     state: Extension<Arc<HttpState>>,
-    Query(GetCovertArtParams { id, size }): Query<GetCovertArtParams>,
+    Query(GetCovertArtParams {
+        id,
+        #[allow(unused_variables)] //TODO
+        size,
+    }): Query<GetCovertArtParams>,
     req: Request,
 ) -> Result<Response<ServeFileSystemResponseBody>, OSError> {
     let id =

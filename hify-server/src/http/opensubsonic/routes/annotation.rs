@@ -54,9 +54,9 @@ async fn set_rating(
             Ok(OSEmptyResponse(f))
         }
 
-        CoverArtId::Album(_) => return Err((StatusCode::NOT_IMPLEMENTED, "TODO")),
+        CoverArtId::Album(_) => Err((StatusCode::NOT_IMPLEMENTED, "TODO")),
 
-        CoverArtId::Artist(_) => return Err((StatusCode::NOT_IMPLEMENTED, "TODO")),
+        CoverArtId::Artist(_) => Err((StatusCode::NOT_IMPLEMENTED, "TODO")),
     }
 }
 

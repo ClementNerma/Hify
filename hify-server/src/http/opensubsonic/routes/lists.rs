@@ -63,7 +63,9 @@ fn _album_list<'a>(
         sort,
         size,
         offset,
+        #[allow(unused_variables)] // TODO
         from_year,
+        #[allow(unused_variables)] // TODO
         to_year,
         genre,
     } = params;

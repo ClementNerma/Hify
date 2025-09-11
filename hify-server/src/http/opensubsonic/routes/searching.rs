@@ -1,18 +1,18 @@
 use std::sync::Arc;
 
-use axum::{extract::Query, Extension};
+use axum::{Extension, extract::Query};
 use serde::Deserialize;
 
 use crate::{
     http::{
-        opensubsonic::{
-            convert::{album_to_id3_with_songs, artist_to_id3, track_to_child},
-            types::{AlbumID3WithSongs, ArtistID3, Child},
-            OSCommonParams, OSNestedResponse,
-        },
         HttpState,
+        opensubsonic::{
+            OSCommonParams, OSNestedResponse,
+            convert::{album_to_id3_with_songs, artist_to_id3, track_to_child},
+            types::{AlbumID3WithSongs, ArtistID3, Child, MUSIC_FOLDER_ID},
+        },
     },
-    index::{search_index, IndexSearchResults, SearchOptions},
+    index::{IndexSearchResults, SearchOptions, search_index},
     os_struct,
 };
 
@@ -60,6 +60,18 @@ async fn search3(
         song_offset,
         music_folder_id,
     } = params;
+
+    if music_folder_id.is_some_and(|id| id != MUSIC_FOLDER_ID) {
+        return OSNestedResponse(
+            f,
+            "searchResult3",
+            Search3Answer {
+                artist: vec![],
+                album: vec![],
+                song: vec![],
+            },
+        );
+    }
 
     let index = state.index.read().await;
     let user_data = state.user_data.read().await;

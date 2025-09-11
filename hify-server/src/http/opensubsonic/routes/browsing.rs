@@ -64,7 +64,7 @@ async fn get_genres(
         GetGenresAnswer {
             genre: index
                 .cache
-                .genre_infos
+                .genres_infos
                 .iter()
                 .map(|(id, genre)| {
                     let tracks = index.cache.genres_tracks.get(id).unwrap();
