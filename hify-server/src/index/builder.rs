@@ -36,36 +36,10 @@ pub async fn build_index(
 ) -> Result<Index> {
     let from = from.unwrap_or_else(|| Index {
         from: dir.clone(),
-
         fingerprint: String::new(),
         tracks: ValueOrdMap::empty(),
-
         album_arts: HashMap::new(),
-
-        cache: IndexCache {
-            tracks_files_mtime: HashMap::new(),
-
-            artists_albums: HashMap::new(),
-            artists_album_participations: HashMap::new(),
-            artists_albums_and_participations: HashMap::new(),
-
-            artists_tracks: HashMap::new(),
-            artists_track_participations: HashMap::new(),
-            artists_tracks_and_participations: HashMap::new(),
-
-            albums_tracks: HashMap::new(),
-
-            artists_infos: ValueOrdMap::empty(),
-            album_artists_infos: ValueOrdMap::empty(),
-            albums_infos: ValueOrdMap::empty(),
-            genre_infos: ValueOrdMap::empty(),
-
-            genres_albums: HashMap::new(),
-            genres_tracks: HashMap::new(),
-            no_genre_tracks: HashSet::new(),
-
-            most_recent_albums: vec![],
-        },
+        cache: IndexCache::empty(),
     });
 
     let started = Instant::now();

@@ -28,8 +28,32 @@ pub struct Index {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IndexCache {
+    //
+    // === TRACKS ===
+    //
     /// List of all tracks' audio files with their modification time
     pub tracks_files_mtime: HashMap<PathBuf, SystemTime>,
+
+    //
+    // === ALBUMS ===
+    //
+    /// Informations about albums
+    pub albums_infos: ValueOrdMap<AlbumID, AlbumInfos>,
+
+    /// Tracks belonging to an album
+    pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
+
+    /// Album IDs sorted by their most recent track file's timestamp
+    pub most_recent_albums: Vec<AlbumID>,
+
+    //
+    // === ARTISTS ===
+    //
+    /// Informations about artists
+    pub artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
+
+    /// Informations about album arists
+    pub album_artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
 
     /// Albums where the artist is listed in the "album artists" tag
     pub artists_albums: HashMap<ArtistID, ValueOrdMap<AlbumID, AlbumInfos>>,
@@ -49,20 +73,11 @@ pub struct IndexCache {
     /// Combination of "artists_tracks" and "artists_track_participations"
     pub artists_tracks_and_participations: HashMap<ArtistID, Vec<TrackID>>,
 
-    /// Tracks belonging to an album
-    pub albums_tracks: HashMap<AlbumID, Vec<TrackID>>,
-
-    /// Informations about artists
-    pub artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
-
-    /// Informations about album arists
-    pub album_artists_infos: ValueOrdMap<ArtistID, ArtistInfos>,
-
-    /// Informations about albums
-    pub albums_infos: ValueOrdMap<AlbumID, AlbumInfos>,
-
+    //
+    // === GENRES ===
+    //
     /// Informations about genres
-    pub genre_infos: ValueOrdMap<GenreID, GenreInfos>,
+    pub genres_infos: ValueOrdMap<GenreID, GenreInfos>,
 
     /// List of album for each genre
     pub genres_albums: HashMap<GenreID, ValueOrdMap<AlbumID, AlbumInfos>>,
@@ -72,9 +87,29 @@ pub struct IndexCache {
 
     /// List of tracks who don't have a genre
     pub no_genre_tracks: HashSet<TrackID>,
+}
 
-    /// Album IDs sorted by their most recent track file's timestamp
-    pub most_recent_albums: Vec<AlbumID>,
+impl IndexCache {
+    pub fn empty() -> Self {
+        Self {
+            tracks_files_mtime: Default::default(),
+            albums_infos: ValueOrdMap::empty(),
+            albums_tracks: Default::default(),
+            most_recent_albums: Default::default(),
+            artists_infos: ValueOrdMap::empty(),
+            album_artists_infos: ValueOrdMap::empty(),
+            artists_albums: Default::default(),
+            artists_album_participations: Default::default(),
+            artists_albums_and_participations: Default::default(),
+            artists_tracks: Default::default(),
+            artists_track_participations: Default::default(),
+            artists_tracks_and_participations: Default::default(),
+            genres_infos: ValueOrdMap::empty(),
+            genres_albums: Default::default(),
+            genres_tracks: Default::default(),
+            no_genre_tracks: Default::default(),
+        }
+    }
 }
 
 /// Album infos, identifying an album

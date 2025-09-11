@@ -5,10 +5,10 @@ use std::{
     slice::{Iter, IterMut},
 };
 
-use async_graphql::{connection::CursorType, OutputType};
+use async_graphql::{OutputType, connection::CursorType};
 use serde::{
-    de::{MapAccess, Visitor},
     Deserialize, Serialize,
+    de::{MapAccess, Visitor},
 };
 
 use crate::graphql::Paginable;

@@ -137,14 +137,14 @@ impl QueryRoot {
     async fn genres(&self, ctx: &Context<'_>) -> Vec<GenreInfos> {
         graphql_index!(ctx)
             .cache
-            .genre_infos
+            .genres_infos
             .values()
             .cloned()
             .collect()
     }
 
     async fn genre(&self, ctx: &Context<'_>, id: GenreID) -> Option<GenreInfos> {
-        graphql_index!(ctx).cache.genre_infos.get(&id).cloned()
+        graphql_index!(ctx).cache.genres_infos.get(&id).cloned()
     }
 
     async fn tracks<'c>(
