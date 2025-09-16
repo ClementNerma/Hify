@@ -82,7 +82,7 @@ watch(currentTrack, (track) => {
     v-else
     class="album-art"
     :class="{ darkened: !distractionFreeMode }"
-    :src="getAlbumArtUrl(currentTrack.metadata.tags.album)"
+    :src="getAlbumArtUrl(currentTrack.metadata.tags.album, 'large')"
   />
 
   <DistractionFreeTogglable>

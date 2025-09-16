@@ -85,7 +85,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           class="art"
           :width="192"
           :height="192"
-          :src="getAlbumArtUrl(album)"
+          :src="getAlbumArtUrl(album, 'medium')"
         />
 
         <div class="flex flex-col mt-2.5 ml-2.5 gap-2.5 w-full">

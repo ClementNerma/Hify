@@ -6,14 +6,21 @@ import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
 
 defineProps<{
-	albums: AlbumFragment[]
+    albums: AlbumFragment[]
 }>()
 </script>
 
 <template>
-    <ProgressiveRow :items="albums" idProp="id"
-        @item-press="(album) => router.push({ name: 'album', params: { id: album.id } })" v-slot="{ item: album }">
-        <Card :title="album.name" :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
-            :art-url="getAlbumArtUrl(album)" />
+    <ProgressiveRow
+        :items="albums"
+        idProp="id"
+        @item-press="(album) => router.push({ name: 'album', params: { id: album.id } })"
+        v-slot="{ item: album }"
+    >
+        <Card
+            :title="album.name"
+            :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
+            :art-url="getAlbumArtUrl(album, 'small')"
+        />
     </ProgressiveRow>
 </template>

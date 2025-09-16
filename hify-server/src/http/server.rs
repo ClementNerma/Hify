@@ -44,8 +44,8 @@ pub async fn launch(
     let app = Router::new()
         // Define all routes
         .route(GRAPHQL_ENDPOINT, get(graphiql).post(graphql_handler))
-        .route("/art/album/{id}", get(album_art))
-        .route("/art/artist/{id}", get(artist_art))
+        .route("/art/album/{id}/{size}", get(album_art))
+        .route("/art/artist/{id}/{size}", get(artist_art))
         .route("/stream/{id}", get(stream))
         // Set up OpenSubsonic routes
         .nest(OPENSUBSONIC_BASE_URI, super::opensubsonic::router())

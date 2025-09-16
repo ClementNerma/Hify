@@ -6,15 +6,21 @@ import router from '@/router'
 import Card from './Card.vue'
 
 const props = defineProps<
-	{
-		album: AlbumFragment
-	} & NavigableItemProps
+    {
+        album: AlbumFragment
+    } & NavigableItemProps
 >()
 </script>
 
 <template>
-    <NavigableItem v-bind="props" @press="router.push({ name: 'album', params: { id: album.id } })">
-        <Card :title="album.name" :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
-            :art-url="getAlbumArtUrl(album)" />
+    <NavigableItem
+        v-bind="props"
+        @press="router.push({ name: 'album', params: { id: album.id } })"
+    >
+        <Card
+            :title="album.name"
+            :subtitle="album.albumArtists.map((artist) => artist.name).join(', ')"
+            :art-url="getAlbumArtUrl(album, 'small')"
+        />
     </NavigableItem>
 </template>

@@ -144,7 +144,7 @@ watch(
             <Card
               :title="track.metadata.tags.title"
               :box-size="80"
-              :art-url="getAlbumArtUrl(track.metadata.tags.album)"
+              :art-url="getAlbumArtUrl(track.metadata.tags.album, 'medium')"
               :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2"
             />
           </ProgressiveRow>

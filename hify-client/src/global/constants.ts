@@ -25,10 +25,12 @@ export function getStreamUrl(trackId: string) {
 	return `${API_SERVER_URL}/stream/${trackId}`
 }
 
-export function getAlbumArtUrl(album: AlbumFragment) {
-	return album.hasArt ? `${API_SERVER_URL}/art/album/${album.id}` : IMG_FALLBACK_URL
+export type ArtSize = 'large' | 'medium' | 'small'
+
+export function getAlbumArtUrl(album: AlbumFragment, size: ArtSize) {
+	return album.hasArt ? `${API_SERVER_URL}/art/album/${album.id}/${size}` : IMG_FALLBACK_URL
 }
 
-export function getArtistArtUrl(artist: ArtistFragment) {
-	return artist.hasArt ? `${API_SERVER_URL}/art/artist/${artist.id}` : IMG_FALLBACK_URL
+export function getArtistArtUrl(artist: ArtistFragment, size: ArtSize) {
+	return artist.hasArt ? `${API_SERVER_URL}/art/artist/${artist.id}/${size}` : IMG_FALLBACK_URL
 }

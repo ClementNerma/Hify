@@ -12,6 +12,7 @@ use crate::{
     http::{
         HttpState,
         opensubsonic::{OSError, types::CoverArtId},
+        routes::ArtSize,
         server::OPENSUBSONIC_BASE_URI,
     },
     index::TrackID,
@@ -86,9 +87,23 @@ async fn get_cover_art(
     let id =
         CoverArtId::decode(&id).map_err(|_| (StatusCode::BAD_REQUEST, "Invalid ID provided"))?;
 
+    let art_size = match size {
+        None => ArtSize::Large,
+        Some(px) => match px {
+            // TODO: use size constants here
+            0..=200 => ArtSize::Small,
+            201..=500 => ArtSize::Medium,
+            501.. => ArtSize::Large,
+        },
+    };
+
     match id {
         CoverArtId::Track(_) => todo!(),
-        CoverArtId::Album(id) => crate::http::routes::album_art(state, Path(id), req).await,
-        CoverArtId::Artist(id) => crate::http::routes::artist_art(state, Path(id), req).await,
+        CoverArtId::Album(id) => {
+            crate::http::routes::album_art(state, Path((id, art_size)), req).await
+        }
+        CoverArtId::Artist(id) => {
+            crate::http::routes::artist_art(state, Path((id, art_size)), req).await
+        }
     }
 }

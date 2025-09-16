@@ -6,17 +6,25 @@ import NavigableTrack from '../atoms/NavigableTrack.vue'
 import Card from './Card.vue'
 
 defineProps<{
-	track: AudioTrackFragment
-	tracks: AudioTrackFragment[]
-	inPlaylist?: EntryInPlaylist
-	onFocus?: () => void
+    track: AudioTrackFragment
+    tracks: AudioTrackFragment[]
+    inPlaylist?: EntryInPlaylist
+    onFocus?: () => void
 }>()
 </script>
 
 <template>
-    <NavigableTrack :track :tracks :context="inPlaylist ? { context: 'playlist', entry: inPlaylist } : {
-        context: 'normal'
-    }" :on-focus>
-        <Card :title="track.metadata.tags.title" :art-url="getAlbumArtUrl(track.metadata.tags.album)" />
+    <NavigableTrack
+        :track
+        :tracks
+        :context="inPlaylist ? { context: 'playlist', entry: inPlaylist } : {
+            context: 'normal'
+        }"
+        :on-focus
+    >
+        <Card
+            :title="track.metadata.tags.title"
+            :art-url="getAlbumArtUrl(track.metadata.tags.album, 'small')"
+        />
     </NavigableTrack>
 </template>

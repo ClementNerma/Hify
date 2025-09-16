@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const album = computed(() => props.track?.metadata.tags.album)
-const background = computed(() => (album.value?.hasArt ? `url("${getAlbumArtUrl(album.value)}")` : 'transparent'))
+const background = computed(() => (album.value?.hasArt ? `url("${getAlbumArtUrl(album.value, 'large')}")` : 'transparent'))
 const backdropFilter = computed(() => `blur(20px) brightness(${props.dim ? 0.3 : 0.4})`)
 </script>
 

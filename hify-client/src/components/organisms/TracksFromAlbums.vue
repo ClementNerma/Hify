@@ -8,10 +8,10 @@ import NavigableTrack from '../atoms/NavigableTrack.vue'
 import TrackRating from '../atoms/TrackRating.vue'
 
 defineProps<{
-	tracks: AudioTrackFragment[]
-	hasMore: boolean
-	showArtistsName?: boolean
-	feedMore: () => Promise<void>
+  tracks: AudioTrackFragment[]
+  hasMore: boolean
+  showArtistsName?: boolean
+  feedMore: () => Promise<void>
 }>()
 </script>
 
@@ -19,14 +19,26 @@ defineProps<{
   <NavigableList>
     <table class="mt-2.5 border-collapse whitespace-nowrap">
       <tbody>
-        <tr v-for="track, i in tracks" :key="track.id" class="[&>td]:p-2.5"
-          :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []">
+        <tr
+          v-for="track, i in tracks"
+          :key="track.id"
+          class="[&>td]:p-2.5"
+          :class="i > 0 ? ['border-0 border-t border-solid border-gray-700'] : []"
+        >
           <td>
-            <img :width="50" :height="50" :src="getAlbumArtUrl(track.metadata.tags.album)" />
+            <img
+              :width="50"
+              :height="50"
+              :src="getAlbumArtUrl(track.metadata.tags.album, 'medium')"
+            />
           </td>
           <td class="w-full">
-            <NavigableTrack :tracks :context="{ context: 'artist' }" :track
-              @focus="isApproachingListEnd(i, tracks.length) && feedMore()">
+            <NavigableTrack
+              :tracks
+              :context="{ context: 'artist' }"
+              :track
+              @focus="isApproachingListEnd(i, tracks.length) && feedMore()"
+            >
               <span>{{ track.metadata.tags.title }}</span>
             </NavigableTrack>
           </td>

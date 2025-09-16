@@ -27,8 +27,15 @@ const contextMenuOptions = computed<ContextMenuOption[]>(() => [
 </script>
 
 <template>
-	<NavigableItem @press="router.push({ name: 'artist', params: { id: artist.id } })"
-		@long-press="showContextMenu(contextMenuOptions)" v-bind="navigableItemProps">
-		<Card :title="artist.name" :art-url="getArtistArtUrl(artist)" circle />
+	<NavigableItem
+		@press="router.push({ name: 'artist', params: { id: artist.id } })"
+		@long-press="showContextMenu(contextMenuOptions)"
+		v-bind="navigableItemProps"
+	>
+		<Card
+			:title="artist.name"
+			:art-url="getArtistArtUrl(artist, 'small')"
+			circle
+		/>
 	</NavigableItem>
 </template>
