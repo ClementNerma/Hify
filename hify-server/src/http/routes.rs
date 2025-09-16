@@ -18,15 +18,15 @@ pub async fn album_art(
     Path(album_id): Path<AlbumID>,
     req: Request<Body>,
 ) -> Result<Response<ServeFileSystemResponseBody>, (StatusCode, &'static str)> {
-    let index = state.index.read().await;
-
-    let relative_path = index
+    // TODO: different sizes
+    let art_path = state
+        .resource_manager
         .album_arts
-        .get(&album_id)
+        .large_art(album_id)
         .ok_or((StatusCode::NOT_FOUND, "Provided album art was not found"))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
-    let served = ServeFile::new(index.from.join(relative_path))
+    let served = ServeFile::new(art_path)
         .oneshot(req)
         .await
         // We can unwrap as the Err() variant is Infallible
@@ -40,10 +40,15 @@ pub async fn artist_art(
     Path(artist_id): Path<ArtistID>,
     req: Request<Body>,
 ) -> Result<Response<ServeFileSystemResponseBody>, (StatusCode, &'static str)> {
-    let art_path = state.resource_manager.artist_art_path(artist_id).ok_or((
-        StatusCode::NOT_FOUND,
-        "The provided artist does not have an associated art",
-    ))?;
+    // TODO: different sizes
+    let art_path = state
+        .resource_manager
+        .artist_arts
+        .large_art(artist_id)
+        .ok_or((
+            StatusCode::NOT_FOUND,
+            "The provided artist does not have an associated art",
+        ))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
     let served = ServeFile::new(art_path)
@@ -68,7 +73,7 @@ pub async fn stream(
         .ok_or((StatusCode::NOT_FOUND, "Provided track was not found"))?;
 
     // NOTE: The `ServeFile` service may produce an error, but will return it as an Ok() value
-    let served = ServeFile::new(index.from.join(&track.relative_path))
+    let served = ServeFile::new(state.music_dir.join(&track.relative_path))
         .oneshot(req)
         .await
         // We can unwrap as the Err() variant is Infallible

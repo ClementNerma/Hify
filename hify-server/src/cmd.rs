@@ -15,32 +15,8 @@ pub struct Args {
     #[clap(long, help = "Force to rebuild index from scratch")]
     pub rebuild_index: bool,
 
-    #[clap(long, help = "Update the index")]
+    #[clap(long, help = "Update the index", conflicts_with = "rebuild_index")]
     pub update_index: bool,
-
-    #[clap(
-        long,
-        help = "Force to rebuild resources (such as cover arts) from scratch",
-        conflicts_with = "rebuild_index"
-    )]
-    pub rebuild_resources: bool,
-
-    #[clap(
-        long,
-        help = "Rebuild the cache",
-        conflicts_with = "update_index",
-        conflicts_with = "rebuild_index"
-    )]
-    pub rebuild_cache: bool,
-
-    #[clap(
-        long,
-        help = "Fetch file times from filesystem",
-        conflicts_with = "update_index",
-        conflicts_with = "rebuild_index",
-        conflicts_with = "rebuild_cache"
-    )]
-    pub refetch_file_times: bool,
 
     #[clap(
         short,

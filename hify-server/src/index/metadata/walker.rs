@@ -1,60 +1,50 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use log::{error, info};
 
 use crate::{
-    index::{metadata::analyzer::analyze_file, TrackMetadata},
-    logging::progress_bar,
+    index::{TrackMetadata, metadata::analyzer::analyze_file},
+    runner::{TaskSet, TaskSetOptions},
 };
 
-pub async fn analyze_audio_files(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>> {
+pub fn analyze_audio_files(files: Vec<PathBuf>) -> Result<Vec<(PathBuf, TrackMetadata)>> {
     if files.is_empty() {
         info!("Nothing to do!");
         return Ok(vec![]);
     }
 
-    let pb = progress_bar(files.len());
-
-    let mut tasks = vec![];
+    let mut runner = TaskSet::new();
 
     for file in &files {
-        let file_bis = file.clone();
-        let pb = pb.clone();
+        let file = file.to_owned();
 
-        tasks.push((
-            file.clone(),
-            tokio::task::spawn_blocking(move || {
-                let ret = analyze_file(file_bis);
-                pb.inc(1);
-                ret
-            }),
-        ));
+        runner.add(move || {
+            analyze_file(&file)
+                .with_context(|| {
+                    format!("Failed to analyze audio file at path: {}", file.display())
+                })
+                .map(|mt| (file, mt))
+        });
     }
 
     let mut successes = vec![];
-    let mut errors = vec![];
+    let mut errors = 0;
 
-    for (file, task) in tasks {
-        match task.await.context("Failed to join task")? {
-            Ok(data) => successes.push((file, data)),
-            Err(err) => errors.push((file, err)),
+    for result in runner.run(TaskSetOptions::with_progress_bar()) {
+        match result.context("Failed to join task")? {
+            Ok(data) => successes.push(data),
+            Err(err) => {
+                error!("* {err:?}");
+                errors += 1;
+            }
         }
     }
 
-    pb.finish();
+    assert_eq!(successes.len() + errors, files.len());
 
-    assert_eq!(successes.len() + errors.len(), files.len());
-
-    if !errors.is_empty() {
-        error!(
-            "Failed with the following errors:\n{}",
-            errors
-                .iter()
-                .map(|(file, err)| format!("* {}: {err:?}", file.to_string_lossy()))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )
+    if errors > 0 {
+        bail!("Failed with {errors} errors")
     }
 
     Ok(successes)

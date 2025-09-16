@@ -49,7 +49,12 @@ async fn set_rating(
             }
 
             let mut user_data = state.user_data.write().await;
-            user_data.set_track_rating(track_id, rating);
+
+            user_data
+                .set_track_rating(track_id, rating)
+                .await
+                // TODO: pass error message to returner
+                .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to set rating"))?;
 
             Ok(OSEmptyResponse(f))
         }

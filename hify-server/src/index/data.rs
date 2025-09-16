@@ -11,26 +11,20 @@ use serde::{Deserialize, Serialize};
 
 use crate::define_id_type;
 
-use super::{builder::FileTimes, value_ord_map::ValueOrdMap};
+use super::{tracks_finder::FileTimes, value_ord_map::ValueOrdMap};
 
-/// Global index, contains all data on the music files contained in a provided directory
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Index {
-    pub from: PathBuf,
-    pub fingerprint: String,
-    pub tracks: ValueOrdMap<TrackID, Track>,
-    pub album_arts: HashMap<AlbumID, PathBuf>,
-    pub cache: IndexCache,
-}
+#[derive(Serialize, Deserialize)]
+pub struct TracksList(pub Vec<Track>);
 
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct IndexCache {
+#[derive(Clone)]
+pub struct Index {
     //
     // === TRACKS ===
     //
+    /// List of all tracks, by ID
+    pub tracks: ValueOrdMap<TrackID, Track>,
+
     /// List of all tracks' audio files with their modification time
     pub tracks_files_mtime: HashMap<PathBuf, SystemTime>,
 
@@ -68,7 +62,7 @@ pub struct IndexCache {
     pub artists_albums_and_participations: HashMap<ArtistID, ValueOrdMap<AlbumID, AlbumInfos>>,
 
     /// Tracks where the artist is listed in
-    pub artists_tracks: HashMap<ArtistID, Vec<TrackID>>,
+    pub artists_album_tracks: HashMap<ArtistID, Vec<TrackID>>,
 
     /// Trachs where the artist is listed in but belonging to an album they're not an "album artist" of
     pub artists_track_participations: HashMap<ArtistID, Vec<TrackID>>,
@@ -92,34 +86,9 @@ pub struct IndexCache {
     pub no_genre_tracks: HashSet<TrackID>,
 }
 
-impl IndexCache {
-    pub fn empty() -> Self {
-        Self {
-            tracks_files_mtime: Default::default(),
-            albums_infos: ValueOrdMap::empty(),
-            albums_tracks: Default::default(),
-            albums_genres: Default::default(),
-            most_recent_albums: Default::default(),
-            artists_infos: ValueOrdMap::empty(),
-            album_artists_infos: ValueOrdMap::empty(),
-            artists_albums: Default::default(),
-            artists_album_participations: Default::default(),
-            artists_albums_and_participations: Default::default(),
-            artists_tracks: Default::default(),
-            artists_track_participations: Default::default(),
-            artists_tracks_and_participations: Default::default(),
-            genres_infos: ValueOrdMap::empty(),
-            genres_albums: Default::default(),
-            genres_tracks: Default::default(),
-            no_genre_tracks: Default::default(),
-        }
-    }
-}
-
 /// Album infos, identifying an album
 /// Mainly aimed to allow fetching album-related data (e.g. tracks) from the GraphQL API
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AlbumInfos {
     pub name: String,
     pub album_artists: Vec<ArtistInfos>,
@@ -142,8 +111,7 @@ impl AlbumInfos {
 
 /// Artist infos, identifying an artist
 /// Mainly aimed to allow fetching artist-related data (e.g. albums) from the GraphQL API
-#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "camelCase")]
+#[derive(Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ArtistInfos {
     pub name: String,
 }
@@ -162,8 +130,7 @@ impl ArtistInfos {
 
 /// Genre infos, identifying a genre
 /// Mainly aimed to allow fetching genre-related data (e.g. albums) from the GraphQL API
-#[derive(Serialize, Deserialize, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "camelCase")]
+#[derive(Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GenreInfos {
     pub name: String,
 }

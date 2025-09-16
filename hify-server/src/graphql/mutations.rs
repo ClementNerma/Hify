@@ -1,9 +1,12 @@
+use std::sync::Arc;
+
 use async_graphql::{Context, Object, SimpleObject};
 
 use super::{EmptyScalar, GraphQLContext};
 use crate::{
+    changes::detect_changes,
     graphql_ctx_member, graphql_index, graphql_user_data,
-    index::{build_index, Index, Rating, Track, TrackID},
+    index::{Rating, Track, TrackID},
     library::mixer::{self, MixParams},
     userdata::{MixID, OneListening, PlaylistEditAction, PlaylistID},
 };
@@ -15,27 +18,29 @@ pub struct MutationRoot;
 impl MutationRoot {
     async fn update_index(&self, ctx: &Context<'_>) -> Result<EmptyScalar, String> {
         let ctx = ctx.data::<GraphQLContext>().unwrap();
+        let app_state = Arc::clone(&ctx.app_state);
 
-        let current = Index::clone(&*ctx.app_state.index.read().await);
+        let index = tokio::task::spawn_blocking(move || {
+            let index = app_state.index.blocking_read();
+            let mut user_data = app_state.user_data.blocking_write();
 
-        let index = build_index(
-            current.from.clone(),
-            Some(current),
-            &ctx.app_state.resource_manager,
-        )
+            detect_changes(
+                &app_state.music_dir,
+                &mut user_data,
+                &app_state.resource_manager,
+                Some(&index),
+            )
+            .map_err(|err| format!("{err:?}"))
+        })
         .await
-        .map_err(|err| format!("{err:?}"))?;
-
-        (ctx.save_index)(&index)?;
-
-        // Clear the serach cache
-        ctx.search_cache.write().await.clear();
-
-        // Cleanup user data (delete dangling data from removed tracks)
-        ctx.app_state.user_data.write().await.cleanup(&index);
+        .map_err(|err| format!("Failed to analyze audio library: {err:?}"))?
+        .map_err(|err| format!("Failed to analyze audio library: {err:?}"))?;
 
         // Update the index
         *ctx.app_state.index.write().await = index;
+
+        // Clear the search cache
+        ctx.search_cache.write().await.clear();
 
         Ok(EmptyScalar)
     }
@@ -48,6 +53,7 @@ impl MutationRoot {
     ) -> Result<EmptyScalar, String> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .log_listening(OneListening::new_now(track_id, duration_s))
+            .await
             .map(|()| EmptyScalar)
     }
 
@@ -56,17 +62,22 @@ impl MutationRoot {
         ctx: &Context<'_>,
         track_id: TrackID,
         rating: Rating,
-    ) -> EmptyScalar {
+    ) -> Result<EmptyScalar, String> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
-            .set_track_rating(track_id, Some(rating));
-
-        EmptyScalar
+            .set_track_rating(track_id, Some(rating))
+            .await
+            .map(|()| EmptyScalar)
     }
 
-    async fn remove_track_rating(&self, ctx: &Context<'_>, track_id: TrackID) -> EmptyScalar {
-        graphql_ctx_member!(ctx, app_state.user_data, write).set_track_rating(track_id, None);
-
-        EmptyScalar
+    async fn remove_track_rating(
+        &self,
+        ctx: &Context<'_>,
+        track_id: TrackID,
+    ) -> Result<EmptyScalar, String> {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .set_track_rating(track_id, None)
+            .await
+            .map(|()| EmptyScalar)
     }
 
     async fn create_playlist(
@@ -74,8 +85,10 @@ impl MutationRoot {
         ctx: &Context<'_>,
         name: String,
         tracks: Vec<TrackID>,
-    ) -> PlaylistID {
-        graphql_ctx_member!(ctx, app_state.user_data, write).create_playlist(name, tracks)
+    ) -> Result<PlaylistID, String> {
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .create_playlist(name, tracks)
+            .await
     }
 
     async fn edit_playlist(
@@ -83,9 +96,10 @@ impl MutationRoot {
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
         action: PlaylistEditAction,
-    ) -> Result<EmptyScalar, &'static str> {
+    ) -> Result<EmptyScalar, String> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .edit_playlist(playlist_id, action)
+            .await
             .map(|()| EmptyScalar)
     }
 
@@ -93,9 +107,10 @@ impl MutationRoot {
         &self,
         ctx: &Context<'_>,
         playlist_id: PlaylistID,
-    ) -> Result<EmptyScalar, &'static str> {
+    ) -> Result<EmptyScalar, String> {
         graphql_ctx_member!(ctx, app_state.user_data, write)
             .delete_playlist(playlist_id)
+            .await
             .map(|()| EmptyScalar)
     }
 
@@ -104,7 +119,7 @@ impl MutationRoot {
         ctx: &Context<'_>,
         params: MixParams,
         max_tracks: usize,
-    ) -> Result<CreatedMix, &'static str> {
+    ) -> Result<CreatedMix, String> {
         let index = graphql_index!(ctx);
 
         let mut mix = mixer::generate_mix(&index, &*graphql_user_data!(ctx), params)?;
@@ -117,7 +132,7 @@ impl MutationRoot {
 
         let mut user_data = graphql_ctx_member!(ctx, app_state.user_data, write);
 
-        user_data.register_mix(mix);
+        user_data.register_mix(mix).await?;
 
         Ok(CreatedMix {
             mix_id,
@@ -130,25 +145,19 @@ impl MutationRoot {
         ctx: &Context<'_>,
         mix_id: MixID,
         max_tracks: usize,
-    ) -> Result<Vec<Track>, &'static str> {
+    ) -> Result<Vec<Track>, String> {
         let index = graphql_index!(ctx);
 
-        graphql_ctx_member!(ctx, app_state.user_data, write).get_next_tracks_of_mix(
-            mix_id,
-            max_tracks,
-            |track_id| index.tracks.get(&track_id).unwrap().clone(),
-        )
+        graphql_ctx_member!(ctx, app_state.user_data, write)
+            .get_next_tracks_of_mix(mix_id, max_tracks, |track_id| {
+                index.tracks.get(&track_id).unwrap().clone()
+            })
+            .await
     }
 
-    async fn delete_mix(
-        &self,
-        ctx: &Context<'_>,
-        mix_id: MixID,
-    ) -> Result<EmptyScalar, &'static str> {
+    async fn delete_mix(&self, ctx: &Context<'_>, mix_id: MixID) -> Result<EmptyScalar, String> {
         let mut user_data = graphql_ctx_member!(ctx, app_state.user_data, write);
-        user_data.delete_mix(mix_id)?;
-
-        Ok(EmptyScalar)
+        user_data.delete_mix(mix_id).await.map(|()| EmptyScalar)
     }
 }
 

@@ -28,7 +28,6 @@ pub fn generate_mix(
             .iter()
             .flat_map(|artist| {
                 index
-                    .cache
                     .artists_tracks_and_participations
                     .get(artist)
                     .map_or_else(Vec::new, Vec::clone)

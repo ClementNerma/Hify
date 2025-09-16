@@ -3,7 +3,17 @@ use std::hash::Hash;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 
 pub trait IdType:
-    std::fmt::Debug + Clone + Copy + Hash + PartialEq + Serialize + Deserialize<'static>
+    std::fmt::Debug
+    + Clone
+    + Copy
+    + Hash
+    + PartialEq
+    + Eq
+    + Send
+    + Sync
+    + Serialize
+    + Deserialize<'static>
+    + 'static
 {
     fn encode(&self) -> String;
     fn decode(input: &str) -> Result<Self, IdTypeDecodingErr>;

@@ -75,7 +75,6 @@ fn _album_list<'a>(
     // TODO: takegenre into consideration
 
     index
-        .cache
         .albums_infos
         .iter()
         .skip(offset.unwrap_or(0))

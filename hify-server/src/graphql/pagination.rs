@@ -1,9 +1,9 @@
 use async_graphql::{
+    InputObject, OutputType, Result,
     connection::{
         Connection, ConnectionNameType, CursorType, DefaultConnectionName, DefaultEdgeName, Edge,
         EdgeNameType, EmptyFields, EnableNodesField,
     },
-    InputObject, OutputType, Result,
 };
 
 /// Pagination input for GraphQL
@@ -75,24 +75,24 @@ pub fn raw_paginate<
     ) {
         (None, None, None, None) => return Err("Please provide pagination parameters".into()),
         (Some(_), Some(_), _, _) => {
-            return Err("Cannot provide both 'after' and 'before' parameters at once".into())
+            return Err("Cannot provide both 'after' and 'before' parameters at once".into());
         }
         (_, _, Some(_), Some(_)) => {
-            return Err("Cannot provide both 'first' and 'last' parameters at once".into())
+            return Err("Cannot provide both 'first' and 'last' parameters at once".into());
         }
         (None, Some(_), None, None) | (Some(_), None, None, None) => {
-            return Err("Please provide a number of elements to get".into())
+            return Err("Please provide a number of elements to get".into());
         }
         (None, Some(_), _, None) => {
             return Err(
                 "Specifying a 'before' parameter requires the 'last' parameter as well".into(),
-            )
+            );
         }
         (None, Some(c), None, Some(i)) => (Some(c), i, Direction::Before),
         (Some(_), None, None, _) => {
             return Err(
                 "Specifying an 'after' parameter requires the 'first' parameter as well".into(),
-            )
+            );
         }
         (Some(c), None, Some(i), None) => (Some(c), i, Direction::After),
         (None, None, Some(i), None) => (None, i, Direction::After),

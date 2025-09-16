@@ -98,11 +98,10 @@ pub fn generate_feed(
     );
 
     let most_recent_albums = index
-        .cache
         .most_recent_albums
         .iter()
         .take(max_items)
-        .map(|album_id| index.cache.albums_infos.get(album_id).unwrap().clone())
+        .map(|album_id| index.albums_infos.get(album_id).unwrap().clone())
         .collect::<Vec<_>>();
 
     Feed {

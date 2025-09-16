@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use crate::index::{Index, TrackID};
 
 use super::{
-    history::{History, OneListening},
     UserDataConfig,
+    history::{History, OneListening},
 };
 
 #[derive(Clone, Serialize, Deserialize)]

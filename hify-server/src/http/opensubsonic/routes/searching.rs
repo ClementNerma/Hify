@@ -88,7 +88,6 @@ async fn search3(
                 .collect(),
 
             albums: index
-                .cache
                 .albums_infos
                 .values()
                 .skip(album_offset.unwrap_or(0))
@@ -97,7 +96,6 @@ async fn search3(
                 .collect(),
 
             artists: index
-                .cache
                 .artists_infos
                 .values()
                 .skip(artist_offset.unwrap_or(0))

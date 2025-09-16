@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fs, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 use crate::index::{Index, Rating, TrackID};
 
@@ -18,9 +18,11 @@ pub struct UserDataWrapper {
 impl UserDataWrapper {
     pub fn new_create(path: PathBuf) -> Result<Self> {
         let inner = if path.exists() {
-            let content = fs::read(&path)?;
+            let content = std::fs::read(&path).context("Failed to read user data file")?;
+
             let json_str = std::str::from_utf8(&content)?;
-            serde_json::from_str::<UserData>(json_str)?
+
+            serde_json::from_str::<UserData>(json_str).context("Failed to parse user data file")?
         } else {
             UserData::new(UserDataConfig::default())
         };
@@ -32,10 +34,18 @@ impl UserDataWrapper {
         })
     }
 
-    fn _save(&self) {
-        // TODO: error handling
+    async fn _save(&self) -> Result<(), String> {
         let json = serde_json::to_string(&self.inner).unwrap();
-        fs::write(&self.path, json).unwrap();
+
+        tokio::fs::write(&self.path, json)
+            .await
+            .map_err(|err| format!("Failed to save user data: {err}"))
+    }
+
+    fn _save_sync(&self) -> Result<(), String> {
+        let json = serde_json::to_string(&self.inner).unwrap();
+
+        std::fs::write(&self.path, json).map_err(|err| format!("Failed to save user data: {err}"))
     }
 
     pub fn cache(&self) -> &UserDataCache {
@@ -54,7 +64,11 @@ impl UserDataWrapper {
         &self.inner.playlists
     }
 
-    pub fn set_track_rating(&mut self, track_id: TrackID, rating: Option<Rating>) {
+    pub async fn set_track_rating(
+        &mut self,
+        track_id: TrackID,
+        rating: Option<Rating>,
+    ) -> Result<(), String> {
         match rating {
             Some(rating) => {
                 self.inner.track_ratings.insert(track_id, rating);
@@ -65,10 +79,10 @@ impl UserDataWrapper {
             }
         }
 
-        self._save();
+        self._save().await
     }
 
-    pub fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
+    pub async fn log_listening(&mut self, entry: OneListening) -> Result<(), String> {
         if let Some(last) = self.inner.history.entries().last()
             && let Some(overlapping_for) = entry.is_overlapping_prev(last)
         {
@@ -84,26 +98,29 @@ impl UserDataWrapper {
         self.cache.update_with(&entry);
         self.inner.history.push(entry);
 
-        self._save();
-        Ok(())
+        self._save().await
     }
 
-    pub fn create_playlist(&mut self, name: String, tracks: Vec<TrackID>) -> PlaylistID {
+    pub async fn create_playlist(
+        &mut self,
+        name: String,
+        tracks: Vec<TrackID>,
+    ) -> Result<PlaylistID, String> {
         let playlist = Playlist::new(name, tracks);
         let playlist_id = playlist.id;
 
         self.inner.playlists.insert(playlist.id, playlist);
 
-        self._save();
+        self._save().await?;
 
-        playlist_id
+        Ok(playlist_id)
     }
 
-    pub fn edit_playlist(
+    pub async fn edit_playlist(
         &mut self,
         playlist_id: PlaylistID,
         action: PlaylistEditAction,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), String> {
         let playlist = self
             .inner
             .playlists
@@ -112,45 +129,39 @@ impl UserDataWrapper {
 
         playlist.edit(action)?;
 
-        self._save();
-
-        Ok(())
+        self._save().await
     }
 
-    pub fn delete_playlist(&mut self, playlist_id: PlaylistID) -> Result<(), &'static str> {
+    pub async fn delete_playlist(&mut self, playlist_id: PlaylistID) -> Result<(), String> {
         self.inner
             .playlists
             .remove(&playlist_id)
             .ok_or("Playlist was not found")?;
 
-        self._save();
-
-        Ok(())
+        self._save().await
     }
 
-    pub fn register_mix(&mut self, mix: Mix) {
+    pub async fn register_mix(&mut self, mix: Mix) -> Result<(), String> {
         self.inner.mixes.insert(mix.id(), mix);
 
-        self._save();
+        self._save().await
     }
 
-    pub fn delete_mix(&mut self, mix_id: MixID) -> Result<(), &'static str> {
+    pub async fn delete_mix(&mut self, mix_id: MixID) -> Result<(), String> {
         self.inner
             .mixes
             .remove(&mix_id)
             .ok_or("Mix was not found")?;
 
-        self._save();
-
-        Ok(())
+        self._save().await
     }
 
-    pub fn get_next_tracks_of_mix<T>(
+    pub async fn get_next_tracks_of_mix<T>(
         &mut self,
         mix_id: MixID,
         max_tracks: usize,
         mapper: impl Fn(TrackID) -> T,
-    ) -> Result<Vec<T>, &'static str> {
+    ) -> Result<Vec<T>, String> {
         let mix = self
             .inner
             .mixes
@@ -159,12 +170,12 @@ impl UserDataWrapper {
 
         let tracks = mix.next_tracks(max_tracks, mapper);
 
-        self._save();
+        self._save().await?;
 
         Ok(tracks)
     }
 
-    pub fn cleanup(&mut self, new_index: &Index) {
+    pub fn cleanup_sync(&mut self, new_index: &Index) -> Result<(), String> {
         self.inner.history.cleanup(new_index);
         self.cache.cleanup(new_index);
 
@@ -176,6 +187,6 @@ impl UserDataWrapper {
             mix.cleanup(new_index);
         }
 
-        self._save();
+        self._save_sync()
     }
 }

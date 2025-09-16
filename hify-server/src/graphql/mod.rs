@@ -7,7 +7,7 @@ mod state;
 pub use self::{
     entrypoint::{AppSchema, get_graphql_schema},
     pagination::Paginable,
-    state::{GraphQLContext, SaveIndexFn},
+    state::GraphQLContext,
 };
 use async_graphql::{InputValueError, InputValueResult, Scalar, ScalarType, Value};
 

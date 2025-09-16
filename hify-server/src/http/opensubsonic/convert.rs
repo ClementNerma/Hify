@@ -92,7 +92,7 @@ pub fn album_to_id3_with_songs(
     index: &Index,
     user_data: Option<&UserDataWrapper>,
 ) -> AlbumID3WithSongs {
-    let album_tracks = index.cache.albums_tracks.get(&album.get_id()).unwrap();
+    let album_tracks = index.albums_tracks.get(&album.get_id()).unwrap();
     let album_tracks = album_tracks
         .iter()
         .map(|track| index.tracks.get(track).unwrap())
@@ -154,7 +154,7 @@ pub fn album_to_id3_with_songs(
 }
 
 pub fn album_to_child(album: &AlbumInfos, index: &Index) -> Child {
-    let album_tracks = index.cache.albums_tracks.get(&album.get_id()).unwrap();
+    let album_tracks = index.albums_tracks.get(&album.get_id()).unwrap();
     let album_tracks = album_tracks
         .iter()
         .map(|track| index.tracks.get(track).unwrap())
@@ -253,7 +253,6 @@ pub fn artist_to_id3(artist: &ArtistInfos, index: &Index) -> ArtistID3 {
         covert_art_id: Some(CoverArtId::Artist(artist_id)),
         artist_image_url: None, // TODO
         album_count: index
-            .cache
             .artists_albums
             .get(&artist_id)
             .map(|albums| albums.len()),

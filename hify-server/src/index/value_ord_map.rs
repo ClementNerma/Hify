@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     hash::{DefaultHasher, Hash, Hasher},
     marker::PhantomData,
-    slice::{Iter, IterMut},
+    slice::Iter,
 };
 
 use async_graphql::{OutputType, connection::CursorType};
@@ -78,14 +78,6 @@ impl<K: Eq + Hash, V: Ord> ValueOrdMap<K, V> {
 
     pub fn values(&self) -> Iter<'_, V> {
         self.values.iter()
-    }
-
-    pub fn values_mut(&mut self) -> IterMut<'_, V> {
-        self.values.iter_mut()
-    }
-
-    pub fn into_values(self) -> Vec<V> {
-        self.values
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {

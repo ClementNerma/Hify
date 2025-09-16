@@ -1,59 +1,59 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, sync::Arc};
 
-use anyhow::{Context, Result};
-use image::{codecs::webp::WebPEncoder, ImageBuffer, Rgba};
+use anyhow::{Context, Result, bail};
 
-use crate::index::{ArtistID, IdType};
+use crate::{
+    arts::ItemArtsManager,
+    index::{AlbumID, ArtistID, Index, TracksList},
+    userdata::UserDataWrapper,
+};
 
 // TODO: waveform
 // TODO: lyrics
 
 #[derive(Clone)]
 pub struct ResourceManager {
-    // path: PathBuf,
-    artist_arts_dir: PathBuf,
+    pub tracks_file: PathBuf,
+    pub user_data_file: PathBuf,
+    pub album_arts: Arc<ItemArtsManager<AlbumID>>,
+    pub artist_arts: Arc<ItemArtsManager<ArtistID>>,
 }
 
 impl ResourceManager {
-    pub fn new(path: PathBuf) -> Result<Self> {
-        let artist_arts_dir = path.join("artist-arts");
-        fs::create_dir_all(&artist_arts_dir).context("Failed to create artist arts directory")?;
-
-        Ok(Self { artist_arts_dir })
+    pub fn load(path: PathBuf) -> Result<Self> {
+        Ok(Self {
+            tracks_file: path.join("tracks.json"),
+            user_data_file: path.join("userdata.json"),
+            album_arts: Arc::new(ItemArtsManager::load(path.join("arts").join("albums"))?),
+            artist_arts: Arc::new(ItemArtsManager::load(path.join("arts").join("artists"))?),
+        })
     }
 
-    fn _artist_art_path(&self, artist_id: ArtistID) -> PathBuf {
-        self.artist_arts_dir
-            .join(format!("{}.webp", artist_id.encode()))
+    pub fn load_user_data(&self) -> Result<UserDataWrapper> {
+        UserDataWrapper::new_create(self.user_data_file.clone())
     }
 
-    // TODO: replace rgba with rgb?
-    pub fn save_artist_art(
-        &self,
-        artist_id: ArtistID,
-        image: ImageBuffer<Rgba<u8>, Vec<u8>>,
-    ) -> Result<()> {
-        let mut image_buf = vec![];
+    pub fn load_index(&self) -> Result<Option<Index>> {
+        if self.tracks_file.is_dir() {
+            bail!("Tracks index file must not be a directory");
+        } else if !self.tracks_file.exists() {
+            return Ok(None);
+        };
 
-        image
-            .write_with_encoder(WebPEncoder::new_lossless(&mut image_buf))
-            .context("Failed to encode artist's art image")?;
+        let tracks_list_json =
+            fs::read_to_string(&self.tracks_file).context("Failed to read tracks index file")?;
 
-        let path = self._artist_art_path(artist_id);
+        let tracks_list = serde_json::from_str::<TracksList>(&tracks_list_json)
+            .context("Failed to parse tracks list file")?;
 
-        fs::write(&path, image_buf)
-            .with_context(|| format!("Failed to write image file at path: {}", path.display()))?;
-
-        Ok(())
+        Ok(Some(Index::build(tracks_list)))
     }
 
-    pub fn artist_art_path(&self, artist_id: ArtistID) -> Option<PathBuf> {
-        let path = self._artist_art_path(artist_id);
+    pub fn save_index(&self, index: &Index) -> Result<()> {
+        let tracks_list = index.tracks.values().cloned().collect::<Vec<_>>();
 
-        if path.is_file() {
-            Some(path)
-        } else {
-            None
-        }
+        let json = serde_json::to_string(&tracks_list).unwrap();
+
+        fs::write(&self.tracks_file, json).context("Failed to write tasks index file")
     }
 }

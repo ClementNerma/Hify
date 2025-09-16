@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
-    graphql_ctx, graphql_index, graphql_user_data,
+    graphql_ctx, graphql_index, graphql_res_manager, graphql_user_data,
     index::{
         AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Rating, Track, TrackTags,
         ValueOrdMap,
@@ -18,7 +18,6 @@ use super::{
 
 #[derive(SimpleObject)]
 pub struct IndexInfos {
-    pub fingerprint: String,
     pub albums_count: usize,
     pub artists_count: usize,
     pub album_artists_count: usize,
@@ -77,7 +76,7 @@ impl AlbumInfos {
 
     async fn tracks(&self, ctx: &Context<'_>) -> Vec<Track> {
         let index = graphql_index!(ctx);
-        let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
+        let album_tracks = index.albums_tracks.get(&self.get_id()).unwrap();
         album_tracks
             .iter()
             .map(|track_id| index.tracks.get(track_id).unwrap().clone())
@@ -86,7 +85,7 @@ impl AlbumInfos {
 
     async fn year(&self, ctx: &Context<'_>) -> Option<u32> {
         let index = graphql_index!(ctx);
-        let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
+        let album_tracks = index.albums_tracks.get(&self.get_id()).unwrap();
         let years: Vec<_> = album_tracks
             .iter()
             .filter_map(|track_id| index.tracks.get(track_id).unwrap().metadata.tags.date)
@@ -112,7 +111,7 @@ impl AlbumInfos {
 
     async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<GenreInfos> {
         let index = graphql_index!(ctx);
-        let album_tracks = index.cache.albums_tracks.get(&self.get_id()).unwrap();
+        let album_tracks = index.albums_tracks.get(&self.get_id()).unwrap();
         album_tracks
             .iter()
             .flat_map(|track_id| {
@@ -128,7 +127,7 @@ impl AlbumInfos {
     }
 
     async fn has_art(&self, ctx: &Context<'_>) -> bool {
-        graphql_index!(ctx).album_arts.contains_key(&self.get_id())
+        graphql_res_manager!(ctx).album_arts.has(self.get_id())
     }
 }
 
@@ -159,7 +158,6 @@ impl ArtistInfos {
         paginate(
             pagination,
             index
-                .cache
                 .artists_albums
                 .get(&self.get_id())
                 .unwrap_or(&ValueOrdMap::empty()),
@@ -176,7 +174,6 @@ impl ArtistInfos {
         paginate(
             pagination,
             index
-                .cache
                 .artists_album_participations
                 .get(&self.get_id())
                 .unwrap_or(&ValueOrdMap::empty()),
@@ -192,7 +189,6 @@ impl ArtistInfos {
         let index = graphql_index!(ctx);
 
         let track_ids = index
-            .cache
             .artists_track_participations
             .get(&self.get_id())
             .map(Vec::as_slice)
@@ -211,7 +207,6 @@ impl ArtistInfos {
         let index = graphql_index!(ctx);
 
         let track_ids = index
-            .cache
             .artists_tracks_and_participations
             .get(&self.get_id())
             .map(Vec::as_slice)
@@ -226,8 +221,8 @@ impl ArtistInfos {
         graphql_ctx!(ctx)
             .app_state
             .resource_manager
-            .artist_art_path(self.get_id())
-            .is_some()
+            .artist_arts
+            .has(self.get_id())
     }
 }
 
@@ -250,7 +245,6 @@ impl GenreInfos {
         paginate(
             pagination,
             index
-                .cache
                 .genres_albums
                 .get(&self.get_id())
                 .unwrap_or(&ValueOrdMap::empty()),
@@ -260,7 +254,6 @@ impl GenreInfos {
 
     async fn albums_count(&self, ctx: &Context<'_>) -> usize {
         graphql_index!(ctx)
-            .cache
             .genres_albums
             .get(&self.get_id())
             .unwrap()

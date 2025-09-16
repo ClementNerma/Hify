@@ -63,12 +63,11 @@ async fn get_genres(
         "genres",
         GetGenresAnswer {
             genre: index
-                .cache
                 .genres_infos
                 .iter()
                 .map(|(id, genre)| {
-                    let tracks = index.cache.genres_tracks.get(id).unwrap();
-                    let albums = index.cache.genres_albums.get(id).unwrap();
+                    let tracks = index.genres_tracks.get(id).unwrap();
+                    let albums = index.genres_albums.get(id).unwrap();
 
                     Genre {
                         name: genre.name.clone(),
@@ -95,7 +94,6 @@ async fn get_album(
     let user_data = state.user_data.read().await;
 
     let album = index
-        .cache
         .albums_infos
         .get(&id)
         .ok_or((StatusCode::NOT_FOUND, "Provided album ID was not found"))?;
@@ -154,14 +152,15 @@ async fn get_artist_info2(
 ) -> OSResult<ArtistInfo2> {
     let index = state.index.read().await;
 
-    let artist = index.cache.artists_infos.get(&artist_id).ok_or((
+    let artist = index.artists_infos.get(&artist_id).ok_or((
         StatusCode::NOT_FOUND,
         "The provided artist ID was not found",
     ))?;
 
     let img_url = state
         .resource_manager
-        .artist_art_path(artist_id)
+        .artist_arts
+        .large_art(artist_id)
         .map(|_| make_cover_art_uri(CoverArtId::Artist(artist.get_id())));
 
     Ok(OSNestedResponse(
@@ -193,7 +192,6 @@ async fn get_album_info2(
     let index = state.index.read().await;
 
     let album = index
-        .cache
         .albums_infos
         .get(&id)
         .ok_or((StatusCode::NOT_FOUND, "The provided album ID was not found"))?;

@@ -42,14 +42,14 @@ pub fn search_index(
     let results = IndexSearchResults {
         tracks: search_and_score(index.tracks.values(), &words, limit, opts.tracks_user_score),
         albums: search_and_score(
-            index.cache.albums_infos.values(),
+            index.albums_infos.values(),
             &words,
             limit,
             // TODO
             None,
         ),
         artists: search_and_score(
-            index.cache.artists_infos.values(),
+            index.artists_infos.values(),
             &words,
             limit,
             // TODO

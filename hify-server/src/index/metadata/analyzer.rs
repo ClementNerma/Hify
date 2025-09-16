@@ -1,6 +1,6 @@
-use std::{fs::File, path::PathBuf};
+use std::{fs::File, path::Path};
 
-use anyhow::{bail, ensure, Context, Result};
+use anyhow::{Context, Result, bail, ensure};
 use symphonia::core::{
     codecs::{
         CODEC_TYPE_AAC, CODEC_TYPE_FLAC, CODEC_TYPE_MP3, CODEC_TYPE_NULL, CODEC_TYPE_OPUS,
@@ -18,8 +18,8 @@ use crate::index::{AudioCodec, TrackMetadata};
 
 use super::adapter::convert_symphonia_metadata;
 
-pub fn analyze_file(path: PathBuf) -> Result<TrackMetadata> {
-    let src = File::open(&path).context("Failed")?;
+pub fn analyze_file(path: &Path) -> Result<TrackMetadata> {
+    let src = File::open(path).context("Failed")?;
 
     let file_size = src
         .metadata()

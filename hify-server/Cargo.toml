@@ -37,5 +37,6 @@ image = { version = "0.25.8", default-features = false, features = [
     "png",
     "webp",
 ] }
-rayon = "1.11.0"
 jiff = { version = "0.2.15", features = ["serde"] }
+num_cpus = "1.17.0"
+webp = { version = "0.3.1", default-features = false }

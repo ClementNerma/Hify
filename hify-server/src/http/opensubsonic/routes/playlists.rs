@@ -1,7 +1,7 @@
 use axum::extract::Query;
 
 use crate::{
-    http::opensubsonic::{types::Playlist, OSCommonParams, OSNestedResponse},
+    http::opensubsonic::{OSCommonParams, OSNestedResponse, types::Playlist},
     os_struct,
 };
 

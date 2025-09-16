@@ -9,36 +9,15 @@ pub fn check_correctness(index: &Index, user_data: &UserDataWrapper) -> Result<(
         }}
     }
 
-    let Index {
-        from: _,
-        fingerprint: _,
-        tracks,
-        cache: _, // TODO: check this as well
-        album_arts,
-    } = index;
-
     //
     // Check tracks ID
     //
 
-    for (id, track) in tracks.iter() {
+    for (id, track) in index.tracks.iter() {
         if track.id != *id {
             error!(
                 "Track registered with ID '{id:?}' in map but has ID '{:?}' instead",
                 track.id
-            );
-        }
-    }
-
-    //
-    // Check album arts
-    //
-
-    for (album_id, relative_path) in album_arts.iter() {
-        if !index.cache.albums_infos.contains_key(album_id) {
-            error!(
-                "Art at path '{}' registered for unknown album ID '{album_id:?}'",
-                relative_path.display()
             );
         }
     }

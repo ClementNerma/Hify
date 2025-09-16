@@ -1,7 +1,7 @@
 use axum::extract::Query;
 
 use crate::{
-    http::opensubsonic::{types::Bookmark, OSCommonParams, OSNestedResponse},
+    http::opensubsonic::{OSCommonParams, OSNestedResponse, types::Bookmark},
     os_struct,
 };
 

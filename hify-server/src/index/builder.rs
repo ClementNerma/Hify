@@ -1,368 +1,267 @@
-use anyhow::{Context, Result};
-use log::info;
-use tokio::task::JoinSet;
+use std::collections::{BTreeSet, HashMap, HashSet};
 
-use std::{
-    collections::{BTreeMap, HashMap, HashSet},
-    fs::Metadata,
-    path::{Path, PathBuf},
-    time::{Instant, SystemTime, UNIX_EPOCH},
-};
-use walkdir::WalkDir;
-
-use crate::{
-    index::arts::{find_albums_arts, generate_artist_arts},
-    logging::spinner,
-    resources::ResourceManager,
-};
+use log::debug;
 
 use super::{
-    IndexCache,
-    arts::detect_deleted_album_arts,
-    cache::build_index_cache,
-    data::{Index, Track},
-    metadata,
-    value_ord_map::ValueOrdMap,
+    AlbumID, AlbumInfos, ArtistID, ArtistInfos, GenreID, GenreInfos, Index, TrackID, TracksList,
+    ValueOrdMap,
 };
 
-pub fn log(time: Instant, message: &str) {
-    info!("[{: >4}s] {message}", time.elapsed().as_secs());
-}
+impl Index {
+    // TODO: lots of optimization to perform here
+    pub fn build(tracks: TracksList) -> Index {
+        debug!("Building index cache...");
 
-pub async fn build_index(
-    dir: PathBuf,
-    from: Option<Index>,
-    res_manager: &ResourceManager,
-) -> Result<Index> {
-    let from = from.unwrap_or_else(|| Index {
-        from: dir.clone(),
-        fingerprint: String::new(),
-        tracks: ValueOrdMap::empty(),
-        album_arts: HashMap::new(),
-        cache: IndexCache::empty(),
-    });
+        let TracksList(tracks) = tracks;
 
-    let started = Instant::now();
+        let tracks = ValueOrdMap::from_iter(tracks.into_iter().map(|track| (track.id, track)));
 
-    log(started, "Looking for audio files...");
+        let mut tracks_files_mtime = HashMap::new();
 
-    let files = build_files_list(&dir)
-        .await
-        .context("Failed to build files list")?;
+        let mut tracks_formats = HashMap::new();
 
-    log(started, &format!("Found a total of {} files", files.len()));
+        let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
+        let mut album_artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
+        let mut artists_albums = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
+        let mut artists_album_participations = HashMap::<ArtistID, BTreeSet<AlbumInfos>>::new();
 
-    let files = files
-        .into_iter()
-        .filter(|(path, _)| metadata::is_audio_file(path))
-        .collect::<HashMap<_, _>>();
+        let mut artists_album_tracks = HashMap::<ArtistID, Vec<TrackID>>::new();
+        let mut artists_track_participations = HashMap::<ArtistID, Vec<TrackID>>::new();
+        let mut artists_tracks_and_participations = HashMap::<ArtistID, Vec<TrackID>>::new();
 
-    log(
-        started,
-        &format!("...of which {} are audio files.", files.len()),
-    );
+        let mut albums_infos = HashMap::<AlbumID, AlbumInfos>::new();
+        let mut albums_tracks = HashMap::<AlbumID, Vec<TrackID>>::new();
+        let mut albums_genres = HashMap::<AlbumID, Vec<GenreID>>::new();
 
-    // Remove deleted tracks
-    let (mut tracks, deleted_tracks) = from
-        .tracks
-        .into_values()
-        .into_iter()
-        .partition::<Vec<_>, _>(|track| files.contains_key(&dir.join(&track.relative_path)));
+        let mut genres_infos = HashMap::<GenreID, GenreInfos>::new();
+        let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
+        let mut genres_tracks = HashMap::<GenreID, Vec<TrackID>>::new();
+        let mut no_genre_tracks = HashSet::new();
 
-    if !deleted_tracks.is_empty() {
-        log(
-            started,
-            &format!("...detected {} deleted tracks.", deleted_tracks.len()),
-        );
-    }
+        debug!("| Building tracks cache...");
 
-    let file_times = files
-        .iter()
-        .map(|(path, times)| (path.clone(), *times))
-        .filter(|(path, times)| {
-            match from
-                .cache
-                .tracks_files_mtime
-                .get(path.strip_prefix(&dir).expect(
-                    "Internal error: audio file path couldn't be stripped of the base directory",
-                )) {
-                None => true,
-                Some(old_mtime) => old_mtime != &times.mtime,
+        for track in tracks.values() {
+            tracks_files_mtime.insert(track.relative_path.clone(), track.mtime);
+            tracks_formats.insert(track.id, track.metadata.codec);
+
+            let tags = &track.metadata.tags;
+
+            let album_infos = tags.get_album_infos();
+            let album_id = album_infos.get_id();
+
+            albums_infos.insert(album_id, album_infos.clone());
+
+            let album_artists: HashSet<_> = tags.get_album_artists_infos().collect();
+
+            let track_artists = tags.get_artists_infos().collect::<HashSet<_>>();
+            let non_album_artists = &track_artists - &album_artists;
+
+            for artist_infos in &album_artists {
+                let artist_id = artist_infos.get_id();
+
+                album_artists_infos.insert(artist_id, artist_infos.clone());
+
+                artists_albums
+                    .entry(artist_id)
+                    .or_default()
+                    .insert(album_infos.clone());
+
+                artists_album_tracks
+                    .entry(artist_id)
+                    .or_default()
+                    .push(track.id)
             }
-        })
-        .collect::<BTreeMap<_, _>>();
 
-    log(
-        started,
-        &format!("...and {} new or modified tracks.", file_times.len()),
-    );
+            for artist_infos in &non_album_artists {
+                let artist_id = artist_infos.get_id();
 
-    log(started, "Extracting audio metadata...");
+                artists_album_participations
+                    .entry(artist_id)
+                    .or_default()
+                    .insert(album_infos.clone());
 
-    // Run analysis tool on all new and modified files
-    let analyzed =
-        metadata::analyze_audio_files(file_times.keys().cloned().collect::<Vec<_>>()).await?;
+                artists_track_participations
+                    .entry(artist_id)
+                    .or_default()
+                    .push(track.id)
+            }
 
-    // Turn the analyzed files into tracks
-    let analyzed = analyzed
-        .into_iter()
-        .map(|(path, metadata)| {
-            Track::new(
-                path.strip_prefix(&dir)
-                    .expect("Internal error: track path couldn't be stripped of the base directory")
-                    .to_path_buf(),
-                *file_times.get(&path).unwrap(),
-                metadata,
-            )
-        })
-        .collect::<Vec<_>>();
+            for artist_infos in track_artists {
+                let artist_id = artist_infos.get_id();
 
-    // Remove previous versions of analyzed files
-    let analyzed_file_paths = analyzed
-        .iter()
-        .map(|track| &track.relative_path)
-        .collect::<HashSet<_>>();
+                artists_infos.insert(artist_id, artist_infos.clone());
 
-    tracks.retain(|track| !analyzed_file_paths.contains(&track.relative_path));
+                artists_tracks_and_participations
+                    .entry(artist_id)
+                    .or_default()
+                    .push(track.id);
+            }
 
-    // Remove previous versions of analyzed tracks
-    let analyzed_ids = analyzed
-        .iter()
-        .map(|track| &track.id)
-        .collect::<HashSet<_>>();
+            albums_tracks.entry(album_id).or_default().push(track.id);
 
-    tracks.retain(|track| !analyzed_ids.contains(&track.id));
+            if track.metadata.tags.genres.is_empty() {
+                no_genre_tracks.insert(track.id);
+            } else {
+                for genre in tags.get_genres_infos() {
+                    let genre_id = genre.get_id();
 
-    // Add new (or modified) tracks
-    tracks.extend(analyzed);
+                    genres_infos.insert(genre_id, genre.clone());
 
-    log(
-        started,
-        &format!("Collected {} tracks, generating cache...", tracks.len()),
-    );
+                    genres_tracks.entry(genre_id).or_default().push(track.id);
 
-    let tracks = tracks.into_iter().map(|track| (track.id, track)).collect();
+                    genres_albums
+                        .entry(genre_id)
+                        .or_default()
+                        .insert(album_infos.clone());
 
-    let cache = build_index_cache(&tracks);
+                    albums_genres.entry(album_id).or_default().push(genre_id);
+                }
+            }
+        }
 
-    let new_albums = cache
-        .albums_infos
-        .values()
-        .filter(|album| !from.cache.albums_infos.contains_key(&album.get_id()))
-        .cloned()
-        .collect::<Vec<_>>();
+        debug!("| Building maps...");
 
-    let mut album_arts = from
-        .album_arts
-        .into_iter()
-        .filter(|(id, _)| cache.albums_infos.contains_key(id))
-        .collect::<HashMap<_, _>>();
-
-    log(
-        started,
-        &format!(
-            "Searching for existing albums' ({}) arts...",
-            album_arts.len()
-        ),
-    );
-
-    // TODO: remove deleted albums from this
-    let deleted_arts = detect_deleted_album_arts(&dir, &album_arts).await?;
-
-    if !deleted_arts.is_empty() {
-        log(
-            started,
-            &format!("> Detected {} deleted arts", deleted_arts.len()),
-        );
-    }
-
-    let mut search_for_album_arts = new_albums;
-    search_for_album_arts.extend(
-        deleted_arts
-            .iter()
-            .map(|id| from.cache.albums_infos.get(id).unwrap())
-            .cloned(),
-    );
-
-    if !search_for_album_arts.is_empty() {
-        log(
-            started,
-            &format!(
-                "Searching for {} albums' art...",
-                search_for_album_arts.len()
-            ),
-        );
-
-        // Cleanup deleted arts
-        album_arts.retain(|album_id, _| cache.albums_infos.contains_key(album_id));
-
-        // Detect art for new albums
-        let new_albums_arts = find_albums_arts(
-            search_for_album_arts.iter().cloned(),
-            &dir,
-            tracks.clone(),
-            cache.clone(),
-        )
-        .await?;
-
-        album_arts.extend(new_albums_arts);
-    }
-
-    // Generate art for artists
-    let artists_new_or_diff_albums = cache
-        .artists_albums_and_participations
-        .iter()
-        .filter(|(artist_id, albums)| {
-            from.cache
-                .artists_albums_and_participations
-                .get(artist_id)
-                .is_none_or(|old_albums| {
-                    // NOTE: we don't check if albums have been removed at the end, as only the first ones are necessary for generation
-                    let mut old_albums = old_albums.keys();
-                    albums.keys().any(|id| old_albums.next() != Some(id))
-                })
-        })
-        .map(|(artist_id, _)| cache.artists_infos.get(artist_id).unwrap())
-        .collect::<Vec<_>>();
-
-    if !artists_new_or_diff_albums.is_empty() {
-        info!(
-            "Generating art for {} artist(s)...",
-            artists_new_or_diff_albums.len(),
-        );
-
-        generate_artist_arts(
-            artists_new_or_diff_albums.into_iter(),
-            &dir,
-            &album_arts,
-            cache.clone(),
-            res_manager.clone(),
-        )?;
-    }
-
-    log(started, "Index has been generated.");
-
-    let fingerprint = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap() // cannot fail as it would imply SystemTime::now() returns a time *earlier* than UNIX_EPOCH
-        .as_secs()
-        .to_string();
-
-    Ok(Index {
-        fingerprint,
-        from: dir,
-        tracks,
-        album_arts,
-        cache,
-    })
-}
-
-pub fn rebuild_cache(index: &mut Index) {
-    index.cache = build_index_cache(&index.tracks);
-}
-
-pub async fn rebuild_resources(index: &mut Index, res_manager: &ResourceManager) -> Result<()> {
-    info!(
-        "Detecting cover art for {} albums...",
-        index.cache.albums_infos.len()
-    );
-
-    let album_arts = find_albums_arts(
-        index.cache.albums_infos.values().cloned(),
-        &index.from,
-        index.tracks.clone(),
-        index.cache.clone(),
-    )
-    .await?;
-
-    index.album_arts = album_arts.into_iter().collect();
-
-    info!(
-        "Generating cover art for {} artists...",
-        index.cache.artists_infos.len()
-    );
-
-    generate_artist_arts(
-        index.cache.artists_infos.values(),
-        &index.from,
-        &index.album_arts,
-        index.cache.clone(),
-        res_manager.clone(),
-    )?;
-
-    Ok(())
-}
-
-pub fn refetch_file_times(index: &mut Index) -> Result<()> {
-    for track in index.tracks.values_mut() {
-        let mt = index
-            .from
-            .join(&track.relative_path)
-            .metadata()
-            .with_context(|| {
-                format!(
-                    "Failed to get file metadata from track path: {}",
-                    track.relative_path.display()
+        let artists_album_participations = artists_album_participations
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter()
+                        .map(|album| (album.get_id(), album))
+                        .collect::<ValueOrdMap<_, _>>(),
                 )
-            })?;
+            })
+            .collect::<HashMap<_, _>>();
 
-        let FileTimes { ctime, mtime } = get_file_times(&mt)?;
+        let artists_albums = artists_albums
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter()
+                        .map(|album| (album.get_id(), album))
+                        .collect::<ValueOrdMap<_, _>>(),
+                )
+            })
+            .collect::<HashMap<_, _>>();
 
-        track.ctime = ctime;
-        track.mtime = mtime;
-    }
+        let artists_tracks_and_participations = artists_tracks_and_participations
+            .into_iter()
+            .map(|(artist_id, mut artist_tracks)| {
+                artist_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
+                (artist_id, artist_tracks)
+            })
+            .collect::<HashMap<_, _>>();
 
-    Ok(())
-}
+        let albums_tracks = albums_tracks
+            .into_iter()
+            .map(|(album_id, mut album_tracks)| {
+                album_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
+                (album_id, album_tracks)
+            })
+            .collect::<HashMap<_, _>>();
 
-#[derive(Clone, Copy)]
-pub struct FileTimes {
-    pub ctime: Option<SystemTime>,
-    pub mtime: SystemTime,
-}
+        let albums_genres = albums_genres
+            .into_iter()
+            .map(|(album_id, mut genres)| {
+                let mut seen = HashSet::new();
+                genres.retain(|genre| seen.insert(*genre));
+                (album_id, genres)
+            })
+            .collect::<HashMap<_, _>>();
 
-async fn build_files_list(from: &Path) -> Result<HashMap<PathBuf, FileTimes>> {
-    let spinner = spinner("[{elapsed_precise}] Found {pos} files");
+        let genres_tracks = genres_tracks
+            .into_iter()
+            .map(|(genre_id, mut genre_tracks)| {
+                genre_tracks.sort_by(|a, b| tracks.get(a).unwrap().cmp(tracks.get(b).unwrap()));
+                (genre_id, genre_tracks)
+            })
+            .collect();
 
-    let mut set: JoinSet<Result<Option<(PathBuf, FileTimes)>>> = JoinSet::new();
+        let genres_albums = genres_albums
+            .into_iter()
+            .map(|(k, v)| {
+                (
+                    k,
+                    v.into_iter().map(|album| (album.get_id(), album)).collect(),
+                )
+            })
+            .collect();
 
-    for item in WalkDir::new(from).min_depth(1) {
-        let spinner = spinner.clone();
+        let artists_albums_and_participations = artists_infos
+            .keys()
+            .map(|artist_id| {
+                (
+                    *artist_id,
+                    artists_albums
+                        .get(artist_id)
+                        .unwrap_or(&ValueOrdMap::empty())
+                        .iter()
+                        .chain(
+                            artists_album_participations
+                                .get(artist_id)
+                                .unwrap_or(&ValueOrdMap::empty())
+                                .iter(),
+                        )
+                        .map(|(album_id, album_infos)| (*album_id, album_infos.clone()))
+                        .collect::<ValueOrdMap<_, _>>(),
+                )
+            })
+            .collect();
 
-        set.spawn(async move {
-            let item = item.context("Failed to read directory entry")?;
-            let mt = item.metadata().with_context(|| {
-                format!("Failed to get metadata for path: {}", item.path().display())
-            })?;
+        debug!("| Building statistics...");
 
-            if !mt.is_file() {
-                return Ok(None);
-            }
+        debug!("| > Most recent albums...");
 
-            spinner.inc(1);
-            Ok(Some((item.path().to_path_buf(), get_file_times(&mt)?)))
+        let mut most_recent_albums = albums_infos.keys().cloned().collect::<Vec<_>>();
+
+        most_recent_albums.sort_by_key(|album_id| {
+            let most_recent_track = albums_tracks
+                .get(album_id)
+                .unwrap()
+                .iter()
+                .map(|track_id| tracks.get(track_id).unwrap())
+                // NOTE: We use the minimum here to avoid a typical problem where
+                //       some tracks are updated manually and mess with the whole ordering.
+                // So instead the lowest (usually common) time of all tracks to determine
+                // the album's one.
+                .min_by_key(|track| track.ctime.unwrap_or(track.mtime))
+                .unwrap();
+
+            most_recent_track.ctime.unwrap_or(most_recent_track.mtime)
         });
-    }
 
-    let mut files = HashMap::new();
+        // Reverse to get the most recent albums first
+        most_recent_albums.reverse();
 
-    while let Some(res) = set.join_next().await {
-        if let Some((path, times)) = res?? {
-            files.insert(path, times);
+        debug!("| Done.");
+
+        Index {
+            tracks,
+            tracks_files_mtime,
+
+            albums_infos: albums_infos.into_iter().collect(),
+            albums_tracks,
+
+            albums_genres,
+
+            artists_infos: artists_infos.into_iter().collect(),
+            album_artists_infos: album_artists_infos.into_iter().collect(),
+
+            artists_albums,
+            artists_album_participations,
+            artists_albums_and_participations,
+
+            artists_album_tracks,
+            artists_track_participations,
+            artists_tracks_and_participations,
+
+            genres_infos: genres_infos.into_iter().collect(),
+            genres_albums,
+            genres_tracks,
+            no_genre_tracks,
+
+            most_recent_albums,
         }
     }
-
-    spinner.finish_and_clear();
-
-    Ok(files)
-}
-
-fn get_file_times(mt: &Metadata) -> Result<FileTimes> {
-    let ctime = mt.created().ok();
-
-    let mtime = mt
-        .modified()
-        .context("Failed to get the file's modification time")?;
-
-    Ok(FileTimes { ctime, mtime })
 }

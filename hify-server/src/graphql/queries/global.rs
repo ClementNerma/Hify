@@ -32,10 +32,9 @@ impl QueryRoot {
         let index = graphql_index!(ctx);
 
         IndexInfos {
-            fingerprint: index.fingerprint.clone(),
-            albums_count: index.cache.albums_infos.len(),
-            album_artists_count: index.cache.album_artists_infos.len(),
-            artists_count: index.cache.artists_infos.len(),
+            albums_count: index.albums_infos.len(),
+            album_artists_count: index.album_artists_infos.len(),
+            artists_count: index.artists_infos.len(),
             tracks_count: index.tracks.len(),
         }
     }
@@ -87,9 +86,7 @@ impl QueryRoot {
     ) -> Paginated<AlbumID, AlbumInfos> {
         let index = graphql_index!(ctx);
 
-        paginate(pagination, &index.cache.albums_infos, |album| {
-            album.get_id()
-        })
+        paginate(pagination, &index.albums_infos, |album| album.get_id())
     }
 
     async fn most_recent_albums(
@@ -99,13 +96,13 @@ impl QueryRoot {
     ) -> Paginated<usize, AlbumInfos, AlbumUsizeConnection, AlbumUsizeEdge> {
         let index = graphql_index!(ctx);
 
-        paginate_mapped_slice(pagination, &index.cache.most_recent_albums, |album_id| {
-            index.cache.albums_infos.get(album_id).unwrap().clone()
+        paginate_mapped_slice(pagination, &index.most_recent_albums, |album_id| {
+            index.albums_infos.get(album_id).unwrap().clone()
         })
     }
 
     async fn album(&self, ctx: &Context<'_>, id: AlbumID) -> Option<AlbumInfos> {
-        graphql_index!(ctx).cache.albums_infos.get(&id).cloned()
+        graphql_index!(ctx).albums_infos.get(&id).cloned()
     }
 
     async fn artists(
@@ -114,9 +111,7 @@ impl QueryRoot {
         pagination: PaginationInput,
     ) -> Paginated<ArtistID, ArtistInfos> {
         let index = graphql_index!(ctx);
-        paginate(pagination, &index.cache.artists_infos, |artist| {
-            artist.get_id()
-        })
+        paginate(pagination, &index.artists_infos, |artist| artist.get_id())
     }
 
     async fn album_artists(
@@ -125,26 +120,21 @@ impl QueryRoot {
         pagination: PaginationInput,
     ) -> Paginated<ArtistID, ArtistInfos> {
         let index = graphql_index!(ctx);
-        paginate(pagination, &index.cache.album_artists_infos, |artist| {
+        paginate(pagination, &index.album_artists_infos, |artist| {
             artist.get_id()
         })
     }
 
     async fn artist(&self, ctx: &Context<'_>, id: ArtistID) -> Option<ArtistInfos> {
-        graphql_index!(ctx).cache.artists_infos.get(&id).cloned()
+        graphql_index!(ctx).artists_infos.get(&id).cloned()
     }
 
     async fn genres(&self, ctx: &Context<'_>) -> Vec<GenreInfos> {
-        graphql_index!(ctx)
-            .cache
-            .genres_infos
-            .values()
-            .cloned()
-            .collect()
+        graphql_index!(ctx).genres_infos.values().cloned().collect()
     }
 
     async fn genre(&self, ctx: &Context<'_>, id: GenreID) -> Option<GenreInfos> {
-        graphql_index!(ctx).cache.genres_infos.get(&id).cloned()
+        graphql_index!(ctx).genres_infos.get(&id).cloned()
     }
 
     async fn tracks<'c>(
