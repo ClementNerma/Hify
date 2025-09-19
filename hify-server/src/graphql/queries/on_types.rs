@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 
 use crate::{
@@ -109,21 +107,15 @@ impl AlbumInfos {
         // }
     }
 
-    async fn genres(&self, ctx: &Context<'_>) -> BTreeSet<GenreInfos> {
+    async fn genres(&self, ctx: &Context<'_>) -> Vec<GenreInfos> {
         let index = graphql_index!(ctx);
-        let album_tracks = index.albums_tracks.get(&self.get_id()).unwrap();
-        album_tracks
+
+        let genres = index.albums_genres.get(&self.get_id()).unwrap();
+
+        genres
             .iter()
-            .flat_map(|track_id| {
-                index
-                    .tracks
-                    .get(track_id)
-                    .unwrap()
-                    .metadata
-                    .tags
-                    .get_genres_infos()
-            })
-            .collect()
+            .map(|genre_id| index.genres_infos.get(genre_id).unwrap().clone())
+            .collect::<Vec<_>>()
     }
 
     async fn has_art(&self, ctx: &Context<'_>) -> bool {
