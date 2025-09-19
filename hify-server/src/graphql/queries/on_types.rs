@@ -173,6 +173,24 @@ impl ArtistInfos {
         )
     }
 
+    async fn album_tracks(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
+        let index = graphql_index!(ctx);
+
+        let track_ids = index
+            .artists_album_tracks
+            .get(&self.get_id())
+            .map(Vec::as_slice)
+            .unwrap_or(&[]);
+
+        paginate_mapped_slice(pagination, track_ids, |track| {
+            index.tracks.get(track).unwrap().clone()
+        })
+    }
+
     async fn track_participations(
         &self,
         ctx: &Context<'_>,
