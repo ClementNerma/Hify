@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result};
-use async_graphql::{Context, Object};
+use async_graphql::{Context, Object, SimpleObject};
 
 use crate::{
     graphql_ctx_member, graphql_index, graphql_user_data,
@@ -19,7 +19,6 @@ use super::{
     super::pagination::{Paginated, PaginationInput, paginate, paginate_mapped_slice},
     AlbumUsizeConnection, AlbumUsizeEdge, TrackIDConnection, TrackIDEdge, TrackUsizeConnection,
     TrackUsizeEdge,
-    on_types::*,
 };
 
 transparent_cursor_type!(TrackID, AlbumID, ArtistID, GenreID);
@@ -192,4 +191,12 @@ impl QueryRoot {
     async fn generate_stats(&self, ctx: &Context<'_>) -> LibraryStats {
         stats::generate_stats(&*graphql_index!(ctx), &*graphql_user_data!(ctx))
     }
+}
+
+#[derive(SimpleObject)]
+pub struct IndexInfos {
+    pub albums_count: usize,
+    pub artists_count: usize,
+    pub album_artists_count: usize,
+    pub tracks_count: usize,
 }

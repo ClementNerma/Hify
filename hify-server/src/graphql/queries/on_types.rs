@@ -1,4 +1,4 @@
-use async_graphql::{ComplexObject, Context, Object, SimpleObject};
+use async_graphql::{ComplexObject, Context, Object};
 
 use crate::{
     graphql_ctx, graphql_index, graphql_res_manager, graphql_user_data,
@@ -13,14 +13,6 @@ use super::{
     super::pagination::{Paginated, PaginationInput, paginate, paginate_mapped_slice},
     TrackUsizeConnection, TrackUsizeEdge,
 };
-
-#[derive(SimpleObject)]
-pub struct IndexInfos {
-    pub albums_count: usize,
-    pub artists_count: usize,
-    pub album_artists_count: usize,
-    pub tracks_count: usize,
-}
 
 #[ComplexObject]
 impl Track {
