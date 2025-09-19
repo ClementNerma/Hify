@@ -51,7 +51,7 @@ pub fn assemble_four_images(
 }
 
 pub fn save_image_webp(image: &RgbImage, path: &Path) -> Result<()> {
-    let encoder = webp::Encoder::from_rgb(image, image.width(), image.height()).encode(90f32);
+    let encoder = webp::Encoder::from_rgb(image, image.width(), image.height()).encode(70f32);
 
     fs::write(path, &*encoder)
         .with_context(|| format!("Failed to write image to file: {}", path.display()))?;
