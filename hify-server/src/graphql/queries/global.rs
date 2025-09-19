@@ -145,6 +145,17 @@ impl QueryRoot {
         paginate(pagination, &index.tracks, |track| track.id)
     }
 
+    async fn no_genre_tracks<'c>(
+        &self,
+        ctx: &Context<'_>,
+        pagination: PaginationInput,
+    ) -> Paginated<usize, Track, TrackUsizeConnection, TrackUsizeEdge> {
+        let index = graphql_index!(ctx);
+        paginate_mapped_slice(pagination, &index.no_genre_tracks, |track_id| {
+            index.tracks.get(track_id).unwrap().clone()
+        })
+    }
+
     async fn select_tracks(&self, ctx: &Context<'_>, in_ids: Vec<TrackID>) -> Result<Vec<Track>> {
         let index = graphql_index!(ctx);
         in_ids

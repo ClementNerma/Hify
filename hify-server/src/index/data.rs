@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    collections::{HashMap, HashSet, hash_map::DefaultHasher},
+    collections::{HashMap, hash_map::DefaultHasher},
     hash::{Hash, Hasher},
     path::PathBuf,
     time::SystemTime,
@@ -83,7 +83,7 @@ pub struct Index {
     pub genres_tracks: HashMap<GenreID, Vec<TrackID>>,
 
     /// List of tracks who don't have a genre
-    pub no_genre_tracks: HashSet<TrackID>,
+    pub no_genre_tracks: Vec<TrackID>,
 }
 
 /// Album infos, identifying an album

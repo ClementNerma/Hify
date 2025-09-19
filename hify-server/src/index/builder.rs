@@ -36,7 +36,7 @@ impl Index {
         let mut genres_infos = HashMap::<GenreID, GenreInfos>::new();
         let mut genres_albums = HashMap::<GenreID, BTreeSet<AlbumInfos>>::new();
         let mut genres_tracks = HashMap::<GenreID, Vec<TrackID>>::new();
-        let mut no_genre_tracks = HashSet::new();
+        let mut no_genre_tracks = vec![];
 
         debug!("| Building tracks cache...");
 
@@ -100,7 +100,7 @@ impl Index {
             albums_tracks.entry(album_id).or_default().push(track.id);
 
             if track.metadata.tags.genres.is_empty() {
-                no_genre_tracks.insert(track.id);
+                no_genre_tracks.push(track.id);
             } else {
                 for genre in tags.get_genres_infos() {
                     let genre_id = genre.get_id();
