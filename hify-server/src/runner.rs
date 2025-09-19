@@ -51,7 +51,6 @@ impl<T: Send + 'static> TaskSet<T> {
             let results = Arc::clone(&results);
             let pb = pb.clone();
 
-            // TODO: handle panics (+ remove .unwrap() calls)
             runners.push(std::thread::spawn(move || {
                 loop {
                     let Some(next_task) = remaining_tasks.lock().unwrap().pop() else {
@@ -61,7 +60,7 @@ impl<T: Send + 'static> TaskSet<T> {
                     let result = std::panic::catch_unwind(next_task);
 
                     results.lock().unwrap().push(result.map_err(|_| {
-                        // TODO: show error
+                        // TODO: show exact error
                         anyhow!("Task panicked")
                     }));
 

@@ -13,9 +13,16 @@ use log::debug;
 use regex::Regex;
 
 use crate::{
-    arts::tools::{resize_image_constraint, save_image_webp},
+    arts::{
+        LARGE_ART_SIDE_PX, MEDIUM_ART_SIDE_PX, SMALL_ART_SIDE_PX,
+        tools::{resize_image_constraint, save_image_webp},
+    },
     index::IdType,
 };
+
+static LARGE_WEBP_FILENAME: &str = "large.webp";
+static MEDIUM_WEBP_FILENAME: &str = "medium.webp";
+static SMALL_WEBP_FILENAME: &str = "small.webp";
 
 pub struct ItemArtsManager<I: IdType> {
     dir: PathBuf,
@@ -124,12 +131,11 @@ impl<I: IdType> ItemArtsManager<I> {
     }
 
     pub fn large_art(&self, id: I) -> Option<PathBuf> {
-        // TODO: put filenames in constants!
         self.arts
             .read()
             .unwrap()
             .get(&id)
-            .map(|arts| arts.dir.join("large.webp"))
+            .map(|arts| arts.dir.join(LARGE_WEBP_FILENAME))
     }
 
     pub fn medium_art(&self, id: I) -> Option<PathBuf> {
@@ -137,7 +143,7 @@ impl<I: IdType> ItemArtsManager<I> {
             .read()
             .unwrap()
             .get(&id)
-            .map(|arts| arts.dir.join("medium.webp"))
+            .map(|arts| arts.dir.join(MEDIUM_WEBP_FILENAME))
     }
 
     pub fn small_art(&self, id: I) -> Option<PathBuf> {
@@ -145,7 +151,7 @@ impl<I: IdType> ItemArtsManager<I> {
             .read()
             .unwrap()
             .get(&id)
-            .map(|arts| arts.dir.join("small.webp"))
+            .map(|arts| arts.dir.join(SMALL_WEBP_FILENAME))
     }
 
     pub fn register_art(
@@ -203,20 +209,19 @@ impl<I: IdType> ItemArtsManager<I> {
             )
         })?;
 
-        // TODO: put the three sizes into constants
         save_image_webp(
-            &resize_image_constraint(&image, 2000),
-            &item_arts_dir.join("large.webp"),
+            &resize_image_constraint(&image, LARGE_ART_SIDE_PX),
+            &item_arts_dir.join(LARGE_WEBP_FILENAME),
         )?;
 
         save_image_webp(
-            &resize_image_constraint(&image, 500),
-            &item_arts_dir.join("medium.webp"),
+            &resize_image_constraint(&image, MEDIUM_ART_SIDE_PX),
+            &item_arts_dir.join(MEDIUM_WEBP_FILENAME),
         )?;
 
         save_image_webp(
-            &resize_image_constraint(&image, 200),
-            &item_arts_dir.join("small.webp"),
+            &resize_image_constraint(&image, SMALL_ART_SIDE_PX),
+            &item_arts_dir.join(SMALL_WEBP_FILENAME),
         )?;
 
         self.arts.write().unwrap().insert(

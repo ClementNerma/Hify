@@ -17,7 +17,7 @@ use crate::{
     runner::{TaskSet, TaskSetOptions},
 };
 
-use super::ItemArtsManager;
+use super::{ItemArtsManager, LARGE_ART_SIDE_PX};
 
 pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Result<()> {
     let artists = index.artists_albums_and_participations.keys().copied();
@@ -41,7 +41,6 @@ pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Res
                 .take(4)
                 .collect::<Vec<_>>();
 
-            // TODO: put '2000' in a constant
             match artist_album_arts.as_slice() {
                 [] => Ok(()),
 
@@ -49,14 +48,16 @@ pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Res
                     artist_id,
                     &artists_art_manager,
                     [single.as_path()],
-                    |[single]| Ok(resize_image_constraint(&single, 2000).into_owned()),
+                    |[single]| Ok(resize_image_constraint(&single, LARGE_ART_SIDE_PX).into_owned()),
                 ),
 
                 [left, right] => assemble(
                     artist_id,
                     &artists_art_manager,
                     [left.as_path(), right.as_path()],
-                    |[left, right]| assemble_four_images(&left, &right, &right, &left, 2000),
+                    |[left, right]| {
+                        assemble_four_images(&left, &right, &right, &left, LARGE_ART_SIDE_PX)
+                    },
                 ),
 
                 [top_left, top_right, bottom_left] => assemble(
@@ -68,7 +69,7 @@ pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Res
                         bottom_left.as_path(),
                     ],
                     |[top_left, top_right, bottom_left]| {
-                        assemble_four_images(&top_left, &top_right, &bottom_left, &top_left, 2000)
+                        assemble_four_images(&top_left, &top_right, &bottom_left, &top_left, LARGE_ART_SIDE_PX)
                     },
                 ),
 
@@ -87,7 +88,7 @@ pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Res
                             &top_right,
                             &bottom_left,
                             &bottom_right,
-                            2000,
+                            LARGE_ART_SIDE_PX,
                         )
                     },
                 ),

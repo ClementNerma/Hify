@@ -10,7 +10,6 @@ use crate::{
     userdata::UserDataWrapper,
 };
 
-// TODO: deleted album arts
 pub fn detect_changes(
     music_dir: &Path,
     user_data: &mut UserDataWrapper,

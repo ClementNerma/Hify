@@ -9,6 +9,7 @@ use serde::Deserialize;
 use tower_http::services::fs::ServeFileSystemResponseBody;
 
 use crate::{
+    arts::{LARGE_ART_SIDE_PX, MEDIUM_ART_SIDE_PX, SMALL_ART_SIDE_PX},
     http::{
         HttpState,
         opensubsonic::{OSError, types::CoverArtId},
@@ -62,10 +63,15 @@ async fn stream(
 
 static GET_COVER_ART_URI: &str = "/getCoverArt";
 
-pub fn make_cover_art_uri(id: CoverArtId) -> String {
+pub fn make_cover_art_uri(id: CoverArtId, art_size: ArtSize) -> String {
     format!(
-        "{OPENSUBSONIC_BASE_URI}{GET_COVER_ART_URI}?id={}",
-        id.encode()
+        "{OPENSUBSONIC_BASE_URI}{GET_COVER_ART_URI}?id={}&size={}",
+        id.encode(),
+        match art_size {
+            ArtSize::Large => LARGE_ART_SIDE_PX,
+            ArtSize::Medium => MEDIUM_ART_SIDE_PX,
+            ArtSize::Small => SMALL_ART_SIDE_PX,
+        }
     )
 }
 

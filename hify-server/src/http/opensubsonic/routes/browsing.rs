@@ -12,6 +12,7 @@ use crate::{
                 AlbumInfo, ArtistInfo2, Child, CoverArtId, Genre, MUSIC_FOLDER_ID, MusicFolder,
             },
         },
+        routes::ArtSize,
     },
     index::{AlbumID, ArtistID, TrackID},
     os_struct,
@@ -152,16 +153,15 @@ async fn get_artist_info2(
 ) -> OSResult<ArtistInfo2> {
     let index = state.index.read().await;
 
-    let artist = index.artists_infos.get(&artist_id).ok_or((
-        StatusCode::NOT_FOUND,
-        "The provided artist ID was not found",
-    ))?;
+    if !index.artists_infos.contains_key(&artist_id) {
+        return Err((
+            StatusCode::NOT_FOUND,
+            "The provided artist ID was not found",
+        ));
+    }
 
-    let img_url = state
-        .resource_manager
-        .artist_arts
-        .large_art(artist_id)
-        .map(|_| make_cover_art_uri(CoverArtId::Artist(artist.get_id())));
+    let get_image_uri =
+        |art_size: ArtSize| make_cover_art_uri(CoverArtId::Artist(artist_id), art_size);
 
     Ok(OSNestedResponse(
         f,
@@ -170,10 +170,9 @@ async fn get_artist_info2(
             biography: None,
             music_brainz_id: None,
             last_fm_url: None,
-            // TODO: different image size
-            small_image_url: img_url.clone(),
-            medium_image_url: img_url.clone(),
-            large_image_url: img_url,
+            small_image_url: Some(get_image_uri(ArtSize::Small)),
+            medium_image_url: Some(get_image_uri(ArtSize::Medium)),
+            large_image_url: Some(get_image_uri(ArtSize::Large)),
             similar_artists: None, // TODO
         },
     ))
@@ -181,22 +180,23 @@ async fn get_artist_info2(
 
 #[derive(Deserialize)]
 struct GetAlbumInfo2Params {
-    id: AlbumID,
+    #[serde(rename = "id")]
+    album_id: AlbumID,
 }
 
 async fn get_album_info2(
     Query(OSCommonParams { f }): Query<OSCommonParams>,
-    Query(GetAlbumInfo2Params { id }): Query<GetAlbumInfo2Params>,
+    Query(GetAlbumInfo2Params { album_id }): Query<GetAlbumInfo2Params>,
     Extension(state): Extension<Arc<HttpState>>,
 ) -> OSResult<AlbumInfo> {
     let index = state.index.read().await;
 
-    let album = index
-        .albums_infos
-        .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "The provided album ID was not found"))?;
+    if !index.albums_infos.contains_key(&album_id) {
+        return Err((StatusCode::NOT_FOUND, "The provided album ID was not found"));
+    }
 
-    let img_url = make_cover_art_uri(CoverArtId::Album(album.get_id()));
+    let get_image_uri =
+        |art_size: ArtSize| make_cover_art_uri(CoverArtId::Album(album_id), art_size);
 
     Ok(OSNestedResponse(
         f,
@@ -205,10 +205,9 @@ async fn get_album_info2(
             notes: None,
             music_brainz_id: None,
             last_fm_url: None,
-            // TODO: different image size
-            small_image_url: Some(img_url.clone()),
-            medium_image_url: Some(img_url.clone()),
-            large_image_url: Some(img_url),
+            small_image_url: Some(get_image_uri(ArtSize::Small)),
+            medium_image_url: Some(get_image_uri(ArtSize::Medium)),
+            large_image_url: Some(get_image_uri(ArtSize::Large)),
         },
     ))
 }

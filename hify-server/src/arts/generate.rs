@@ -49,7 +49,6 @@ pub fn generate_arts(
     }
 
     for deleted_album in &albums_prev_index - &albums_new_index {
-        // TODO: async
         res_manager.album_arts.delete_arts(*deleted_album)?;
     }
 
