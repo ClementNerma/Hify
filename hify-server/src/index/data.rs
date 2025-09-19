@@ -133,7 +133,7 @@ pub struct GenreInfos {
 }
 
 impl GenreInfos {
-    fn new(name: String) -> Self {
+    pub fn new(name: String) -> Self {
         Self { name }
     }
 

@@ -11,7 +11,7 @@ use crate::{
             types::{AlbumID3WithSongs, Artist, Child},
         },
     },
-    index::{AlbumInfos, Index},
+    index::{AlbumInfos, GenreID, GenreInfos, Index},
     os_struct,
 };
 
@@ -55,10 +55,7 @@ enum AlbumListSort {
     ByGenre,
 }
 
-fn _album_list<'a>(
-    params: &AlbumListParams,
-    index: &'a Index,
-) -> impl Iterator<Item = &'a AlbumInfos> {
+fn _album_list(params: AlbumListParams, index: &Index) -> impl Iterator<Item = &AlbumInfos> {
     let AlbumListParams {
         sort,
         size,
@@ -72,11 +69,15 @@ fn _album_list<'a>(
 
     // TODO: take sort into consideration
     // TODO: take from_year + to_year into consideration
-    // TODO: takegenre into consideration
+
+    let genre = genre.map(|genre| GenreInfos::new(genre).get_id());
 
     index
         .albums_infos
         .iter()
+        .filter(move |(album_id, _)| {
+            genre.is_none_or(|genre| index.albums_genres.get(album_id).unwrap().contains(&genre))
+        })
         .skip(offset.unwrap_or(0))
         .take(size.unwrap_or(50))
         .map(|(_, album)| album)
@@ -100,7 +101,7 @@ async fn get_album_list(
         f,
         "albumList",
         GetAlbumListAnswer {
-            albums: _album_list(&params, &index)
+            albums: _album_list(params, &index)
                 .map(|album| album_to_child(album, &index))
                 .collect(),
         },
@@ -126,7 +127,7 @@ async fn get_album_list2(
         f,
         "albumList2",
         GetAlbumList2Answer {
-            albums: _album_list(&params, &index)
+            albums: _album_list(params, &index)
                 .map(|album| album_to_id3_with_songs(album, &index, None))
                 .collect(),
         },

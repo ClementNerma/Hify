@@ -137,18 +137,14 @@ async fn get_song(
 struct GetArtistInfo2Params {
     #[serde(rename = "id")]
     artist_id: ArtistID,
-    #[serde(rename = "count")]
-    similar_artists_count: Option<usize>,
-    include_not_present: Option<bool>,
+    // #[serde(rename = "count")]
+    // similar_artists_count: Option<usize>, (TODO)
+    // include_not_present: Option<bool>, (TODO)
 }
 
 async fn get_artist_info2(
     Query(OSCommonParams { f }): Query<OSCommonParams>,
-    Query(GetArtistInfo2Params {
-        artist_id,
-        similar_artists_count,
-        include_not_present,
-    }): Query<GetArtistInfo2Params>,
+    Query(GetArtistInfo2Params { artist_id }): Query<GetArtistInfo2Params>,
     Extension(state): Extension<Arc<HttpState>>,
 ) -> OSResult<ArtistInfo2> {
     let index = state.index.read().await;
