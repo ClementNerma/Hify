@@ -16,8 +16,6 @@ impl Index {
 
         let tracks = ValueOrdMap::from_iter(tracks.into_iter().map(|track| (track.id, track)));
 
-        let mut tracks_files_mtime = HashMap::new();
-
         let mut tracks_formats = HashMap::new();
 
         let mut artists_infos = HashMap::<ArtistID, ArtistInfos>::new();
@@ -41,7 +39,6 @@ impl Index {
         debug!("| Building tracks cache...");
 
         for track in tracks.values() {
-            tracks_files_mtime.insert(track.relative_path.clone(), track.mtime);
             tracks_formats.insert(track.id, track.metadata.codec);
 
             let tags = &track.metadata.tags;
@@ -238,7 +235,6 @@ impl Index {
 
         Index {
             tracks,
-            tracks_files_mtime,
 
             albums_infos: albums_infos.into_iter().collect(),
             albums_tracks,

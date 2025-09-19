@@ -25,9 +25,6 @@ pub struct Index {
     /// List of all tracks, by ID
     pub tracks: ValueOrdMap<TrackID, Track>,
 
-    /// List of all tracks' audio files with their modification time
-    pub tracks_files_mtime: HashMap<PathBuf, SystemTime>,
-
     //
     // === ALBUMS ===
     //
