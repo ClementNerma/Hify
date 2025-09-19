@@ -35,7 +35,7 @@ pub fn assemble_four_images(
     bottom_right: &RgbImage,
     side_px: u32,
 ) -> Result<RgbImage> {
-    assert!(side_px % 2 == 0);
+    assert!(side_px.is_multiple_of(2));
 
     // TODO: choose how to handle images with different aspect ratios
     let mut image = RgbImage::new(side_px, side_px);
