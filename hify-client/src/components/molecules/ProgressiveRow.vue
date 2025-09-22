@@ -26,6 +26,7 @@ defineSlots<{
 
 defineExpose<ProgressiveRowExposeType>({
   jumpUnfocusedPosition(newPosition) {
+    // TODO
     position.value = newPosition
   },
 
@@ -36,7 +37,6 @@ defineExpose<ProgressiveRowExposeType>({
 
 const position = ref(0)
 const disableHandler = ref(false)
-const isFirstEntering = ref(true)
 
 const COLUMNS = 7
 
@@ -53,8 +53,6 @@ function onFocus(newPosition: number, requestItemFocus: boolean) {
   if (disableHandler.value || newPosition < 0) {
     return
   }
-
-  isFirstEntering.value = false
 
   if (requestItemFocus) {
     requestFocus(Math.min(newPosition, props.items.length - 1))
@@ -121,12 +119,13 @@ const rowRef = useTemplateRef<NavigableRowExposeType>('rowRef')
           :intercept-key-press="d => d === NavigationDirection.Left || d === NavigationDirection.Right"
           @left-key="onFocus(itemPosition - 1, true)"
           @right-key="onFocus(itemPosition + 1, true)"
-          @focus="onFocus(i, false)"
+          @focus="onFocus(itemPosition, false)"
           @press="onItemPress?.(item, itemPosition)"
           @long-press="onItemLongPress?.(item, itemPosition)"
           :has-focus-priority="itemPosition === position"
           v-slot="{ item: navigableItem, focused }"
         >
+          {{ position }}/{{ itemPosition }}
           <slot
             :item
             :position="itemPosition"
