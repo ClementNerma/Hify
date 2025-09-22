@@ -12,7 +12,6 @@ defineProps<{ tracks: AudioTrackFragment[] }>()
 <template>
     <ProgressiveRow
         :items="tracks"
-        idProp="id"
         @item-press="(track) => ctxMenuCallbacks.playTrack(track, tracks, null)"
         @item-long-press="(track) =>
             showContextMenu(ctxMenuOptions.forTrack(track, { fromMixId: null }, { context: 'normal' }))"

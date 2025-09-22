@@ -5,15 +5,14 @@ export type ProgressiveRowExposeType = {
 }
 </script>
 
-<script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
-import { computed, onMounted, onUpdated, ref, useTemplateRef, type VNodeRef } from 'vue';
-import { getChildrenOf, logFatal, NavigationDirection, requestFocusById, requestFocusOnItem, type NavigableElementByType } from '@/navigable';
+<script setup lang="ts" generic="T">
+import { computed, onUpdated, ref, useTemplateRef } from 'vue';
+import { getChildrenOf, logFatal, NavigationDirection, requestFocusOnItem, type NavigableElementByType } from '@/navigable';
 import NavigableRow, { type NavigableRowExposeType } from '@/navigable/vue/components/NavigableRow.vue';
-import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 
 const props = defineProps<{
   items: T[],
-  idProp: K,
   disableScroll?: boolean
   initialPosition?: number,
   onItemPress?: (item: T, newPosition: number) => void

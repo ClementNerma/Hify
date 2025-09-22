@@ -13,7 +13,6 @@ defineProps<{
 <template>
     <ProgressiveRow
         :items="albums"
-        idProp="id"
         @item-press="(album) => router.push({ name: 'album', params: { id: album.id } })"
         v-slot="{ item: album }"
     >

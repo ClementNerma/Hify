@@ -133,7 +133,6 @@ watch(
           <ProgressiveRow
             ref="queueGalleryRef"
             :items="readablePlayQueue.tracks"
-            idProp="idInQueue"
             disable-scroll
             :initialPosition="readablePlayQueue.position ?? 0"
             @item-press="(_, pos) => playTrackFromCurrentQueue(pos)"
