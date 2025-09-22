@@ -22,25 +22,25 @@ import router from '@/router'
 const albumId = getRouteParam('id')
 
 function getAlbumInfos(filteredTracks: AudioTrackFragment[]) {
-  const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
-    number: num.toString(),
-    tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
-  }))
+	const discs = dedup(filterMap(filteredTracks, (track) => track.metadata.tags.disc)).map((num) => ({
+		number: num.toString(),
+		tracks: filteredTracks.filter((track) => track.metadata.tags.disc === num),
+	}))
 
-  const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
+	const tracksWithoutDisc = filteredTracks.filter((track) => !isDefined(track.metadata.tags.disc))
 
-  if (tracksWithoutDisc.length > 0) {
-    discs.unshift({ number: '?', tracks: tracksWithoutDisc })
-  }
+	if (tracksWithoutDisc.length > 0) {
+		discs.unshift({ number: '?', tracks: tracksWithoutDisc })
+	}
 
-  return {
-    totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
-    discs,
-  }
+	return {
+		totalDuration: filteredTracks.map((track) => track.metadata.duration).reduce((a, x) => a + x, 0),
+		discs,
+	}
 }
 
 const { data, fetching, error } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query AlbumPage($albumId: String!) {
       album(id: $albumId) {
         ...Album
@@ -55,16 +55,16 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-  variables: { albumId },
+	variables: { albumId },
 })
 
 const onlyShowGreatSongs = ref(false)
 
 const album = computed(() => data.value?.album)
 const filteredTracks = computed(() =>
-  album.value && onlyShowGreatSongs.value
-    ? album.value.tracks.filter((track) => hasMinimumRating(track, 8))
-    : album.value?.tracks,
+	album.value && onlyShowGreatSongs.value
+		? album.value.tracks.filter((track) => hasMinimumRating(track, 8))
+		: album.value?.tracks,
 )
 const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTracks.value))
 </script>

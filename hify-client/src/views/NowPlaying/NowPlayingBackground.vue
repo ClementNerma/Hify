@@ -4,12 +4,14 @@ import { getAlbumArtUrl } from '@/global/constants'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 
 const props = defineProps<{
-  track: AudioTrackFragment | null
-  dim: boolean
+	track: AudioTrackFragment | null
+	dim: boolean
 }>()
 
 const album = computed(() => props.track?.metadata.tags.album)
-const background = computed(() => (album.value?.hasArt ? `url("${getAlbumArtUrl(album.value, 'large')}")` : 'transparent'))
+const background = computed(() =>
+	album.value?.hasArt ? `url("${getAlbumArtUrl(album.value, 'large')}")` : 'transparent',
+)
 const backdropFilter = computed(() => `blur(20px) brightness(${props.dim ? 0.3 : 0.4})`)
 </script>
 

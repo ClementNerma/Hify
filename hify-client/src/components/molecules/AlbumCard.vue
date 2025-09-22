@@ -6,9 +6,9 @@ import router from '@/router'
 import Card from './Card.vue'
 
 const props = defineProps<
-    {
-        album: AlbumFragment
-    } & NavigableItemProps
+	{
+		album: AlbumFragment
+	} & NavigableItemProps
 >()
 </script>
 

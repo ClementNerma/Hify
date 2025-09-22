@@ -14,7 +14,7 @@ import router from '@/router'
 const GENRES_PER_LINE = 6
 
 const { data, fetching, error } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query GenresPage {
       genres {
         id
@@ -23,7 +23,7 @@ const { data, fetching, error } = useQuery({
       }
     }
   `),
-  variables: {},
+	variables: {},
 })
 
 const genres = computed(() => data.value?.genres)

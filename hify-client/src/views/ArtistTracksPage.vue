@@ -20,12 +20,12 @@ const artistId = getRouteParam('id')
 const TRACKS_PER_PAGE = 100
 
 const feedMore = noParallel(async () => {
-  if (currentPageInfo.value?.hasNextPage === false) {
-    return
-  }
+	if (currentPageInfo.value?.hasNextPage === false) {
+		return
+	}
 
-  const { data, error } = await gqlClient.query(
-    graphql(`
+	const { data, error } = await gqlClient.query(
+		graphql(`
       query ArtistAllTracks($artistId: String!, $pagination: PaginationInput!) {
         artist(id: $artistId) {
           name
@@ -43,22 +43,22 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-    {
-      artistId,
-      pagination: {
-        after: currentPageInfo.value?.endCursor,
-        first: TRACKS_PER_PAGE,
-      },
-    },
-  )
+		{
+			artistId,
+			pagination: {
+				after: currentPageInfo.value?.endCursor,
+				first: TRACKS_PER_PAGE,
+			},
+		},
+	)
 
-  if (!data?.artist) {
-    logFatal('Failed to fetch track participations', error)
-  }
+	if (!data?.artist) {
+		logFatal('Failed to fetch track participations', error)
+	}
 
-  authorName.value = data.artist.name
-  currentPageInfo.value = data.artist.allTracks.pageInfo
-  unfilteredTracks.value.push(...data.artist.allTracks.nodes)
+	authorName.value = data.artist.name
+	currentPageInfo.value = data.artist.allTracks.pageInfo
+	unfilteredTracks.value.push(...data.artist.allTracks.nodes)
 })
 
 const currentPageInfo = ref<NonNullable<ArtistAllTracksQuery['artist']>['allTracks']['pageInfo'] | null>(null)
@@ -68,9 +68,9 @@ const unfilteredTracks = ref<AudioTrackFragment[]>([])
 
 const onlyShowGreatSongs = ref(false)
 const filteredTracks = computed(() =>
-  onlyShowGreatSongs.value
-    ? unfilteredTracks.value.filter((track) => hasMinimumRating(track, 8))
-    : unfilteredTracks.value,
+	onlyShowGreatSongs.value
+		? unfilteredTracks.value.filter((track) => hasMinimumRating(track, 8))
+		: unfilteredTracks.value,
 )
 
 onMounted(feedMore)

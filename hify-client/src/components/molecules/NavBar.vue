@@ -8,43 +8,43 @@ import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
 
 export type Tab = {
-  label: string
-  routeName: string
-  subMenu?: TabDropdownItem[]
+	label: string
+	routeName: string
+	subMenu?: TabDropdownItem[]
 }
 
 export type TabDropdownItem = Omit<Tab, 'subMenu'>
 
 const props = defineProps<{
-  tabs: Tab[]
+	tabs: Tab[]
 }>()
 
 onMounted(() => {
-  router.afterEach((to) => {
-    if (typeof to.name === 'string' && Object.hasOwn(routeLinkByName.value, to.name)) {
-      requestFocusOnItem(routeLinkByName.value[to.name].item)
-    } else {
-      // Fallback to first link
-      requestFocusOnItem(Object.values(routeLinkByName.value)[0].item)
-    }
-  })
+	router.afterEach((to) => {
+		if (typeof to.name === 'string' && Object.hasOwn(routeLinkByName.value, to.name)) {
+			requestFocusOnItem(routeLinkByName.value[to.name].item)
+		} else {
+			// Fallback to first link
+			requestFocusOnItem(Object.values(routeLinkByName.value)[0].item)
+		}
+	})
 })
 
 function showSubMenu(subMenu: TabDropdownItem[]) {
-  showContextMenu(
-    subMenu.map(({ label, routeName }) => ({
-      label,
-      onPress: () => {
-        router.push({ name: routeName })
-      },
-    })),
-  )
+	showContextMenu(
+		subMenu.map(({ label, routeName }) => ({
+			label,
+			onPress: () => {
+				router.push({ name: routeName })
+			},
+		})),
+	)
 }
 
 const routeLinkByName = ref<Record<string, NavigableItemExposeType>>({})
 
 function scrollTop() {
-  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+	window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
 }
 </script>
 

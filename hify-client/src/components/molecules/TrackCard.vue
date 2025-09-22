@@ -6,10 +6,10 @@ import NavigableTrack from '../atoms/NavigableTrack.vue'
 import Card from './Card.vue'
 
 defineProps<{
-    track: AudioTrackFragment
-    tracks: AudioTrackFragment[]
-    inPlaylist?: EntryInPlaylist
-    onFocus?: () => void
+	track: AudioTrackFragment
+	tracks: AudioTrackFragment[]
+	inPlaylist?: EntryInPlaylist
+	onFocus?: () => void
 }>()
 </script>
 

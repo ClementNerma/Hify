@@ -16,7 +16,7 @@ import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
 
 const { data, error, executeQuery } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query HomePage($itemParams: FeedParams!) {
       generateFeed(input: $itemParams) {
         lastListenedTo {
@@ -33,11 +33,11 @@ const { data, error, executeQuery } = useQuery({
       }
     }
   `),
-  variables: {
-    itemParams: {
-      maxItems: 100,
-    },
-  },
+	variables: {
+		itemParams: {
+			maxItems: 100,
+		},
+	},
 })
 
 const feed = computed(() => data.value?.generateFeed)

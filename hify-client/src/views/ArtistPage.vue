@@ -15,16 +15,16 @@ import ArtistTrackParticipations from './Artist/ArtistTrackParticipations.vue'
 const artistId = getRouteParam('id')
 
 const { data, fetching, error } = useQuery({
-  query: graphql(`
+	query: graphql(`
     query ArtistPage($artistId: String!) {
       artist(id: $artistId) {
         name
       }
     }
   `),
-  variables: {
-    artistId,
-  },
+	variables: {
+		artistId,
+	},
 })
 </script>
 

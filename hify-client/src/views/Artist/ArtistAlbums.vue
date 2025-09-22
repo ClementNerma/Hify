@@ -16,12 +16,12 @@ const ALBUMS_PER_LINE = 6
 const LINES_PER_PAGE = 5
 
 const feedMore = noParallel(async () => {
-  if (currentPageInfo.value?.hasNextPage === false) {
-    return
-  }
+	if (currentPageInfo.value?.hasNextPage === false) {
+		return
+	}
 
-  const { data, error } = await gqlClient.query(
-    graphql(`
+	const { data, error } = await gqlClient.query(
+		graphql(`
       query ArtistAlbums($artistId: String!, $pagination: PaginationInput!) {
         artist(id: $artistId) {
           albums(pagination: $pagination) {
@@ -37,21 +37,21 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-    {
-      artistId,
-      pagination: {
-        after: currentPageInfo.value?.endCursor,
-        first: ALBUMS_PER_LINE * LINES_PER_PAGE,
-      },
-    },
-  )
+		{
+			artistId,
+			pagination: {
+				after: currentPageInfo.value?.endCursor,
+				first: ALBUMS_PER_LINE * LINES_PER_PAGE,
+			},
+		},
+	)
 
-  if (!data?.artist) {
-    logFatal('Failed to fetch albums list', error)
-  }
+	if (!data?.artist) {
+		logFatal('Failed to fetch albums list', error)
+	}
 
-  currentPageInfo.value = data.artist.albums.pageInfo
-  albums.value.push(...data.artist.albums.nodes)
+	currentPageInfo.value = data.artist.albums.pageInfo
+	albums.value.push(...data.artist.albums.nodes)
 })
 
 const currentPageInfo = ref<NonNullable<ArtistAlbumsQuery['artist']>['albums']['pageInfo'] | null>(null)

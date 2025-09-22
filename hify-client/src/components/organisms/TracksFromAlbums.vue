@@ -8,10 +8,10 @@ import NavigableTrack from '../atoms/NavigableTrack.vue'
 import TrackRating from '../atoms/TrackRating.vue'
 
 defineProps<{
-  tracks: AudioTrackFragment[]
-  hasMore: boolean
-  showArtistsName?: boolean
-  feedMore: () => Promise<void>
+	tracks: AudioTrackFragment[]
+	hasMore: boolean
+	showArtistsName?: boolean
+	feedMore: () => Promise<void>
 }>()
 </script>
 

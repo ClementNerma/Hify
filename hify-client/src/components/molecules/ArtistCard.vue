@@ -8,9 +8,11 @@ import NavigableItem, { type NavigableItemProps } from '@/navigable/vue/componen
 import router from '@/router'
 import Card from './Card.vue'
 
-const { artist, ...navigableItemProps } = defineProps<{
-	artist: ArtistFragment
-} & NavigableItemProps>()
+const { artist, ...navigableItemProps } = defineProps<
+	{
+		artist: ArtistFragment
+	} & NavigableItemProps
+>()
 
 const contextMenuOptions = computed<ContextMenuOption[]>(() => [
 	{

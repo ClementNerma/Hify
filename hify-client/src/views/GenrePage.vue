@@ -17,12 +17,12 @@ const LINES_PER_PAGE = 5
 const genreId = getRouteParam('id')
 
 const feedMore = noParallel(async () => {
-  if (currentPageInfo.value?.hasNextPage === false) {
-    return
-  }
+	if (currentPageInfo.value?.hasNextPage === false) {
+		return
+	}
 
-  const { data, error } = await gqlClient.query(
-    graphql(`
+	const { data, error } = await gqlClient.query(
+		graphql(`
       query GenrePage($genreId: String!, $pagination: PaginationInput!) {
         genre(id: $genreId) {
           name
@@ -40,22 +40,22 @@ const feedMore = noParallel(async () => {
         }
       }
     `),
-    {
-      genreId,
-      pagination: {
-        after: currentPageInfo.value?.endCursor,
-        first: ALBUMS_PER_LINE * LINES_PER_PAGE,
-      },
-    },
-  )
+		{
+			genreId,
+			pagination: {
+				after: currentPageInfo.value?.endCursor,
+				first: ALBUMS_PER_LINE * LINES_PER_PAGE,
+			},
+		},
+	)
 
-  if (!data?.genre) {
-    logFatal('Failed to fetch albums list', error)
-  }
+	if (!data?.genre) {
+		logFatal('Failed to fetch albums list', error)
+	}
 
-  currentPageInfo.value = data.genre.albums.pageInfo
-  albums.value.push(...data.genre.albums.nodes)
-  genreName.value = data.genre.name
+	currentPageInfo.value = data.genre.albums.pageInfo
+	albums.value.push(...data.genre.albums.nodes)
+	genreName.value = data.genre.name
 })
 
 const currentPageInfo = ref<NonNullable<GenrePageQuery['genre']>['albums']['pageInfo'] | null>(null)

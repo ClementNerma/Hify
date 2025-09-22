@@ -6,7 +6,7 @@ import Card from './Card.vue'
 import ProgressiveRow from './ProgressiveRow.vue'
 
 defineProps<{
-    albums: AlbumFragment[]
+	albums: AlbumFragment[]
 }>()
 </script>
 

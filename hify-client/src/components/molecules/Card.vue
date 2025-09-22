@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 export type CardProps = {
-    title: string
-    artUrl: string
+	title: string
+	artUrl: string
 
-    subtitle?: string
-    boxSize?: number
-    circle?: boolean
-    opacity?: number
+	subtitle?: string
+	boxSize?: number
+	circle?: boolean
+	opacity?: number
 }
 
 const props = defineProps<CardProps>()

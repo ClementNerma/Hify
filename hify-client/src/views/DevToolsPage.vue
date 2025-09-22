@@ -12,7 +12,7 @@ import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 const hideDebugLogs = ref(true)
 
 const slicedAppLogs = computed(() =>
-  appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)),
+	appLogs.value.filter((entry) => (hideDebugLogs.value ? entry.level !== LogLevel.Debug : true)),
 )
 
 const win = window
