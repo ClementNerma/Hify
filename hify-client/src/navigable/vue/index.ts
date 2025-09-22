@@ -78,7 +78,7 @@ function createVueNavDirectiveForElement<ElementType extends NavigableElementTyp
 			({
 				...data,
 				type: elementType,
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				// biome-ignore lint/suspicious/noExplicitAny: -
 			}) as any,
 	)
 }

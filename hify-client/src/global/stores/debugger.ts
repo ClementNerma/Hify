@@ -12,7 +12,6 @@ const logs = reactive<LogEntry[]>([])
 export const appLogs = computed(() => [...logs].reverse())
 
 export function log(level: LogLevel, message: string, error?: unknown): void {
-	// biome-ignore lint/style/noParameterAssign: <explanation>
 	message = `${message}${
 		error !== null && error !== undefined
 			? ` |> ${error instanceof Error ? error.message : typeof error === 'string' ? error : '<unknown error>'}`

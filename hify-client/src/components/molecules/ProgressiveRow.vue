@@ -62,9 +62,13 @@ function onFocus(newPosition: number, requestItemFocus: boolean) {
 }
 
 function requestFocus(position: number) {
+	if (!rowRef.value) {
+		logFatal('Row reference is not initialized yet in progressive row')
+	}
+
 	disableHandler.value = true
 
-	const itemEls = getChildrenOf(rowRef.value!.row)
+	const itemEls = getChildrenOf(rowRef.value.row)
 	const itemEl = itemEls[position - computeFirstVisibleItemIndex(position)]
 
 	if (!itemEl) {

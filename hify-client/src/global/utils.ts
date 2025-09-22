@@ -85,7 +85,7 @@ export function swapInArray<T>(array: T[], index: number, newIndex: number): T[]
 	return newArray
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: function inference
 export function noParallel<F extends (...args: any[]) => Promise<unknown>>(
 	value: F,
 ): (...args: Parameters<F>) => Promise<void> {
@@ -116,7 +116,7 @@ export function isApproachingListEnd(itemIndex: number, totalItems: number): boo
 
 export function bindRef<T extends object>(container: T, key: keyof T): VNodeRef {
 	return (value) => {
-		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: -
 		container[key] = value as any
 	}
 }
