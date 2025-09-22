@@ -5,8 +5,8 @@ import Checkbox from '@/components/atoms/Checkbox.vue'
 import { hifyInterface } from '@/global/injected'
 import { appLogs } from '@/global/stores/debugger'
 import { LogLevel } from '@/navigable'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 
 const hideDebugLogs = ref(true)
@@ -34,7 +34,7 @@ const win = window
     </Button>
   </NavigableRow>
 
-  <NavigableList>
+  <NavigableColumn>
     <NavigableItem v-for="logEntry in slicedAppLogs">
       <div
         class="log-entry"
@@ -44,7 +44,7 @@ const win = window
         <strong>{{ logEntry.at.toLocaleTimeString() }}</strong>: {{ logEntry.message }}
       </div>
     </NavigableItem>
-  </NavigableList>
+  </NavigableColumn>
 </template>
 
 <style scoped>

@@ -8,7 +8,7 @@ import { setPlayingAudioProgressRelative, toggleAudioPlayback } from '@/global/s
 import { NotificationLevel, showNotification } from '@/global/stores/notifications'
 import { playNextTrack, playPreviousTrackOrRewind, restorePlayQueue } from '@/global/stores/play-queue'
 import { handleInput, InputHandlingResult, LogLevel, setupNavigable, watchLongPressForKeys } from '@/navigable'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import router from '@/router'
 import { log } from './global/stores/debugger'
 
@@ -84,7 +84,7 @@ handleInput(({ key, longPress, ctrlKey, shiftKey }) => {
 <template>
 	<div class="background fixed inset-0 -z-30" />
 
-	<NavigableList @back-key="router.back()">
+	<NavigableColumn @back-key="router.back()">
 		<ContextMenu />
 		<Notifications />
 
@@ -107,7 +107,7 @@ handleInput(({ key, longPress, ctrlKey, shiftKey }) => {
 		</DistractionFreeTogglable>
 
 		<slot />
-	</NavigableList>
+	</NavigableColumn>
 
 </template>
 

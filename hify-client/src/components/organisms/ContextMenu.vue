@@ -10,8 +10,8 @@ import {
 	requestFocusById,
 	requestFocusOnElement,
 } from '@/navigable'
+import NavigableColumn, { type NavigableColumnExposeType } from '@/navigable/vue/components/NavigableColumn.vue'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import NavigableList, { type NavigableListExposeType } from '@/navigable/vue/components/NavigableList.vue'
 
 onUpdated(() => {
 	if (!containerRef.value) {
@@ -19,7 +19,7 @@ onUpdated(() => {
 	}
 
 	const ctxMenuContainer = containerRef.value
-	const column = listRef.value ?? logFatal('Column reference not initialized yet')
+	const { column } = columnRef.value ?? logFatal('Column reference not initialized yet')
 
 	const focusedItemId = getFocusedItemId()
 
@@ -44,7 +44,7 @@ onUpdated(() => {
 
 	prevFocusItemId.value = focusedItemId
 
-	requestFocusOnElement(column.list)
+	requestFocusOnElement(column)
 })
 
 function closeContextMenu() {
@@ -61,26 +61,39 @@ const prevFocusItemId = ref<string | null>(null)
 const ctxTop = ref(-1)
 const ctxLeft = ref(-1)
 
-const listRef = ref<NavigableListExposeType | null>(null)
+const columnRef = ref<NavigableColumnExposeType | null>(null)
 const containerRef = ref<HTMLDivElement | null>(null)
 </script>
 
 <template>
-	<NavigableList v-if="contextMenuStore && contextMenuStore.options.length > 0"
-		:intercept-key-press="dir => dir === NavigationDirection.Back" @back-key="closeContextMenu">
-		<div class="ctxmenu fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
-			ref="containerRef" :style="`top: ${ctxTop}px; left: ${ctxLeft}px;`">
+	<NavigableColumn
+		v-if="contextMenuStore && contextMenuStore.options.length > 0"
+		:intercept-key-press="dir => dir === NavigationDirection.Back"
+		@back-key="closeContextMenu"
+	>
+		<div
+			class="ctxmenu fixed bg-gray-800 text-white border border-solid border-gray-600 z-10 shadow-[2px_2px_5px_rgb(60,60,60)]"
+			ref="containerRef"
+			:style="`top: ${ctxTop}px; left: ${ctxLeft}px;`"
+		>
 			<!-- TODO: implement "trapped" -->
-			<NavigableList trapped ref="listRef">
-				<NavigableItem v-for="option in contextMenuStore.options" :key="option.label"
-					@press="closeContextMenu(); option.onPress()" v-slot="{ focused }">
+			<NavigableColumn
+				trapped
+				ref="columnRef"
+			>
+				<NavigableItem
+					v-for="option in contextMenuStore.options"
+					:key="option.label"
+					@press="closeContextMenu(); option.onPress()"
+					v-slot="{ focused }"
+				>
 					<div :class="{ 'bg-gray-400': focused }">
 						<div class="p-1.5 option">{{ option.label }}</div>
 					</div>
 				</NavigableItem>
-			</NavigableList>
+			</NavigableColumn>
 		</div>
-	</NavigableList>
+	</NavigableColumn>
 </template>
 
 <style scoped>

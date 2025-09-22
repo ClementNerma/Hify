@@ -6,7 +6,7 @@ export type DropdownSelectExposeType = { buttonRef: ButtonExposeType | null }
 
 <script setup lang="ts" generic="T extends string">
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
-import NavigableList from '@/navigable/vue/components/NavigableList.vue';
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue';
 import { onBeforeMount, onUpdated, ref, watch } from 'vue';
 import Button, { type ButtonExposeType } from '../atoms/Button.vue';
 import { logFatal } from '@/navigable';
@@ -78,24 +78,41 @@ defineExpose({ buttonRef: togglerRef })
 </script>
 
 <template>
-  <Button @press="toggle()" ref="togglerRef">
+  <Button
+    @press="toggle()"
+    ref="togglerRef"
+  >
     {{ prefixLabel ?? '' }}
     <template v-if="selectedId !== null">
       {{items.find(item => item.id === selectedId)?.label ?? ''}}
     </template>
   </Button>
 
-  <div class="relative" v-if="opened">
+  <div
+    class="relative"
+    v-if="opened"
+  >
     <div class="absolute top-0 border border-solid bg-slate-700">
-      <NavigableList trapped ref="menuRef" @back-key="toggle()"
-        :intercept-key-press="dir => dir === NavigationDirection.Back">
-        <NavigableItem v-for="item in items" :key="item.id" @press="select(item.id)"
-          :ref="ref => handleRef(ref as any, item.id)">
-          <div class="choice !px-4 !py-3" :class="{ 'bg-slate-600': selectedId === item.id }">
+      <NavigableColumn
+        trapped
+        ref="menuRef"
+        @back-key="toggle()"
+        :intercept-key-press="dir => dir === NavigationDirection.Back"
+      >
+        <NavigableItem
+          v-for="item in items"
+          :key="item.id"
+          @press="select(item.id)"
+          :ref="ref => handleRef(ref as any, item.id)"
+        >
+          <div
+            class="choice !px-4 !py-3"
+            :class="{ 'bg-slate-600': selectedId === item.id }"
+          >
             {{ item.label }}
           </div>
         </NavigableItem>
-      </NavigableList>
+      </NavigableColumn>
     </div>
   </div>
 </template>

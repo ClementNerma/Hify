@@ -20,8 +20,8 @@ import { enableOpacitor } from '@/global/stores/opacitor'
 import { currentTrack, playTrackFromCurrentQueue, readablePlayQueue } from '@/global/stores/play-queue'
 import { formatDate } from '@/global/utils'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
 
@@ -64,8 +64,8 @@ watch(
     class="player-bottom"
     :class="{ isQueueFocused, noCurrentTrack: !currentTrack }"
   >
-    <NavigableList>
-      <NavigableList v-if="currentTrack">
+    <NavigableColumn>
+      <NavigableColumn v-if="currentTrack">
         <With
           :data="currentTrack.metadata.tags"
           v-slot="{ data: tags }"
@@ -126,10 +126,10 @@ watch(
             />
           </div>
         </With>
-      </NavigableList>
+      </NavigableColumn>
 
       <div class="play-queue-gallery">
-        <NavigableList>
+        <NavigableColumn>
           <ProgressiveRow
             ref="queueGalleryRef"
             :items="readablePlayQueue.tracks"
@@ -147,9 +147,9 @@ watch(
               :opacity="readablePlayQueue.position === position ? 1 : focused ? 0.7 : 0.2"
             />
           </ProgressiveRow>
-        </NavigableList>
+        </NavigableColumn>
       </div>
-    </NavigableList>
+    </NavigableColumn>
   </div>
 </template>
 

@@ -27,7 +27,7 @@ export function setupVueNavigable(app: App<Element>, options: SetupNavigableOpti
 
 	app.directive('nav', vNav)
 	app.directive('nav-item', vNavItem)
-	app.directive('nav-list', vNavList)
+	app.directive('nav-column', vNavColumn)
 	app.directive('nav-row', vNavRow)
 	app.directive('nav-grid', vNavGrid)
 	app.directive('nav-custom-container', vNavCustomContainer)
@@ -84,7 +84,7 @@ function createVueNavDirectiveForElement<ElementType extends NavigableElementTyp
 }
 
 export const vNavItem = createVueNavDirectiveForElement('item')
-export const vNavList = createVueNavDirectiveForElement('list')
+export const vNavColumn = createVueNavDirectiveForElement('column')
 export const vNavRow = createVueNavDirectiveForElement('row')
 export const vNavGrid = createVueNavDirectiveForElement('grid')
 export const vNavCustomContainer = createVueNavDirectiveForElement('customContainer')
@@ -99,7 +99,7 @@ declare module 'vue' {
 	export interface ComponentCustomProperties {
 		vNav: typeof vNav
 		vNavItem: typeof vNavItem
-		vNavList: typeof vNavList
+		vNavColumn: typeof vNavColumn
 		vNavRow: typeof vNavRow
 		vNavGrid: typeof vNavGrid
 		vNavCustomContainer: typeof vNavCustomContainer

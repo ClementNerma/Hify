@@ -3,7 +3,7 @@ import { getAlbumArtUrl } from '@/global/constants'
 import { humanReadableDuration } from '@/global/stores/audio-player'
 import { isApproachingListEnd } from '@/global/utils'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import NavigableTrack from '../atoms/NavigableTrack.vue'
 import TrackRating from '../atoms/TrackRating.vue'
 
@@ -16,7 +16,7 @@ defineProps<{
 </script>
 
 <template>
-  <NavigableList>
+  <NavigableColumn>
     <table class="mt-2.5 border-collapse whitespace-nowrap">
       <tbody>
         <tr
@@ -58,5 +58,5 @@ defineProps<{
         </tr>
       </tbody>
     </table>
-  </NavigableList>
+  </NavigableColumn>
 </template>

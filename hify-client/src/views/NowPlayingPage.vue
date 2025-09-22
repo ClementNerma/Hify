@@ -8,7 +8,7 @@ import { distractionFreeMode, setupDistractionFreeListener } from '@/global/stor
 import { currentTrack } from '@/global/stores/play-queue'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
 import { NavigationDirection } from '@/navigable'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import NowPlayingBackground from './NowPlaying/NowPlayingBackground.vue'
 import NowPlayingBottomPanel from './NowPlaying/NowPlayingBottomPanel.vue'
 import NowPlayingOpacitor from './NowPlaying/NowPlayingOpacitor.vue'
@@ -86,9 +86,9 @@ watch(currentTrack, (track) => {
   />
 
   <DistractionFreeTogglable>
-    <NavigableList :intercept-key-press>
+    <NavigableColumn :intercept-key-press>
       <NowPlayingBottomPanel />
-    </NavigableList>
+    </NavigableColumn>
   </DistractionFreeTogglable>
 
   <NowPlayingOpacitor :visible="distractionFreeMode" />

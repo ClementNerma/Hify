@@ -14,8 +14,8 @@ import { enqueue, playNewQueueFromBeginning } from '@/global/stores/play-queue'
 import { dedup, filterMap, getRouteParam, hasMinimumRating, isDefined, shuffle } from '@/global/utils'
 import { graphql } from '@/graphql/generated'
 import type { AudioTrackFragment } from '@/graphql/generated/graphql'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
 import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
-import NavigableList from '@/navigable/vue/components/NavigableList.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
 import router from '@/router'
 
@@ -79,7 +79,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
     class="mt-2.5 ml-[15%] w-[70%]"
     v-if="album && filteredTracks && infos"
   >
-    <NavigableList>
+    <NavigableColumn>
       <div class="flex flex-row">
         <img
           class="art"
@@ -149,7 +149,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
           </NavigableRow>
         </div>
       </div>
-    </NavigableList>
+    </NavigableColumn>
 
     <div
       v-for="disc in infos.discs"
@@ -161,7 +161,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
 
       <table class="mt-2.5 w-full border-collapse">
         <tbody>
-          <NavigableList>
+          <NavigableColumn>
             <NavigableTrack
               v-for="track, i in disc.tracks"
               :key="track.id"
@@ -183,7 +183,7 @@ const infos = computed(() => filteredTracks.value && getAlbumInfos(filteredTrack
                 <td class="text-right">{{ humanReadableDuration(track.metadata.duration) }}</td>
               </tr>
             </NavigableTrack>
-          </NavigableList>
+          </NavigableColumn>
         </tbody>
       </table>
     </div>

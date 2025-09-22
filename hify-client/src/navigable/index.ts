@@ -180,7 +180,7 @@ export type NavigableCommonElementProps = {
 export type NavigableElement = NavigableCommonElementProps &
 	(
 		| { type: 'item'; hasFocusPriority?: boolean }
-		| { type: 'list' }
+		| { type: 'column' }
 		| { type: 'row' }
 		| { type: 'grid'; columns: number }
 		| { type: 'customContainer'; customId?: string }
@@ -233,7 +233,7 @@ const ELEMENTS_PARSER = {
 	item: {
 		hasFocusPriority: PARAM_PARSERS.optional(PARAM_PARSERS.bool),
 	},
-	list: {},
+	column: {},
 	row: {},
 	grid: {
 		columns: PARAM_PARSERS.required(PARAM_PARSERS.positiveInt),
@@ -341,14 +341,16 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 		unfocus: (_) => {},
 	},
 
-	list: _structElementEvtHandlers('list', () => ({
-		navigate(listEl, currentChild, direction) {
-			const children = getChildrenOf(listEl)
+	column: _structElementEvtHandlers('column', () => ({
+		navigate(columnEl, currentChild, direction) {
+			const children = getChildrenOf(columnEl)
 
 			const childIndex = children.findIndex(({ navEl }) => navEl.id === currentChild.id)
 
 			if (childIndex === -1) {
-				logFatal(`Child navigable element "${currentChild.id}" was not found in its parent list "${listEl.id}"`)
+				logFatal(
+					`Child navigable element "${currentChild.id}" was not found in its parent column "${columnEl.id}"`,
+				)
 			}
 
 			switch (direction) {
@@ -377,7 +379,7 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 					return { type: 'propagate' }
 
 				case NavigationDirection.DirectFocus:
-					logFatal('Unreachable: direct focus navigation on list')
+					logFatal('Unreachable: direct focus navigation on column')
 			}
 		},
 
@@ -398,13 +400,13 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 	})),
 
 	row: _structElementEvtHandlers('row', () => ({
-		navigate(listEl, currentChild, direction) {
-			const children = getChildrenOf(listEl)
+		navigate(rowEl, currentChild, direction) {
+			const children = getChildrenOf(rowEl)
 
 			const childIndex = children.findIndex(({ navEl }) => navEl.id === currentChild.id)
 
 			if (childIndex === -1) {
-				logFatal(`Child navigable element "${currentChild.id}" was not found in its parent row "${listEl.id}"`)
+				logFatal(`Child navigable element "${currentChild.id}" was not found in its parent row "${rowEl.id}"`)
 			}
 
 			switch (direction) {
@@ -433,7 +435,7 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 					return { type: 'propagate' }
 
 				case NavigationDirection.DirectFocus:
-					logFatal('Unreachable: direct focus navigation on list')
+					logFatal('Unreachable: direct focus navigation on row')
 			}
 		},
 
