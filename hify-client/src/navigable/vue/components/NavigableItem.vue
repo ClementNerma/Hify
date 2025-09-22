@@ -1,32 +1,41 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue'
+import {
+  generateNavigableElementId,
+  type KeyPress,
+  type NavigableCommonElementProps,
+  type NavigableElementCustomInteractionHandlers,
+  NavigationDirection,
+  navigableElementAttrs,
+  registerNavigableElementHandlers,
+  translateNavigationKey,
+  unregisterNavigableElementHandlers,
+  updateNavigableElementHandlers,
+} from '../..'
+
 // TODO: required because Vue's compiler is not smart enough yet
 type NavigableItem = NavigableCommonElementProps & { type: 'item'; hasFocusPriority?: boolean }
 
 export type NavigableItemProps = {
-	disabled?: boolean
+  disabled?: boolean
 
-	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, item: NavigableItem) => boolean
+  interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, item: NavigableItem) => boolean
 
-	onFocus?: (item: NavigableItem) => void
-	onUnfocus?: (item: NavigableItem) => void
-	onPress?: (item: NavigableItem) => void
-	onLongPress?: (item: NavigableItem) => void
-	onLeftKey?: (item: NavigableItem) => void
-	onRightKey?: (item: NavigableItem) => void
-	onUpKey?: (item: NavigableItem) => void
-	onDownKey?: (item: NavigableItem) => void
-	onBackKey?: (item: NavigableItem) => void
+  onFocus?: (item: NavigableItem) => void
+  onUnfocus?: (item: NavigableItem) => void
+  onPress?: (item: NavigableItem) => void
+  onLongPress?: (item: NavigableItem) => void
+  onLeftKey?: (item: NavigableItem) => void
+  onRightKey?: (item: NavigableItem) => void
+  onUpKey?: (item: NavigableItem) => void
+  onDownKey?: (item: NavigableItem) => void
+  onBackKey?: (item: NavigableItem) => void
 } & Omit<NavigableItem, 'id' | 'type'>
 
 export type NavigableItemExposeType = {
-	item: NavigableItem
-	focused: boolean
+  item: NavigableItem
+  focused: boolean
 }
-</script>
-
-<script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableItemProps>()
 
@@ -70,7 +79,6 @@ const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'item'>
     return props.interceptKeyPress?.(key.longPress ? null : dir, key, item) ? { type: 'trap' } : { type: 'native' }
   },
 
-
   focus(item) {
     focused.value = true
 
@@ -97,13 +105,15 @@ const focused = ref(false)
 defineExpose({ item, focused })
 
 defineSlots<{
-  default(props: { item: NavigableItem, focused: boolean }): unknown
+  default(props: { item: NavigableItem; focused: boolean }): unknown
 }>()
-
 </script>
 
 <template>
   <navigable-item-wrapper v-bind="navigableElementAttrs(item)">
-    <slot :item :focused />
+    <slot
+      :item
+      :focused
+    />
   </navigable-item-wrapper>
 </template>

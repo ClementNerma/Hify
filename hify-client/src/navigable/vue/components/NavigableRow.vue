@@ -1,30 +1,40 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue'
+import {
+    generateNavigableElementId,
+    type KeyPress,
+    type NavigableCommonElementProps,
+    type NavigableElement,
+    type NavigableElementCustomInteractionHandlers,
+    NavigationDirection,
+    navigableElementAttrs,
+    registerNavigableElementHandlers,
+    translateNavigationKey,
+    unregisterNavigableElementHandlers,
+    updateNavigableElementHandlers,
+} from '../..'
+
 // TODO: required because Vue's compiler is not smart enough yet
 type NavigableRow = NavigableCommonElementProps & { type: 'row' }
 
 export type NavigableRowProps = {
-	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, row: NavigableRow) => boolean
+    interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, row: NavigableRow) => boolean
 
-	onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void
-	onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void
-	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, row: NavigableRow) => void
-	onEnter?: (from: NavigationDirection, row: NavigableRow) => void
-	onLeftKey?: (row: NavigableRow) => void
-	onRightKey?: (row: NavigableRow) => void
-	onUpKey?: (row: NavigableRow) => void
-	onDownKey?: (row: NavigableRow) => void
-	onBackKey?: (row: NavigableRow) => void
+    onFocus?: (grid: NavigableRow, focusedChild: NavigableElement) => void
+    onUnfocus?: (grid: NavigableRow, unfocusedChild: NavigableElement) => void
+    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, row: NavigableRow) => void
+    onEnter?: (from: NavigationDirection, row: NavigableRow) => void
+    onLeftKey?: (row: NavigableRow) => void
+    onRightKey?: (row: NavigableRow) => void
+    onUpKey?: (row: NavigableRow) => void
+    onDownKey?: (row: NavigableRow) => void
+    onBackKey?: (row: NavigableRow) => void
 } & Omit<NavigableRow, 'id' | 'type'>
 
 export type NavigableRowExposeType = {
-	row: NavigableRow
-	focused: boolean
+    row: NavigableRow
+    focused: boolean
 }
-</script>
-
-<script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
-import { NavigationDirection, generateNavigableElementId, type NavigableCommonElementProps, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type NavigableElement, type NavigableElementCustomInteractionHandlers, type KeyPress } from '../..';
 
 const props = defineProps<NavigableRowProps>()
 
@@ -33,7 +43,7 @@ const id = generateNavigableElementId()
 const row = computed<NavigableRow>(() => ({
     id,
     type: 'row',
-    disableScroll: props.disableScroll
+    disableScroll: props.disableScroll,
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'row'>>(() => ({
@@ -86,12 +96,18 @@ const focused = ref(false)
 defineExpose({ row, focused })
 
 defineSlots<{
-    default(props: { row: NavigableRow, focused: boolean }): unknown
+    default(props: { row: NavigableRow; focused: boolean }): unknown
 }>()
 </script>
 
 <template>
-    <div class="flex flex-row" v-bind="navigableElementAttrs(row)">
-        <slot :row :focused />
+    <div
+        class="flex flex-row"
+        v-bind="navigableElementAttrs(row)"
+    >
+        <slot
+            :row
+            :focused
+        />
     </div>
 </template>

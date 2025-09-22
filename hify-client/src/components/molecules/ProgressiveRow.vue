@@ -1,27 +1,36 @@
-<script lang="ts">
+<script setup lang="ts" generic="T">
+import { computed, onUpdated, ref, useTemplateRef } from 'vue'
+import {
+  getChildrenOf,
+  logFatal,
+  type NavigableElementByType,
+  NavigationDirection,
+  requestFocusOnItem,
+} from '@/navigable'
+import NavigableItem from '@/navigable/vue/components/NavigableItem.vue'
+import NavigableRow, { type NavigableRowExposeType } from '@/navigable/vue/components/NavigableRow.vue'
+
 export type ProgressiveRowExposeType = {
   jumpUnfocusedPosition(newPosition: number): void
   requestFocus(position: number): void
 }
-</script>
-
-<script setup lang="ts" generic="T">
-import { computed, onUpdated, ref, useTemplateRef } from 'vue';
-import { getChildrenOf, logFatal, NavigationDirection, requestFocusOnItem, type NavigableElementByType } from '@/navigable';
-import NavigableRow, { type NavigableRowExposeType } from '@/navigable/vue/components/NavigableRow.vue';
-import NavigableItem from '@/navigable/vue/components/NavigableItem.vue';
 
 const props = defineProps<{
-  items: T[],
+  items: T[]
   disableScroll?: boolean
-  initialPosition?: number,
+  initialPosition?: number
   onItemPress?: (item: T, newPosition: number) => void
   onItemLongPress?: (item: T, newPosition: number) => void
   onFocusChange?: (nowFocused: boolean) => void
 }>()
 
 defineSlots<{
-  default(props: { item: T, position: number, navigableItem: NavigableElementByType<'item'>, focused: boolean }): unknown
+  default(props: {
+    item: T
+    position: number
+    navigableItem: NavigableElementByType<'item'>
+    focused: boolean
+  }): unknown
 }>()
 
 defineExpose<ProgressiveRowExposeType>({
@@ -32,7 +41,7 @@ defineExpose<ProgressiveRowExposeType>({
 
   requestFocus(position) {
     requestFocus(position)
-  }
+  },
 })
 
 const position = ref(0)
@@ -86,7 +95,11 @@ function computeFirstVisibleItemIndex(position: number): number {
 }
 
 const firstVisibleItemIndex = computed(() => computeFirstVisibleItemIndex(position.value))
-const rowIter = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS).map((item, i) => ({ itemPosition: firstVisibleItemIndex.value + i, item })))
+const rowIter = computed(() =>
+  props.items
+    .slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS)
+    .map((item, i) => ({ itemPosition: firstVisibleItemIndex.value + i, item })),
+)
 
 const columnSize = computed(() => `${100 / COLUMNS}%`)
 

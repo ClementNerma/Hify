@@ -1,15 +1,15 @@
-<script lang="ts">
+<script setup lang="ts" generic="T extends string">
+import { computed, onBeforeMount, onBeforeUpdate, onUpdated, ref } from 'vue'
+import { logFatal, NavigationDirection } from '@/navigable'
+import NavigableItem, {
+  type NavigableItemExposeType,
+  type NavigableItemProps,
+} from '@/navigable/vue/components/NavigableItem.vue'
+import { type ButtonExposeType } from '../atoms/Button.vue'
+
 export type OneListItemChoices<T> = Array<{ id: T; label: string }>
 
 export type OneListSelectExposeType = { buttonRef: ButtonExposeType | null }
-</script>
-
-<script setup lang="ts" generic="T extends string">
-import NavigableItem, { type NavigableItemExposeType, type NavigableItemProps } from '@/navigable/vue/components/NavigableItem.vue';
-import { computed, onBeforeMount, onBeforeUpdate, onUpdated, ref } from 'vue';
-import { type ButtonExposeType } from '../atoms/Button.vue';
-import { logFatal } from '@/navigable';
-import { NavigationDirection } from '@/navigable';
 
 const props = defineProps<{
   items: OneListItemChoices<T>
@@ -24,13 +24,13 @@ defineEmits<{
 const activeId = defineModel<T | null>()
 
 const activeIndex = computed(() => {
-  const active = props.items.findIndex(item => item.id === activeId.value)
+  const active = props.items.findIndex((item) => item.id === activeId.value)
   return active !== -1 ? active : null
 })
 
 const expectActiveId = (): T => activeId.value ?? logFatal('Expected a selected item in OneLineList')
 
-const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = dir => {
+const interceptKeyPress: NavigableItemProps['interceptKeyPress'] = (dir) => {
   if (activeIndex.value === null || activeIndex.value === -1) {
     return false
   }
@@ -69,8 +69,12 @@ defineExpose({ itemRef })
 </script>
 
 <template>
-  <NavigableItem ref="itemRef" :intercept-key-press @press="$emit('press', expectActiveId())"
-    @long-press="$emit('longPress', expectActiveId())">
+  <NavigableItem
+    ref="itemRef"
+    :intercept-key-press
+    @press="$emit('press', expectActiveId())"
+    @long-press="$emit('longPress', expectActiveId())"
+  >
     {{ prefix ?? '' }}
     {{ isFirst && isLast ? '' : isFirst ? '⏷' : isLast ? '⏶' : '⏶⏷' }}
     {{activeId && items.find(item => item.id === activeId)?.label || ''}}

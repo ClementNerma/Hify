@@ -1,29 +1,27 @@
-<script lang="ts">
-export type Tab = {
-	label: string
-	routeName: string
-	subMenu?: TabDropdownItem[]
-}
-
-export type TabDropdownItem = Omit<Tab, 'subMenu'>
-</script>
-
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import router from '@/router'
+import { showContextMenu } from '@/global/stores/context-menu'
+import { bindRef } from '@/global/utils'
 import { requestFocusOnItem } from '@/navigable'
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
 import NavigableRow from '@/navigable/vue/components/NavigableRow.vue'
-import { showContextMenu } from '@/global/stores/context-menu'
-import { bindRef } from '@/global/utils'
+import router from '@/router'
+
+export type Tab = {
+  label: string
+  routeName: string
+  subMenu?: TabDropdownItem[]
+}
+
+export type TabDropdownItem = Omit<Tab, 'subMenu'>
 
 const props = defineProps<{
-  tabs: Tab[],
+  tabs: Tab[]
 }>()
 
 onMounted(() => {
   router.afterEach((to) => {
-    if (typeof to.name === 'string' && Object.prototype.hasOwnProperty.call(routeLinkByName.value, to.name)) {
+    if (typeof to.name === 'string' && Object.hasOwn(routeLinkByName.value, to.name)) {
       requestFocusOnItem(routeLinkByName.value[to.name].item)
     } else {
       // Fallback to first link
@@ -36,7 +34,9 @@ function showSubMenu(subMenu: TabDropdownItem[]) {
   showContextMenu(
     subMenu.map(({ label, routeName }) => ({
       label,
-      onPress: () => { router.push({ name: routeName }) },
+      onPress: () => {
+        router.push({ name: routeName })
+      },
     })),
   )
 }
@@ -49,15 +49,28 @@ function scrollTop() {
 </script>
 
 <template>
-  <NavigableRow @focus="scrollTop()" v-slot="{ focused }">
-    <div class="flex flex-row items-center justify-center mb-2.5 w-full gap-10"
-      :class="focused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']">
-      <NavigableItem v-for="tab in tabs" :key="tab.label" :ref="bindRef(routeLinkByName, tab.routeName)"
-        @press="router.push({ name: tab.routeName })" @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
-        :has-focus-priority="router.currentRoute.value.name === tab.routeName">
+  <NavigableRow
+    @focus="scrollTop()"
+    v-slot="{ focused }"
+  >
+    <div
+      class="flex flex-row items-center justify-center mb-2.5 w-full gap-10"
+      :class="focused ? [] : ['opacity-20', 'transition ease-linear delay-200 duration-700']"
+    >
+      <NavigableItem
+        v-for="tab in tabs"
+        :key="tab.label"
+        :ref="bindRef(routeLinkByName, tab.routeName)"
+        @press="router.push({ name: tab.routeName })"
+        @long-press="tab.subMenu && showSubMenu(tab.subMenu)"
+        :has-focus-priority="router.currentRoute.value.name === tab.routeName"
+      >
         <div class="!px-6 !py-1">
           {{ tab.label }}
-          <span class="text-xs" v-if="tab.subMenu">▽</span>
+          <span
+            class="text-xs"
+            v-if="tab.subMenu"
+          >▽</span>
         </div>
       </NavigableItem>
     </div>

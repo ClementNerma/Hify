@@ -1,16 +1,13 @@
-<script lang="ts">
+<script setup lang="ts" generic="T extends string">
+import { onBeforeMount, onUpdated, ref, watch } from 'vue'
+import { logFatal, NavigationDirection, requestFocusOnItem } from '@/navigable'
+import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue'
+import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue'
+import Button, { type ButtonExposeType } from '../atoms/Button.vue'
+
 export type DropdownChoices<T> = Array<{ id: T; label: string }>
 
 export type DropdownSelectExposeType = { buttonRef: ButtonExposeType | null }
-</script>
-
-<script setup lang="ts" generic="T extends string">
-import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
-import NavigableColumn from '@/navigable/vue/components/NavigableColumn.vue';
-import { onBeforeMount, onUpdated, ref, watch } from 'vue';
-import Button, { type ButtonExposeType } from '../atoms/Button.vue';
-import { logFatal } from '@/navigable';
-import { NavigationDirection, requestFocusOnItem } from '@/navigable';
 
 const props = defineProps<{
   items: DropdownChoices<T>

@@ -1,4 +1,19 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue'
+import {
+    generateNavigableElementId,
+    type KeyPress,
+    type NavigableCommonElementProps,
+    type NavigableElement,
+    type NavigableElementCustomInteractionHandlers,
+    NavigationDirection,
+    navigableElementAttrs,
+    registerNavigableElementHandlers,
+    translateNavigationKey,
+    unregisterNavigableElementHandlers,
+    updateNavigableElementHandlers,
+} from '../..'
+
 // TODO: required because Vue's compiler is not smart enough yet
 type NavigableColumn = NavigableCommonElementProps & { type: 'column' }
 
@@ -22,11 +37,6 @@ export type NavigableColumnExposeType = {
     column: NavigableColumn
     focused: boolean
 }
-</script>
-
-<script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref, } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableColumnProps>()
 
@@ -88,7 +98,7 @@ const focused = ref(false)
 defineExpose({ column, focused })
 
 defineSlots<{
-    default(props: { column: NavigableColumn, focused: boolean }): unknown
+    default(props: { column: NavigableColumn; focused: boolean }): unknown
 }>()
 </script>
 

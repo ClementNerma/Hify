@@ -1,30 +1,40 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue'
+import {
+    generateNavigableElementId,
+    type KeyPress,
+    type NavigableCommonElementProps,
+    type NavigableElement,
+    type NavigableElementCustomInteractionHandlers,
+    NavigationDirection,
+    navigableElementAttrs,
+    registerNavigableElementHandlers,
+    translateNavigationKey,
+    unregisterNavigableElementHandlers,
+    updateNavigableElementHandlers,
+} from '../..'
+
 // TODO: required because Vue's compiler is not smart enough yet
 type NavigableGrid = NavigableCommonElementProps & { type: 'grid'; columns: number }
 
 export type NavigableGridProps = {
-	interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, grid: NavigableGrid) => boolean
+    interceptKeyPress?: (navigationKey: NavigationDirection | null, key: KeyPress, grid: NavigableGrid) => boolean
 
-	onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
-	onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
-	onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
-	onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
-	onLeftKey?: (grid: NavigableGrid) => void
-	onRightKey?: (grid: NavigableGrid) => void
-	onUpKey?: (grid: NavigableGrid) => void
-	onDownKey?: (grid: NavigableGrid) => void
-	onBackKey?: (grid: NavigableGrid) => void
+    onFocus?: (grid: NavigableGrid, focusedChild: NavigableElement) => void
+    onUnfocus?: (grid: NavigableGrid, unfocusedChild: NavigableElement) => void
+    onNavigate?: (key: NavigationDirection, currentChild: NavigableElement, grid: NavigableGrid) => void
+    onEnter?: (from: NavigationDirection, grid: NavigableGrid) => void
+    onLeftKey?: (grid: NavigableGrid) => void
+    onRightKey?: (grid: NavigableGrid) => void
+    onUpKey?: (grid: NavigableGrid) => void
+    onDownKey?: (grid: NavigableGrid) => void
+    onBackKey?: (grid: NavigableGrid) => void
 } & Omit<NavigableGrid, 'id' | 'type'>
 
 export type NavigableGridExposeType = {
-	grid: NavigableGrid
-	focused: boolean
+    grid: NavigableGrid
+    focused: boolean
 }
-</script>
-
-<script setup lang="ts">
-import { computed, onBeforeUnmount, onBeforeUpdate, onMounted, ref } from 'vue';
-import { NavigationDirection, generateNavigableElementId, navigableElementAttrs, registerNavigableElementHandlers, translateNavigationKey, unregisterNavigableElementHandlers, updateNavigableElementHandlers, type KeyPress, type NavigableCommonElementProps, type NavigableElement, type NavigableElementCustomInteractionHandlers } from '../..';
 
 const props = defineProps<NavigableGridProps>()
 
@@ -34,7 +44,7 @@ const grid = computed<NavigableGrid>(() => ({
     id,
     type: 'grid',
     disableScroll: props.disableScroll,
-    columns: props.columns
+    columns: props.columns,
 }))
 
 const eventHandlers = computed<NavigableElementCustomInteractionHandlers<'grid'>>(() => ({
@@ -87,13 +97,19 @@ const focused = ref(false)
 defineExpose({ grid, focused })
 
 defineSlots<{
-    default(props: { grid: NavigableGrid, focused: boolean }): unknown
+    default(props: { grid: NavigableGrid; focused: boolean }): unknown
 }>()
 </script>
 
 <template>
-    <div class="container grid text-center min-w-full" v-bind="navigableElementAttrs(grid)">
-        <slot :grid :focused />
+    <div
+        class="container grid text-center min-w-full"
+        v-bind="navigableElementAttrs(grid)"
+    >
+        <slot
+            :grid
+            :focused
+        />
     </div>
 </template>
 

@@ -1,17 +1,15 @@
-<script lang="ts">
-export type CardProps = {
-	title: string
-	artUrl: string
-
-	subtitle?: string
-	boxSize?: number
-	circle?: boolean
-	opacity?: number
-}
-</script>
-
 <script setup lang="ts">
 import { computed } from 'vue';
+
+export type CardProps = {
+    title: string
+    artUrl: string
+
+    subtitle?: string
+    boxSize?: number
+    circle?: boolean
+    opacity?: number
+}
 
 const props = defineProps<CardProps>()
 
@@ -20,12 +18,20 @@ const opacity = computed(() => props.opacity ?? 1)
 
 <template>
     <div class="card">
-        <img class="cover" :class="{ 'rounded-[50%]': circle }" :width="boxSize ?? 120" :height="boxSize ?? 120"
-            :src="artUrl" />
+        <img
+            class="cover"
+            :class="{ 'rounded-[50%]': circle }"
+            :width="boxSize ?? 120"
+            :height="boxSize ?? 120"
+            :src="artUrl"
+        />
 
         <div class="title experimental-line-limiter">{{ title }}</div>
 
-        <div v-if="subtitle" class="text-sm experimental-line-limiter">{{ subtitle }}</div>
+        <div
+            v-if="subtitle"
+            class="text-sm experimental-line-limiter"
+        >{{ subtitle }}</div>
     </div>
 
 </template>
