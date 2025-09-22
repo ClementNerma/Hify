@@ -1,16 +1,15 @@
 <script lang="ts">
 export type ProgressiveRowExposeType = {
-	jumpUnfocusedPosition(newPosition: number): void
-	requestFocus(position: number): void
+  jumpUnfocusedPosition(newPosition: number): void
+  requestFocus(position: number): void
 }
 </script>
 
 <script setup lang="ts" generic="T extends { [key in K]: string }, K extends string">
-import { computed, onUpdated, ref } from 'vue';
-import { requestFocusById, type NavigableElementByType } from '@/navigable';
-import NavigableRow from '@/navigable/vue/components/NavigableRow.vue';
+import { computed, onMounted, onUpdated, ref, useTemplateRef, type VNodeRef } from 'vue';
+import { getChildrenOf, logFatal, NavigationDirection, requestFocusById, requestFocusOnItem, type NavigableElementByType } from '@/navigable';
+import NavigableRow, { type NavigableRowExposeType } from '@/navigable/vue/components/NavigableRow.vue';
 import NavigableItem, { type NavigableItemExposeType } from '@/navigable/vue/components/NavigableItem.vue';
-import { bindRef } from '@/global/utils';
 
 const props = defineProps<{
   items: T[],
@@ -29,7 +28,6 @@ defineSlots<{
 defineExpose<ProgressiveRowExposeType>({
   jumpUnfocusedPosition(newPosition) {
     position.value = newPosition
-    positionOnUnfocused.value = newPosition
   },
 
   requestFocus(position) {
@@ -39,8 +37,6 @@ defineExpose<ProgressiveRowExposeType>({
 
 const position = ref(0)
 const disableHandler = ref(false)
-const prevSelected = ref<T[K] | null>(null)
-const positionOnUnfocused = ref(0)
 const isFirstEntering = ref(true)
 
 const COLUMNS = 7
@@ -49,67 +45,95 @@ onUpdated(() => {
   if (position.value >= props.items.length) {
     position.value = Math.max(props.items.length - 1, 0)
     requestFocus(position.value)
-  } else if (prevSelected.value !== null && !props.items.find((item) => item[props.idProp] === prevSelected.value)) {
+  } else {
     requestFocus(position.value)
   }
 })
 
-async function onSelect(newPosition: number, requestItemFocus: boolean) {
+function onFocus(newPosition: number, requestItemFocus: boolean) {
   if (disableHandler.value || newPosition < 0) {
     return
   }
 
   isFirstEntering.value = false
 
-  position.value = Math.min(newPosition, props.items.length - 1)
-
   if (requestItemFocus) {
-    requestFocus(position.value)
+    requestFocus(Math.min(newPosition, props.items.length - 1))
   }
 
-  positionOnUnfocused.value = newPosition
+  position.value = Math.min(newPosition, props.items.length - 1)
 }
 
 function requestFocus(position: number) {
-  if (props.items.length === 0) {
-    return
-  }
-
-  const itemId = props.items[position][props.idProp]
-
   disableHandler.value = true
 
-  const itemRef = (itemsById.value as Record<T[K], NavigableItemExposeType>)[itemId]
+  const itemEls = getChildrenOf(rowRef.value!.row)
+  const itemEl = itemEls[position - computeFirstVisibleItemIndex(position)]
 
-  if (itemId) {
-    requestFocusById(itemRef.item.id)
+  if (!itemEl) {
+    logFatal(`Tried to request focus for position ${position}, but corresponding navigable item was not found`)
   }
 
-  disableHandler.value = false
+  if (itemEl.navEl.type !== 'item') {
+    logFatal('Non-item navigable found in progressive row')
+  }
 
-    ; (prevSelected.value as T[K]) = itemId
+  requestFocusOnItem(itemEl.navEl)
+
+  disableHandler.value = false
 }
 
-const firstVisibleItemIndex = computed(() => Math.max(position.value - Math.round((COLUMNS - 1) / 2), 0))
-const visibleTracks = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS))
-const visibleTracksWithPosition = computed(() => visibleTracks.value.map((track, i) => [track, firstVisibleItemIndex.value + i] as const))
+function computeFirstVisibleItemIndex(position: number): number {
+  const start = position - Math.round((COLUMNS - 1) / 2)
 
-const itemsById = ref<Partial<Record<T[K], NavigableItemExposeType>>>({})
+  if (start < 0) {
+    return 0
+  }
+
+  if (props.items.length - start + 1 < COLUMNS) {
+    return Math.max(props.items.length - COLUMNS + 1, 0)
+  }
+
+  return start
+}
+
+const firstVisibleItemIndex = computed(() => computeFirstVisibleItemIndex(position.value))
+const rowIter = computed(() => props.items.slice(firstVisibleItemIndex.value, firstVisibleItemIndex.value + COLUMNS).map((item, i) => ({ itemPosition: firstVisibleItemIndex.value + i, item })))
 
 const columnSize = computed(() => `${100 / COLUMNS}%`)
+
+const rowRef = useTemplateRef<NavigableRowExposeType>('rowRef')
 </script>
 
 <template>
-  <NavigableRow @focus="onFocusChange?.(true)" @unfocus="onFocusChange?.(false)" :disable-scroll>
+  <NavigableRow
+    @focus="onFocusChange?.(true)"
+    @unfocus="onFocusChange?.(false)"
+    :disable-scroll
+    ref="rowRef"
+  >
     <div class="flex flex-row py-2 overflow-hidden w-full">
-      <div class="gallery-item" v-for="[item, newPosition] in visibleTracksWithPosition" :key="item[idProp as K]">
-        <NavigableItem :ref="bindRef(itemsById as any, (item as any)[idProp])"
-          @left-key="onSelect(newPosition - 1, true)" @right-key="onSelect(newPosition + 1, true)"
-          @focus="onSelect(newPosition, false)" @press="onItemPress?.(item, newPosition)"
-          @long-press="onItemLongPress?.(item, newPosition)" :has-focus-priority="newPosition === position"
-          v-slot="{ item: navigableItem, focused }">
-
-          <slot :item :position="newPosition" :navigableItem :focused />
+      <div
+        class="gallery-item"
+        v-for="{ item, itemPosition }, i in rowIter"
+        :key="i"
+      >
+        <NavigableItem
+          :intercept-key-press="d => d === NavigationDirection.Left || d === NavigationDirection.Right"
+          @left-key="onFocus(itemPosition - 1, true)"
+          @right-key="onFocus(itemPosition + 1, true)"
+          @focus="onFocus(i, false)"
+          @press="onItemPress?.(item, itemPosition)"
+          @long-press="onItemLongPress?.(item, itemPosition)"
+          :has-focus-priority="itemPosition === position"
+          v-slot="{ item: navigableItem, focused }"
+        >
+          <slot
+            :item
+            :position="itemPosition"
+            :navigableItem
+            :focused
+          />
         </NavigableItem>
       </div>
     </div>

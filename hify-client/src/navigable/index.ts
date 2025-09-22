@@ -212,7 +212,7 @@ const PARAM_PARSERS = {
 	string: (value: string) => value,
 
 	positiveInt: (value: string) => {
-		const parsed = Number.parseInt(value)
+		const parsed = Number.parseInt(value, 10)
 
 		return Number.isSafeInteger(parsed) && parsed > 0
 			? parsed
@@ -607,9 +607,11 @@ export function getNavigableElementById(id: string): ConcreteNavigable<Navigable
 }
 
 export function parseNavigableDataFromElement(el: Element): NavigableElement {
-	const navData =
-		el.getAttribute(DATA_NAV_ATTR_NAME) ??
+	const navData = el.getAttribute(DATA_NAV_ATTR_NAME)
+
+	if (!navData) {
 		logFatal(`Missing navigable data (expected attribute "${DATA_NAV_ATTR_NAME}" on HTML element)`)
+	}
 
 	return parseNavigableElementData(navData)
 }
@@ -1045,8 +1047,11 @@ export function getChildrenOfElement(el: Element, navEl: NavigableElement): Conc
 }
 
 export function getChildrenOf(navEl: NavigableContainer): ConcreteNavigable<NavigableElement>[] {
-	const domEl =
-		getNavigableDOMElementById(navEl.id) ?? logFatal(`No DOM element found for container element "${navEl.id}"`)
+	const domEl = getNavigableDOMElementById(navEl.id)
+
+	if (!domEl) {
+		logFatal(`No corresponding DOM element found for navigable container "${navEl.id}"`)
+	}
 
 	return getChildrenOfElement(domEl, navEl)
 }
