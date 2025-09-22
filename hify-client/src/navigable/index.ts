@@ -305,7 +305,7 @@ function _structElementsEvtHandlers<
 }
 
 function navigateToFirstDescendantIn(
-	children: ConcreteNavigable<NavigableElement>[],
+	children: NavigableWithDOM<NavigableElement>[],
 	enteringFrom: NavigationDirection,
 	handleFocusPriority?: boolean,
 ): NavigationResult {
@@ -456,8 +456,8 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 	grid: _structElementEvtHandlers('grid', () => {
 		function makeRows(
 			gridEl: NavigableElementByType<'grid'>,
-			children: ConcreteNavigable<NavigableElement>[],
-		): ConcreteNavigable<NavigableElement>[][] {
+			children: NavigableWithDOM<NavigableElement>[],
+		): NavigableWithDOM<NavigableElement>[][] {
 			return new Array(Math.ceil(children.length / gridEl.columns))
 				.fill(null)
 				.map((_, i) => children.slice(i * gridEl.columns, i * gridEl.columns + gridEl.columns))
@@ -591,7 +591,7 @@ export const ELEMENTS_EVENT_HANDLERS = _structElementsEvtHandlers({
 export const DATA_NAV_ATTR_NAME = 'data-nav'
 export const FOCUSED_NAV_ATTR_NAME = 'data-nav-focused'
 
-type ConcreteNavigable<ElementType extends NavigableElement> = {
+type NavigableWithDOM<ElementType extends NavigableElement> = {
 	domEl: Element
 	navEl: ElementType
 }
@@ -600,7 +600,7 @@ export function getNavigableDOMElementById(id: string): Element | null {
 	return document.querySelector(`[${DATA_NAV_ATTR_NAME}^="${id};"]`)
 }
 
-export function getNavigableElementById(id: string): ConcreteNavigable<NavigableElement> | null {
+export function getNavigableElementById(id: string): NavigableWithDOM<NavigableElement> | null {
 	const domEl = getNavigableDOMElementById(id)
 
 	return domEl ? { navEl: parseNavigableDataFromElement(domEl), domEl } : null
@@ -617,8 +617,8 @@ export function parseNavigableDataFromElement(el: Element): NavigableElement {
 }
 
 export function getNavigableParent(
-	el: ConcreteNavigable<NavigableElement>,
-): ConcreteNavigable<NavigableContainer> | null {
+	el: NavigableWithDOM<NavigableElement>,
+): NavigableWithDOM<NavigableContainer> | null {
 	const parent = el.domEl.parentElement
 
 	if (!parent) {
@@ -642,8 +642,8 @@ export function getNavigableParent(
 	return { navEl: parentNav, domEl: parentNavDomEl }
 }
 
-function getNavigableAncestors(el: ConcreteNavigable<NavigableElement>): ConcreteNavigable<NavigableContainer>[] {
-	const ancestors: ConcreteNavigable<NavigableContainer>[] = []
+function getNavigableAncestors(el: NavigableWithDOM<NavigableElement>): NavigableWithDOM<NavigableContainer>[] {
+	const ancestors: NavigableWithDOM<NavigableContainer>[] = []
 	let current = getNavigableParent(el)
 
 	while (current) {
@@ -743,13 +743,13 @@ let isHandlingInteraction = false
 
 let focusedItemId: string | null = null
 
-export function isNavigableItem(el: ConcreteNavigable<NavigableElement>): el is ConcreteNavigable<NavigableItem> {
+export function isNavigableItem(el: NavigableWithDOM<NavigableElement>): el is NavigableWithDOM<NavigableItem> {
 	return el.navEl.type === 'item'
 }
 
 export function isNavigableContainer(
-	el: ConcreteNavigable<NavigableElement>,
-): el is ConcreteNavigable<NavigableContainer> {
+	el: NavigableWithDOM<NavigableElement>,
+): el is NavigableWithDOM<NavigableContainer> {
 	return el.navEl.type !== 'item'
 }
 
@@ -865,7 +865,7 @@ function __handleKeyPress(key: KeyPress): void {
 		return
 	}
 
-	let current: ConcreteNavigable<NavigableElement> = focusedItem
+	let current: NavigableWithDOM<NavigableElement> = focusedItem
 
 	while (parent) {
 		const infos = { parent, current }
@@ -946,7 +946,7 @@ export function requestFocusOnItem(navEl: NavigableItem): void {
 		(el) => !previouslyFocusedAncestors.find((c) => c.navEl.id === el.navEl.id),
 	)
 
-	const newlyFocused: ConcreteNavigable<NavigableElement> = { navEl, domEl }
+	const newlyFocused: NavigableWithDOM<NavigableElement> = { navEl, domEl }
 
 	for (const [ancestor, ancestorChild] of _oneShiftedList(focusedAncestors, newlyFocused)) {
 		runHandlers.push(() => triggerNavigableEvent(ancestor.navEl, 'focus', ancestorChild.navEl))
@@ -1027,11 +1027,11 @@ export type OptionalUndefined<
 	}
 >
 
-export function parseConcreteNavigable(domEl: Element): ConcreteNavigable<NavigableElement> {
+export function parseConcreteNavigable(domEl: Element): NavigableWithDOM<NavigableElement> {
 	return { domEl, navEl: parseNavigableDataFromElement(domEl) }
 }
 
-export function getChildrenOfElement(el: Element, navEl: NavigableElement): ConcreteNavigable<NavigableElement>[] {
+export function getChildrenOfElement(el: Element, navEl: NavigableElement): NavigableWithDOM<NavigableElement>[] {
 	const childrenEl = Array.from(
 		el.querySelectorAll(
 			// Select all DOM elements with the navigable attribute
@@ -1046,7 +1046,7 @@ export function getChildrenOfElement(el: Element, navEl: NavigableElement): Conc
 	return childrenEl.map(parseConcreteNavigable)
 }
 
-export function getChildrenOf(navEl: NavigableContainer): ConcreteNavigable<NavigableElement>[] {
+export function getChildrenOf(navEl: NavigableContainer): NavigableWithDOM<NavigableElement>[] {
 	const domEl = getNavigableDOMElementById(navEl.id)
 
 	if (!domEl) {
