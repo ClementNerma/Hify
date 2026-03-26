@@ -1,3 +1,0 @@
-mutation DeleteMix($mixId: String!) {
-	deleteMix(mixId: $mixId)
-}

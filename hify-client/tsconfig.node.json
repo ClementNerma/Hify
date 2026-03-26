@@ -1,13 +1,31 @@
 {
-	"extends": "@tsconfig/node20/tsconfig.json",
-	"include": ["vite.config.*", "vitest.config.*", "cypress.config.*", "nightwatch.conf.*", "playwright.config.*"],
+	"extends": "./tsconfig.base.json",
+	
 	"compilerOptions": {
-		"composite": true,
-		"noEmit": true,
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-
+		"target": "ES2023",
+		"lib": ["ESNext"],
 		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"types": ["node"]
-	}
+		"types": ["node"],
+		"skipLibCheck": true,
+
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"moduleDetection": "force",
+		"noEmit": true,
+
+		/* Strictness */
+		"allowUnusedLabels": false,
+		"exactOptionalPropertyTypes": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"strict": true,
+		"erasableSyntaxOnly": true,
+		"noUncheckedSideEffectImports": true,
+	},
+	"include": ["vite.config.ts"]
 }

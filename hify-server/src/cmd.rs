@@ -4,47 +4,25 @@ use clap::Parser;
 use log::LevelFilter;
 
 #[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
-pub struct Args {
-    #[clap(help = "Path to the directory containing the audio files")]
+#[clap(version, about, long_about = None)]
+pub struct CmdArgs {
+    #[clap(help = "Path to the music directory to index")]
     pub music_dir: PathBuf,
 
-    #[clap(long, help = "Path to the user data directory")]
-    pub data_dir: Option<PathBuf>,
-
-    #[clap(long, help = "Force to rebuild index from scratch")]
-    pub rebuild_index: bool,
-
-    #[clap(long, help = "Update the index", conflicts_with = "rebuild_index")]
-    pub update_index: bool,
+    #[clap(short, long, help = "Path to the data directory")]
+    pub data_dir: PathBuf,
 
     #[clap(
         short,
         long,
-        help = "Address to listen on (default: 0.0.0.0)",
-        default_value = "0.0.0.0"
+        help = "Logging verbosity level (error, warn, info, debug, trace)",
+        default_value = "info"
     )]
+    pub verbosity: LevelFilter,
+
+    #[clap(short, long, help = "Address to listen on", default_value = "0.0.0.0")]
     pub addr: IpAddr,
 
-    #[clap(
-        short,
-        long,
-        help = "Port to listen on (default: 8893)",
-        default_value = "8893"
-    )]
+    #[clap(short, long, help = "Port to listen on", default_value = "8891")]
     pub port: u16,
-
-    #[clap(
-        long,
-        help = "Don't start the server",
-        conflicts_with = "addr",
-        conflicts_with = "port"
-    )]
-    pub no_server: bool,
-
-    #[clap(short = 'v', long, help = "Logging level", default_value = "info")]
-    pub logging_level: LevelFilter,
-
-    #[clap(short, long, help = "Display timestamps in TTYs (disabled by default)")]
-    pub display_timestamps_in_tty: bool,
 }

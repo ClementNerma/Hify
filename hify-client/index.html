@@ -1,15 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!--
+      The original viewport is defined as follows:
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hify</title>
-</head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
-</body>
+      Unfortunately, this causes issues on certain devices (notably Android TV with 4K resolution),
+      where all DOM elements appear bigger than they should (greater front size, greater paddings, etc.).
 
+      To address this, we set a fixed width and adjust the initial scale accordingly.
+      This **ONLY WORKS** if we set Android's WebView settings correctly:
+
+      * `loadWithOverviewMode` to `true`
+      * `useWideViewPort` to `true
+
+      Then we can modify the meta viewport tag below, alongside the custom style element.
+      
+      The `width` in both tags should be set such as:
+
+        <width> * <initial-scale> = 950.4
+          
+      Where 950.4 is almost 960, the result of dividing 4K resolution (3840px) by 4.
+      The 9.6 pixels difference _probably_ lies in the way calculations are performed in the browser (not sure though).
+    -->
+    <meta name='viewport' content='width=1440, initial-scale=0.66, maximum-scale=1.0, user-scalable=no'>
+    <style>html, body { width: 1440px !important; /*overflow: hidden !important; TODO:USELESS?*/ }</style>
+    <title>hify-client</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

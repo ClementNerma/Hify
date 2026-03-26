@@ -1,6 +1,0 @@
-fragment PlaylistEntry on PlaylistEntry {
-	id
-	track {
-		...AudioTrack
-	}
-}

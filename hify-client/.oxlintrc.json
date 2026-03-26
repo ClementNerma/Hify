@@ -1,0 +1,138 @@
+{
+  "categories": {
+    "correctness": "error",
+    "nursery": "warn",
+    "pedantic": "warn",
+    "perf": "warn",
+    "restriction": "warn",
+    "style": "warn",
+    "suspicious": "warn"
+  },
+  "jsPlugins": [{ "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "react",
+    "react-perf",
+    "oxc",
+    "import",
+    "jsdoc",
+    "jsx-a11y",
+    "node",
+    "promise"
+  ],
+  "rules": {
+    "eslint/func-style": "off",
+    "eslint/id-length": "off",
+    "eslint/max-params": "off",
+    "eslint/no-alert": "off",
+    "eslint/no-console": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-negated-condition": "off",
+    "eslint/no-nested-ternary": "off",
+    "eslint/no-ternary": "off",
+    "eslint/no-undef": "off",
+    "eslint/no-unused-vars": "warn",
+    "eslint/no-warning-comments": "off",
+    "eslint/require-await": "off",
+    "eslint/sort-keys": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/max-lines": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-statements": "off",
+    "eslint/no-inline-comments": "off",
+    "eslint/no-use-before-define": "off",
+    "eslint/no-shadow": "off",
+
+    "import/exports-last": "off",
+    "import/group-exports": "off",
+    "import/max-dependencies": "off",
+    "import/no-named-export": "off",
+    "import/prefer-default-export": "off",
+    "import/no-relative-parent-imports": "off",
+
+    "jsx_a11y/click-events-have-key-events": "warn",
+
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+
+    "promise/catch-or-return": "off", // Buggy
+    "promise/always-return": "off",
+    "promise/prefer-await-to-then": "off",
+    "promise/prefer-await-to-callbacks": "off",
+
+    "react/button-has-type": "off",
+    "react/jsx-filename-extension": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-max-depth": "off",
+    "react/no-multi-comp": "off",
+
+    "typescript/consistent-type-definitions": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "typescript/no-confusing-void-expression": "off",
+    "typescript/no-floating-promises": "warn",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/no-invalid-void-type": "off",
+    "typescript/consistent-return": "off",
+
+    "unicorn/catch-error-name": "off",
+    "unicorn/filename-case": "off",
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prefer-global-this": "off",
+    "unicorn/prefer-dom-node-dataset": "off",
+    "unicorn/no-useless-spread": "warn",
+
+    // Plugins (all rules need to be activated one by one)
+
+    //
+    // => React hooks
+    //
+    "react-hooks-js/component-hook-factories": "error",
+    "react-hooks-js/config": "error",
+    "react-hooks-js/error-boundaries": "error",
+    "react-hooks-js/gating": "error",
+    "react-hooks-js/globals": "error",
+    "react-hooks-js/immutability": "error",
+    "react-hooks-js/incompatible-library": "error",
+    "react-hooks-js/preserve-manual-memoization": "error",
+    "react-hooks-js/purity": "error",
+    "react-hooks-js/refs": "error",
+    "react-hooks-js/set-state-in-effect": "error",
+    "react-hooks-js/set-state-in-render": "error",
+    "react-hooks-js/static-components": "error",
+    "react-hooks-js/unsupported-syntax": "error",
+    "react-hooks-js/use-memo": "error",
+
+    //
+    // ==== Misc ====
+    //
+
+    // Explicitly disabled for this project
+    "jsx_a11y/alt-text": "off",
+
+    // ?
+    "react_perf/jsx-no-new-array-as-prop": "off",
+    "react_perf/jsx-no-new-function-as-prop": "off",
+    "react/jsx-key": "off",
+    "eslint/default-case": "off",
+    "react_perf/jsx-no-new-object-as-prop": "off",
+    "unicorn/prefer-at": "off",
+
+    // Doesn't work yet
+    "eslint/sort-imports": "off",
+    "eslint/no-duplicate-imports": "off",
+    "eslint/no-empty-function": "off",
+    "eslint/no-undefined": "off",
+    "eslint/no-loop-func": "off",
+    "import/consistent-type-specifier-style": "off",
+    "jsx_a11y/no-static-element-interactions": "off",
+    "typescript/consistent-indexed-object-style": "off",
+    "typescript/promise-function-async": "off",
+    "react/no-array-index-key": "off"
+  }
+}

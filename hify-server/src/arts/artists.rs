@@ -1,140 +1,156 @@
-use std::{
-    hash::{DefaultHasher, Hash, Hasher},
-    path::Path,
-    sync::Arc,
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
 };
 
 use anyhow::{Context, Result};
-use image::RgbImage;
+use colored::Colorize;
+use image::DynamicImage;
+use log::{debug, info};
 
 use crate::{
-    arts::{
-        RegisterableArtType,
-        tools::{assemble_four_images, resize_image, resize_image_constraint},
-    },
-    index::{ArtistID, Index},
-    resources::ResourceManager,
-    runner::{TaskSet, TaskSetOptions},
+    arts::{LARGE_ART_SIDE_PX, manager::ArtSize, tools::assemble_four_images},
+    index::{AlbumID, ArtistID, IndexCache},
+    utils::{TaskRunner, iter_stable_hash},
 };
 
-use super::{ItemArtsManager, LARGE_ART_SIDE_PX};
+use super::ArtsManager;
 
-pub fn generate_artist_arts(index: &Index, res_manager: &ResourceManager) -> Result<()> {
-    let artists = index.artists_albums_and_participations.keys().copied();
-
-    let mut runner = TaskSet::<Result<()>>::new();
-    let index = Arc::new(index.clone());
-
-    for artist_id in artists {
-        let index = Arc::clone(&index);
-
-        let albums_art_manager = Arc::clone(&res_manager.album_arts);
-        let artists_art_manager = Arc::clone(&res_manager.artist_arts);
-
-        runner.add(move || {
-            let artist_album_arts = index
-                .artists_albums_and_participations
-                .get(&artist_id)
-                .unwrap()
-                .keys()
-                .filter_map(|album_id| albums_art_manager.large_art(*album_id))
-                .take(4)
-                .collect::<Vec<_>>();
-
-            match artist_album_arts.as_slice() {
-                [] => Ok(()),
-
-                [single] => assemble(
-                    artist_id,
-                    &artists_art_manager,
-                    [single.as_path()],
-                    |[single]| Ok(resize_image_constraint(&single, LARGE_ART_SIDE_PX).into_owned()),
-                ),
-
-                [left, right] => assemble(
-                    artist_id,
-                    &artists_art_manager,
-                    [left.as_path(), right.as_path()],
-                    |[left, right]| {
-                        assemble_four_images(&left, &right, &right, &left, LARGE_ART_SIDE_PX)
-                    },
-                ),
-
-                [top_left, top_right, bottom_left] => assemble(
-                    artist_id,
-                    &artists_art_manager,
-                    [
-                        top_left.as_path(),
-                        top_right.as_path(),
-                        bottom_left.as_path(),
-                    ],
-                    |[top_left, top_right, bottom_left]| {
-                        assemble_four_images(&top_left, &top_right, &bottom_left, &top_left, LARGE_ART_SIDE_PX)
-                    },
-                ),
-
-                [top_left, top_right, bottom_left, bottom_right, ..] => assemble(
-                    artist_id,
-                    &artists_art_manager,
-                    [
-                        top_left.as_path(),
-                        top_right.as_path(),
-                        bottom_left.as_path(),
-                        bottom_right.as_path(),
-                    ],
-                    |[top_left, top_right, bottom_left, bottom_right]| {
-                        assemble_four_images(
-                            &top_left,
-                            &top_right,
-                            &bottom_left,
-                            &bottom_right,
-                            LARGE_ART_SIDE_PX,
-                        )
-                    },
-                ),
-            }
-        });
-    }
-
-    for result in runner.run(TaskSetOptions::with_progress_bar()) {
-        result??;
-    }
-
-    Ok(())
-}
-
-fn assemble<const N: usize>(
-    artist_id: ArtistID,
-    artists_art_manager: &ItemArtsManager<ArtistID>,
-    files: [&Path; N],
-    assemble: impl FnOnce([RgbImage; N]) -> Result<RgbImage>,
+// NOTE: should only be called *AFTER* album arts have been generated
+pub fn generate_artists_art(
+    index: &IndexCache,
+    album_arts: &ArtsManager<AlbumID>,
+    artist_arts: &ArtsManager<ArtistID>,
 ) -> Result<()> {
-    let load = |path: &Path| {
-        image::open(path)
-            .with_context(|| format!("Failed to open album art file at: {}", path.display()))
-            .map(|img| resize_image(&img.into_rgb8(), 1000, 1000))
-    };
+    debug!("-> Checking artists that require new art generation...");
 
-    let mut hasher = DefaultHasher::new();
+    let mut artist_album_arts = vec![];
 
-    for file in files {
-        file.hash(&mut hasher);
+    for artist_id in index.artists.keys() {
+        let artist_in_albums = index
+            .artists_albums
+            .get(artist_id)
+            .unwrap()
+            .iter()
+            .chain(
+                index
+                    .artists_album_participations
+                    .get(artist_id)
+                    .unwrap()
+                    .iter(),
+            )
+            .take(4)
+            .copied()
+            .collect::<Vec<_>>();
+
+        assert!(!artist_in_albums.is_empty());
+
+        if artist_in_albums.is_empty() {
+            if artist_arts.has(*artist_id) {
+                artist_arts.delete(*artist_id)?;
+            }
+
+            continue;
+        }
+
+        let img_hash = iter_stable_hash(
+            artist_in_albums
+                .iter()
+                .map(|album_id| album_arts.get_art_source_data(*album_id).unwrap()),
+        );
+
+        if artist_arts.has_with_source_data(*artist_id, img_hash) {
+            continue;
+        }
+
+        artist_album_arts.push((*artist_id, artist_in_albums, img_hash));
     }
 
-    let source_hash = hasher.finish();
-
-    if artists_art_manager
-        .get_hash(artist_id)
-        .is_some_and(|existing_hash| source_hash == existing_hash)
-    {
+    if artist_album_arts.is_empty() {
         return Ok(());
     }
 
-    let files = files.into_iter().map(load).collect::<Result<Vec<_>>>()?;
+    info!(
+        "-> Generating {} artist arts...",
+        artist_album_arts.len().to_string().bright_yellow()
+    );
 
-    let image = assemble(files.try_into().unwrap())?;
+    let mut tasks = TaskRunner::new();
 
-    artists_art_manager.register_art(artist_id, source_hash, RegisterableArtType::Buffer(image))?;
+    let total = Arc::new(AtomicUsize::new(0));
+
+    for (artist_id, first_albums, img_hash) in artist_album_arts {
+        let album_arts = album_arts.clone();
+        let artist_arts = artist_arts.clone();
+        let total = Arc::clone(&total);
+
+        tasks.spawn(move || {
+            // TODO: prefer images with 1:1 aspect ratio (or closest to it)
+            let images = first_albums
+                .into_iter()
+                .map(|album_id| album_arts.get_art_path(album_id, ArtSize::Large).unwrap())
+                .map(|art| {
+                    image::open(&art)
+                        .with_context(|| {
+                            format!("Failed to open album art image at path: {}", art.display())
+                        })
+                        .map(DynamicImage::into_rgb8)
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            assert!((1..=4).contains(&images.len()));
+
+            let img = match images.as_slice() {
+                [single] => single.clone(),
+
+                [top_left, top_right] => assemble_four_images(
+                    top_left,
+                    top_right,
+                    top_right,
+                    top_left,
+                    LARGE_ART_SIDE_PX / 2,
+                )?,
+
+                [top_left, top_right, bottom_left] => assemble_four_images(
+                    top_left,
+                    top_right,
+                    bottom_left,
+                    top_left,
+                    LARGE_ART_SIDE_PX / 2,
+                )?,
+
+                [top_left, top_right, bottom_left, bottom_right] => assemble_four_images(
+                    top_left,
+                    top_right,
+                    bottom_left,
+                    bottom_right,
+                    LARGE_ART_SIDE_PX / 2,
+                )?,
+
+                [] | [_, _, _, _, ..] => unreachable!(),
+            };
+
+            assert!(artist_arts.register(artist_id, img_hash, &img)?);
+
+            let curr = total.fetch_add(1, Ordering::SeqCst) + 1;
+
+            if curr.is_multiple_of(100) {
+                debug!(
+                    "--> Generated {} artist arts so far...",
+                    curr.to_string().bright_yellow()
+                );
+            }
+
+            Ok(())
+        });
+    }
+
+    tasks.join_all()?;
+
+    info!(
+        "-> Successfully generated {} artist arts",
+        total.load(Ordering::SeqCst).to_string().bright_yellow()
+    );
 
     Ok(())
 }

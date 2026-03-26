@@ -1,5 +1,0 @@
-mutation GetNextTracksOfMix($mixId: String!, $maxTracks: Int!) {
-	getNextTracksOfMix(mixId: $mixId, maxTracks: $maxTracks) {
-		...AudioTrack
-	}
-}

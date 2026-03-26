@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+@layer base {
+  h1 {
+    @apply my-12 text-3xl;
+  }
+
+  h2 {
+    @apply my-8 text-2xl;
+  }
+
+  h3 {
+    @apply my-6 text-xl;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-bold;
+  }
+
+  hr {
+    @apply border-gray-500 my-8;
+  }
+
+  body {
+    @apply overflow-hidden;
+  }
+
+  [data-navigable-type='item'] {
+    @apply border border-transparent nav-self-focused:border-neutral-300! nav-self-focused:cursor-pointer;
+  }
+
+  [data-navigable-type='row'] {
+    @apply flex flex-nowrap gap-5 overflow-x-hidden;
+  }
+
+  /* Detect browser focus (should never happen) */
+  :not(input[type='text']):focus {
+    outline: none !important;
+    border: 10px solid red !important ;
+    box-shadow: 0 0 10px #719ece !important;
+  }
+}
+
+@variant navigable (&[data-navigable-id]);
+@variant nav-self-focused   (&[data-navigable-focused]);
+@variant nav-self-unfocused (&:not([data-navigable-focused]));
+
+@variant nav-focused   (&[data-navigable-focused], &:has([data-navigable-focused]));
+@variant nav-unfocused (&:not([data-navigable-focused]):not(:has([data-navigable-focused])));
+
+@utility items-row-* {
+  > * {
+    flex: 0 0 calc((100% - calc(--value(integer) - 1) * 20px) / --value(integer));
+    min-width: calc((100% - calc(--value(integer) - 1) * 20px) / --value(integer));
+  }
+}
+
+@utility items-row-auto {
+  @apply items-row-2 sm:items-row-3 md:items-row-5 lg:items-row-7 xl:items-row-9;
+}

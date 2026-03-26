@@ -1,5 +1,0 @@
-fragment Artist on ArtistInfos {
-	id
-	name
-	hasArt
-}

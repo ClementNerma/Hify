@@ -1,3 +1,0 @@
-mutation LogListening($trackId: String!, $duration_s: Int!) {
-	logListening(trackId: $trackId, durationS: $duration_s)
-}
