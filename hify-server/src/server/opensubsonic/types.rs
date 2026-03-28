@@ -90,6 +90,7 @@ os_struct! {
 }
 
 os_struct! {
+    #[allow(clippy::struct_field_names)]
     pub struct Artist {
         id: ArtistID,
         name: String,

@@ -17,6 +17,7 @@ use crate::{
 use super::ArtsManager;
 
 // NOTE: should only be called *AFTER* album arts have been generated
+#[allow(clippy::too_many_lines)]
 pub fn generate_artists_art(
     index: &IndexCache,
     album_arts: &ArtsManager<AlbumID>,

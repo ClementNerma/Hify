@@ -71,6 +71,7 @@ pub struct IndexCache {
 
 impl IndexCache {
     // TODO: move assertions to a health check method on `Index`
+    #[allow(clippy::too_many_lines)]
     pub fn build(index: &Index) -> Self {
         let cmp_index = CmpIndex::build(index);
 
@@ -172,9 +173,9 @@ impl IndexCache {
             }
         }
 
-        let cmp_tracks_by_id = |a: &TrackID, b: &TrackID| cmp_index.cmp_tracks_by_id(a, b);
-        let cmp_albums_by_id = |a: &AlbumID, b: &AlbumID| cmp_index.cmp_albums_by_id(a, b);
-        let cmp_genres_by_id = |a: &GenreID, b: &GenreID| cmp_index.cmp_genres_by_id(a, b);
+        let cmp_tracks_by_id = |a: &TrackID, b: &TrackID| cmp_index.cmp_tracks_by_id(*a, *b);
+        let cmp_albums_by_id = |a: &AlbumID, b: &AlbumID| cmp_index.cmp_albums_by_id(*a, *b);
+        let cmp_genres_by_id = |a: &GenreID, b: &GenreID| cmp_index.cmp_genres_by_id(*a, *b);
 
         Self {
             latest_added_albums: to_sorted_set(albums.values().map(|album| album.id), |a, b| {

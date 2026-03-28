@@ -71,6 +71,7 @@ pub enum ArtistsSort {
     GreatTracksCount,
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn paginate_sort_albums(
     mut albums: Vec<&Album>,
     sort: AlbumsSort,

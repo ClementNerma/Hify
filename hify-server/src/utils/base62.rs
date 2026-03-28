@@ -26,12 +26,12 @@ pub fn encode_base62(data: &[u8]) -> String {
         let mut new_num = Vec::new();
 
         for &byte in &num {
-            let current = remainder * 256 + byte as u32;
+            let current = remainder * 256 + u32::from(byte);
             let quotient = current / 62;
             remainder = current % 62;
 
             if !new_num.is_empty() || quotient > 0 {
-                new_num.push(quotient as u8);
+                new_num.push(u8::try_from(quotient).unwrap());
             }
         }
 
@@ -81,9 +81,9 @@ pub fn decode_base62(encoded: &str) -> Result<Vec<u8>, String> {
         };
 
         // Multiply num by 62 and add digit
-        let mut carry = digit as u32;
+        let mut carry = u32::from(digit);
         for byte in num.iter_mut().rev() {
-            let current = (*byte as u32) * 62 + carry;
+            let current = u32::from(*byte) * 62 + carry;
             *byte = (current & 0xFF) as u8;
             carry = current >> 8;
         }
@@ -115,6 +115,7 @@ pub mod u64_base62_serialization {
         de::{Error, Visitor},
     };
 
+    #[allow(clippy::trivially_copy_pass_by_ref)] // BUG: doesn't work here
     pub fn serialize<S: Serializer>(value: &u64, ser: S) -> Result<S::Ok, S::Error> {
         ser.serialize_str(&super::encode_base62_u64(*value))
     }

@@ -4,7 +4,7 @@ use crate::index::IdType;
 
 #[macro_export]
 macro_rules! os_struct {
-    ($pub:vis struct $struct_name:ident {
+    ($(#[$meta:meta])* $pub:vis struct $struct_name:ident {
         $(
             $( #[rename = $field_rename:expr] )?
             $field_name:ident: $field_typ:ty,
@@ -26,6 +26,7 @@ macro_rules! os_struct {
 
         $(#[content] $( #[rename = $content_rename:expr] )? $content_name:ident: $content_type: ty)?
     }) => {
+        $( #[$meta] )*
         $pub struct $struct_name {
             $( $pub $field_name: $field_typ, )*
             $( $( $pub $content_field_name: $content_field_type, )+ )?

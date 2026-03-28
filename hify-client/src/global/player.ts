@@ -8,6 +8,8 @@ import { createGlobalStore } from '#/utils/stores.ts'
 import { showFailure, showNotification } from './notifications'
 import { loadPersistentData, prependHistoryTrack, updatePersistedPlayerState } from './persistent'
 
+// TODO: don't show error notification for audio player's AbortError, which can happen when quickly skipping tracks or when navigating away from the player view while a track is loading
+
 //
 // => Player state
 //

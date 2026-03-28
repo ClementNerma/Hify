@@ -165,7 +165,7 @@ pub enum Rating {
 }
 
 impl Rating {
-    pub fn get_zero_to_five(&self) -> u8 {
+    pub fn get_zero_to_five(self) -> u8 {
         match self {
             Self::Zero => 0,
             Self::One => 1,

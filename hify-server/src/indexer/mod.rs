@@ -23,6 +23,7 @@ mod analyzer;
 mod tags;
 mod walker;
 
+#[allow(clippy::too_many_lines)]
 pub fn analyze_tracks_in(dir: &Path, prev_index: Option<&IndexCache>) -> Result<Option<Index>> {
     debug!("-> Building files list...");
 
@@ -32,10 +33,10 @@ pub fn analyze_tracks_in(dir: &Path, prev_index: Option<&IndexCache>) -> Result<
     let prev_index = prev_index.unwrap_or(&empty_cache);
 
     let TracksChanges {
-        new_tracks,
-        modified_tracks,
-        deleted_tracks,
-        unchanged_tracks,
+        new: new_tracks,
+        modified: modified_tracks,
+        deleted: deleted_tracks,
+        unchanged: unchanged_tracks,
     } = compute_changes_in(&files, prev_index);
 
     let total_tracks = new_tracks.len() + modified_tracks.len() + unchanged_tracks.len();
@@ -342,16 +343,16 @@ fn compute_changes_in<'a>(
     deleted_tracks.sort();
 
     TracksChanges {
-        new_tracks,
-        modified_tracks,
-        deleted_tracks,
-        unchanged_tracks,
+        new: new_tracks,
+        modified: modified_tracks,
+        deleted: deleted_tracks,
+        unchanged: unchanged_tracks,
     }
 }
 
 struct TracksChanges<'a> {
-    new_tracks: Vec<&'a PathBuf>,
-    modified_tracks: Vec<&'a PathBuf>,
-    deleted_tracks: Vec<&'a PathBuf>,
-    unchanged_tracks: Vec<&'a PathBuf>,
+    new: Vec<&'a PathBuf>,
+    modified: Vec<&'a PathBuf>,
+    deleted: Vec<&'a PathBuf>,
+    unchanged: Vec<&'a PathBuf>,
 }

@@ -45,7 +45,7 @@ impl Rng {
             .wrapping_add(self.increment);
 
         // Calculate output function (XSH-RR)
-        #[allow(clippy::as_conversions)]
+        #[allow(clippy::as_conversions, clippy::cast_possible_truncation)]
         let xorshifted = (((old_state >> 18) ^ old_state) >> 27) as u32;
 
         #[allow(clippy::as_conversions)]

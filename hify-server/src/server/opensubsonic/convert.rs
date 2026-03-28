@@ -13,7 +13,9 @@ use super::types::{AlbumID3WithSongs, ArtistID3, Child, CoverArtId, ItemGenre};
 pub fn track_to_child(track: &Track, index: &IndexCache, ratings: &Ratings) -> Child {
     let tags = &track.tags;
 
-    let rating = ratings.get(&track.id).map(Rating::get_zero_to_five);
+    let rating = ratings
+        .get(&track.id)
+        .map(|rating| Rating::get_zero_to_five(*rating));
 
     let album = index.albums.get(&tags.album_id).unwrap();
 
