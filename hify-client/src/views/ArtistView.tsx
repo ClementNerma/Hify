@@ -1,19 +1,23 @@
 import { useSuspenseQueries } from '#/api/hooks.ts'
-import { fetchArtistAlbumParticipations, fetchArtistAlbums } from '#/api/queries.ts'
+import { fetchArtist, fetchArtistAlbumParticipations, fetchArtistAlbums } from '#/api/queries.ts'
 import { AlbumCard } from '#/components/molecules/AlbumCard.tsx'
 import { NavRow } from '#/components/navigables/Row.tsx'
 
 type ArtistViewProps = { artistId: string }
 
 export function ArtistView({ artistId }: ArtistViewProps) {
-  const [albumsByName, /*albumsByDate, albumsByScore,*/ albumParticipationsByName] =
+  const [{ artist }, albumsByName, /*albumsByDate, albumsByScore,*/ albumParticipationsByName] =
     useSuspenseQueries(
       {
-        queryKey: ['artistAlbums'],
+        queryKey: ['artist', artistId],
+        queryFn: () => fetchArtist(artistId),
+      },
+      {
+        queryKey: ['artistAlbums', artistId],
         queryFn: () => fetchArtistAlbums(artistId, 'DATE', { dir: 'DESC', limit: 50, offset: 0 }),
       },
       {
-        queryKey: ['artistALbumParticipations'],
+        queryKey: ['artistAlbumParticipations', artistId],
         queryFn: () =>
           fetchArtistAlbumParticipations(artistId, 'DATE', {
             limit: 50,
@@ -25,6 +29,8 @@ export function ArtistView({ artistId }: ArtistViewProps) {
 
   return (
     <div>
+      <h1 className="text-center">{artist.name}</h1>
+
       {albumsByName.total > 0 && (
         <>
           <h2>Albums ({albumsByName.total})</h2>
