@@ -1,7 +1,7 @@
 import { use, useRef, useState } from 'react'
 import { showFailure, showNotification } from '#/global/notifications.ts'
 import { fail, getOrInsertWith, staticTypeAssert } from '#/utils/common.ts'
-import { useValueIdentityWatcher, useValueWatcher } from '#/utils/hooks.ts'
+import { useInitialValue, useValueIdentityWatcher, useValueWatcher } from '#/utils/hooks.ts'
 import type { Paginated, Pagination, PaginationDir } from './types'
 
 //
@@ -21,9 +21,9 @@ export function useSuspenseQuery<T>({ queryKey: queryKeyArray, queryFn }: Cachab
     Promise<T>
   >
 
-  const initialQueryKey = useRef(queryKey)
+  const initialQueryKey = useInitialValue(queryKey)
 
-  return use(getOrInsertWith(retypedCache, initialQueryKey.current, queryFn))
+  return use(getOrInsertWith(retypedCache, initialQueryKey, queryFn))
 }
 
 export function useSuspenseQueries<Q extends CachableQuery<unknown>[]>(
@@ -76,10 +76,10 @@ export function usePaginatedQuery<T>({
     suspensePaginatedQueriesCache,
   ) as Map<string, Promise<InitialState>>
 
-  const initialQueryKey = useRef(queryKey)
+  const initialQueryKey = useInitialValue(queryKey)
 
   const initialState = use(
-    getOrInsertWith(retypedCache, initialQueryKey.current, async () =>
+    getOrInsertWith(retypedCache, initialQueryKey, async () =>
       suspense === true
         ? queryFn({ offset: 0, limit: pageSize, dir: paginationDir })
         : { results: null, hasMore: true },

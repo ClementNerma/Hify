@@ -136,3 +136,9 @@ export function useOnUnmounted(callback: () => void): void {
     [],
   )
 }
+
+export function useInitialValue<T>(value: T): T {
+  const initialValue = useRef(value)
+  // oxlint-disable-next-line react-hooks-js/refs
+  return initialValue.current
+}
