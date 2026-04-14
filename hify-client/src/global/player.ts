@@ -217,6 +217,7 @@ export function playNextTrack(): void {
     showFailure('Unexpected: tracks should have been loaded ahead of time')
   } else {
     audioPlayer?.pause()
+    showNotification({ type: 'info', title: 'End of queue', message: 'No more tracks to play' })
   }
 }
 
