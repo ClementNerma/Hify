@@ -5,7 +5,7 @@ import { navigate } from '#/router/routes.ts'
 import { routes } from '#/routes.ts'
 import { arrayWithInsertion, arrayWithoutIndex, assertNotNull } from '#/utils/common.ts'
 import { createGlobalStore } from '#/utils/stores.ts'
-import { showFailure, showNotification } from './notifications'
+import { showFailure, showNotification, showQuickNotification } from './notifications'
 import { loadPersistentData, prependHistoryTrack, updatePersistedPlayerState } from './persistent'
 
 // TODO: don't show error notification for audio player's AbortError, which can happen when quickly skipping tracks or when navigating away from the player view while a track is loading
@@ -217,7 +217,12 @@ export function playNextTrack(): void {
     showFailure('Unexpected: tracks should have been loaded ahead of time')
   } else {
     audioPlayer?.pause()
-    showNotification({ type: 'info', title: 'End of queue', message: 'No more tracks to play' })
+
+    showQuickNotification({
+      type: 'info',
+      title: 'End of queue',
+      message: 'No more tracks to play',
+    })
   }
 }
 
@@ -275,12 +280,10 @@ export function enqueueTracksAsNext(tracks: TrackCompleteInfos[]): void {
     }
   })
 
-  showNotification({
+  showQuickNotification({
     type: 'info',
     title: 'Queue updated',
     message: `${tracks.length} ${tracks.length > 1 ? 'tracks have' : 'track has'} been added to queue`,
-    durationMs: 2000,
-    hideProgressBar: true,
   })
 }
 

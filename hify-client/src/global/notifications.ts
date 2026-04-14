@@ -18,6 +18,12 @@ export function showNotification(params: Omit<Notification, 'id'>): void {
   notificationStore.mutateWith((notifs) => [...notifs, { id: randomId(), ...params }])
 }
 
+export function showQuickNotification(
+  params: Omit<Notification, 'id' | 'durationMs' | 'hideProgressBar'>,
+): void {
+  showNotification({ ...params, durationMs: 3000, hideProgressBar: true })
+}
+
 export function showFailure(message: string, type: NotificationType = 'error'): void {
   showNotification({ type, title: 'Internal Error', message })
 }
