@@ -30,7 +30,9 @@ export function HistoryView() {
             <div key={track.track.id} className="flex">
               <TrackCard
                 track={track}
-                onPress={() => playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true })}
+                onPress={() =>
+                  playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true, fromMix: null })
+                }
               />
             </div>
           ))

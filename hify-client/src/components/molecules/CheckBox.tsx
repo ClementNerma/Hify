@@ -14,6 +14,7 @@ export function CheckBox({
 }: PropsWithChildren<CheckBoxProps>) {
   return (
     <NavItem onPress={() => onChange(!checked)} {...navProps}>
+      {/* TODO: React complains about missing onChange handler */}
       {/* oxlint-disable-next-line react/checked-requires-onchange-or-readonly */}
       <input type="checkbox" checked={checked} /> {children}
     </NavItem>

@@ -61,7 +61,9 @@ export function HomeView() {
           <TrackCard
             key={track.track.id}
             track={track}
-            onPress={() => playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true })}
+            onPress={() =>
+              playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true, fromMix: null })
+            }
           />
         ))}
       </NavRow>

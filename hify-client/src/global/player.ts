@@ -64,7 +64,7 @@ export const audioProgressStore = createGlobalStore<{
 export function playTrackFromNewQueue(
   tracks: TrackCompleteInfos[],
   position: number,
-  opts: { gotoPlayer: boolean; fromMix?: PlayerMix },
+  opts: { gotoPlayer: boolean; fromMix: PlayerMix | null },
 ): void {
   if (Math.floor(position) !== position || position < 0 || position >= tracks.length) {
     showFailure('Cannot play track: position out of bounds in provided queue')
@@ -160,9 +160,9 @@ export function playTrackFromNewQueue(
 }
 
 export function playTrackFromCurrentQueue(position: number): void {
-  const { playQueue } = playerStateStore.getSnapshot()
+  const { playQueue, currentMix } = playerStateStore.getSnapshot()
 
-  playTrackFromNewQueue(playQueue, position, { gotoPlayer: false })
+  playTrackFromNewQueue(playQueue, position, { gotoPlayer: false, fromMix: currentMix })
 }
 
 export function toggleAudioPlaying(): void {

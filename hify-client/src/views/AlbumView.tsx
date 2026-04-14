@@ -137,7 +137,7 @@ export function AlbumView({ albumId }: AlbumViewProps) {
                   playTrackFromNewQueue(
                     tracks,
                     tracks.findIndex((c) => c.track.id === track.track.id),
-                    { gotoPlayer: true },
+                    { gotoPlayer: true, fromMix: null },
                   )
                 }
                 onLongPress={() => openContextMenu(defaultCtxMenus.track(track))}

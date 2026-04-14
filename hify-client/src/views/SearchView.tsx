@@ -123,6 +123,7 @@ export function SearchView({ initialQuery }: SearchViewProps) {
                     onPress={() =>
                       playTrackFromNewQueue(searchResults.tracks.results, i, {
                         gotoPlayer: true,
+                        fromMix: null,
                       })
                     }
                   />
