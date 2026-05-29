@@ -15,6 +15,7 @@ import { NavRow } from '#/components/navigables/Row.tsx'
 import { playTrackFromNewQueue } from '#/global/player.ts'
 import { unwrapNotNull } from '#/utils/common.ts'
 import { useValueWatcher } from '#/utils/hooks.ts'
+import { NavList } from '../components/navigables/List'
 
 export type SearchViewProps = { initialQuery?: string }
 
@@ -84,7 +85,7 @@ export function SearchView({ initialQuery }: SearchViewProps) {
   }
 
   return (
-    <>
+    <NavList focusChildIndexOnEnter={query !== '' ? 1 : 0}>
       <div className="flex justify-center mt-2">
         <BlockNavItem className="w-1/4" onFocused={focusInput} onUnfocused={unfocusInput}>
           <div className="relative">
@@ -161,7 +162,7 @@ export function SearchView({ initialQuery }: SearchViewProps) {
           </div>
         </div>
       )}
-    </>
+    </NavList>
   )
 }
 
