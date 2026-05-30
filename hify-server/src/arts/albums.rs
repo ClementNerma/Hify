@@ -22,7 +22,7 @@ use crate::{
 use super::ArtsManager;
 
 static COVER_FILE_STEMS: &[&str] = &["cover", "folder"];
-static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "jfif", "png"];
+static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "jfif", "png", "webp"];
 
 pub fn generate_album_arts(
     index_cache: &IndexCache,
