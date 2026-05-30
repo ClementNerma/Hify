@@ -5,6 +5,7 @@ use std::{
     path::PathBuf,
 };
 
+use anyhow::{Context, Result};
 use indexmap::{IndexMap, IndexSet};
 
 use crate::utils;
@@ -72,7 +73,7 @@ pub struct IndexCache {
 impl IndexCache {
     // TODO: move assertions to a health check method on `Index`
     #[allow(clippy::too_many_lines)]
-    pub fn build(index: &Index) -> Self {
+    pub fn build(index: &Index) -> Result<Self> {
         let cmp_index = CmpIndex::build(index);
 
         let Index {
@@ -177,7 +178,7 @@ impl IndexCache {
         let cmp_albums_by_id = |a: &AlbumID, b: &AlbumID| cmp_index.cmp_albums_by_id(*a, *b);
         let cmp_genres_by_id = |a: &GenreID, b: &GenreID| cmp_index.cmp_genres_by_id(*a, *b);
 
-        Self {
+        Ok(Self {
             latest_added_albums: to_sorted_set(albums.values().map(|album| album.id), |a, b| {
                 let get_latest_mtime = |album_id: &AlbumID| {
                     let album_tracks = albums_tracks.get(album_id).unwrap();
@@ -213,27 +214,33 @@ impl IndexCache {
 
             albums_tracks_relative_common_path: albums_tracks
                 .iter()
-                .map(|(album_id, album_tracks)| {
+                .map(|(album_id, album_tracks)| -> Result<(AlbumID, PathBuf)> {
                     let tracks_path = album_tracks
                         .iter()
                         .map(|track_id| &tracks.get(track_id).unwrap().relative_path);
 
-                    (
-                        *album_id,
-                        if tracks_path.len() == 1 {
-                            tracks_path
-                                .into_iter()
-                                .next()
-                                .unwrap()
-                                .parent()
-                                .unwrap()
-                                .to_owned()
-                        } else {
-                            utils::common_ancestor(tracks_path).unwrap()
-                        },
-                    )
+                    let relative_common_path = if tracks_path.len() == 1 {
+                        tracks_path
+                            .into_iter()
+                            .next()
+                            .unwrap()
+                            .parent()
+                            .unwrap()
+                            .to_owned()
+                    } else {
+                        utils::common_ancestor(tracks_path.clone())
+                            .with_context(|| format!(
+                                "Found album with tracks scattered across multiple non-common directories:\n\n{}",
+                                tracks_path
+                                    .map(|path| format!(" * {}", path.display()))
+                                    .collect::<Vec<_>>()
+                                    .join("\n")
+                            ))?
+                    };
+
+                    Ok((*album_id, relative_common_path))
                 })
-                .collect(),
+                .collect::<Result<HashMap<_, _>>>()?,
 
             albums_tracks: to_map_of_sorted_sets(
                 albums_tracks,
@@ -277,7 +284,7 @@ impl IndexCache {
             albums,
             artists,
             genres,
-        }
+        })
     }
 }
 

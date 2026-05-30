@@ -78,7 +78,7 @@ impl DataManager {
         };
 
         debug!("> Building index cache...");
-        let index_cache = IndexCache::build(&index);
+        let index_cache = IndexCache::build(&index)?;
 
         info!("> Successfully loaded all data!");
 
@@ -135,7 +135,7 @@ impl DataManager {
         let index_updated = new_index.is_some();
 
         let index = new_index.unwrap_or_else(|| self.index.blocking_read().clone());
-        let index_cache = IndexCache::build(&index);
+        let index_cache = IndexCache::build(&index)?;
 
         if index_updated {
             assert_index_correctness(&index);
