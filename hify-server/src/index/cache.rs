@@ -1,6 +1,7 @@
 use std::{
     cmp::Ordering,
     collections::{HashMap, HashSet},
+    fmt::Debug,
     hash::Hash,
     path::PathBuf,
 };
@@ -203,7 +204,14 @@ impl IndexCache {
                         .unwrap()
                 };
 
-                get_latest_mtime(a).cmp(&get_latest_mtime(b)).reverse()
+                get_latest_mtime(a)
+                    .cmp(&get_latest_mtime(b))
+                    .reverse()
+                    // In case two files have the exact same mtime, we sort by album name to ensure a deterministic order
+                    .then_with(||
+                        albums.get(a).unwrap().name
+                            .cmp(&albums.get(b).unwrap().name)
+                    )
             }),
 
             albums_min_max_date: albums
@@ -304,7 +312,7 @@ impl IndexCache {
     }
 }
 
-fn build_sorted_map<K: Hash + Eq, V>(
+fn build_sorted_map<K: Hash + Eq, V: Debug>(
     values: impl IntoIterator<Item = V>,
     map_key: impl Fn(&V) -> K,
     sort_by_value: impl Fn(&V, &V) -> Ordering,
@@ -315,26 +323,28 @@ fn build_sorted_map<K: Hash + Eq, V>(
         .collect::<IndexMap<_, _>>();
 
     values.sort_by(|_, a, _, b| {
-        sort_by_value(a, b).then_with(|| panic!("No value should be equal in build_sorted_map"))
+        sort_by_value(a, b).then_with(|| {
+            panic!("Equal ordering should not happen in build_sorted_map, but got equal for: {a:?} & {b:?}")
+        })
     });
 
     values
 }
 
-fn to_sorted_set<T: Hash + Eq>(
+fn to_sorted_set<T: Hash + Eq + Debug>(
     values: impl IntoIterator<Item = T>,
     sort: impl Fn(&T, &T) -> Ordering,
 ) -> IndexSet<T> {
     let mut values = values.into_iter().collect::<IndexSet<_>>();
 
     values.sort_by(|a, b| {
-        sort(a, b).then_with(|| panic!("No value should be equal in to_sorted_set"))
+        sort(a, b).then_with(|| panic!("Equal ordering should not happen in to_sorted_set, but got equal for: {a:?} & {b:?}"))
     });
 
     values
 }
 
-fn to_map_of_sorted_sets<K: Hash + Eq, V: Hash + Eq>(
+fn to_map_of_sorted_sets<K: Hash + Eq, V: Hash + Eq + Debug>(
     values: HashMap<K, HashSet<V>>,
     sort: impl Fn(&V, &V) -> Ordering,
     fill_with: impl IntoIterator<Item = K>,
