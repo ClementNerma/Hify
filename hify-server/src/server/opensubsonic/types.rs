@@ -238,8 +238,32 @@ os_struct! {
 }
 
 os_struct! {
-    pub struct Playlist {
-        // TODO
+    pub struct PlaylistWithSongs {
+        id: String,
+        name: String,
+        comment: Option<String>,
+        owner: Option<String>,
+        public: Option<bool>,
+        #[rename = "songCount"]
+        song_count: usize,
+        #[rename = "duration"]
+        duration_s: u32,
+        #[rename = "created"]
+        created_iso_8601: String,
+        #[rename = "changed"]
+        changed_iso_8601: String,
+        #[rename = "coverArt"]
+        cover_art_id: Option<CoverArtId>,
+        // #[rename = "allowedUser"]
+        // allowed_users: Option<Vec<String>>,
+        readonly: Option<bool>,
+        #[rename = "validUntil"]
+        valid_until_iso_8601: Option<String>,
+
+        #[children] {
+            #[rename = "entry"]
+            tracks: Vec<Child>
+        }
     }
 }
 

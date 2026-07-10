@@ -54,6 +54,9 @@ pub struct IndexCache {
     /// Albums where the artist is listed in one of the tracks but not in the album artists tag
     pub artists_album_participations: HashMap<ArtistID, IndexSet<AlbumID>>,
 
+    /// Tracks where the artist is listed in the track's artists or composers tag, in his albums only
+    pub artists_tracks: HashMap<ArtistID, IndexSet<TrackID>>,
+
     /// Tracks where the artist is listed in but belonging to an album they're not an album artist of
     pub artists_track_participations: HashMap<ArtistID, IndexSet<TrackID>>,
 
@@ -111,6 +114,8 @@ impl IndexCache {
         let mut artists_album_participations = HashMap::<ArtistID, HashSet<AlbumID>>::new();
 
         let mut artists_album_tracks = HashMap::<ArtistID, HashSet<TrackID>>::new();
+
+        let mut artists_tracks = HashMap::<ArtistID, HashSet<TrackID>>::new();
         let mut artists_track_participations = HashMap::<ArtistID, HashSet<TrackID>>::new();
 
         let mut albums_tracks = HashMap::<AlbumID, HashSet<TrackID>>::new();
@@ -137,6 +142,11 @@ impl IndexCache {
                     .insert(album.id);
 
                 artists_album_tracks
+                    .entry(*artist_id)
+                    .or_default()
+                    .insert(track.id);
+
+                artists_tracks
                     .entry(*artist_id)
                     .or_default()
                     .insert(track.id);
@@ -263,6 +273,12 @@ impl IndexCache {
             artists_album_participations: to_map_of_sorted_sets(
                 artists_album_participations,
                 cmp_albums_by_id,
+                artists.keys().copied(),
+            ),
+
+            artists_tracks: to_map_of_sorted_sets(
+                artists_tracks,
+                cmp_tracks_by_id,
                 artists.keys().copied(),
             ),
 
