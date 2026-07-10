@@ -13,7 +13,7 @@ use crate::{
             types::{AlbumID3WithSongs, Artist, Child},
         },
     },
-    utils::Rng,
+    utils::{Rng, deterministic_shuffle},
 };
 
 use super::{
@@ -86,7 +86,7 @@ fn album_list(params: AlbumListParams, index: &IndexCache) -> impl Iterator<Item
     match sort {
         AlbumListSort::Random => {
             let mut rng = Rng::new();
-            albums.sort_by_key(|_| rng.next_u64());
+            deterministic_shuffle(&mut albums, &mut rng);
         }
 
         AlbumListSort::Newest => {
