@@ -5,72 +5,51 @@ use std::{collections::HashMap, sync::LazyLock};
 use anyhow::{Context, Result, bail};
 use pomsky_macro::pomsky;
 use regex::Regex;
-use symphonia::core::meta::{MetadataRevision, StandardTagKey, Tag, Value};
+use symphonia::core::meta::{MetadataRevision, StandardTag, Tag};
 
 pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags> {
     let mut standard_tags = HashMap::new();
 
-    for tag in rev.tags() {
-        let Tag {
-            key: _, // NOTE: can be duplicates
-            std_key,
-            value,
-        } = tag;
+    // TODO: chain &rev.per_track.tags?
+    for tag in &rev.media.tags {
+        let Tag { raw, std } = tag;
 
-        if let Some(std_key) = std_key {
-            standard_tags.insert(*std_key, value);
+        if let Some(std) = std {
+            standard_tags.insert(std, raw);
         }
     }
 
-    let get_tag_str = |name: StandardTagKey| -> Result<Option<String>> {
-        standard_tags
-            .get(&name)
-            .map(|value| {
-                decode_value_as_string(value)
-                    .with_context(|| format!("Failed to decode tag '{name:?}'"))
+    macro_rules! get_tag_str {
+        ($tag:ident) => {
+            standard_tags.iter().find_map(|(std, _)| match std {
+                StandardTag::$tag(value) => Some(String::clone(&*value)),
+                _ => None,
             })
-            .transpose()
-            .map(Option::flatten)
-    };
+        };
+    }
 
-    let get_first_tag_str = |names: &[StandardTagKey]| -> Result<Option<String>> {
-        for name in names {
-            if let Some(value) = get_tag_str(*name)? {
-                return Ok(Some(value));
-            }
-        }
-
-        Ok(None)
-    };
+    macro_rules! get_tag_int {
+        ($tag:ident) => {
+            standard_tags.iter().find_map(|(std, _)| match std {
+                StandardTag::$tag(value) => Some(*value),
+                _ => None,
+            })
+        };
+    }
 
     let tags = TrackStrTags {
-        title: get_tag_str(StandardTagKey::TrackTitle)?.context("Track title is missing")?,
-        artists: get_tag_str(StandardTagKey::Artist)?
-            .map(parse_array_tag)
-            .unwrap_or_default(),
-        composers: get_tag_str(StandardTagKey::Composer)?
-            .map(parse_array_tag)
-            .unwrap_or_default(),
-        album: get_tag_str(StandardTagKey::Album)?.context("Album name is missing")?,
-        album_artists: get_tag_str(StandardTagKey::AlbumArtist)?
-            .map(parse_array_tag)
-            .unwrap_or_default(),
-        disc: get_tag_str(StandardTagKey::DiscNumber)?
-            .map(|value| parse_set_number(&value, "disc number"))
+        title: get_tag_str!(TrackTitle).context("Track title is missing")?,
+        artists: get_tag_str!(Artist).map_or_else(Vec::new, parse_array_tag),
+        composers: get_tag_str!(Composer).map_or_else(Vec::new, parse_array_tag),
+        album: get_tag_str!(Album).context("Album name is missing")?,
+        album_artists: get_tag_str!(AlbumArtist).map_or_else(Vec::new, parse_array_tag),
+        disc: get_tag_int!(DiscNumber).map(|disc| u16::try_from(disc).unwrap()),
+        track_no: get_tag_int!(TrackNumber).map(|track_no| u16::try_from(track_no).unwrap()),
+        date: get_tag_str!(ReleaseDate)
+            .or_else(|| get_tag_str!(OriginalReleaseDate))
+            .map(|date| parse_date(&date))
             .transpose()?,
-        track_no: get_tag_str(StandardTagKey::TrackNumber)?
-            .map(|value| parse_set_number(&value, "track number"))
-            .transpose()?,
-        date: get_first_tag_str(&[
-            StandardTagKey::ReleaseDate,
-            StandardTagKey::Date,
-            StandardTagKey::OriginalDate,
-        ])?
-        .map(|date| parse_date(&date))
-        .transpose()?,
-        genres: get_tag_str(StandardTagKey::Genre)?
-            .map(parse_array_tag)
-            .unwrap_or_default(),
+        genres: get_tag_str!(Genre).map_or_else(Vec::new, parse_array_tag),
     };
 
     if tags.album_artists.is_empty() {
@@ -78,16 +57,6 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
     }
 
     Ok(tags)
-}
-
-fn parse_set_number(input: &str, category: &'static str) -> Result<u32> {
-    let c = PARSE_TRACK_OR_DISC_NUMBER
-        .captures(input)
-        .with_context(|| format!("Invalid {category} value: {input}"))?;
-
-    c.name("number").unwrap().as_str().parse().with_context(|| {
-        format!("Internal error: failed to parse validated {category} number: {input}")
-    })
 }
 
 fn parse_date(input: &str) -> Result<TrackDate> {
@@ -104,7 +73,6 @@ fn parse_date(input: &str) -> Result<TrackDate> {
             .as_str()
             .parse::<u16>()
             .context("Invalid year number")?,
-
         month: captured
             .name("month")
             .map(|month| month.as_str().parse::<u8>().context("Invalid month number"))
@@ -125,36 +93,6 @@ fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
         .map(str::to_owned)
         .collect()
 }
-
-fn decode_value_as_string(value: &Value) -> Result<Option<String>> {
-    let decoded = match value {
-        Value::Binary(_) => bail!("Found unsupported tag data (binary)"),
-        Value::Boolean(_) => bail!("Found unsupported tag data (boolean)"),
-        Value::Flag => bail!("Found unsupported tag data (flag)"),
-        Value::Float(float) => Some(float.to_string()),
-        Value::SignedInt(int) => Some(int.to_string()),
-        Value::UnsignedInt(uint) => Some(uint.to_string()),
-        Value::String(str) => {
-            if str.trim().is_empty() {
-                None
-            } else {
-                Some(str.trim().to_owned())
-            }
-        }
-    };
-
-    Ok(decoded)
-}
-
-static PARSE_TRACK_OR_DISC_NUMBER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(pomsky!(
-        Start
-            :number([digit]+)
-            (("/" | " of ") [digit]+)?
-        End
-    ))
-    .unwrap()
-});
 
 static PARSE_TRACK_YEAR_OR_DATE_1: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(pomsky!(
@@ -220,10 +158,10 @@ pub struct TrackStrTags {
     pub album_artists: Vec<String>,
 
     /// The disc number the track is present on
-    pub disc: Option<u32>,
+    pub disc: Option<u16>,
 
     /// The track's number in its own disc
-    pub track_no: Option<u32>,
+    pub track_no: Option<u16>,
 
     /// The track's release date
     pub date: Option<TrackDate>,

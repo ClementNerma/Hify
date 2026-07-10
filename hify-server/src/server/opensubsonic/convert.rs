@@ -28,7 +28,7 @@ pub fn track_to_child(track: &Track, index: &IndexCache, ratings: &Ratings) -> C
             .artists_id
             .first()
             .map(|artist_id| index.artists.get(artist_id).unwrap().name.clone()), // OK?
-        track_number: tags.track_number,
+        track_number: tags.track_number.map(Into::into),
         year: tags.date.map(|date| u32::from(date.year)),
         genre: tags
             .genres_id
@@ -48,7 +48,7 @@ pub fn track_to_child(track: &Track, index: &IndexCache, ratings: &Ratings) -> C
         user_rating_1_to_5: rating,
         average_rating_1_to_5: rating.map(f32::from),
         play_count: None, // TODO (requires caching)
-        disc_number: tags.disc_number,
+        disc_number: tags.disc_number.map(Into::into),
         created_iso_8601: Some(to_iso_8601(
             track.file_times.ctime.unwrap_or(track.file_times.mtime),
         )),
