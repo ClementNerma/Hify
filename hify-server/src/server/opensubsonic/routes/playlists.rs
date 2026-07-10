@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::SystemTime};
 
 use axum::{
     extract::{Query, State},
@@ -158,8 +158,6 @@ fn auto_playlists(
     // Convert playlists to OpenSubsonic format
     playlists
         .into_iter()
-        // Remove empty playlists (cannot get created / changed dates from them)
-        .filter(|(_, track_ids)| !track_ids.is_empty())
         .map(|(name, track_ids)| {
             let tracks: Vec<_> = track_ids
                 .into_iter()
@@ -174,20 +172,8 @@ fn auto_playlists(
                 public: Some(false),
                 song_count: tracks.len(),
                 duration_s: tracks.iter().map(|track| track.metadata.duration_s).sum(),
-                created_iso_8601: to_iso_8601(
-                    tracks
-                        .iter()
-                        .map(|track| track.file_times.mtime)
-                        .min()
-                        .unwrap(),
-                ),
-                changed_iso_8601: to_iso_8601(
-                    tracks
-                        .iter()
-                        .map(|track| track.file_times.mtime)
-                        .max()
-                        .unwrap(),
-                ),
+                created_iso_8601: to_iso_8601(SystemTime::UNIX_EPOCH),
+                changed_iso_8601: to_iso_8601(SystemTime::now()),
                 cover_art_id: None,
                 readonly: Some(true),
                 valid_until_iso_8601: None,
