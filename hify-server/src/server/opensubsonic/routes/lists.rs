@@ -220,7 +220,11 @@ async fn get_starred2(
 
             song: ratings
                 .keys()
-                .map(|track| track_to_child(index.tracks.get(track).unwrap(), &index, &ratings))
+                // NOTE: required as the track may have been deleted, leaving a dangling rating
+                //       removing the rating on index update is not a good idea either, since the
+                //       song could have been removed by mistake. On re-add, the rating would be lost.
+                .filter_map(|track_id| index.tracks.get(track_id))
+                .map(|track| track_to_child(track, &index, &ratings))
                 .collect(),
         },
     )
