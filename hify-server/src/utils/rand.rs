@@ -54,11 +54,11 @@ impl Rng {
         xorshifted.rotate_right(rot)
     }
 
-    pub fn next_u64(&mut self) -> u64 {
-        let high = u64::from(self.next_u32());
-        let low = u64::from(self.next_u32());
-        (high << 32) | low
-    }
+    // pub fn next_u64(&mut self) -> u64 {
+    //     let high = u64::from(self.next_u32());
+    //     let low = u64::from(self.next_u32());
+    //     (high << 32) | low
+    // }
 }
 
 /// Shuffles a vector in place using the Fisher-Yates algorithm with a PCG32 generator.
