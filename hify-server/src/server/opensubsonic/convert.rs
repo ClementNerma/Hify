@@ -1,7 +1,6 @@
 use std::{collections::BTreeSet, time::SystemTime};
 
 use indexmap::IndexSet;
-use jiff::fmt::temporal::DateTimePrinter;
 
 use crate::{
     index::{Album, Artist, IdType, IndexCache, Rating, Track},
@@ -280,12 +279,6 @@ pub fn artist_to_id3(artist: &Artist, index: &IndexCache) -> ArtistID3 {
     }
 }
 
-// TODO: optimize
 pub fn to_iso_8601(st: SystemTime) -> String {
-    let printer = DateTimePrinter::new();
-    let mut buf = String::new();
-    printer
-        .print_zoned(&jiff::Zoned::try_from(st).unwrap(), &mut buf)
-        .unwrap();
-    buf
+    jiff::Timestamp::try_from(st).unwrap().to_string()
 }
