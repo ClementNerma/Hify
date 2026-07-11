@@ -1,20 +1,17 @@
 use axum::extract::{Query, State};
 use indexmap::IndexMap;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use crate::{
-    os_struct,
-    server::{
-        HttpState,
-        opensubsonic::{
-            OSCommonParams, OSNestedResponse,
-            convert::{album_to_id3_with_songs, artist_to_id3, track_to_child},
-            types::{AlbumID3WithSongs, ArtistID3, Child, MUSIC_FOLDER_ID},
-        },
-        utils::{
-            pagination::{Paginated, Pagination, PaginationDir},
-            search::{search_albums, search_artists, search_tracks},
-        },
+use crate::server::{
+    HttpState,
+    opensubsonic::{
+        OSCommonParams, OSNestedResponse,
+        convert::{album_to_id3_with_songs, artist_to_id3, track_to_child},
+        types::{AlbumID3WithSongs, ArtistID3, Child, MUSIC_FOLDER_ID},
+    },
+    utils::{
+        pagination::{Paginated, Pagination, PaginationDir},
+        search::{search_albums, search_artists, search_tracks},
     },
 };
 
@@ -37,18 +34,16 @@ struct Search3Params {
     music_folder_id: Option<u64>,
 }
 
-os_struct! {
-    pub struct Search3Answer {
-        #[children] {
-            artist: Vec<ArtistID3>,
-            album: Vec<AlbumID3WithSongs>,// TODO: Technically should be without songs
-            song: Vec<Child>
-        }
-    }
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Search3Answer {
+    pub artist: Vec<ArtistID3>,
+    pub album: Vec<AlbumID3WithSongs>,
+    pub song: Vec<Child>,
 }
 
 async fn search3(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<Search3Params>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<Search3Answer> {
@@ -65,7 +60,6 @@ async fn search3(
 
     if music_folder_id.is_some_and(|id| id != MUSIC_FOLDER_ID) {
         return OSNestedResponse(
-            f,
             "searchResult3",
             Search3Answer {
                 artist: vec![],
@@ -112,7 +106,6 @@ async fn search3(
     );
 
     OSNestedResponse(
-        f,
         "searchResult3",
         Search3Answer {
             artist: artists

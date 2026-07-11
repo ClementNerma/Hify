@@ -27,7 +27,7 @@ pub struct SetRatingParams {
 }
 
 async fn set_rating(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(SetRatingParams { id, rating }): Query<SetRatingParams>,
     State(state): State<HttpState>,
 ) -> Result<OSEmptyResponse, OSError> {
@@ -48,7 +48,7 @@ async fn set_rating(
                 .await
                 .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to set rating"))?;
 
-            Ok(OSEmptyResponse(f))
+            Ok(OSEmptyResponse)
         }
 
         CoverArtId::Album(_) => Err((StatusCode::NOT_IMPLEMENTED, "TODO: albums")),
@@ -58,6 +58,6 @@ async fn set_rating(
 }
 
 // (TODO?) Scrobbling is not supported, so a placeholder handler is put here
-async fn scrobble(Query(OSCommonParams { f }): Query<OSCommonParams>) -> OSEmptyResponse {
-    OSEmptyResponse(f)
+async fn scrobble(Query(OSCommonParams {}): Query<OSCommonParams>) -> OSEmptyResponse {
+    OSEmptyResponse
 }

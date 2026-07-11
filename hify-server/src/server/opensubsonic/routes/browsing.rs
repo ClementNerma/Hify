@@ -2,12 +2,11 @@ use axum::{
     extract::{Query, State},
     http::StatusCode,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     arts::ArtSize,
     index::{AlbumID, ArtistID, TrackID},
-    os_struct,
     server::{
         HttpState,
         opensubsonic::{
@@ -35,13 +34,16 @@ pub fn router() -> OpenSubsonicRouter {
         .route("/getAlbumInfo2", get_album_info2)
 }
 
-os_struct!(pub struct GetMusicFoldersAnswer { #[children] { music_folder: Vec<MusicFolder> } });
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetMusicFoldersAnswer {
+    pub music_folder: Vec<MusicFolder>,
+}
 
 async fn get_music_folders(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
 ) -> OSNestedResponse<GetMusicFoldersAnswer> {
     OSNestedResponse(
-        f,
         "musicFolders",
         GetMusicFoldersAnswer {
             music_folder: vec![MusicFolder {
@@ -52,16 +54,19 @@ async fn get_music_folders(
     )
 }
 
-os_struct!(pub struct GetGenresAnswer { #[children] { genre: Vec<Genre> } });
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetGenresAnswer {
+    pub genre: Vec<Genre>,
+}
 
 async fn get_genres(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<GetGenresAnswer> {
     let index = state.index().await;
 
     OSNestedResponse(
-        f,
         "genres",
         GetGenresAnswer {
             genre: index
@@ -88,7 +93,7 @@ struct GetAlbumParams {
 }
 
 async fn get_album(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetAlbumParams { id }): Query<GetAlbumParams>,
     State(state): State<HttpState>,
 ) -> OSResult<AlbumID3WithSongs> {
@@ -101,7 +106,6 @@ async fn get_album(
         .ok_or((StatusCode::NOT_FOUND, "Provided album ID was not found"))?;
 
     Ok(OSNestedResponse(
-        f,
         "album",
         album_to_id3_with_songs(album, &index, &ratings),
     ))
@@ -113,7 +117,7 @@ struct GetSongParams {
 }
 
 async fn get_song(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetSongParams { id }): Query<GetSongParams>,
     State(state): State<HttpState>,
 ) -> OSResult<Child> {
@@ -127,7 +131,6 @@ async fn get_song(
     let ratings = state.ratings().await;
 
     Ok(OSNestedResponse(
-        f,
         "song",
         track_to_child(track, &index, &ratings),
     ))
@@ -144,7 +147,7 @@ struct GetArtistInfo2Params {
 }
 
 async fn get_artist_info2(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetArtistInfo2Params { artist_id }): Query<GetArtistInfo2Params>,
     State(state): State<HttpState>,
 ) -> OSResult<ArtistInfo2> {
@@ -161,7 +164,6 @@ async fn get_artist_info2(
         |art_size: ArtSize| make_cover_art_uri(CoverArtId::Artist(artist_id), art_size);
 
     Ok(OSNestedResponse(
-        f,
         "artistInfo2",
         ArtistInfo2 {
             biography: None,
@@ -182,7 +184,7 @@ struct GetAlbumInfo2Params {
 }
 
 async fn get_album_info2(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetAlbumInfo2Params { album_id }): Query<GetAlbumInfo2Params>,
     State(state): State<HttpState>,
 ) -> OSResult<AlbumInfo> {
@@ -196,7 +198,6 @@ async fn get_album_info2(
         |art_size: ArtSize| make_cover_art_uri(CoverArtId::Album(album_id), art_size);
 
     Ok(OSNestedResponse(
-        f,
         "albumInfo",
         AlbumInfo {
             notes: None,

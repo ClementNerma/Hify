@@ -157,12 +157,10 @@ pub fn album_to_id3_with_songs(
         release_date: None, // TODO?
         is_compilation: None,
         explicit_status: None,
-        tracks: Some(
-            album_tracks
-                .iter()
-                .map(|track| track_to_child(track, index, ratings))
-                .collect(),
-        ),
+        tracks: album_tracks
+            .iter()
+            .map(|track| track_to_child(track, index, ratings))
+            .collect(),
     }
 }
 

@@ -4,11 +4,10 @@ use axum::{
     extract::{Query, State},
     http::StatusCode,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     index::{IndexCache, Rating, TrackID},
-    os_struct,
     server::{
         HttpState,
         opensubsonic::{
@@ -28,10 +27,14 @@ pub fn router() -> OpenSubsonicRouter {
         .route("/getPlaylist", get_playlist)
 }
 
-os_struct!(pub struct GetPlaylistsAnswer { #[children] { playlist: Vec<PlaylistWithSongs> } });
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPlaylistsAnswer {
+    pub playlist: Vec<PlaylistWithSongs>,
+}
 
 async fn get_playlists(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     State(state): State<HttpState>,
     // TODO: query parameters
 ) -> OSNestedResponse<GetPlaylistsAnswer> {
@@ -39,7 +42,6 @@ async fn get_playlists(
     let ratings = state.ratings().await;
 
     OSNestedResponse(
-        f,
         "playlists",
         GetPlaylistsAnswer {
             // TODO: this returns a 'empty' playlist for each artist and genre, whereas the server does not need the tracks.
@@ -54,7 +56,7 @@ struct GetPlaylistParams {
 }
 
 async fn get_playlist(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetPlaylistParams { id }): Query<GetPlaylistParams>,
     State(state): State<HttpState>,
 ) -> OSResult<PlaylistWithSongs> {
@@ -67,7 +69,6 @@ async fn get_playlist(
         .ok_or((StatusCode::NOT_FOUND, "Provided playlist ID was not found"))?;
 
     Ok(OSNestedResponse(
-        f,
         "playlist",
         auto_playlists(&index, &ratings)
             .into_iter()

@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
 use axum::extract::{Query, State};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     index::{Album, Genre, IndexCache},
-    os_struct,
     server::{
         HttpState,
         opensubsonic::{
@@ -140,22 +139,20 @@ fn album_list(params: AlbumListParams, index: &IndexCache) -> impl Iterator<Item
         .map(|(_, album)| album)
 }
 
-os_struct!(pub struct GetAlbumListAnswer {
-    #[children] {
-        #[rename = "album"]
-        albums: Vec<Child>
-    }
-});
+#[derive(Serialize)]
+pub struct GetAlbumListAnswer {
+    #[serde(rename = "album")]
+    pub albums: Vec<Child>,
+}
 
 async fn get_album_list(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<AlbumListParams>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<GetAlbumListAnswer> {
     let index = state.index().await;
 
     OSNestedResponse(
-        f,
         "albumList",
         GetAlbumListAnswer {
             albums: album_list(params, &index)
@@ -165,16 +162,14 @@ async fn get_album_list(
     )
 }
 
-os_struct!(pub struct GetAlbumList2Answer {
-    #[children] {
-        #[rename = "album"]
-        // Technically should be `AlbumID3` but eh...
-        albums: Vec<AlbumID3WithSongs>
-    }
-});
+#[derive(Serialize)]
+pub struct GetAlbumList2Answer {
+    #[serde(rename = "album")]
+    pub albums: Vec<AlbumID3WithSongs>,
+}
 
 async fn get_album_list2(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<AlbumListParams>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<GetAlbumList2Answer> {
@@ -182,7 +177,6 @@ async fn get_album_list2(
     let ratings = state.ratings().await;
 
     OSNestedResponse(
-        f,
         "albumList2",
         GetAlbumList2Answer {
             albums: album_list(params, &index)
@@ -192,16 +186,16 @@ async fn get_album_list2(
     )
 }
 
-os_struct!(pub struct GetStarred2Answer {
-    #[children] {
-        artist: Vec<Artist>,
-        album: Vec<Child>,
-        song: Vec<Child>
-    }
-});
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetStarred2Answer {
+    pub artist: Vec<Artist>,
+    pub album: Vec<Child>,
+    pub song: Vec<Child>,
+}
 
 async fn get_starred2(
-    Query(OSCommonParams { f }): Query<OSCommonParams>,
+    Query(OSCommonParams {}): Query<OSCommonParams>,
     State(state): State<HttpState>,
     // TODO: query
 ) -> OSNestedResponse<GetStarred2Answer> {
@@ -209,7 +203,6 @@ async fn get_starred2(
     let ratings = state.ratings().await;
 
     OSNestedResponse(
-        f,
         "starred2",
         GetStarred2Answer {
             // TODO: should return explicitly-starred artists, not artists who have starred songs
