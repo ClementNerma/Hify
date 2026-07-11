@@ -267,6 +267,23 @@ os_struct! {
     }
 }
 
+os_struct! {
+    pub struct PlayQueue {
+        current: Option<TrackID>,
+        position: Option<u32>,
+        username: String,
+        #[rename = "changed"]
+        changed_iso_8601: String,
+        #[rename = "changedBy"]
+        changed_by_app: String,
+
+        #[children] {
+            #[rename = "entry"]
+            tracks: Option<Vec<Child>>
+        }
+    }
+}
+
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CoverArtId {
