@@ -43,12 +43,12 @@
   }
 }
 
-@variant navigable (&[data-navigable-id]);
-@variant nav-self-focused   (&[data-navigable-focused]);
-@variant nav-self-unfocused (&:not([data-navigable-focused]));
+@custom-variant navigable (&[data-navigable-id]);
+@custom-variant nav-self-focused   (&[data-navigable-focused]);
+@custom-variant nav-self-unfocused (&:not([data-navigable-focused]));
 
-@variant nav-focused   (&[data-navigable-focused], &:has([data-navigable-focused]));
-@variant nav-unfocused (&:not([data-navigable-focused]):not(:has([data-navigable-focused])));
+@custom-variant nav-focused   (&[data-navigable-focused], &:has([data-navigable-focused]));
+@custom-variant nav-unfocused (&:not([data-navigable-focused]):not(:has([data-navigable-focused])));
 
 @utility items-row-* {
   > * {
