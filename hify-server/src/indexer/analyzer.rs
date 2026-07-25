@@ -22,6 +22,7 @@ use crate::{
 
 use super::tags::TrackStrTags;
 
+/// Analyzes an audio file and returns its metadata and tags.
 pub fn analyze_file(path: &Path) -> Result<(TrackMetadata, TrackStrTags)> {
     let src = File::open(path).context("Failed")?;
 
@@ -142,46 +143,3 @@ pub fn analyze_file(path: &Path) -> Result<(TrackMetadata, TrackStrTags)> {
         convert_symphonia_metadata(&rev)?,
     ))
 }
-
-// fn analyze_file_duration(
-//     reader: &mut Box<dyn FormatReader>,
-//     track_id: u32,
-//     time_base: TimeBase,
-// ) -> Result<Time, Error> {
-//     let mut raw_dur = Duration::new(0);
-
-//     loop {
-//         // Read next packet
-//         let packet = match reader.next_packet() {
-//             Ok(Some(packet)) => packet,
-
-//             Ok(None) => {
-//                 todo!() // seek
-//             }
-
-//             Err(err) => match err {
-//                 Error::IoError(err)
-//                     if err.kind() == std::io::ErrorKind::UnexpectedEof
-//                         && err.to_string() == "end of stream" =>
-//                 {
-//                     // Do not treat "end of stream" as a fatal error. It's the currently only way a
-//                     // format reader can indicate the media is complete.
-//                     let ts = Timestamp::new(i64::try_from(raw_dur.get()).unwrap());
-//                     break Ok(time_base.calc_time(ts).unwrap());
-//                 }
-
-//                 _ => break Err(err),
-//             },
-//         };
-
-//         // This should always be true since we previously ensured there was only one track in the audio file
-//         assert_eq!(packet.track_id, track_id);
-
-//         // Gapless playback is not enabled, so these values should be zero
-//         assert_eq!(packet.trim_start.get(), 0);
-//         assert_eq!(packet.trim_end.get(), 0);
-
-//         // Add packet duration to the total
-//         raw_dur = raw_dur.checked_add(packet.dur).unwrap();
-//     }
-// }

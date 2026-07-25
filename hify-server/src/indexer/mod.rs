@@ -23,6 +23,9 @@ mod analyzer;
 mod tags;
 mod walker;
 
+/// Analyze the tracks in the given directory, merges with the previous index.
+///
+/// Returns the next index if changes were detected, or [`None`] if no changes were found.
 #[allow(clippy::too_many_lines)]
 pub fn analyze_tracks_in(dir: &Path, prev_index: Option<&IndexCache>) -> Result<Option<Index>> {
     debug!("-> Building files list...");
@@ -239,6 +242,7 @@ pub fn analyze_tracks_in(dir: &Path, prev_index: Option<&IndexCache>) -> Result<
     }))
 }
 
+/// Build a list of all audio files in the given directory, along with their file times and sizes.
 fn build_files_list(dir: &Path) -> Result<BTreeMap<PathBuf, FileTimesWithSize>> {
     let dir_bis = dir.to_owned();
 
@@ -292,6 +296,7 @@ struct FileTimesWithSize {
     file_size_bytes: u64,
 }
 
+/// Compute the changes between the current files and the previous index.
 fn compute_changes_in<'a>(
     files: &'a BTreeMap<PathBuf, FileTimesWithSize>,
     prev: &'a IndexCache,

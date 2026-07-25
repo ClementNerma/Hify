@@ -18,6 +18,8 @@ impl<K: Hash + Eq, V> Either<'_, K, V> {
     }
 }
 
+/// Comparison utility, providing methods to sort tracks, albums, artists and genres.
+/// It can be built from either an [`Index`] or an [`IndexCache`].
 pub struct CmpIndex<'a> {
     tracks: Either<'a, TrackID, Track>,
     albums: Either<'a, AlbumID, Album>,
@@ -80,19 +82,19 @@ impl<'a> CmpIndex<'a> {
         self.cmp_albums(self.albums.get(&a).unwrap(), self.albums.get(&b).unwrap())
     }
 
-    pub fn cmp_artists(a: &Artist, b: &Artist) -> Ordering {
-        a.name.cmp(&b.name)
-    }
-
     pub fn cmp_artists_by_id(&self, a: ArtistID, b: ArtistID) -> Ordering {
-        Self::cmp_artists(self.artists.get(&a).unwrap(), self.artists.get(&b).unwrap())
-    }
-
-    pub fn cmp_genres(a: &Genre, b: &Genre) -> Ordering {
-        a.name.cmp(&b.name)
+        cmp_artists(self.artists.get(&a).unwrap(), self.artists.get(&b).unwrap())
     }
 
     pub fn cmp_genres_by_id(&self, a: GenreID, b: GenreID) -> Ordering {
-        Self::cmp_genres(self.genres.get(&a).unwrap(), self.genres.get(&b).unwrap())
+        cmp_genres(self.genres.get(&a).unwrap(), self.genres.get(&b).unwrap())
     }
+}
+
+pub fn cmp_artists(a: &Artist, b: &Artist) -> Ordering {
+    a.name.cmp(&b.name)
+}
+
+pub fn cmp_genres(a: &Genre, b: &Genre) -> Ordering {
+    a.name.cmp(&b.name)
 }

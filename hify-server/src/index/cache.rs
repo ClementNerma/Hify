@@ -11,7 +11,10 @@ use indexmap::{IndexMap, IndexSet};
 
 use crate::utils;
 
-use super::{cmp::CmpIndex, content::*};
+use super::{
+    cmp::{CmpIndex, cmp_artists, cmp_genres},
+    content::*,
+};
 
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
 #[derive(Default)]
@@ -99,17 +102,9 @@ impl IndexCache {
             |a, b| cmp_index.cmp_albums(a, b),
         );
 
-        let artists = build_sorted_map(
-            artists.iter().cloned(),
-            |artist| artist.id,
-            CmpIndex::cmp_artists,
-        );
+        let artists = build_sorted_map(artists.iter().cloned(), |artist| artist.id, cmp_artists);
 
-        let genres = build_sorted_map(
-            genres.iter().cloned(),
-            |genre| genre.id,
-            CmpIndex::cmp_genres,
-        );
+        let genres = build_sorted_map(genres.iter().cloned(), |genre| genre.id, cmp_genres);
 
         let mut artists_albums = HashMap::<ArtistID, HashSet<AlbumID>>::new();
         let mut artists_album_participations = HashMap::<ArtistID, HashSet<AlbumID>>::new();
@@ -312,6 +307,7 @@ impl IndexCache {
     }
 }
 
+/// Builds a map which keys are derived from the values, and which is sorted by value using the provided comparator.
 fn build_sorted_map<K: Hash + Eq, V: Debug>(
     values: impl IntoIterator<Item = V>,
     map_key: impl Fn(&V) -> K,
@@ -331,6 +327,7 @@ fn build_sorted_map<K: Hash + Eq, V: Debug>(
     values
 }
 
+/// Builds a sorted set from the provided values, using the provided comparator.
 fn to_sorted_set<T: Hash + Eq + Debug>(
     values: impl IntoIterator<Item = T>,
     sort: impl Fn(&T, &T) -> Ordering,
@@ -344,6 +341,10 @@ fn to_sorted_set<T: Hash + Eq + Debug>(
     values
 }
 
+/// Builds a map of sorted sets from the provided values, using the provided comparator, and filling missing keys with empty sets.
+///
+/// Used to e.g. get coverage of all album tracks per artist, even for artists with no album tracks.
+/// This allows to avoid having to check for missing keys when iterating over the map, and adding safety assertions around that.
 fn to_map_of_sorted_sets<K: Hash + Eq, V: Hash + Eq + Debug>(
     values: HashMap<K, HashSet<V>>,
     sort: impl Fn(&V, &V) -> Ordering,

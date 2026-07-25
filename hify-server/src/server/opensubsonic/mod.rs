@@ -1,3 +1,8 @@
+//!
+//! This module contains a compliant [OpenSubsonic](https://opensubsonic.netlify.app/) implementation.
+//!
+//! **WIP:** some routes may not be available yet.
+
 mod convert;
 mod routes;
 mod types;

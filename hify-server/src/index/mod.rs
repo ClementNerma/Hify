@@ -4,8 +4,9 @@ mod content;
 
 use std::collections::{HashMap, HashSet};
 
-pub use self::{cache::IndexCache, cmp::CmpIndex, content::*};
+pub use self::{cache::*, cmp::*, content::*};
 
+/// Assert that the index is correct. Will panic if not.
 pub fn assert_index_correctness(index: &Index) {
     let Index {
         tracks,

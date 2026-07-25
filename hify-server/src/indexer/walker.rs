@@ -7,6 +7,7 @@ use crate::{index::TrackMetadata, utils::TaskRunner};
 
 use super::{analyzer::analyze_file, tags::TrackStrTags};
 
+/// Analyze a list of audio files in parallel and return their metadata and tags.
 pub fn analyze_audio_files(
     files: impl Iterator<Item = PathBuf>,
     dir: &Path,
@@ -28,6 +29,7 @@ pub fn analyze_audio_files(
     tasks.join_all()
 }
 
+/// Determine if a file may be an audio file based on its extension
 pub fn may_be_audio_file(path: impl AsRef<Path>) -> bool {
     let path = path.as_ref();
 

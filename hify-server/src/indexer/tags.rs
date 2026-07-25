@@ -7,6 +7,9 @@ use pomsky_macro::pomsky;
 use regex::Regex;
 use symphonia::core::meta::{MetadataRevision, StandardTag};
 
+/// Extracts tags from a [`symphonia`] [`MetadataRevision`].
+///
+/// Tags are trimmed, deduplicated in the case of arrays, and various errors are reported.
 pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags> {
     // TODO: chain &rev.per_track.tags?
     let std_tags = rev

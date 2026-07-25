@@ -3,7 +3,7 @@ use std::{cmp::Ordering, num::NonZero};
 use regex::Regex;
 
 use crate::{
-    index::{Album, Artist, CmpIndex, IndexCache, Rating, Track},
+    index::{Album, Artist, CmpIndex, IndexCache, Rating, Track, cmp_artists},
     manager::Ratings,
 };
 
@@ -86,7 +86,7 @@ pub fn search_artists(
 
             score
         },
-        CmpIndex::cmp_artists,
+        cmp_artists,
     )
 }
 
