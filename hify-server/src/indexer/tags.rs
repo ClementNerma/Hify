@@ -16,6 +16,7 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         .filter_map(|tag| tag.std.as_ref())
         .collect::<Vec<_>>();
 
+    // Shorthand macros to create closures that match a specific string tag and return its value
     macro_rules! tag_str_matcher {
         ($tag:ident) => {
             |std| match std {
@@ -25,6 +26,7 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         };
     }
 
+    // Shorthand macros to create closures that match a specific integer tag and return its value
     macro_rules! tag_int_matcher {
         ($tag:ident) => {
             |std| match std {
@@ -34,6 +36,7 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         };
     }
 
+    // Collect all the tags used by this application
     let tags = TrackStrTags {
         // Track title
         title: get_tag_str(&std_tags, tag_str_matcher!(TrackTitle))?
@@ -79,6 +82,17 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
     Ok(tags)
 }
 
+/// Find the provided string tag
+///
+/// # Behavior
+///
+/// * Trims the tag's value
+/// * Ignores empty values
+///
+/// # Errors
+///
+/// * Fails if the tag is provided multiple times (works if only one non-empty tag)
+/// * Fails if no tag is provided, or if they are all empty
 fn get_tag_str(
     standard_tags: &[&StandardTag],
     matcher: impl Fn(&&StandardTag) -> Option<String>,
@@ -100,6 +114,14 @@ fn get_tag_str(
     Ok(Some(value))
 }
 
+/// Find the provided string tag and split it into an array of strings
+///
+/// # Behavior
+///
+/// * Values are trimmed
+/// * Empty values are ignored
+/// * If the tag is provided multiple times, values are all combined into a single array.
+/// * Duplicate values are removed.
 fn get_tag_str_array(
     standard_tags: &[&StandardTag],
     matcher: impl Fn(&&StandardTag) -> Option<String>,
@@ -123,6 +145,12 @@ fn get_tag_str_array(
     values
 }
 
+/// Find the provided integer tag
+///
+/// # Errors
+///
+/// * Fails if the tag is provided multiple times
+/// * Fails if no tag is provided
 fn get_tag_int(
     standard_tags: &[&StandardTag],
     matcher: impl Fn(&&StandardTag) -> Option<u64>,
