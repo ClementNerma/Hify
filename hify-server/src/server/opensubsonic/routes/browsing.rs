@@ -19,7 +19,7 @@ use crate::{
 };
 
 use super::{
-    super::{OSCommonParams, OSNestedResponse, OSResult, types::AlbumID3WithSongs},
+    super::{OSNestedResponse, OSResult, types::AlbumID3WithSongs},
     OpenSubsonicRouter,
     media::make_cover_art_uri,
 };
@@ -40,9 +40,7 @@ pub struct GetMusicFoldersAnswer {
     pub music_folder: Vec<MusicFolder>,
 }
 
-async fn get_music_folders(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
-) -> OSNestedResponse<GetMusicFoldersAnswer> {
+async fn get_music_folders() -> OSNestedResponse<GetMusicFoldersAnswer> {
     OSNestedResponse(
         "musicFolders",
         GetMusicFoldersAnswer {
@@ -60,10 +58,7 @@ pub struct GetGenresAnswer {
     pub genre: Vec<Genre>,
 }
 
-async fn get_genres(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
-    State(state): State<HttpState>,
-) -> OSNestedResponse<GetGenresAnswer> {
+async fn get_genres(State(state): State<HttpState>) -> OSNestedResponse<GetGenresAnswer> {
     let index = state.index().await;
 
     OSNestedResponse(
@@ -93,7 +88,6 @@ struct GetAlbumParams {
 }
 
 async fn get_album(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetAlbumParams { id }): Query<GetAlbumParams>,
     State(state): State<HttpState>,
 ) -> OSResult<AlbumID3WithSongs> {
@@ -117,7 +111,6 @@ struct GetSongParams {
 }
 
 async fn get_song(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetSongParams { id }): Query<GetSongParams>,
     State(state): State<HttpState>,
 ) -> OSResult<Child> {
@@ -147,7 +140,6 @@ struct GetArtistInfo2Params {
 }
 
 async fn get_artist_info2(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetArtistInfo2Params { artist_id }): Query<GetArtistInfo2Params>,
     State(state): State<HttpState>,
 ) -> OSResult<ArtistInfo2> {
@@ -184,7 +176,6 @@ struct GetAlbumInfo2Params {
 }
 
 async fn get_album_info2(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetAlbumInfo2Params { album_id }): Query<GetAlbumInfo2Params>,
     State(state): State<HttpState>,
 ) -> OSResult<AlbumInfo> {

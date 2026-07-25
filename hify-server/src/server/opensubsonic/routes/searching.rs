@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::server::{
     HttpState,
     opensubsonic::{
-        OSCommonParams, OSNestedResponse,
+        OSNestedResponse,
         convert::{album_to_id3_with_songs, artist_to_id3, track_to_child},
         types::{AlbumID3WithSongs, ArtistID3, Child, MUSIC_FOLDER_ID},
     },
@@ -43,7 +43,6 @@ pub struct Search3Answer {
 }
 
 async fn search3(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<Search3Params>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<Search3Answer> {

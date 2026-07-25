@@ -11,7 +11,7 @@ use crate::{
     server::{
         HttpState,
         opensubsonic::{
-            OSCommonParams, OSNestedResponse, OSResult,
+            OSNestedResponse, OSResult,
             convert::{to_iso_8601, track_to_child},
             types::PlaylistWithSongs,
         },
@@ -34,7 +34,6 @@ pub struct GetPlaylistsAnswer {
 }
 
 async fn get_playlists(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     State(state): State<HttpState>,
     // TODO: query parameters
 ) -> OSNestedResponse<GetPlaylistsAnswer> {
@@ -56,7 +55,6 @@ struct GetPlaylistParams {
 }
 
 async fn get_playlist(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(GetPlaylistParams { id }): Query<GetPlaylistParams>,
     State(state): State<HttpState>,
 ) -> OSResult<PlaylistWithSongs> {

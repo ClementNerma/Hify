@@ -15,10 +15,7 @@ use crate::{
     utils::{Rng, deterministic_shuffle},
 };
 
-use super::{
-    super::{OSCommonParams, OSNestedResponse},
-    OpenSubsonicRouter,
-};
+use super::{super::OSNestedResponse, OpenSubsonicRouter};
 
 pub fn router() -> OpenSubsonicRouter {
     OpenSubsonicRouter::new()
@@ -146,7 +143,6 @@ pub struct GetAlbumListAnswer {
 }
 
 async fn get_album_list(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<AlbumListParams>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<GetAlbumListAnswer> {
@@ -169,7 +165,6 @@ pub struct GetAlbumList2Answer {
 }
 
 async fn get_album_list2(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(params): Query<AlbumListParams>,
     State(state): State<HttpState>,
 ) -> OSNestedResponse<GetAlbumList2Answer> {
@@ -195,7 +190,6 @@ pub struct GetStarred2Answer {
 }
 
 async fn get_starred2(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     State(state): State<HttpState>,
     // TODO: query
 ) -> OSNestedResponse<GetStarred2Answer> {

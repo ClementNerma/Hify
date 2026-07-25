@@ -1,7 +1,9 @@
 //!
-//! This module contains a compliant [OpenSubsonic](https://opensubsonic.netlify.app/) implementation.
+//! This module contains a mostly-compliant [OpenSubsonic](https://opensubsonic.netlify.app/) implementation.
 //!
 //! **WIP:** some routes may not be available yet.
+//!
+//! Note that some features are explicitly out of scope, such as XML support.
 
 mod convert;
 mod routes;
@@ -11,18 +13,17 @@ use axum::{
     http::{HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::json;
 
 pub use self::routes::router;
 
-#[derive(Deserialize)]
-pub(super) struct OSCommonParams {}
-
+/// Result of an `OpenSubsonic` request, which is either a successful response or a formatted error.
 type OSResult<T> = Result<OSNestedResponse<T>, OSError>;
 
 type OSError = (StatusCode, &'static str);
 
+/// `OpenSubsonic` response wrapper that nests the response in the expected JSON structure.
 struct OSNestedResponse<T: Serialize>(&'static str, T);
 
 impl<T: Serialize> IntoResponse for OSNestedResponse<T> {
@@ -51,10 +52,12 @@ impl<T: Serialize> IntoResponse for OSNestedResponse<T> {
     }
 }
 
+/// `OpenSubsonic` response wrapper for endpoints that return no additional data.
 struct OSEmptyResponse;
 
 impl IntoResponse for OSEmptyResponse {
     fn into_response(self) -> Response {
+        // TODO: DRY (above code is almost identical, but with no key/value pair)
         let response = json!({
             "subsonic-response": {
                 "status": "ok",

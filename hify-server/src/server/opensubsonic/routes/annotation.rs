@@ -8,7 +8,7 @@ use crate::{
     index::Rating,
     server::{
         HttpState,
-        opensubsonic::{OSCommonParams, OSEmptyResponse, OSError, types::CoverArtId},
+        opensubsonic::{OSEmptyResponse, OSError, types::CoverArtId},
     },
 };
 
@@ -27,7 +27,6 @@ pub struct SetRatingParams {
 }
 
 async fn set_rating(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
     Query(SetRatingParams { id, rating }): Query<SetRatingParams>,
     State(state): State<HttpState>,
 ) -> Result<OSEmptyResponse, OSError> {
@@ -58,6 +57,6 @@ async fn set_rating(
 }
 
 // (TODO?) Scrobbling is not supported, so a placeholder handler is put here
-async fn scrobble(Query(OSCommonParams {}): Query<OSCommonParams>) -> OSEmptyResponse {
+async fn scrobble() -> OSEmptyResponse {
     OSEmptyResponse
 }

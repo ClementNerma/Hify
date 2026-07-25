@@ -1,9 +1,8 @@
-use axum::extract::Query;
 use serde::Serialize;
 
 use crate::server::opensubsonic::{OSEmptyResponse, OSNestedResponse};
 
-use super::{super::OSCommonParams, OpenSubsonicRouter};
+use super::OpenSubsonicRouter;
 
 pub fn router() -> OpenSubsonicRouter {
     OpenSubsonicRouter::new()
@@ -13,7 +12,7 @@ pub fn router() -> OpenSubsonicRouter {
     // .route("/tokenInfo", token_info) // TODO
 }
 
-async fn ping(Query(OSCommonParams {}): Query<OSCommonParams>) -> OSEmptyResponse {
+async fn ping() -> OSEmptyResponse {
     OSEmptyResponse
 }
 
@@ -22,8 +21,6 @@ pub struct LicenseAnswer {
     pub valid: bool,
 }
 
-async fn license(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
-) -> OSNestedResponse<LicenseAnswer> {
+async fn license() -> OSNestedResponse<LicenseAnswer> {
     OSNestedResponse("license", LicenseAnswer { valid: true })
 }

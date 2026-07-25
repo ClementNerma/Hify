@@ -1,10 +1,9 @@
 use std::time::SystemTime;
 
-use axum::extract::Query;
 use serde::Serialize;
 
 use crate::server::opensubsonic::{
-    OSCommonParams, OSNestedResponse,
+    OSNestedResponse,
     convert::to_iso_8601,
     types::{Bookmark, PlayQueue},
 };
@@ -22,15 +21,11 @@ pub struct GetBookmarksAnswer {
     pub bookmark: Vec<Bookmark>,
 }
 
-async fn get_bookmarks(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
-) -> OSNestedResponse<GetBookmarksAnswer> {
+async fn get_bookmarks() -> OSNestedResponse<GetBookmarksAnswer> {
     OSNestedResponse("bookmarks", GetBookmarksAnswer { bookmark: vec![] })
 }
 
-async fn get_play_queue(
-    Query(OSCommonParams {}): Query<OSCommonParams>,
-) -> OSNestedResponse<PlayQueue> {
+async fn get_play_queue() -> OSNestedResponse<PlayQueue> {
     OSNestedResponse(
         "playQueue",
         PlayQueue {
