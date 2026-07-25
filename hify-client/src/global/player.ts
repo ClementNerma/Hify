@@ -354,7 +354,15 @@ export async function loadPersistedPlayerState(): Promise<void> {
 
   const { currentMix, currentTrack, queueTrackIds } = playerState
 
-  const playQueue = await fetchMultiTracks(queueTrackIds)
+  const playQueue = await fetchMultiTracks(queueTrackIds).catch((e: unknown) => {
+    showNotification({
+      type: 'error',
+      title: 'Failed to load persisted player state',
+      message: String(e),
+    })
+
+    return []
+  })
 
   playerStateStore.mutate({
     currentMix,

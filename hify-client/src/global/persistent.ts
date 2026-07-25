@@ -1,7 +1,8 @@
 import { ArkErrors, type } from 'arktype'
 import { userMixParams, type TrackCompleteInfos } from '#/api/types.ts'
+import { fetchMultiTracks } from '../api/queries'
 import { tryFallible } from '../utils/common'
-import { showFailure } from './notifications'
+import { showFailure, showNotification } from './notifications'
 
 const HISTORY_CAPACITY = 200
 
@@ -70,4 +71,18 @@ export function prependHistoryTrack(track: TrackCompleteInfos): void {
 
 export function updatePersistedPlayerState(playerState: PersistedData['playerState']): void {
   writePartialPersistentData({ playerState })
+}
+
+export function tryFetchHistoryTracks(historyTrackIds: string[]): Promise<TrackCompleteInfos[]> {
+  return fetchMultiTracks(historyTrackIds).catch((e: unknown) => {
+    showNotification({
+      type: 'error',
+      title: 'Failed to load history tracks',
+      message: String(e),
+    })
+
+    writePartialPersistentData({ historyTrackIds: [] })
+
+    return []
+  })
 }

@@ -1,12 +1,12 @@
 import { FaStar } from 'react-icons/fa6'
 import { useSuspenseQueries } from '#/api/hooks.ts'
-import { fetchAlbums, fetchMultiTracks } from '#/api/queries.ts'
+import { fetchAlbums } from '#/api/queries.ts'
 import { Button } from '#/components/atoms/Button.tsx'
 import { AlbumCard } from '#/components/molecules/AlbumCard.tsx'
 import { TrackCard } from '#/components/molecules/TrackCard.tsx'
 import { NavRow } from '#/components/navigables/Row.tsx'
 import { openContextMenu } from '#/global/ctx-menu.tsx'
-import { loadPersistentData } from '#/global/persistent.ts'
+import { loadPersistentData, tryFetchHistoryTracks } from '#/global/persistent.ts'
 import { playNewMix, playTrackFromNewQueue } from '#/global/player.ts'
 import { randomInt } from '#/utils/common.ts'
 
@@ -16,7 +16,7 @@ export function HomeView() {
   const [historyTracks, newestAlbums] = useSuspenseQueries(
     {
       queryKey: ['history-tracks', historyTrackIds.join(',')],
-      queryFn: () => fetchMultiTracks(historyTrackIds),
+      queryFn: () => tryFetchHistoryTracks(historyTrackIds),
     },
     {
       queryKey: ['newest-albums'],

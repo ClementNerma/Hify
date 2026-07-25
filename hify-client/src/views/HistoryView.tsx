@@ -1,8 +1,7 @@
 import { useSuspenseQuery } from '#/api/hooks.ts'
-import { fetchMultiTracks } from '#/api/queries.ts'
 import { TrackCard } from '#/components/molecules/TrackCard.tsx'
 import { NavGrid } from '#/components/navigables/Grid.tsx'
-import { loadPersistentData } from '#/global/persistent.ts'
+import { loadPersistentData, tryFetchHistoryTracks } from '#/global/persistent.ts'
 import { playTrackFromNewQueue } from '#/global/player.ts'
 
 export function HistoryView() {
@@ -10,7 +9,7 @@ export function HistoryView() {
 
   const historyTracks = useSuspenseQuery({
     queryKey: ['tracks', historyTrackIds.join(',')],
-    queryFn: () => fetchMultiTracks(historyTrackIds),
+    queryFn: () => tryFetchHistoryTracks(historyTrackIds),
   })
 
   if (historyTracks.length === 0) {
