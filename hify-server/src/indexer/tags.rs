@@ -1,6 +1,9 @@
 use crate::index::TrackDate;
 
-use std::{collections::HashMap, sync::LazyLock};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::LazyLock,
+};
 
 use anyhow::{Context, Result, bail};
 use pomsky_macro::pomsky;
@@ -36,6 +39,27 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         }};
     }
 
+    macro_rules! get_tag_str_array {
+        ($tag:ident) => {{
+            let mut already_seen = HashSet::new();
+            let mut out = vec![];
+
+            for (std, _) in &standard_tags {
+                if let StandardTag::$tag(value) = std {
+                    let parsed = parse_array_tag(value.trim());
+
+                    for value in parsed {
+                        if already_seen.insert(value.trim().to_owned()) {
+                            out.push(value);
+                        }
+                    }
+                }
+            }
+
+            out
+        }};
+    }
+
     macro_rules! get_tag_int {
         ($tag:ident) => {{
             let mut iter = standard_tags.iter().filter_map(|(std, _)| match std {
@@ -55,17 +79,17 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
 
     let tags = TrackStrTags {
         title: get_tag_str!(TrackTitle).context("Track title is missing")?,
-        artists: get_tag_str!(Artist).map_or(vec![], parse_array_tag),
-        composers: get_tag_str!(Composer).map_or(vec![], parse_array_tag),
+        artists: get_tag_str_array!(Artist),
+        composers: get_tag_str_array!(Composer),
         album: get_tag_str!(Album).context("Album name is missing")?,
-        album_artists: get_tag_str!(AlbumArtist).map_or(vec![], parse_array_tag),
+        album_artists: get_tag_str_array!(AlbumArtist),
         disc: get_tag_int!(DiscNumber).map(|disc| u16::try_from(disc).unwrap()),
         track_no: get_tag_int!(TrackNumber).map(|track_no| u16::try_from(track_no).unwrap()),
         date: get_tag_str!(ReleaseDate)
             .or(get_tag_str!(OriginalReleaseDate))
             .map(|date| parse_date(&date))
             .transpose()?,
-        genres: get_tag_str!(Genre).map_or(vec![], parse_array_tag),
+        genres: get_tag_str_array!(Genre),
     };
 
     if tags.album_artists.is_empty() {
