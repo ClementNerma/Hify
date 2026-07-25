@@ -121,6 +121,7 @@ fn get_tag_str(
 ///
 /// # Behavior
 ///
+/// * Values are split by `;`, `,` and `/`
 /// * Values are trimmed
 /// * Empty values are ignored
 /// * If the tag is provided multiple times, values are all combined into a single array.
