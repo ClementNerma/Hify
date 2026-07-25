@@ -1,4 +1,3 @@
-import path from 'node:path'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
@@ -14,6 +13,13 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: false,
+      },
+    },
+  },
   server: {
     allowedHosts: ['yoga'],
     port: 8892,
