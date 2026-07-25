@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     fs,
     path::{Path, PathBuf},
 };
@@ -239,7 +239,7 @@ pub fn analyze_tracks_in(dir: &Path, prev_index: Option<&IndexCache>) -> Result<
     }))
 }
 
-fn build_files_list(dir: &Path) -> Result<HashMap<PathBuf, FileTimesWithSize>> {
+fn build_files_list(dir: &Path) -> Result<BTreeMap<PathBuf, FileTimesWithSize>> {
     let dir_bis = dir.to_owned();
 
     let mut tasks = TaskRunner::<Option<(PathBuf, FileTimesWithSize)>>::new();
@@ -293,7 +293,7 @@ struct FileTimesWithSize {
 }
 
 fn compute_changes_in<'a>(
-    files: &'a HashMap<PathBuf, FileTimesWithSize>,
+    files: &'a BTreeMap<PathBuf, FileTimesWithSize>,
     prev: &'a IndexCache,
 ) -> TracksChanges<'a> {
     let prev_tracks_by_path = prev
