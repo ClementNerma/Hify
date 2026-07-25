@@ -20,36 +20,52 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
     }
 
     macro_rules! get_tag_str {
-        ($tag:ident) => {
-            standard_tags.iter().find_map(|(std, _)| match std {
+        ($tag:ident) => {{
+            let mut iter = standard_tags.iter().filter_map(|(std, _)| match std {
                 StandardTag::$tag(value) => Some(value.trim().to_owned()),
                 _ => None,
-            })
-        };
+            });
+
+            let value = iter.next();
+
+            if iter.next().is_some() {
+                bail!("Multiple values found for tag: {:?}", stringify!($tag));
+            }
+
+            value
+        }};
     }
 
     macro_rules! get_tag_int {
-        ($tag:ident) => {
-            standard_tags.iter().find_map(|(std, _)| match std {
+        ($tag:ident) => {{
+            let mut iter = standard_tags.iter().filter_map(|(std, _)| match std {
                 StandardTag::$tag(value) => Some(*value),
                 _ => None,
-            })
-        };
+            });
+
+            let value = iter.next();
+
+            if iter.next().is_some() {
+                bail!("Multiple values found for tag: {:?}", stringify!($tag));
+            }
+
+            value
+        }};
     }
 
     let tags = TrackStrTags {
         title: get_tag_str!(TrackTitle).context("Track title is missing")?,
-        artists: get_tag_str!(Artist).map_or_else(Vec::new, parse_array_tag),
-        composers: get_tag_str!(Composer).map_or_else(Vec::new, parse_array_tag),
+        artists: get_tag_str!(Artist).map_or(vec![], parse_array_tag),
+        composers: get_tag_str!(Composer).map_or(vec![], parse_array_tag),
         album: get_tag_str!(Album).context("Album name is missing")?,
-        album_artists: get_tag_str!(AlbumArtist).map_or_else(Vec::new, parse_array_tag),
+        album_artists: get_tag_str!(AlbumArtist).map_or(vec![], parse_array_tag),
         disc: get_tag_int!(DiscNumber).map(|disc| u16::try_from(disc).unwrap()),
         track_no: get_tag_int!(TrackNumber).map(|track_no| u16::try_from(track_no).unwrap()),
         date: get_tag_str!(ReleaseDate)
-            .or_else(|| get_tag_str!(OriginalReleaseDate))
+            .or(get_tag_str!(OriginalReleaseDate))
             .map(|date| parse_date(&date))
             .transpose()?,
-        genres: get_tag_str!(Genre).map_or_else(Vec::new, parse_array_tag),
+        genres: get_tag_str!(Genre).map_or(vec![], parse_array_tag),
     };
 
     if tags.album_artists.is_empty() {

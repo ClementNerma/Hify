@@ -20,6 +20,14 @@ pub struct CmdArgs {
     )]
     pub verbosity: LevelFilter,
 
+    #[clap(
+        long,
+        help = "Update the index and exit",
+        conflicts_with = "addr",
+        conflicts_with = "port"
+    )]
+    pub just_update_index: bool,
+
     #[clap(short, long, help = "Address to listen on", default_value = "0.0.0.0")]
     pub addr: IpAddr,
 

@@ -46,7 +46,7 @@ use std::process::ExitCode;
 
 use anyhow::{Context, Result, bail};
 use clap::Parser;
-use log::error;
+use log::{error, warn};
 use tokio::{fs, task::spawn_blocking};
 
 use self::{cmd::CmdArgs, logger::Logger, manager::DataManager};
@@ -72,6 +72,7 @@ async fn inner_main(args: CmdArgs) -> Result<()> {
         music_dir,
         data_dir,
         verbosity: _,
+        just_update_index,
         addr,
         port,
     } = args;
@@ -92,6 +93,16 @@ async fn inner_main(args: CmdArgs) -> Result<()> {
     let data_manager = spawn_blocking(move || DataManager::load(&data_dir, music_dir))
         .await
         .unwrap()?;
+
+    if just_update_index {
+        warn!("Updating the index and exiting, as requested.");
+
+        spawn_blocking(move || data_manager.update_index())
+            .await
+            .unwrap()?;
+
+        return Ok(());
+    }
 
     server::launch((addr, port).into(), data_manager).await
 }
