@@ -114,7 +114,7 @@ function PlayerBottomPanel() {
           <TrackInfos track={playQueue[currentTrack]} />
 
           <BlockNavItem
-            className="border-none accent-amber-500 nav-focused:accent-cyan-600"
+            className="border-none accent-yellow-700 nav-focused:accent-cyan-600"
             onPress={() => toggleAudioPlaying()}
             onLeftKey={() => seekAudio(-30)}
             onRightKey={() => seekAudio(30)}
