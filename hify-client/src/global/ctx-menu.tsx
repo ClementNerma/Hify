@@ -34,7 +34,7 @@ export const defaultCtxMenus = {
       },
       {
         icon: <FaCompactDisc />,
-        label: `Go to album: ${track.album.album.name}`,
+        label: 'Go to album',
         onPress: () => {
           navigate(routes.album, { albumId: track.album.album.id })
         },
@@ -43,7 +43,7 @@ export const defaultCtxMenus = {
       ...track.artists.map(
         ({ artist }): ContextMenuItem => ({
           icon: <FaMicrophoneLines />,
-          label: `Go to artist: ${artist.name}`,
+          label: 'Go to artist',
           onPress: () => {
             navigate(routes.artist, { artistId: artist.id })
           },
@@ -93,7 +93,7 @@ export const defaultCtxMenus = {
     ...artists.map(
       ({ artist }): ContextMenuItem => ({
         icon: <FaMicrophoneLines />,
-        label: `Go to artist: ${artist.name}`,
+        label: 'Go to artist',
         onPress: () => {
           navigate(routes.artist, { artistId: artist.id })
         },
