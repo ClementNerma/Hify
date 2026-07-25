@@ -327,7 +327,11 @@ export function removeTrackFromQueue(position: number): void {
       playQueue: arrayWithoutIndex(prev.playQueue, position),
     }))
   } else {
-    showFailure('Cannot remove currently playing track from queue')
+    showNotification({
+      type: 'warning',
+      title: 'Cannot remove track',
+      message: 'Cannot remove currently playing track from queue',
+    })
   }
 }
 
