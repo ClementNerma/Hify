@@ -22,7 +22,7 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
     macro_rules! get_tag_str {
         ($tag:ident) => {
             standard_tags.iter().find_map(|(std, _)| match std {
-                StandardTag::$tag(value) => Some(String::clone(&*value)),
+                StandardTag::$tag(value) => Some(value.trim().to_owned()),
                 _ => None,
             })
         };
