@@ -170,6 +170,8 @@ impl DataManager {
 
             *self.index_cache.blocking_write() = index_cache;
             *self.index.blocking_write() = index;
+
+            info!("-> Done.");
         }
 
         Ok(())
