@@ -290,6 +290,15 @@ export function enqueueTracksAsNext(tracks: TrackCompleteInfos[]): void {
 export function removeTrackFromQueue(position: number): void {
   const { playQueue, currentTrack } = playerStateStore.getSnapshot()
 
+  if (position === currentTrack) {
+    showNotification({
+      type: 'warning',
+      title: 'Cannot remove track',
+      message: 'Cannot remove currently playing track from queue',
+    })
+    return
+  }
+
   if (position < 0 || position >= playQueue.length) {
     showFailure('Cannot remove track from queue: position out of bounds')
     return
@@ -321,17 +330,11 @@ export function removeTrackFromQueue(position: number): void {
       currentTrack: prev.currentTrack !== null ? prev.currentTrack - 1 : null,
       playQueue: arrayWithoutIndex(prev.playQueue, position),
     }))
-  } else if (position > currentTrack) {
+  } else {
     playerStateStore.mutateWith((prev) => ({
       ...prev,
       playQueue: arrayWithoutIndex(prev.playQueue, position),
     }))
-  } else {
-    showNotification({
-      type: 'warning',
-      title: 'Cannot remove track',
-      message: 'Cannot remove currently playing track from queue',
-    })
   }
 }
 
