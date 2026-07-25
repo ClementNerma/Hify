@@ -1,31 +1,53 @@
-use std::hash::{DefaultHasher, Hash, Hasher};
+use std::hash::{Hash, Hasher};
+
+/// A simple FNV‑1a hasher with a fixed initial state.
+pub struct FnvHasher(u64);
+
+impl FnvHasher {
+    pub fn new() -> Self {
+        // FNV offset basis for 64‑bit
+        FnvHasher(0xcbf2_9ce4_8422_2325)
+    }
+}
+
+impl Hasher for FnvHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        let mut hash = self.0;
+        for &b in bytes {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x0100_0000_01b3); // FNV prime
+        }
+        self.0 = hash;
+    }
+}
 
 #[macro_export]
 macro_rules! stable_hash {
-    ($($value:expr),+) => {{
-        use ::std::hash::{DefaultHasher, Hash, Hasher};
+    ($($value: expr),+) => {{
+        use ::std::hash::{Hash, Hasher};
 
-        let mut hasher = DefaultHasher::new();
+        let mut hasher = $crate::utils::FnvHasher::new();
         $( Hash::hash(&$value, &mut hasher); )+
-        <DefaultHasher as Hasher>::finish(&hasher)
+        hasher.finish()
     }};
 }
 
-pub fn iter_stable_hash<T: Hash>(iter: impl ExactSizeIterator<Item = T>) -> u64 {
+pub fn unordered_iter_stable_hash<T: Hash>(iter: impl ExactSizeIterator<Item = T>) -> u64 {
     let len = iter.len();
 
-    let (xor, sum) = iter
+    let hash = iter
         .into_iter()
         .map(|item| {
-            let mut h = DefaultHasher::new();
+            let mut h = FnvHasher::new();
             item.hash(&mut h);
             h.finish()
         })
-        .fold((0_u64, 0_u64), |(xor, sum), h| {
-            (xor ^ h, sum.wrapping_add(h))
-        });
+        .fold(0_u64, u64::wrapping_add);
 
     // Combine with length for extra safety
-    xor.wrapping_add(sum.rotate_left(5))
-        .wrapping_add(u64::try_from(len).unwrap())
+    hash.wrapping_add(u64::try_from(len).unwrap())
 }

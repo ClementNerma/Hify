@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     stable_hash,
-    utils::{iter_stable_hash, u64_base62_serialization},
+    utils::{u64_base62_serialization, unordered_iter_stable_hash},
 };
 
 // TODO: custom debug impl for artistID etc. with base62 encoding
@@ -111,7 +111,10 @@ pub struct Album {
 impl Album {
     pub fn new(name: String, artists: IndexSet<ArtistID>) -> Self {
         Self {
-            id: AlbumID(stable_hash!(name, iter_stable_hash(artists.iter()))),
+            id: AlbumID(stable_hash!(
+                name,
+                unordered_iter_stable_hash(artists.iter())
+            )),
             name,
             artists_id: artists,
         }

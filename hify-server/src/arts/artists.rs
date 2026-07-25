@@ -11,7 +11,7 @@ use log::{debug, info};
 use crate::{
     arts::{LARGE_ART_SIDE_PX, manager::ArtSize, tools::assemble_four_images},
     index::{AlbumID, ArtistID, IndexCache},
-    utils::{TaskRunner, iter_stable_hash},
+    utils::{TaskRunner, unordered_iter_stable_hash},
 };
 
 use super::ArtsManager;
@@ -54,7 +54,7 @@ pub fn generate_artists_art(
             continue;
         }
 
-        let img_hash = iter_stable_hash(
+        let img_hash = unordered_iter_stable_hash(
             artist_in_albums
                 .iter()
                 .map(|album_id| album_arts.get_art_source_data(*album_id).unwrap()),
