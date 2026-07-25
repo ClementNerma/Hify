@@ -467,6 +467,8 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
       case 'LONG_PRESS': {
         let currNav = focused
 
+        // (cannot be rewritten without statement duplication)
+        // oxlint-disable-next-line typescript/no-unnecessary-condition
         while (true) {
           const parentNav = this.findParentOf(currNav.id)
 
@@ -710,6 +712,8 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     let currEl = this.findDomById(navId)
     let currNavId = navId
 
+    // (cannot be rewritten without statement duplication)
+    // oxlint-disable-next-line typescript/no-unnecessary-condition
     while (true) {
       const parentEl = currEl.closest(
         `[${NAVIGABLE_DATA_ID_ATTR}]:not([${NAVIGABLE_DATA_ID_ATTR}="${currNavId}"])`,
