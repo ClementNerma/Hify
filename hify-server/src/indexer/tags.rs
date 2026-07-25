@@ -1,95 +1,75 @@
 use crate::index::TrackDate;
 
-use std::{
-    collections::{HashMap, HashSet},
-    sync::LazyLock,
-};
+use std::{collections::HashSet, sync::LazyLock};
 
 use anyhow::{Context, Result, bail};
 use pomsky_macro::pomsky;
 use regex::Regex;
-use symphonia::core::meta::{MetadataRevision, StandardTag, Tag};
+use symphonia::core::meta::{MetadataRevision, StandardTag};
 
 pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags> {
-    let mut standard_tags = HashMap::new();
-
     // TODO: chain &rev.per_track.tags?
-    for tag in &rev.media.tags {
-        let Tag { raw, std } = tag;
+    let std_tags = rev
+        .media
+        .tags
+        .iter()
+        .filter_map(|tag| tag.std.as_ref())
+        .collect::<Vec<_>>();
 
-        if let Some(std) = std {
-            standard_tags.insert(std, raw);
-        }
-    }
-
-    macro_rules! get_tag_str {
-        ($tag:ident) => {{
-            let mut iter = standard_tags.iter().filter_map(|(std, _)| match std {
+    macro_rules! tag_str_matcher {
+        ($tag:ident) => {
+            |std| match std {
                 StandardTag::$tag(value) => Some(value.trim().to_owned()),
                 _ => None,
-            });
-
-            let value = iter.next();
-
-            if iter.next().is_some() {
-                bail!("Multiple values found for tag: {:?}", stringify!($tag));
             }
-
-            value
-        }};
+        };
     }
 
-    macro_rules! get_tag_str_array {
-        ($tag:ident) => {{
-            let mut already_seen = HashSet::new();
-            let mut out = vec![];
-
-            for (std, _) in &standard_tags {
-                if let StandardTag::$tag(value) = std {
-                    let parsed = parse_array_tag(value.trim());
-
-                    for value in parsed {
-                        if already_seen.insert(value.trim().to_owned()) {
-                            out.push(value);
-                        }
-                    }
-                }
-            }
-
-            out
-        }};
-    }
-
-    macro_rules! get_tag_int {
-        ($tag:ident) => {{
-            let mut iter = standard_tags.iter().filter_map(|(std, _)| match std {
+    macro_rules! tag_int_matcher {
+        ($tag:ident) => {
+            |std| match std {
                 StandardTag::$tag(value) => Some(*value),
                 _ => None,
-            });
-
-            let value = iter.next();
-
-            if iter.next().is_some() {
-                bail!("Multiple values found for tag: {:?}", stringify!($tag));
             }
-
-            value
-        }};
+        };
     }
 
     let tags = TrackStrTags {
-        title: get_tag_str!(TrackTitle).context("Track title is missing")?,
-        artists: get_tag_str_array!(Artist),
-        composers: get_tag_str_array!(Composer),
-        album: get_tag_str!(Album).context("Album name is missing")?,
-        album_artists: get_tag_str_array!(AlbumArtist),
-        disc: get_tag_int!(DiscNumber).map(|disc| u16::try_from(disc).unwrap()),
-        track_no: get_tag_int!(TrackNumber).map(|track_no| u16::try_from(track_no).unwrap()),
-        date: get_tag_str!(ReleaseDate)
-            .or(get_tag_str!(OriginalReleaseDate))
+        // Track title
+        title: get_tag_str(&std_tags, tag_str_matcher!(TrackTitle))?
+            .context("Track title is missing")?,
+
+        // Track artists
+        artists: get_tag_str_array(&std_tags, tag_str_matcher!(Artist)),
+
+        // Track composers
+        composers: get_tag_str_array(&std_tags, tag_str_matcher!(Composer)),
+
+        // Album name
+        album: get_tag_str(&std_tags, tag_str_matcher!(Album))?.context("Album name is missing")?,
+
+        // Album artists
+        album_artists: get_tag_str_array(&std_tags, tag_str_matcher!(AlbumArtist)),
+
+        // Disc number
+        disc: get_tag_int(&std_tags, tag_int_matcher!(DiscNumber))?
+            .map(|disc| u16::try_from(disc).unwrap()),
+
+        // Track number (inside the disc)
+        track_no: get_tag_int(&std_tags, tag_int_matcher!(TrackNumber))?
+            .map(|track_no| u16::try_from(track_no).unwrap()),
+
+        // Release date
+        date: get_tag_str(&std_tags, tag_str_matcher!(ReleaseDate))?
+            .or(get_tag_str(
+                &std_tags,
+                tag_str_matcher!(OriginalReleaseDate),
+            )?)
             .map(|date| parse_date(&date))
             .transpose()?,
-        genres: get_tag_str_array!(Genre),
+
+        // Musical genres
+        genres: get_tag_str_array(&std_tags, tag_str_matcher!(Genre)),
     };
 
     if tags.album_artists.is_empty() {
@@ -97,6 +77,67 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
     }
 
     Ok(tags)
+}
+
+fn get_tag_str(
+    standard_tags: &[&StandardTag],
+    matcher: impl Fn(&&StandardTag) -> Option<String>,
+) -> Result<Option<String>> {
+    let mut iter = standard_tags
+        .iter()
+        .filter_map(matcher)
+        .map(|value| value.trim().to_owned())
+        .filter(|entry| !entry.is_empty());
+
+    let Some(value) = iter.next() else {
+        return Ok(None);
+    };
+
+    if iter.next().is_some() {
+        bail!("Multiple values found for tag {:?}", stringify!($tag));
+    }
+
+    Ok(Some(value))
+}
+
+fn get_tag_str_array(
+    standard_tags: &[&StandardTag],
+    matcher: impl Fn(&&StandardTag) -> Option<String>,
+) -> Vec<String> {
+    let mut already_seen = HashSet::new();
+    let mut values = vec![];
+
+    for value in standard_tags.iter().filter_map(matcher) {
+        for part in value
+            .split(&[';', ',', '/'])
+            .map(str::trim)
+            .filter(|entry| !entry.is_empty())
+            .map(str::to_owned)
+        {
+            if already_seen.insert(part.clone()) {
+                values.push(part);
+            }
+        }
+    }
+
+    values
+}
+
+fn get_tag_int(
+    standard_tags: &[&StandardTag],
+    matcher: impl Fn(&&StandardTag) -> Option<u64>,
+) -> Result<Option<u64>> {
+    let mut iter = standard_tags.iter().filter_map(matcher);
+
+    let Some(value) = iter.next() else {
+        return Ok(None);
+    };
+
+    if iter.next().is_some() {
+        bail!("Multiple values found for tag {:?}", stringify!($tag));
+    }
+
+    Ok(Some(value))
 }
 
 fn parse_date(input: &str) -> Result<TrackDate> {
@@ -122,16 +163,6 @@ fn parse_date(input: &str) -> Result<TrackDate> {
             .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
             .transpose()?,
     })
-}
-
-fn parse_array_tag(tag_content: impl AsRef<str>) -> Vec<String> {
-    tag_content
-        .as_ref()
-        .split(&[';', ',', '/'])
-        .map(str::trim)
-        .filter(|entry| !entry.is_empty())
-        .map(str::to_owned)
-        .collect()
 }
 
 static PARSE_TRACK_YEAR_OR_DATE_1: LazyLock<Regex> = LazyLock::new(|| {
