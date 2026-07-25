@@ -54,6 +54,9 @@
 
     "jsx_a11y/click-events-have-key-events": "warn",
 
+    "jsdoc/require-param-type": "off",
+    "jsdoc/require-returns-type": "off",
+
     "oxc/no-async-await": "off",
     "oxc/no-optional-chaining": "off",
     "oxc/no-rest-spread-properties": "off",
