@@ -101,24 +101,9 @@ function PlayerBottomPanel() {
   const { currentTrack, playQueue } = useGlobalStore(playerStateStore)
   const progress = useGlobalStore(audioProgressStore)
 
-  // HACK: dropping down to the DOM and manually controlling the scroll position is not ideal
   useValueIdentityPrePaintWatcher(currentTrack, (newTrack) => {
-    if (newTrack === null) {
-      return
-    }
-
-    const container = document.querySelector(`[data-navigable-id="${PLAY_QUEUE_NAV_ID}"]`)
-    if (!container) {
-      return
-    }
-
-    const children = container.querySelectorAll('[data-navigable-type="item"]')
-    if (newTrack < children.length) {
-      children[newTrack].scrollIntoView({
-        behavior: 'instant',
-        block: 'nearest',
-        inline: 'nearest',
-      })
+    if (newTrack !== null) {
+      navigationManager.scrollChildIntoView(PLAY_QUEUE_NAV_ID, newTrack)
     }
   })
 

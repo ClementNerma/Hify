@@ -378,6 +378,23 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     this.focusById(children[childIndex].id, dir)
   }
 
+  scrollChildIntoView(navId: string, childIndex: number): void {
+    const nav = this.get(navId)
+    const children = this.findChildrenOf(nav.id)
+
+    if (childIndex < 0 || childIndex >= children.length) {
+      throw new Error(
+        `Cannot scroll to child at invalid index ${childIndex} for navigable "${navId}"`,
+      )
+    }
+
+    this.findDomById(children[childIndex].id).scrollIntoView({
+      behavior: 'instant',
+      block: 'nearest',
+      inline: 'nearest',
+    })
+  }
+
   unfocus(): void {
     const focused = this.getFocused()
 
