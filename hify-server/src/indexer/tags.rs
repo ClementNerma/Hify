@@ -121,7 +121,7 @@ fn get_tag_str(
 ///
 /// # Behavior
 ///
-/// * Values are split by `;`, `,` and `/`
+/// * Values are split by `;` `,` and newlines
 /// * Values are trimmed
 /// * Empty values are ignored
 /// * If the tag is provided multiple times, values are all combined into a single array.
@@ -135,13 +135,13 @@ fn get_tag_str_array(
 
     for value in standard_tags.iter().filter_map(matcher) {
         for part in value
-            .split(&[';', ',', '/'])
+            .lines()
+            .flat_map(|line| line.split(&[';', ',']))
             .map(str::trim)
             .filter(|entry| !entry.is_empty())
-            .map(str::to_owned)
         {
-            if already_seen.insert(part.clone()) {
-                values.push(part);
+            if already_seen.insert(part.to_owned()) {
+                values.push(part.to_owned());
             }
         }
     }
