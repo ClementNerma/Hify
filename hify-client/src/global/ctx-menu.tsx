@@ -61,7 +61,7 @@ export const defaultCtxMenus = {
       label: 'Play next',
       onPress: () => {
         // oxlint-disable-next-line typescript/no-floating-promises
-        fetchAlbumTracks(album.id).then(enqueueTracksAsNext)
+        fetchAlbumTracks(album.id).queryFn().then(enqueueTracksAsNext)
       },
     },
     {
@@ -69,11 +69,13 @@ export const defaultCtxMenus = {
       label: 'Enqueue great tracks',
       onPress: () => {
         // oxlint-disable-next-line typescript/no-floating-promises
-        fetchAlbumTracks(album.id).then((tracks) =>
-          enqueueTracksAsNext(
-            tracks.filter((track) => track.rating === 'Four' || track.rating === 'Five'),
-          ),
-        )
+        fetchAlbumTracks(album.id)
+          .queryFn()
+          .then((tracks) =>
+            enqueueTracksAsNext(
+              tracks.filter((track) => track.rating === 'Four' || track.rating === 'Five'),
+            ),
+          )
       },
     },
     {
@@ -81,13 +83,15 @@ export const defaultCtxMenus = {
       label: 'Enqueue random great tracks',
       onPress: () => {
         // oxlint-disable-next-line typescript/no-floating-promises
-        fetchAlbumTracks(album.id).then((tracks) =>
-          enqueueTracksAsNext(
-            tracks
-              .filter((track) => track.rating === 'Four' || track.rating === 'Five')
-              .toSorted(() => Math.random() - 0.5),
-          ),
-        )
+        fetchAlbumTracks(album.id)
+          .queryFn()
+          .then((tracks) =>
+            enqueueTracksAsNext(
+              tracks
+                .filter((track) => track.rating === 'Four' || track.rating === 'Five')
+                .toSorted(() => Math.random() - 0.5),
+            ),
+          )
       },
     },
     ...artists.map(

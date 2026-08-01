@@ -9,7 +9,7 @@ import {
   FaArrowDownWideShort,
   FaArrowDownShortWide,
 } from 'react-icons/fa6'
-import { useSuspensePaginatedQuery } from '#/api/hooks.ts'
+import { useSuspensePaginatedQuery, type CachableQuery } from '#/api/hooks.ts'
 import type {
   AlbumCompleteInfos,
   AlbumsSort,
@@ -28,12 +28,14 @@ import { NavRow } from '../navigables/Row'
 import { Select } from './Select'
 
 export type AlbumsGridProps = {
-  queryKey: string[]
-  queryFn: (sortBy: AlbumsSort, pagination: Pagination) => Promise<Paginated<AlbumCompleteInfos>>
+  query: (
+    sortBy: AlbumsSort,
+    pagination: Pagination,
+  ) => CachableQuery<Paginated<AlbumCompleteInfos>>
   mixSource: UserMixSource
 }
 
-export function AlbumsGrid({ queryKey, queryFn, mixSource }: AlbumsGridProps) {
+export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
   const COLUMNS = 7
 
   const [sortBy, setSortBy] = useState<AlbumsSort>('ADDED')
@@ -44,8 +46,7 @@ export function AlbumsGrid({ queryKey, queryFn, mixSource }: AlbumsGridProps) {
     fetchNextPage,
     isResetting,
   } = useSuspensePaginatedQuery({
-    queryKey: [...queryKey, sortBy, paginationDir],
-    queryFn: (pagination) => queryFn(sortBy, pagination),
+    query: (pagination) => query(sortBy, pagination),
     paginationDir,
     pageSize: 10 * COLUMNS,
   })

@@ -7,8 +7,7 @@ export function GenresView() {
   const COLUMNS = 7
 
   const { data: genres, fetchNextPage } = useSuspensePaginatedQuery({
-    queryKey: ['genres'],
-    queryFn: (pagination) => fetchGenres({ sortBy: 'NAME', ...pagination }),
+    query: (pagination) => fetchGenres({ sortBy: 'NAME', ...pagination }),
     paginationDir: 'ASC',
     pageSize: 10 * COLUMNS,
   })

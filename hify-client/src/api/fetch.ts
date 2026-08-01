@@ -1,6 +1,7 @@
 import { ArkErrors, type } from 'arktype'
 import { showFailure } from '#/global/notifications.ts'
 import { tryFallible, tryFallibleAsync, type JsonStringifyable } from '#/utils/common.ts'
+import type { CachableQuery } from './hooks'
 
 export const API_DOMAIN = `http://${location.hostname}:8891`
 
@@ -103,6 +104,18 @@ export function queryApi<Validator extends type.Any>(
   bodyParams?: Record<string, JsonStringifyable>,
 ): Promise<Validator['inferOut']> {
   return callRemoteApi('GET', uri, queryParams, bodyParams ?? null, validator)
+}
+
+// Explicitly no body params as those are not cachable anyway
+export function queryApiKeyed<Validator extends type.Any>(
+  uri: string,
+  queryParams: Record<string, JsonStringifyable> | null,
+  validator: Validator,
+): CachableQuery<Validator['inferOut']> {
+  return {
+    queryKey: [uri, JSON.stringify(queryParams ?? {})],
+    queryFn: () => callRemoteApi('GET', uri, queryParams, null, validator),
+  }
 }
 
 export async function callApiMutation(

@@ -23,14 +23,8 @@ export type AlbumViewProps = {
 
 export function AlbumView({ albumId }: AlbumViewProps) {
   const [{ album, artists, genres }, allTracks] = useSuspenseQueries(
-    {
-      queryKey: ['album', albumId],
-      queryFn: () => fetchAlbum(albumId),
-    },
-    {
-      queryKey: ['albumTracks', albumId],
-      queryFn: () => fetchAlbumTracks(albumId),
-    },
+    fetchAlbum(albumId),
+    fetchAlbumTracks(albumId),
   )
 
   const [tracksFilter, setTracksFilter] = useState<'great' | 'best' | null>(null)

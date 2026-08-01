@@ -1,5 +1,6 @@
 import { ArkErrors, type } from 'arktype'
 import { userMixParams, type TrackCompleteInfos } from '#/api/types.ts'
+import type { CachableQuery } from '../api/hooks'
 import { fetchMultiTracks } from '../api/queries'
 import { tryFallible } from '../utils/common'
 import { showFailure, showNotification } from './notifications'
@@ -88,16 +89,24 @@ export function updatePersistedPlayerState(playerState: PersistedData['playerSta
   writePartialPersistentData({ playerState })
 }
 
-export function tryFetchHistoryTracks(historyTrackIds: string[]): Promise<TrackCompleteInfos[]> {
-  return fetchMultiTracks(historyTrackIds).catch((e: unknown) => {
-    showNotification({
-      type: 'error',
-      title: 'Failed to load history tracks',
-      message: String(e),
-    })
+export function tryFetchHistoryTracks(
+  historyTrackIds: string[],
+): CachableQuery<TrackCompleteInfos[]> {
+  const { queryKey, queryFn } = fetchMultiTracks(historyTrackIds)
 
-    writePartialPersistentData({ historyTrackIds: [] })
+  return {
+    queryKey: [...queryKey, ':fallible'],
+    queryFn: () =>
+      queryFn().catch((e: unknown) => {
+        showNotification({
+          type: 'error',
+          title: 'Failed to load history tracks',
+          message: String(e),
+        })
 
-    return []
-  })
+        writePartialPersistentData({ historyTrackIds: [] })
+
+        return []
+      }),
+  }
 }

@@ -7,10 +7,7 @@ import { playTrackFromNewQueue } from '#/global/player.ts'
 export function HistoryView() {
   const { historyTrackIds } = loadPersistentData()
 
-  const historyTracks = useSuspenseQuery({
-    queryKey: ['tracks', historyTrackIds.join(',')],
-    queryFn: () => tryFetchHistoryTracks(historyTrackIds),
-  })
+  const historyTracks = useSuspenseQuery(tryFetchHistoryTracks(historyTrackIds))
 
   if (historyTracks.length === 0) {
     return <h1 className="fixed top-1/3 w-full text-center">History is empty</h1>

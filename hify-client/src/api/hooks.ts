@@ -31,7 +31,7 @@ function getOrInsertWithCapped<K, V>(map: Map<K, V>, key: K, insertFn: () => V):
   return value
 }
 
-type CachableQuery<T> = { queryKey: string[]; queryFn: () => Promise<T> }
+export type CachableQuery<T> = { queryKey: string[]; queryFn: () => Promise<T> }
 
 export function useSuspenseQuery<T>({ queryKey: queryKeyArray, queryFn }: CachableQuery<T>): T {
   const queryKey = queryKeyArray.join('|')
@@ -76,19 +76,17 @@ type PaginatedQueryOutput<T> = {
 }
 
 export function usePaginatedQuery<T>({
-  queryKey: queryKeyArray,
-  queryFn,
+  query,
   paginationDir,
   pageSize,
   suspense,
 }: {
-  queryKey: string[]
-  queryFn: (pagination: Pagination) => Promise<Paginated<T>>
+  query: (pagination: Pagination) => CachableQuery<Paginated<T>>
   paginationDir: PaginationDir
   pageSize: number
   suspense?: boolean
 }): PaginatedQueryOutput<T> {
-  const queryKey = `${queryKeyArray.join('|')}:${paginationDir}:${pageSize}`
+  const queryKey = query({ offset: 0, limit: pageSize, dir: paginationDir }).queryKey.join('|')
 
   type InitialState = { results: T[] | null; hasMore: boolean }
 
@@ -102,7 +100,7 @@ export function usePaginatedQuery<T>({
   const initialState = use(
     getOrInsertWithCapped(retypedCache, initialQueryKey, async () =>
       suspense === true
-        ? queryFn({ offset: 0, limit: pageSize, dir: paginationDir })
+        ? query({ offset: 0, limit: pageSize, dir: paginationDir }).queryFn()
         : { results: null, hasMore: true },
     ),
   )
@@ -129,7 +127,11 @@ export function usePaginatedQuery<T>({
 
     setIsLoading(true)
 
-    const paginated = await queryFn({ offset: offset.current, limit: pageSize, dir: paginationDir })
+    const paginated = await query({
+      offset: offset.current,
+      limit: pageSize,
+      dir: paginationDir,
+    }).queryFn()
 
     setData((prevData) => [...(prevData ?? []), ...paginated.results])
     setHasMore(paginated.hasMore)
@@ -163,21 +165,18 @@ export function usePaginatedQuery<T>({
 }
 
 export function useSuspensePaginatedQuery<T>({
-  queryKey,
-  queryFn,
+  query,
   paginationDir,
   pageSize,
 }: {
-  queryKey: string[]
-  queryFn: (pagination: Pagination) => Promise<Paginated<T>>
+  query: (pagination: Pagination) => CachableQuery<Paginated<T>>
   pageSize: number
   paginationDir: PaginationDir
 }) {
   const [prevData, setPrevData] = useState<T[] | null>(null)
 
   const { data, isLoading, fetchNextPage } = usePaginatedQuery({
-    queryKey,
-    queryFn,
+    query,
     pageSize,
     paginationDir,
     suspense: prevData === null,

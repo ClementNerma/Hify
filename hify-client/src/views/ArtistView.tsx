@@ -6,26 +6,15 @@ import { NavRow } from '#/components/navigables/Row.tsx'
 type ArtistViewProps = { artistId: string }
 
 export function ArtistView({ artistId }: ArtistViewProps) {
-  const [{ artist }, albumsByName, /*albumsByDate, albumsByScore,*/ albumParticipationsByName] =
-    useSuspenseQueries(
-      {
-        queryKey: ['artist', artistId],
-        queryFn: () => fetchArtist(artistId),
-      },
-      {
-        queryKey: ['artistAlbums', artistId],
-        queryFn: () => fetchArtistAlbums(artistId, 'DATE', { dir: 'DESC', limit: 50, offset: 0 }),
-      },
-      {
-        queryKey: ['artistAlbumParticipations', artistId],
-        queryFn: () =>
-          fetchArtistAlbumParticipations(artistId, 'DATE', {
-            limit: 50,
-            offset: 0,
-            dir: 'DESC',
-          }),
-      },
-    )
+  const [{ artist }, albumsByName, albumParticipationsByName] = useSuspenseQueries(
+    fetchArtist(artistId),
+    fetchArtistAlbums(artistId, 'DATE', { dir: 'DESC', limit: 50, offset: 0 }),
+    fetchArtistAlbumParticipations(artistId, 'DATE', {
+      limit: 50,
+      offset: 0,
+      dir: 'DESC',
+    }),
+  )
 
   return (
     <div>

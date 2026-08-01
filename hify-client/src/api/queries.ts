@@ -1,4 +1,5 @@
-import { queryApi } from './fetch'
+import { queryApi, queryApiKeyed } from './fetch'
+import type { CachableQuery } from './hooks'
 import {
   albumCompleteInfos,
   artistCompleteInfos,
@@ -20,40 +21,40 @@ import {
 
 export function fetchAlbums(
   params: Pagination & { sortBy: AlbumsSort },
-): Promise<Paginated<AlbumCompleteInfos>> {
-  return queryApi('/albums', params, paginated(albumCompleteInfos))
+): CachableQuery<Paginated<AlbumCompleteInfos>> {
+  return queryApiKeyed('/albums', params, paginated(albumCompleteInfos))
 }
 
-export function fetchAlbum(albumId: string): Promise<AlbumCompleteInfos> {
-  return queryApi(`/album/${albumId}`, null, albumCompleteInfos)
+export function fetchAlbum(albumId: string): CachableQuery<AlbumCompleteInfos> {
+  return queryApiKeyed(`/album/${albumId}`, null, albumCompleteInfos)
 }
 
-export function fetchAlbumTracks(albumId: string): Promise<TrackCompleteInfos[]> {
-  return queryApi(`/album/${albumId}/tracks`, null, trackCompleteInfos.array())
+export function fetchAlbumTracks(albumId: string): CachableQuery<TrackCompleteInfos[]> {
+  return queryApiKeyed(`/album/${albumId}/tracks`, null, trackCompleteInfos.array())
 }
 
 export function fetchArtists(
   params: Pagination & { sortBy: ArtistsSort },
-): Promise<Paginated<ArtistCompleteInfos>> {
-  return queryApi('/artists', params, paginated(artistCompleteInfos))
+): CachableQuery<Paginated<ArtistCompleteInfos>> {
+  return queryApiKeyed('/artists', params, paginated(artistCompleteInfos))
 }
 
 export function fetchArtistsWithAlbums(
   params: Pagination & { sortBy: ArtistsSort },
-): Promise<Paginated<ArtistCompleteInfos>> {
-  return queryApi('/artists/with-albums', params, paginated(artistCompleteInfos))
+): CachableQuery<Paginated<ArtistCompleteInfos>> {
+  return queryApiKeyed('/artists/with-albums', params, paginated(artistCompleteInfos))
 }
 
-export function fetchArtist(artistId: string): Promise<ArtistCompleteInfos> {
-  return queryApi(`/artist/${artistId}`, null, artistCompleteInfos)
+export function fetchArtist(artistId: string): CachableQuery<ArtistCompleteInfos> {
+  return queryApiKeyed(`/artist/${artistId}`, null, artistCompleteInfos)
 }
 
 export function fetchArtistAlbums(
   artistId: string,
   sortBy: AlbumsSort,
   pagination: Pagination,
-): Promise<Paginated<AlbumCompleteInfos>> {
-  return queryApi(
+): CachableQuery<Paginated<AlbumCompleteInfos>> {
+  return queryApiKeyed(
     `/artist/${artistId}/albums`,
     { sortBy, ...pagination },
     paginated(albumCompleteInfos),
@@ -64,8 +65,8 @@ export function fetchArtistAlbumParticipations(
   artistId: string,
   sortBy: AlbumsSort,
   pagination: Pagination,
-): Promise<Paginated<AlbumCompleteInfos>> {
-  return queryApi(
+): CachableQuery<Paginated<AlbumCompleteInfos>> {
+  return queryApiKeyed(
     `/artist/${artistId}/album-participations`,
     { sortBy, ...pagination },
     paginated(albumCompleteInfos),
@@ -76,8 +77,8 @@ export function fetchArtistTrackParticipations(
   artistId: string,
   sortBy: TracksSort,
   pagination: Pagination,
-): Promise<Paginated<TrackCompleteInfos>> {
-  return queryApi(
+): CachableQuery<Paginated<TrackCompleteInfos>> {
+  return queryApiKeyed(
     `/artist/${artistId}/track-participations`,
     { sortBy, ...pagination },
     paginated(trackCompleteInfos),
@@ -86,33 +87,33 @@ export function fetchArtistTrackParticipations(
 
 export function fetchGenres(
   params: Pagination & { sortBy: GenresSort },
-): Promise<Paginated<GenreCompleteInfos>> {
-  return queryApi('/genres', params, paginated(genreCompleteInfos))
+): CachableQuery<Paginated<GenreCompleteInfos>> {
+  return queryApiKeyed('/genres', params, paginated(genreCompleteInfos))
 }
 
-export function fetchGenre(genreId: string): Promise<GenreCompleteInfos> {
-  return queryApi(`/genre/${genreId}`, null, genreCompleteInfos)
+export function fetchGenre(genreId: string): CachableQuery<GenreCompleteInfos> {
+  return queryApiKeyed(`/genre/${genreId}`, null, genreCompleteInfos)
 }
 
 export function fetchGenreAlbums(
   genreId: string,
   params: Pagination & { sortBy: AlbumsSort },
-): Promise<Paginated<AlbumCompleteInfos>> {
-  return queryApi(`/genre/${genreId}/albums`, params, paginated(albumCompleteInfos))
+): CachableQuery<Paginated<AlbumCompleteInfos>> {
+  return queryApiKeyed(`/genre/${genreId}/albums`, params, paginated(albumCompleteInfos))
 }
 
 export function fetchTracks(
   params: Pagination & { sortBy: TracksSort },
-): Promise<Paginated<TrackCompleteInfos>> {
-  return queryApi('/tracks', params, paginated(trackCompleteInfos))
+): CachableQuery<Paginated<TrackCompleteInfos>> {
+  return queryApiKeyed('/tracks', params, paginated(trackCompleteInfos))
 }
 
-export function fetchMultiTracks(trackIds: string[]): Promise<TrackCompleteInfos[]> {
-  return queryApi('/tracks/multi', { ids: trackIds }, trackCompleteInfos.array())
+export function fetchMultiTracks(trackIds: string[]): CachableQuery<TrackCompleteInfos[]> {
+  return queryApiKeyed('/tracks/multi', { ids: trackIds }, trackCompleteInfos.array())
 }
 
-export function fetchTrack(trackId: string): Promise<TrackCompleteInfos> {
-  return queryApi(`/tracks/${trackId}`, null, trackCompleteInfos)
+export function fetchTrack(trackId: string): CachableQuery<TrackCompleteInfos> {
+  return queryApiKeyed(`/tracks/${trackId}`, null, trackCompleteInfos)
 }
 
 export function mixTracks(

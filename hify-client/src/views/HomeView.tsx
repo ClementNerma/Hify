@@ -14,14 +14,8 @@ export function HomeView() {
   const { historyTrackIds } = loadPersistentData()
 
   const [historyTracks, newestAlbums] = useSuspenseQueries(
-    {
-      queryKey: ['history-tracks', historyTrackIds.join(',')],
-      queryFn: () => tryFetchHistoryTracks(historyTrackIds),
-    },
-    {
-      queryKey: ['newest-albums'],
-      queryFn: () => fetchAlbums({ sortBy: 'ADDED', dir: 'DESC', limit: 50, offset: null }),
-    },
+    tryFetchHistoryTracks(historyTrackIds),
+    fetchAlbums({ sortBy: 'ADDED', dir: 'DESC', limit: 50, offset: null }),
   )
 
   return (

@@ -8,8 +8,7 @@ export function ArtistsView() {
   const COLUMNS = 9
 
   const { data: artists, fetchNextPage } = useSuspensePaginatedQuery({
-    queryKey: ['artists'],
-    queryFn: (pagination) => fetchArtistsWithAlbums({ sortBy: 'NAME', ...pagination }),
+    query: (pagination) => fetchArtistsWithAlbums({ sortBy: 'NAME', ...pagination }),
     paginationDir: 'ASC',
     pageSize: 10 * COLUMNS,
   })
