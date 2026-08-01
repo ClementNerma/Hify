@@ -1,4 +1,8 @@
 {
+  "options": {
+    "typeAware": true,
+    "typeCheck": true
+  },
   "categories": {
     "correctness": "error",
     "nursery": "warn",
@@ -8,7 +12,9 @@
     "style": "warn",
     "suspicious": "warn"
   },
-  "jsPlugins": [{ "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }],
+  "jsPlugins": [
+    { "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }
+  ],
   "plugins": [
     "eslint",
     "typescript",
