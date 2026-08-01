@@ -99,6 +99,7 @@ export function noParallel<P extends unknown[]>(
 export function asyncSingleton<T>(call: () => Promise<T>, fallbackOnErr: T): () => Promise<T> {
   let initPromise: Promise<T> | null = null
 
+  // oxlint-disable-next-line react/function-component-definition -- HACK: invalid report
   return () => {
     initPromise ??= call().catch(() => fallbackOnErr)
     return initPromise

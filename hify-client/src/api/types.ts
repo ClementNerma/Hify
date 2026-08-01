@@ -50,7 +50,7 @@ export const track = type({
   id: 'string',
   relativePath: 'string',
   fileSizeBytes: 'number',
-  fileTimes: fileTimes,
+  fileTimes,
   metadata: trackMetadata,
   tags: trackTags,
 })
@@ -88,7 +88,7 @@ export type Rating = typeof rating.infer
 //
 
 export const artistCompleteInfos = type({
-  artist: artist,
+  artist,
   albumsCount: 'number',
   tracksCount: 'number',
 })
@@ -96,7 +96,7 @@ export const artistCompleteInfos = type({
 export type ArtistCompleteInfos = typeof artistCompleteInfos.infer
 
 export const genreCompleteInfos = type({
-  genre: genre,
+  genre,
   albumsCount: 'number',
   tracksCount: 'number',
 })
@@ -104,7 +104,7 @@ export const genreCompleteInfos = type({
 export type GenreCompleteInfos = typeof genreCompleteInfos.infer
 
 export const albumCompleteInfos = type({
-  album: album,
+  album,
   artists: artistCompleteInfos.array(),
   genres: genreCompleteInfos.array(),
   tracksCount: 'number',
@@ -117,7 +117,7 @@ export type AlbumCompleteInfos = typeof albumCompleteInfos.infer
 //
 
 export const trackCompleteInfos = type({
-  track: track,
+  track,
   album: albumCompleteInfos,
   artists: artistCompleteInfos.array(),
   genres: genreCompleteInfos.array(),

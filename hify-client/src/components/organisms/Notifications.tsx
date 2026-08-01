@@ -2,7 +2,7 @@
  * @file Module written by Claude Opus 4.5 (Github Copilot); edited by hand
  */
 
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { FaCircleInfo, FaTriangleExclamation, FaCircleXmark, FaXmark } from 'react-icons/fa6'
 // oxlint-disable-next-line import/no-unassigned-import
 import './Notifications.css'
@@ -12,6 +12,7 @@ import {
   type NotificationType,
 } from '#/global/notifications.ts'
 import { useGlobalStore } from '#/utils/stores.ts'
+import { useOnMounted } from '../../utils/hooks'
 
 // TODO: make notifications go up as soon as the previous one is dismissed
 export function NotificationsContainer() {
@@ -50,16 +51,16 @@ function NotificationItem({
 
   const durationMs = notification.durationMs ?? DEFAULT_NOTIFICATION_DURATION_MS
 
-  const handleRemove = useCallback(() => {
+  const handleRemove = () => {
     setIsExiting(true)
     setTimeout(
       () => onRemove(notification.id),
       // Matches the exit animation's duration from the associated CSS file
       300,
     )
-  }, [notification.id, onRemove])
+  }
 
-  useEffect(() => {
+  useOnMounted(() => {
     const startTime = Date.now()
 
     const updateProgress = () => {
@@ -76,7 +77,7 @@ function NotificationItem({
 
     const animationId = requestAnimationFrame(updateProgress)
     return () => cancelAnimationFrame(animationId)
-  }, [handleRemove, durationMs])
+  })
 
   return (
     <div

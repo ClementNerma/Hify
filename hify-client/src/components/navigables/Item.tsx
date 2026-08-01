@@ -78,7 +78,7 @@ export function NavItem({ className, ...props }: Omit<NavItemProps, 'tag'>) {
     <InternalNavigableItem
       {...props}
       tag="span"
-      className={className !== undefined ? `${className} inline-block` : 'inline-block'}
+      className={className === undefined ? 'inline-block' : `${className} inline-block`}
     />
   )
 }
@@ -91,8 +91,8 @@ export function BlockNavItem(props: Omit<NavItemProps, 'tag'>) {
   return <InternalNavigableItem {...props} tag="div" />
 }
 
-export function CustomTagNavItem<T extends keyof JSX.IntrinsicElements>(
-  props: Omit<NavItemProps, 'tag'> & { tag: T },
+export function CustomTagNavItem(
+  props: Omit<NavItemProps, 'tag'> & { tag: keyof JSX.IntrinsicElements },
 ) {
   return <InternalNavigableItem {...props} tag={props.tag} />
 }

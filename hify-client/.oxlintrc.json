@@ -12,9 +12,7 @@
     "style": "warn",
     "suspicious": "warn"
   },
-  "jsPlugins": [
-    { "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }
-  ],
+  "jsPlugins": [{ "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }],
   "plugins": [
     "eslint",
     "typescript",
@@ -78,6 +76,7 @@
     "react/jsx-props-no-spreading": "off",
     "react/jsx-max-depth": "off",
     "react/no-multi-comp": "off",
+    "react/jsx-no-literals": "off",
 
     "typescript/consistent-type-definitions": "off",
     "typescript/explicit-function-return-type": "off",
@@ -94,7 +93,10 @@
     "unicorn/no-null": "off",
     "unicorn/prefer-global-this": "off",
     "unicorn/prefer-dom-node-dataset": "off",
+    "unicorn/no-negated-condition": "off",
     "unicorn/no-useless-spread": "warn",
+
+    "node/callback-return": "off",
 
     // Plugins (all rules need to be activated one by one)
 
@@ -123,6 +125,7 @@
 
     // Explicitly disabled for this project
     "jsx_a11y/alt-text": "off",
+    "react/forbid-component-props": "off",
 
     // ?
     "react_perf/jsx-no-new-array-as-prop": "off",

@@ -38,7 +38,7 @@
   /* Detect browser focus (should never happen) */
   :not(input[type='text']):focus {
     outline: none !important;
-    border: 10px solid red !important ;
+    border: 10px solid red !important;
     box-shadow: 0 0 10px #719ece !important;
   }
 }

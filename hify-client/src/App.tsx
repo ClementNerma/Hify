@@ -26,6 +26,7 @@ export function App() {
             <Router
               routes={routes}
               renderers={routeRenderers}
+              // oxlint-disable-next-line react/no-unstable-nested-components
               fallback={() => <h1>404</h1>}
               onLoading={() => {
                 clearQueriesCache()

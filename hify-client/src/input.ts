@@ -20,15 +20,14 @@ export function setupInputHandler() {
   document.body.addEventListener('keydown', (e) => {
     // showNotification({ title: 'Key Down', message: `Key "${e.key}" pressed.`, type: 'info' })
 
-    if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || e.key.match(/^F5|F8|F9|F1\d$/)) {
+    if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || /^F5|F8|F9|F1\d$/u.exec(e.key)) {
       return
     }
 
     if (
-      // oxlint-disable-next-line typescript/prefer-optional-chain (buggy)
       e.target instanceof Element &&
       e.target.tagName.toLocaleLowerCase() === 'input' &&
-      !(e.key.startsWith('Arrow') || e.key.match(/^F\d+/))
+      !(e.key.startsWith('Arrow') || /^F\d+/u.exec(e.key))
     ) {
       return
     }

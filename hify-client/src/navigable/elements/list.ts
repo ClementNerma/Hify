@@ -41,7 +41,7 @@ export const NavigableListHandler: NavigableHandler<
     }
 
     if (children.length === 0) {
-      return fromDir !== null ? { type: 'propagate' } : { type: 'cancel' }
+      return { type: 'propagate' }
     }
 
     switch (fromDir) {

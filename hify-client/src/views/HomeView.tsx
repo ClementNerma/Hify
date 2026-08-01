@@ -33,6 +33,7 @@ export function HomeView() {
           onPress={() =>
             playNewMix({ filter: 'WELL_RATED', source: { type: 'all' }, seed: randomInt() })
           }
+          // oxlint-disable-next-line react/no-unstable-nested-components
           onLongPress={() => {
             openContextMenu([
               {

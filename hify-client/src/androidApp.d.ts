@@ -3,7 +3,7 @@
  */
 
 type HifyAndroidInjectedObject = {
-  updateAppUrl(): void
+  updateAppUrl: () => void
 }
 
 /**

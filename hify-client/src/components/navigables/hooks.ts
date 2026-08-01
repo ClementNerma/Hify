@@ -29,7 +29,10 @@ export function useNavigable<R extends UntypedNavigablesSet, N extends RegistryI
 
   navManager.createNav(name, props, navId)
 
-  useOnMounted(() => navManager.createNav(name, props, navId))
+  useOnMounted(() => {
+    navManager.createNav(name, props, navId)
+  })
+
   useOnUnmounted(() => navManager.unregisterNav(navId))
 
   // TODO: this is triggered frequently, is is possible to fix?

@@ -17,7 +17,6 @@ export type RouterProps<R extends UntypedRoutes> = {
   onPageReady?: (routeName: keyof R | null) => void
 }
 
-// oxlint-disable-next-line max-lines-per-function
 export function Router<R extends UntypedRoutes>({
   routes,
   renderers,
@@ -49,11 +48,11 @@ export function Router<R extends UntypedRoutes>({
 
       if (match) {
         return {
-          routeName: routeName as keyof R,
+          routeName,
           params: Object.fromEntries(
             route.params.map((param, i) => [
               param,
-              match[i + 1] !== undefined ? decodeURIComponent(match[i + 1]) : undefined,
+              match[i + 1] ? decodeURIComponent(match[i + 1]) : undefined,
             ]),
           ),
         }

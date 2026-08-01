@@ -74,7 +74,7 @@ export function useDistractionFree(enabledLocally: boolean) {
       window.removeEventListener('keydown', onKeyPress, true)
       window.removeEventListener('mousemove', onMouseMove, true)
     }
-  }, [onKeyPress, onMouseMove])
+  })
 
   useOnUnmounted(() => {
     dfModeTimeout.clear()

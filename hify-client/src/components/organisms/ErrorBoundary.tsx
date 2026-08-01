@@ -10,22 +10,22 @@ type ErrorBoundaryState = {
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+  public constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { error: null }
   }
 
-  static getDerivedStateFromError(error: Error) {
+  public static getDerivedStateFromError(error: Error) {
     // Update state so the next render will show the fallback UI.
     return { error }
   }
 
   // oxlint-disable-next-line class-methods-use-this
-  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // showNotification({ type: 'error', title: 'React Error', message: error.message })
   }
 
-  override render() {
+  public override render() {
     if (this.state.error) {
       return (
         <div className="px-5">

@@ -81,6 +81,7 @@ export function AlbumsGrid({ queryKey, queryFn, mixSource }: AlbumsGridProps) {
 
         <Button
           onPress={() => playNewMix({ source: mixSource, filter: 'WELL_RATED', seed: randomInt() })}
+          // oxlint-disable-next-line react/no-unstable-nested-components
           onLongPress={() =>
             openContextMenu([
               {

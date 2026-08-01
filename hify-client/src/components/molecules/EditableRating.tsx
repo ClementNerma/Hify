@@ -59,7 +59,6 @@ export function EditableRating({ track, onUpdated }: EditableRatingProps) {
 
     setIsEditing(false)
 
-    // oxlint-disable-next-line typescript/no-floating-promises
     replaceRating(track.track.id, nextRating)
   })
 

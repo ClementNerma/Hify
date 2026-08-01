@@ -201,7 +201,7 @@ function TrackInfos({ track }: { track: TrackCompleteInfos }) {
           // NOTE: good enough as current page (and player queue) will only use this reference,
           //       and any page change clears the queries cache to fetch the updated data
           //
-          // oxlint-disable-next-line react-hooks-js/immutability
+          // oxlint-disable-next-line react-hooks-js/immutability react/react-compiler
           track.rating = rating
         }}
       />

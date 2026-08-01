@@ -16,6 +16,7 @@ export function LoadingIndicator({ size, top, left }: { size: number; top: numbe
         {/* <!-- macOS Beachball Spinner --> */}
         <div
           className="w-5 h-5 animate-spin rounded-full shadow-lg bg-[conic-gradient(from_0deg,var(--color-blue-500)_0deg_60deg,var(--color-purple-500)_60deg_120deg,var(--color-pink-500)_120deg_180deg,var(--color-orange-500)_180deg_240deg,var(--color-yellow-400)_240deg_300deg,var(--color-green-500)_300deg_360deg)]"
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- HACK: false positive
           role="status"
           aria-label="loading"
         >

@@ -74,31 +74,34 @@ export function useValueIdentityWatcher<T>(
   callback: (value: T) => void,
   opts?: { immediate: boolean },
 ) {
-  const [prevValue, setPrevValue] = useState<{ prev: T } | null>(null)
+  const prevValueRef = useRef<T | null>(null)
+  const isFirstRunRef = useRef(true)
 
   useOnBeforeMounted(() => {
     if (opts?.immediate === true) {
-      setPrevValue({ prev: value })
+      prevValueRef.current = value
       callback(value)
     }
   })
 
   useEffect(() => {
-    if (prevValue === null) {
-      // oxlint-disable-next-line react-hooks-js/set-state-in-effect: need to track previous value
-      setPrevValue({ prev: value })
-    } else if (prevValue.prev !== value) {
-      setPrevValue({ prev: value })
+    if (isFirstRunRef.current) {
+      prevValueRef.current = value
+      isFirstRunRef.current = false
+      return
+    }
+
+    if (prevValueRef.current !== value) {
+      prevValueRef.current = value
       callback(value)
     }
-  }, [value, prevValue, callback])
+  }, [value, callback])
 }
 
 export function useValueIdentityPrePaintWatcher<T>(value: T, callback: (value: T) => void) {
   const prevValue = useRef<{ prev: T } | null>(null)
 
   useLayoutEffect(() => {
-    // oxlint-disable-next-line typescript/prefer-optional-chain: buggy lint
     if (prevValue.current === null || prevValue.current.prev !== value) {
       prevValue.current = { prev: value }
       callback(value)
@@ -117,14 +120,8 @@ export function useOnBeforeMounted(callback: () => void): void {
   })
 }
 
-export function useOnMounted(callback: () => void): void {
-  useEffect(
-    () => {
-      callback()
-    },
-    // oxlint-disable-next-line eslint-plugin-react-hooks/exhaustive-deps: needs to run once and only once, on mount
-    [],
-  )
+export function useOnMounted(callback: () => void | (() => void)): void {
+  useEffect(() => callback(), [callback])
 }
 
 export function useOnUnmounted(callback: () => void): void {
@@ -132,13 +129,12 @@ export function useOnUnmounted(callback: () => void): void {
     () => () => {
       callback()
     },
-    // oxlint-disable-next-line eslint-plugin-react-hooks/exhaustive-deps: needs to run once and only once, on unmount
-    [],
+    [callback],
   )
 }
 
 export function useInitialValue<T>(value: T): T {
-  const initialValue = useRef(value)
-  // oxlint-disable-next-line react-hooks-js/refs
-  return initialValue.current
+  // oxlint-disable-next-line react/hook-use-state -- setter is never used, the initial value is captured once
+  const [initialValue] = useState(() => value)
+  return initialValue
 }

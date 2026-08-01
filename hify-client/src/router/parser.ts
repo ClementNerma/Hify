@@ -40,7 +40,7 @@ export function parseRoutePath(
 
   return {
     keys,
-    pattern: new RegExp(`^${pattern}${loose === true ? '(?=$|/)' : '/?$'}`, 'i'),
+    pattern: new RegExp(`^${pattern}${loose === true ? '(?=$|/)' : '/?$'}`, 'iu'),
   }
 }
 
@@ -60,27 +60,27 @@ export type RouteUriParams<T extends string> = T extends `${infer Prev}/*/${infe
               ? { '*'?: string }
               : Record<string, never>
 
-const ROUTE_PARAMS_REGEX = /(\/|^)([:*][^/]*?)(\?)?(?=[/.]|$)/g
+const ROUTE_PARAMS_REGEX = /(?:\/|^)(?<rawKey>[:*][^/]*?)(?<optional>\?)?(?=[/.]|$)/gu
 
 export function injectParamsInRoute<T extends string>(route: T, values: RouteUriParams<T>) {
   // TODO: explain how this works
-  return route.replace(
-    ROUTE_PARAMS_REGEX,
-    (_x: string, _lead: string, rawKey: string, optional: string | undefined) => {
-      const key = rawKey === '*' ? rawKey : rawKey.slice(1)
+  return route.replace(ROUTE_PARAMS_REGEX, (...args: unknown[]) => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    const { rawKey, optional } = args.pop() as { rawKey: string; optional: string | undefined }
 
-      if (!isKeyOf(values, key) && optional === undefined) {
-        throw new Error(`Missing param "${key}" for route "${route}"`)
-      }
+    const key = rawKey === '*' ? rawKey : rawKey.slice(1)
 
-      const out =
-        isKeyOf(values, key) && values[key] !== undefined
-          ? // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-            encodeURIComponent(values[key] as string)
-          : ''
+    if (!isKeyOf(values, key) && optional === undefined) {
+      throw new Error(`Missing param "${key}" for route "${route}"`)
+    }
 
-      // TODO: optimize
-      return out ? `/${out}` : Boolean(optional) || key === '*' ? '' : `/${out}`
-    },
-  )
+    const out =
+      isKeyOf(values, key) && values[key] !== undefined
+        ? // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+          encodeURIComponent(values[key] as string)
+        : ''
+
+    // TODO: optimize
+    return out ? `/${out}` : Boolean(optional) || key === '*' ? '' : `/${out}`
+  })
 }

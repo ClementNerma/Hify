@@ -27,9 +27,14 @@ export type NavigableHandler<
 
   // validateProps(untypedProps: UntypedNavigableProps): Props | Error
 
-  createState(): State
+  createState: () => State
 } & NavigableHandlerMethods<NavType, Props, State>
 
+// Method signatures are required here: method parameters are checked bivariantly, which lets
+// specific handlers (e.g. NavigableGridHandler) be assignable to UntypedNavigableHandler and
+// to the registry handler types. Strict function types on property signatures would make those
+// handlers invariant in Props/State and break that assignability.
+// oxlint-disable typescript/method-signature-style
 export type NavigableHandlerMethods<
   NavType extends string,
   Props extends UntypedNavigableProps,
@@ -69,15 +74,16 @@ export type NavigableHandlerMethods<
     willUnfocusParent: boolean, // Is the current container going to be unfocused
   ): void
 }
+// oxlint-enable typescript/method-signature-style
 
 export type NavigationHelpers = {
-  focus(dir: NavigationDirection): void
-  focusAnother(id: string, dir: NavigationDirection): void
-  findChildren(): UntypedNavigable[]
-  // findDescendantsById(id: string): UntypedNavigable | null
-  findParent(): UntypedNavigable | null
-  findAncestors(): UntypedNavigable[]
-  findSiblings(): UntypedNavigable[]
+  focus: (dir: NavigationDirection) => void
+  focusAnother: (id: string, dir: NavigationDirection) => void
+  findChildren: () => UntypedNavigable[]
+  // findDescendantsById: (id: string): UntypedNavigable | null
+  findParent: () => UntypedNavigable | null
+  findAncestors: () => UntypedNavigable[]
+  findSiblings: () => UntypedNavigable[]
 }
 
 export type NavigationResult =
@@ -202,7 +208,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     AnyRegistryItem<R> & { extendedProps: ExtendedNavProps }
   >()
 
-  constructor(
+  public constructor(
     domContainer: typeof this.domContainer,
     navigableHandlers: typeof this.navigableHandlers,
   ) {
@@ -210,7 +216,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     this.navigableHandlers = navigableHandlers
   }
 
-  createNav<NavType extends RegistryItemNavType<R>>(
+  public createNav<NavType extends RegistryItemNavType<R>>(
     navigableType: NavType,
     mergedProps: RegistryItemProps<R, NavType>,
     specificId?: string,
@@ -253,7 +259,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     return nav.id
   }
 
-  updateNavProps<NavType extends RegistryItemNavType<R>>(
+  public updateNavProps<NavType extends RegistryItemNavType<R>>(
     navId: string,
     navType: NavType,
     newMergedProps: RegistryItemProps<R, NavType>,
@@ -270,12 +276,11 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
 
     // TODO: fix the need to remove the readonly marker
     type Writeable<T> = { -readonly [P in keyof T]: T[P] }
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     ;(nav.props as Writeable<typeof nav.props>) = props
     ;(nav.extendedProps as Writeable<typeof nav.extendedProps>) = extendedProps
   }
 
-  unregisterNav(navId: string): void {
+  public unregisterNav(navId: string): void {
     if (!this.navById.has(navId)) {
       throw new Error(`Cannot unregister unknown navigable with ID "${navId}"`)
     }
@@ -288,12 +293,12 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     this.navById.delete(navId)
   }
 
-  focusedId(): string | null {
+  public focusedId(): string | null {
     const focused = this.getFocused()
     return focused ? focused.id : null
   }
 
-  focusById(navId: string, dir: NavigationDirection | null): void {
+  public focusById(navId: string, dir: NavigationDirection | null): void {
     const focused = this.getFocused()
 
     if (focused?.id === navId) {
@@ -366,7 +371,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     })
   }
 
-  focusChildOf(navId: string, childIndex: number, dir: NavigationDirection | null): void {
+  public focusChildOf(navId: string, childIndex: number, dir: NavigationDirection | null): void {
     const nav = this.get(navId)
 
     const children = this.findChildrenOf(nav.id)
@@ -378,7 +383,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     this.focusById(children[childIndex].id, dir)
   }
 
-  scrollChildIntoView(navId: string, childIndex: number): void {
+  public scrollChildIntoView(navId: string, childIndex: number): void {
     const nav = this.get(navId)
     const children = this.findChildrenOf(nav.id)
 
@@ -395,7 +400,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     })
   }
 
-  unfocus(): void {
+  public unfocus(): void {
     const focused = this.getFocused()
 
     if (!focused) {
@@ -419,7 +424,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     return focused ? this.getNavigableFromDOM(focused) : null
   }
 
-  dispatchKeyPress(key: NavigationKeyName): void {
+  public dispatchKeyPress(key: NavigationKeyName): void {
     const focused = this.getFocused()
 
     if (!focused) {
@@ -555,7 +560,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     }
   }
 
-  callKeyPressHandler<NavType extends RegistryItemNavType<R>>(
+  public callKeyPressHandler<NavType extends RegistryItemNavType<R>>(
     nav: RegistryItem<R, NavType>,
     key: NavigationKeyName,
   ): NavigationResult | null {
@@ -594,7 +599,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     )
   }
 
-  callHandlerMethod<
+  public callHandlerMethod<
     NavType extends RegistryItemNavType<R>,
     MethodName extends Exclude<keyof RegistryHandlerMethods<R, NavType>, 'handleKeyPress'>,
   >(
@@ -631,7 +636,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     return handler[methodName]?.(baseNav, ...args)
   }
 
-  focusFirstItem(): void {
+  public focusFirstItem(): void {
     const firstItem = this.domContainer.querySelector(`[${NAVIGABLE_DATA_ID_ATTR}]`)
 
     if (!firstItem) {
@@ -681,7 +686,7 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
     return this.get(navId)
   }
 
-  findDomById(navId: string): Element {
+  public findDomById(navId: string): Element {
     const nav = this.navById.get(navId)
 
     if (!nav) {
@@ -798,12 +803,14 @@ export const NAVIGABLE_DATA_ID_ATTR = 'data-navigable-id'
 export const NAVIGABLE_DATA_TYPE_ATTR = 'data-navigable-type'
 export const NAVIGABLE_DATA_FOCUSED_ATTR = 'data-navigable-focused'
 
+// oxlint-disable-next-line no-underscore-dangle
 function _assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(`Assertion failed: ${message}`)
   }
 }
 
+// oxlint-disable-next-line no-underscore-dangle
 function _unwrapUndefinable<T>(value: T | undefined): T {
   if (value === undefined) {
     throw new Error('Unexpected undefined value')
@@ -812,15 +819,18 @@ function _unwrapUndefinable<T>(value: T | undefined): T {
   return value
 }
 
+// oxlint-disable-next-line no-underscore-dangle
 function _typecheckUnreachable(_: never): never {
   console.error({ never: _ })
   throw new Error('Reached theorically unreachable statement')
 }
 
+// oxlint-disable-next-line no-underscore-dangle
 function _oneShiftedList<T>(array: T[], withFirst: T): [T, T][] {
   return array.map((value, i) => [i === 0 ? withFirst : array[i - 1], value])
 }
 
+// oxlint-disable-next-line no-underscore-dangle
 function _categorizeProps<R extends UntypedNavigablesSet, N extends keyof R & string>(
   props: R[N] & ExtendedNavProps,
 ): { props: R[N]; extendedProps: ExtendedNavProps } {

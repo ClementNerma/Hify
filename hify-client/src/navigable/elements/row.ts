@@ -20,7 +20,7 @@ export const NavigableRowHandler: NavigableHandler<'row', NavigableRowProps, Nav
     const children = helpers.findChildren()
 
     if (children.length === 0) {
-      return fromDir !== null ? { type: 'propagate' } : { type: 'cancel' }
+      return { type: 'propagate' }
     }
 
     if (props.focusChildOnEnter !== undefined) {

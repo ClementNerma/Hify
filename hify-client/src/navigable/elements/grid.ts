@@ -29,7 +29,7 @@ export const NavigableGridHandler: NavigableHandler<
     const children = makeRows(nav)
 
     if (children.length === 0) {
-      return fromDir !== null ? { type: 'propagate' } : { type: 'cancel' }
+      return { type: 'propagate' }
     }
 
     switch (fromDir) {
