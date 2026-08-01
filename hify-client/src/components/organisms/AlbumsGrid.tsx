@@ -105,7 +105,7 @@ export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
       <NavGrid
         columns={COLUMNS}
         onLastRow={fetchNextPage}
-        className={isResetting ? 'opacity-50' : ''}
+        className={`h-[calc(100vh-9rem)] overflow-y-auto ${isResetting ? 'opacity-50' : ''}`}
       >
         {/* TODO: make grid-cols-7 dynamic with `COLUMNS` */}
         <div className="grid grid-cols-7 auto-rows-fr gap-4">
