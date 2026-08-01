@@ -31,10 +31,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="px-5">
           <h2>Something went wrong!</h2>
           <pre>Details: {this.state.error.message}</pre>
-          {/*
-          <NavItem onPress={() => location.reload()} className="mt-5 p-2 border-gray-600">
-            Reload
-          </NavItem> */}
         </div>
       )
     }
