@@ -2,7 +2,10 @@ import type { NavigableHandler, NavigableOf, UntypedNavigable } from '..'
 
 export type NavigableGridProps = {
   columns: number
-  onLastRow?: () => void
+  fetchMore?: {
+    rowsEagerness: number
+    debouncedLoader: () => void
+  }
 }
 
 export type NavigableGridState = {
@@ -80,8 +83,8 @@ export const NavigableGridHandler: NavigableHandler<
       }
 
       case 'DOWN': {
-        if (childRow === rows.length - 1) {
-          nav.props.onLastRow?.()
+        if (nav.props.fetchMore && childRow >= rows.length - nav.props.columns) {
+          nav.props.fetchMore.debouncedLoader()
         }
 
         return childRow < rows.length - 1

@@ -70,7 +70,7 @@ const suspensePaginatedQueriesCache = new Map<string, Promise<unknown>>()
 
 type PaginatedQueryOutput<T> = {
   data: T[] | null
-  fetchNextPage: () => void
+  fetchNextPage: () => Promise<void>
   hasMore: boolean
   isLoading: boolean
 }
@@ -155,10 +155,7 @@ export function usePaginatedQuery<T>({
 
   return {
     data,
-    fetchNextPage: () => {
-      // oxlint-disable-next-line typescript/no-floating-promises
-      fetchNextPage()
-    },
+    fetchNextPage,
     hasMore,
     isLoading,
   }

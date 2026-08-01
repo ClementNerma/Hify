@@ -80,18 +80,17 @@ export function isKeyOf<T extends object>(obj: T, key: PropertyKey): key is keyo
 
 export function noParallel<P extends unknown[]>(
   call: (...params: P) => Promise<void>,
-): (...params: P) => Promise<void> {
+): (...params: P) => void {
   let inProgress = false
 
-  return async (...params: P) => {
+  return (...params: P) => {
     if (!inProgress) {
       inProgress = true
 
-      await call(...params).finally(() => {
+      // oxlint-disable-next-line typescript/no-floating-promises
+      call(...params).finally(() => {
         inProgress = false
       })
-
-      inProgress = false
     }
   }
 }

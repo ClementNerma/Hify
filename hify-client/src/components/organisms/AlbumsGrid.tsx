@@ -20,7 +20,7 @@ import type {
 } from '#/api/types.ts'
 import { openContextMenu } from '#/global/ctx-menu.tsx'
 import { playNewMix } from '#/global/player.ts'
-import { randomInt } from '#/utils/common.ts'
+import { noParallel, randomInt } from '#/utils/common.ts'
 import { Button } from '../atoms/Button'
 import { AlbumCard } from '../molecules/AlbumCard'
 import { NavGrid } from '../navigables/Grid'
@@ -36,7 +36,8 @@ export type AlbumsGridProps = {
 }
 
 export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
-  const COLUMNS = 7
+  const COLUMNS = 9
+  const ROWS_PER_PAGE = 10
 
   const [sortBy, setSortBy] = useState<AlbumsSort>('ADDED')
   const [paginationDir, setPaginationDir] = useState<PaginationDir>(defaultPaginationOrder[sortBy])
@@ -48,7 +49,7 @@ export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
   } = useSuspensePaginatedQuery({
     query: (pagination) => query(sortBy, pagination),
     paginationDir,
-    pageSize: 10 * COLUMNS,
+    pageSize: ROWS_PER_PAGE * COLUMNS,
   })
 
   return (
@@ -106,7 +107,10 @@ export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
         columns={COLUMNS}
         items={albums}
         keyOfItem={(item) => item.album.id}
-        onLastRow={fetchNextPage}
+        fetchMore={{
+          rowsEagerness: ROWS_PER_PAGE / 2,
+          debouncedLoader: noParallel(fetchNextPage),
+        }}
         className={`h-[calc(100vh-9rem)] overflow-y-auto ${isResetting ? 'opacity-50' : ''}`}
       >
         {(item) => <AlbumCard album={item} />}
