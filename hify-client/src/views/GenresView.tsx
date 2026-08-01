@@ -13,19 +13,13 @@ export function GenresView() {
   })
 
   return (
-    <NavGrid columns={COLUMNS} onLastRow={fetchNextPage}>
-      {/* TODO: make grid-cols-9 dynamic with `COLUMNS` */}
-      <div className="grid grid-cols-7 auto-rows-fr gap-4">
-        {Array.from({ length: Math.ceil(genres.length / COLUMNS) }).map((_, rowIndex) => {
-          const rowGenres = genres.slice(rowIndex * COLUMNS, rowIndex * COLUMNS + COLUMNS)
-
-          return rowGenres.map(({ genre }) => (
-            <div key={genre.id} className="flex [&_img]:rounded-full">
-              <GenreCard genre={genre} />
-            </div>
-          ))
-        })}
-      </div>
+    <NavGrid
+      items={genres}
+      keyOfItem={(item) => item.genre.id}
+      columns={COLUMNS}
+      onLastRow={fetchNextPage}
+    >
+      {({ genre }) => <GenreCard genre={genre} />}
     </NavGrid>
   )
 }

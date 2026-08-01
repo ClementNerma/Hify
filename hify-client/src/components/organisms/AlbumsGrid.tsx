@@ -104,21 +104,12 @@ export function AlbumsGrid({ query, mixSource }: AlbumsGridProps) {
 
       <NavGrid
         columns={COLUMNS}
+        items={albums}
+        keyOfItem={(item) => item.album.id}
         onLastRow={fetchNextPage}
         className={`h-[calc(100vh-9rem)] overflow-y-auto ${isResetting ? 'opacity-50' : ''}`}
       >
-        {/* TODO: make grid-cols-7 dynamic with `COLUMNS` */}
-        <div className="grid grid-cols-7 auto-rows-fr gap-4">
-          {Array.from({ length: Math.ceil(albums.length / COLUMNS) }).map((_, rowIndex) => {
-            const rowAlbums = albums.slice(rowIndex * COLUMNS, rowIndex * COLUMNS + COLUMNS)
-
-            return rowAlbums.map((album) => (
-              <div key={album.album.id} className="flex">
-                <AlbumCard album={album} />
-              </div>
-            ))
-          })}
-        </div>
+        {(item) => <AlbumCard album={item} />}
       </NavGrid>
     </>
   )

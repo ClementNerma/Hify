@@ -12,7 +12,11 @@ export type GenreCardProps = {
 export function GenreCard({ genre }: GenreCardProps) {
   return (
     <NavItem onPress={() => navigate(routes.genre, { genreId: genre.id })}>
-      <Card title={genre.name} artUrl={urls.genreArt(genre, 'small')} />
+      <Card
+        className="[&_img]:rounded-full"
+        title={genre.name}
+        artUrl={urls.genreArt(genre, 'small')}
+      />
     </NavItem>
   )
 }

@@ -5,6 +5,8 @@ import { loadPersistentData, tryFetchHistoryTracks } from '#/global/persistent.t
 import { playTrackFromNewQueue } from '#/global/player.ts'
 
 export function HistoryView() {
+  const COLUMNS = 7
+
   const { historyTrackIds } = loadPersistentData()
 
   const historyTracks = useSuspenseQuery(tryFetchHistoryTracks(historyTrackIds))
@@ -13,27 +15,16 @@ export function HistoryView() {
     return <h1 className="fixed top-1/3 w-full text-center">History is empty</h1>
   }
 
-  const COLUMNS = 7
-
   return (
-    <NavGrid columns={COLUMNS}>
-      {/* TODO: make grid-cols-7 dynamic with `COLUMNS` */}
-      <div className="grid grid-cols-7 auto-rows-fr gap-4">
-        {Array.from({ length: Math.ceil(historyTracks.length / COLUMNS) }).map((_, rowIndex) => {
-          const rowTracks = historyTracks.slice(rowIndex * COLUMNS, rowIndex * COLUMNS + COLUMNS)
-
-          return rowTracks.map((track, i) => (
-            <div key={track.track.id} className="flex">
-              <TrackCard
-                track={track}
-                onPress={() =>
-                  playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true, fromMix: null })
-                }
-              />
-            </div>
-          ))
-        })}
-      </div>
+    <NavGrid items={historyTracks} keyOfItem={(item) => item.track.id} columns={COLUMNS}>
+      {(track, i) => (
+        <TrackCard
+          track={track}
+          onPress={() =>
+            playTrackFromNewQueue(historyTracks, i, { gotoPlayer: true, fromMix: null })
+          }
+        />
+      )}
     </NavGrid>
   )
 }
