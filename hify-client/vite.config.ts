@@ -21,7 +21,6 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['yoga'],
     port: 8892,
   },
 })
