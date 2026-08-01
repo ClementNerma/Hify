@@ -10,6 +10,27 @@ import type { Paginated, Pagination, PaginationDir } from './types'
 
 const queriesCache = new Map<string, Promise<unknown>>()
 
+// The query caches now live for the whole session (they used to be cleared on
+// every navigation, which forced a refetch of all data on each page switch).
+// Bound their size so a long session doesn't accumulate stale entries forever.
+const MAX_QUERIES_CACHE_SIZE = 500
+
+function getOrInsertWithCapped<K, V>(map: Map<K, V>, key: K, insertFn: () => V): V {
+  const value = getOrInsertWith(map, key, insertFn)
+
+  while (map.size > MAX_QUERIES_CACHE_SIZE) {
+    const oldestKey = map.keys().next().value
+
+    if (oldestKey === undefined) {
+      break
+    }
+
+    map.delete(oldestKey)
+  }
+
+  return value
+}
+
 type CachableQuery<T> = { queryKey: string[]; queryFn: () => Promise<T> }
 
 export function useSuspenseQuery<T>({ queryKey: queryKeyArray, queryFn }: CachableQuery<T>): T {
@@ -23,7 +44,7 @@ export function useSuspenseQuery<T>({ queryKey: queryKeyArray, queryFn }: Cachab
 
   const initialQueryKey = useInitialValue(queryKey)
 
-  return use(getOrInsertWith(retypedCache, initialQueryKey, queryFn))
+  return use(getOrInsertWithCapped(retypedCache, initialQueryKey, queryFn))
 }
 
 export function useSuspenseQueries<Q extends CachableQuery<unknown>[]>(
@@ -79,7 +100,7 @@ export function usePaginatedQuery<T>({
   const initialQueryKey = useInitialValue(queryKey)
 
   const initialState = use(
-    getOrInsertWith(retypedCache, initialQueryKey, async () =>
+    getOrInsertWithCapped(retypedCache, initialQueryKey, async () =>
       suspense === true
         ? queryFn({ offset: 0, limit: pageSize, dir: paginationDir })
         : { results: null, hasMore: true },
@@ -206,6 +227,7 @@ export function useApiMutation<T extends any[]>(
     mutation(...params)
       .then(() => {
         setStatus('success')
+        clearQueriesCache()
       })
       .catch((e: unknown) => {
         setStatus('failed')

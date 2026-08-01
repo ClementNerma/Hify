@@ -1,6 +1,5 @@
 import React, { useState, type LazyExoticComponent } from 'react'
 import { IconContext } from 'react-icons'
-import { clearQueriesCache } from './api/hooks'
 import { ErrorBoundary } from './components/organisms/ErrorBoundary'
 import { setInputFrozen } from './input'
 import { Layout } from './Layout'
@@ -29,7 +28,6 @@ export function App() {
               // oxlint-disable-next-line react/no-unstable-nested-components
               fallback={() => <h1>404</h1>}
               onLoading={() => {
-                clearQueriesCache()
                 setIsLoading(true)
               }}
               onPageReady={(routeName) => {

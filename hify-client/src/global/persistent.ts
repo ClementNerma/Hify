@@ -23,30 +23,42 @@ type PersistedData = typeof persistedDataValidator.infer
 
 const LOCAL_STORAGE_KEY = 'hify-persistent-data'
 
+// Keep the parsed data in memory to avoid re-reading + re-parsing + re-validating
+// localStorage on every render/update (this function is called from React renders
+// and from the player state store subscription).
+let cachedPersistedData: PersistedData | null = null
+
 export function loadPersistentData(): PersistedData {
+  if (cachedPersistedData !== null) {
+    return cachedPersistedData
+  }
+
+  let data: PersistedData = defaultPersistedData()
+
   const str = localStorage.getItem(LOCAL_STORAGE_KEY)
 
   if (str === null) {
     console.info('No persisted data found in localStorage')
-    return defaultPersistedData()
+  } else {
+    const json = tryFallible(() => JSON.parse(str) as unknown)
+
+    if (json instanceof Error) {
+      console.error({ badLocalStorageData: json })
+      showFailure('Failed to parse persisted data from localStorage')
+    } else {
+      const parsed = persistedDataValidator.onDeepUndeclaredKey('reject')(json)
+
+      if (parsed instanceof ArkErrors) {
+        showFailure(`Persisted data from localStorage has invalid structure:\n\n${parsed.summary}`)
+      } else {
+        data = parsed
+      }
+    }
   }
 
-  const data = tryFallible(() => JSON.parse(str) as unknown)
+  cachedPersistedData = data
 
-  if (data instanceof Error) {
-    console.error({ badLocalStorageData: data })
-    showFailure('Failed to parse persisted data from localStorage')
-    return defaultPersistedData()
-  }
-
-  const parsed = persistedDataValidator.onDeepUndeclaredKey('reject')(data)
-
-  if (parsed instanceof ArkErrors) {
-    showFailure(`Persisted data from localStorage has invalid structure:\n\n${parsed.summary}`)
-    return defaultPersistedData()
-  }
-
-  return parsed
+  return data
 }
 
 function defaultPersistedData(): PersistedData {
@@ -54,9 +66,12 @@ function defaultPersistedData(): PersistedData {
 }
 
 function writePartialPersistentData(data: Partial<PersistedData>): void {
-  // TODO: optimize
-  const existingData = loadPersistentData()
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ ...existingData, ...data }))
+  const existingData = cachedPersistedData ?? loadPersistentData()
+  const newData = { ...existingData, ...data }
+
+  cachedPersistedData = newData
+
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData))
 }
 
 export function prependHistoryTrack(track: TrackCompleteInfos): void {

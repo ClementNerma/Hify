@@ -35,6 +35,9 @@ export function Router<R extends UntypedRoutes>({
     (newPath) => {
       onLoading?.()
 
+      // Transition to the new view: React keeps the previous view displayed
+      // while the new one suspends (loads its data), instead of replacing it
+      // with the Suspense fallback.
       startTransition(() => {
         setPath(newPath)
       })
