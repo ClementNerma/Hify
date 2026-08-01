@@ -12,7 +12,7 @@ export type ArtistCardProps = {
 export function ArtistCard({ artist }: ArtistCardProps) {
   return (
     <NavItem onPress={() => navigate(routes.artist, { artistId: artist.id })}>
-      <Card title={artist.name} artUrl={urls.artistArt(artist, 'small')} />
+      <Card className="p-2" title={artist.name} artUrl={urls.artistArt(artist, 'small')} />
     </NavItem>
   )
 }

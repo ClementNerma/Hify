@@ -16,7 +16,7 @@ export function ArtistsView() {
   return (
     <NavGrid columns={COLUMNS} onLastRow={fetchNextPage}>
       {/* TODO: make grid-cols-9 dynamic with `COLUMNS` */}
-      <div className="grid grid-cols-9 auto-rows-fr gap-4">
+      <div className="grid grid-cols-9 gap-4">
         {Array.from({ length: Math.ceil(artists.length / COLUMNS) }).map((_, rowIndex) => {
           const rowArtists = artists.slice(rowIndex * COLUMNS, rowIndex * COLUMNS + COLUMNS)
 
