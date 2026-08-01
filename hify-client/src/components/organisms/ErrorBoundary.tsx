@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="px-5">
           <h2>Something went wrong!</h2>
-          <pre>Details: {this.state.error.message}</pre>
+          <pre>{this.state.error.message}</pre>
         </div>
       )
     }
