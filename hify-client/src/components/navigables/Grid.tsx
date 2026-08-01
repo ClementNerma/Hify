@@ -35,7 +35,7 @@ export function NavGrid<T>({
   return (
     <RawNavGrid {...rest}>
       <div
-        className={`grid ${TAILWIND_GRID_COLUMNS.get(columns)} auto-rows-fr ${gapless !== true ? 'gap-4' : ''}`}
+        className={`grid ${TAILWIND_GRID_COLUMNS.get(columns)} auto-rows-auto ${gapless !== true ? 'gap-4' : ''}`}
       >
         {items.map((item, index) => (
           <div key={keyOfItem(item)} className="flex">
