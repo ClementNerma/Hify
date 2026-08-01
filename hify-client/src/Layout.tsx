@@ -43,9 +43,7 @@ export function Layout({
       <div className="h-4" />
 
       {/* Current page's view */}
-      <div className={`transition-opacity duration-200 ${isLoading ? 'opacity-75' : ''}`}>
-        {children}
-      </div>
+      {children}
     </NavList>
   )
 }
