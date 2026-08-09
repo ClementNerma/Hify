@@ -204,9 +204,11 @@ impl<I: IdType> ArtsManager<I> {
             }
         }
 
-        // If the art directory already exists, it means that the art was already generated despite not being generated
-        // (e.g. old generation directory)
+        // If the art directory already exists, it means that the art was already generated
+        // (e.g. index was wiped, state was reset, and now we re-use the previously-generated arts)
         if art_dir.exists() {
+            // TODO: check if all required files exist
+
             self.arts.write().unwrap().insert(
                 item_id,
                 ArtDirForItem {
