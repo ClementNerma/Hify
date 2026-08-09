@@ -265,6 +265,9 @@ function BlackOutFilter() {
   )
 }
 
+// A small pause icon that shows when the player is paused or stopped,
+// to remind the user that the TV is still on after a long period of inactivity
+// (when Black Out mode is enabled and DF mode is active)
 function BlackOutPauseIndicator() {
   const isBlackOutModeEnabled = useGlobalStore(isBlackOutModeFeatureEnabledStore)
   const dfModeActive = useGlobalStore(isDfModeActiveStore)
