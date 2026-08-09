@@ -83,7 +83,7 @@ export const NavigableGridHandler: NavigableHandler<
       }
 
       case 'DOWN': {
-        if (nav.props.fetchMore && childRow >= rows.length - nav.props.columns) {
+        if (nav.props.fetchMore && childRow >= rows.length - nav.props.fetchMore.rowsEagerness) {
           nav.props.fetchMore.debouncedLoader()
         }
 
