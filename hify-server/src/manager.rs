@@ -52,7 +52,7 @@ impl DataManager {
                 "Provided data directory is not a directory"
             );
         } else {
-            fs::create_dir(data_dir).context("Failed to create the data directory")?;
+            fs::create_dir_all(data_dir).context("Failed to create the data directory")?;
         }
 
         let index_path = data_dir.join("index.json");
