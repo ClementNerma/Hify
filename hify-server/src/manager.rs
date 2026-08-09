@@ -6,7 +6,7 @@ use std::{
     time::Instant,
 };
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, anyhow, bail, ensure};
 use colored::Colorize;
 use log::{debug, info, trace};
 use tokio::sync::{RwLock, RwLockReadGuard};
@@ -41,7 +41,17 @@ impl DataManager {
     pub fn load(data_dir: &Path, music_dir: PathBuf) -> Result<Self> {
         info!("Starting up...");
 
-        if !music_dir.exists() {
+        ensure!(
+            music_dir.is_dir(),
+            "Provided music directory is not a directory"
+        );
+
+        if data_dir.exists() {
+            ensure!(
+                data_dir.is_dir(),
+                "Provided data directory is not a directory"
+            );
+        } else {
             fs::create_dir(data_dir).context("Failed to create the data directory")?;
         }
 
