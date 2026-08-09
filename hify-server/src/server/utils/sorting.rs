@@ -1,7 +1,5 @@
 // TODO: stable sort (to keep the order of the index for equal elements)
 
-use std::collections::HashMap;
-
 use serde::Deserialize;
 
 use crate::{
@@ -89,15 +87,7 @@ pub fn paginate_sort_albums(
         }
 
         AlbumsSort::Added => {
-            let album_recent_pos = index
-                .latest_added_albums
-                .iter()
-                .enumerate()
-                .map(|(pos, album_id)| (*album_id, pos))
-                .collect::<HashMap<_, _>>();
-
-            albums.sort_by_key(|album| album_recent_pos.get(&album.id).unwrap());
-            albums.reverse();
+            albums.sort_by_key(|album| index.latest_added_albums.get_index_of(&album.id).unwrap());
         }
 
         AlbumsSort::Date => {
