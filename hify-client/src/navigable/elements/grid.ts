@@ -87,9 +87,19 @@ export const NavigableGridHandler: NavigableHandler<
           nav.props.fetchMore.debouncedLoader()
         }
 
-        return childRow < rows.length - 1
-          ? { type: 'focusChild', navId: rows[childRow + 1][childCol].id, fromDir: 'ABOVE' }
-          : { type: 'propagate' }
+        if (childRow < rows.length - 2) {
+          return { type: 'focusChild', navId: rows[childRow + 1][childCol].id, fromDir: 'ABOVE' }
+        }
+
+        if (childRow === rows.length - 2) {
+          const lastRow = rows[rows.length - 1]
+
+          if (childCol < lastRow.length) {
+            return { type: 'focusChild', navId: lastRow[childCol].id, fromDir: 'ABOVE' }
+          }
+        }
+
+        return { type: 'propagate' }
       }
 
       case 'LEFT': {
