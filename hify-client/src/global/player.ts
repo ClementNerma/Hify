@@ -88,6 +88,11 @@ export function playTrackFromNewQueue(
 
     // oxlint-disable-next-line typescript/no-floating-promises
     mixTracks(params, newPagination).then((newTracks) => {
+      if (playerStateStore.getSnapshot().currentMix?.params.seed !== params.seed) {
+        // Mix has changed in the meantime, don't update the queue
+        return
+      }
+
       playerStateStore.mutateWith((prev) => ({
         ...prev,
         currentMix: {
