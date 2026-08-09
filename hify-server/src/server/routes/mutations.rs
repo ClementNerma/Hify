@@ -23,11 +23,7 @@ pub fn router() -> Router<HttpState> {
 }
 
 async fn update_index(State(state): State<HttpState>) -> ApiResult<()> {
-    spawn_blocking(move || state.update_index())
-        .await
-        .context("Failed to update index")?
-        .context("Failed to update index")?;
-
+    spawn_blocking(move || state.update_index()).await??;
     Ok(ApiResponse(()))
 }
 
