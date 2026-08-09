@@ -1,3 +1,5 @@
+// TODO: stable sort (to keep the order of the index for equal elements)
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

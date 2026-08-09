@@ -32,7 +32,6 @@ pub fn router() -> Router<HttpState> {
         .route("/album/{id}", get(album))
         .route("/album/{id}/tracks", get(album_tracks))
         .route("/artists", get(artists))
-        // TODO: rename as it is inconsistent with "/album/{id}/with-tracks" which returns albums with their tracks
         .route("/artists/with-albums", get(artists_with_albums))
         .route("/artist/{id}", get(artist))
         .route("/artist/{id}/albums", get(artist_albums))
