@@ -53,7 +53,11 @@ export const NavigableGridHandler: NavigableHandler<
 
       case 'RIGHT': {
         // TODO: use state for row
-        return { type: 'focusChild', navId: children[0][children.length - 1].id, fromDir: 'RIGHT' }
+        return {
+          type: 'focusChild',
+          navId: children[0][children[0].length - 1].id,
+          fromDir: 'RIGHT',
+        }
       }
 
       case 'BELOW': {
