@@ -45,6 +45,13 @@ pub fn assert_index_correctness(index: &Index) {
         assert_eq!(TrackID::compute(relative_path), *id);
 
         assert!(relative_path.is_relative());
+
+        assert!(
+            relative_path
+                .components()
+                .all(|c| matches!(c, std::path::Component::Normal(_)))
+        );
+
         assert!(*file_size_bytes > 0);
 
         let TrackTags {
