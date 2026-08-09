@@ -259,7 +259,7 @@ fn build_files_list(dir: &Path) -> Result<BTreeMap<PathBuf, FileTimesWithSize>> 
         let dir = dir.to_owned();
 
         tasks.spawn(move || {
-            let mt = fs::metadata(&item)
+            let mt = fs::symlink_metadata(&item)
                 .with_context(|| format!("Failed to get metadata for path: {}", item.display()))?;
 
             if mt.is_dir() {
