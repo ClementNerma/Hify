@@ -184,29 +184,33 @@ impl IndexCache {
         let cmp_albums_by_id = |a: &AlbumID, b: &AlbumID| cmp_index.cmp_albums_by_id(*a, *b);
         let cmp_genres_by_id = |a: &GenreID, b: &GenreID| cmp_index.cmp_genres_by_id(*a, *b);
 
+        let albums_mtime = albums
+            .values()
+            .map(|album| {
+                let album_tracks = albums_tracks.get(&album.id).unwrap();
+
+                let latest_mtime = album_tracks
+                    .iter()
+                    .map(|track_id| {
+                        let track = tracks.get(track_id).unwrap();
+                        track.file_times.ctime.unwrap_or(track.file_times.mtime)
+                    })
+                    .max()
+                    .unwrap();
+
+                (album.id, latest_mtime)
+            })
+            .collect::<HashMap<_, _>>();
+
         Ok(Self {
             latest_added_albums: to_sorted_set(albums.values().map(|album| album.id), |a, b| {
-                let get_latest_mtime = |album_id: &AlbumID| {
-                    let album_tracks = albums_tracks.get(album_id).unwrap();
-
-                    album_tracks
-                        .iter()
-                        .map(|track_id| {
-                            let track = tracks.get(track_id).unwrap();
-                            track.file_times.ctime.unwrap_or(track.file_times.mtime)
-                        })
-                        .max()
-                        .unwrap()
-                };
-
-                get_latest_mtime(a)
-                    .cmp(&get_latest_mtime(b))
+                albums_mtime
+                    .get(a)
+                    .unwrap()
+                    .cmp(albums_mtime.get(b).unwrap())
                     .reverse()
                     // In case two files have the exact same mtime, we sort by album name to ensure a deterministic order
-                    .then_with(||
-                        albums.get(a).unwrap().name
-                            .cmp(&albums.get(b).unwrap().name)
-                    )
+                    .then_with(|| albums.get(a).unwrap().name.cmp(&albums.get(b).unwrap().name))
             }),
 
             albums_min_max_date: albums
