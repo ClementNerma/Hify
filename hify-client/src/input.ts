@@ -3,7 +3,7 @@ import { navigationManager } from './global/nav'
 import {
   pauseAudio,
   playNextTrack,
-  rewindorPlayPrevTrack,
+  rewindOrPlayPrevTrack,
   seekAudio,
   toggleAudioPlaying,
 } from './global/player'
@@ -136,7 +136,7 @@ const LONG_KEYS_HANDLER = {
 
   MediaRewind: {
     short: () => seekAudio(-10),
-    long: rewindorPlayPrevTrack,
+    long: rewindOrPlayPrevTrack,
   },
 
   MediaFastForward: {

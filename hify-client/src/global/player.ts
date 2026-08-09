@@ -226,14 +226,17 @@ export function playNextTrack(): void {
   }
 }
 
-export function rewindorPlayPrevTrack(): void {
+export function rewindOrPlayPrevTrack(): void {
   const { currentTrack } = playerStateStore.getSnapshot()
 
   if (currentTrack === null) {
     return
   }
 
-  assertNotNull(audioPlayer)
+  // May happen if state was just restored but player didn't start yet
+  if (audioPlayer === null) {
+    return
+  }
 
   if (audioPlayer.currentTime > 5) {
     audioPlayer.currentTime = 0
