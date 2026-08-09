@@ -116,7 +116,10 @@ async fn get_cover_art(
     let index = state.index().await;
 
     match id {
-        CoverArtId::Track(_) => todo!(),
+        CoverArtId::Track(_) => Err((
+            StatusCode::BAD_REQUEST,
+            "Track ID is not supported for cover art",
+        )),
 
         CoverArtId::Album(id) => {
             if !index.albums.contains_key(&id) {
