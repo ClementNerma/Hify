@@ -88,6 +88,7 @@ pub fn paginate_sort_albums(
 
         AlbumsSort::Added => {
             albums.sort_by_key(|album| index.latest_added_albums.get_index_of(&album.id).unwrap());
+            albums.reverse();
         }
 
         AlbumsSort::Date => {
