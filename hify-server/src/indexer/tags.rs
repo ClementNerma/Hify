@@ -179,22 +179,40 @@ fn parse_date(input: &str) -> Result<TrackDate> {
         .or_else(|| PARSE_TRACK_YEAR_OR_DATE_3.captures(input))
         .with_context(|| format!("Invalid date value: {input}"))?;
 
-    Ok(TrackDate {
-        year: captured
-            .name("year")
-            .unwrap()
-            .as_str()
-            .parse::<u16>()
-            .context("Invalid year number")?,
-        month: captured
-            .name("month")
-            .map(|month| month.as_str().parse::<u8>().context("Invalid month number"))
-            .transpose()?,
-        day: captured
-            .name("day")
-            .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
-            .transpose()?,
-    })
+    let year = captured
+        .name("year")
+        .unwrap()
+        .as_str()
+        .parse::<u16>()
+        .context("Invalid year number")?;
+
+    let month = captured
+        .name("month")
+        .map(|month| month.as_str().parse::<u8>().context("Invalid month number"))
+        .transpose()?;
+
+    let day = captured
+        .name("day")
+        .map(|day| day.as_str().parse::<u8>().context("Invalid day number"))
+        .transpose()?;
+
+    if year < 1000 {
+        bail!("Year is before 1000");
+    }
+
+    if let Some(month) = month
+        && (month == 0 || month > 12)
+    {
+        bail!("Month is not between 1 and 12");
+    }
+
+    if let Some(day) = day
+        && (day == 0 || day > 31)
+    {
+        bail!("Day is not between 1 and 31");
+    }
+
+    Ok(TrackDate { year, month, day })
 }
 
 static PARSE_TRACK_YEAR_OR_DATE_1: LazyLock<Regex> = LazyLock::new(|| {
