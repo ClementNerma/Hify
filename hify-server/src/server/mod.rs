@@ -39,7 +39,7 @@ pub async fn launch(addr: SocketAddr, data_manager: DataManager) -> Result<()> {
         .with_state(state)
         // Set up CORS headers
         .layer(cors)
-        // Set up compression
+        // Set up compression (TODO: don't apply to media files)
         .layer(compression)
         // Set up errors logging
         .layer(middleware::from_fn(log_errors));
