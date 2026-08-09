@@ -27,7 +27,7 @@ pub struct StreamParams {
     #[serde(rename = "maxBitRate")]
     max_bit_rate_kbps: Option<u32>,
     format: Option<String>,
-    #[serde(rename = "time_offset")]
+    #[serde(rename = "timeOffset")]
     time_offset_s: Option<u32>,
     // N/A: size (for videos only)
     estimate_content_length: Option<usize>,
