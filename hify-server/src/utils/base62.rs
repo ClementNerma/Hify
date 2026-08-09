@@ -141,38 +141,3 @@ pub mod u64_base62_serialization {
         de.deserialize_str(StrU64Visitor)
     }
 }
-
-// pub mod str_base62_serialization {
-//     use serde::{
-//         Deserializer, Serializer,
-//         de::{Error, Visitor},
-//     };
-
-//     pub fn serialize<S: Serializer>(value: &str, ser: S) -> Result<S::Ok, S::Error> {
-//         ser.serialize_str(&super::encode_base62(value.as_bytes()))
-//     }
-
-//     struct Base64StrVisitor;
-
-//     impl<'de> Visitor<'de> for Base64StrVisitor {
-//         type Value = String;
-
-//         fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-//             formatter.write_str("a string containing an integer between -2^64 and 2^64-1")
-//         }
-
-//         fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-//         where
-//             E: Error,
-//         {
-//             super::decode_base62(v)
-//                 .ok()
-//                 .and_then(|bytes| String::from_utf8(bytes).ok())
-//                 .ok_or_else(|| E::custom("Failed to decode base62 buffer as an UTF-8 string"))
-//         }
-//     }
-
-//     pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> Result<String, D::Error> {
-//         de.deserialize_str(Base64StrVisitor)
-//     }
-// }
