@@ -13,7 +13,6 @@ import type { TrackCompleteInfos } from '#/api/types.ts'
 import { urls } from '#/api/urls.ts'
 import { DfFadeOut, DfShow } from '#/components/molecules/DfToggle.tsx'
 import { EditableRating } from '#/components/molecules/EditableRating.tsx'
-import { OneLineList } from '#/components/molecules/OneLineList.tsx'
 import { TrackCard } from '#/components/molecules/TrackCard.tsx'
 import { BlockNavItem, NavItem } from '#/components/navigables/Item.tsx'
 import { NavRow } from '#/components/navigables/Row.tsx'
@@ -173,27 +172,13 @@ function TrackInfos({ track }: { track: TrackCompleteInfos }) {
         <FaItunesNote /> {tags.title}
       </NavItem>
 
-      <NavItem
-        onPress={() => {
-          navigate(routes.album, { albumId: album.album.id })
-        }}
-      >
+      <span>
         <FaCompactDisc /> {album.album.name}
-      </NavItem>
+      </span>
 
-      {artists.length > 0 && (
-        <OneLineList
-          items={artists.map(({ artist }) => ({
-            label: (
-              <>
-                <FaMicrophoneLines /> {artist.name}
-              </>
-            ),
-            value: artist.id,
-          }))}
-          onSelect={(artistId) => navigate(routes.artist, { artistId })}
-        />
-      )}
+      <span>
+        <FaMicrophoneLines /> {artists[0].artist.name}
+      </span>
 
       <EditableRating
         track={track}
@@ -205,7 +190,6 @@ function TrackInfos({ track }: { track: TrackCompleteInfos }) {
           track.rating = rating
         }}
       />
-
       <span className="ml-auto">
         <PlayerStatusIndicator /> {progress !== null ? formatDuration(progress.seconds) : '--:--'} /{' '}
         {formatDuration(metadata.durationS)}
