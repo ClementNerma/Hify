@@ -232,7 +232,7 @@ pub fn paginate_sort_tracks(
 ) -> Paginated<TrackCompleteInfos> {
     match sort {
         TracksSort::Title => {
-            assert!(tracks.is_sorted_by(|a, b| a.tags.title <= b.tags.title));
+            tracks.sort_by(|a, b| a.tags.title.cmp(&b.tags.title));
         }
 
         TracksSort::Date => {
