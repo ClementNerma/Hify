@@ -210,7 +210,6 @@ impl DataManager {
             bail!("Provided track ID was not found");
         }
 
-        // Keep the lock until we finish writing to disk to avoid fs-related data races
         let mut ratings = self.ratings.write().await;
 
         match rating {
@@ -225,6 +224,9 @@ impl DataManager {
 
         let ratings_str =
             serde_json::to_string(&*ratings).context("Failed to serialize ratings")?;
+
+        // Drop the lock to avoid holding it across a filesystem access
+        drop(ratings);
 
         fs::write(&self.ratings_path, &ratings_str).context("Failed to write ratings file")?;
 
