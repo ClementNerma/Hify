@@ -2,6 +2,7 @@ use axum::{extract::Request, middleware::Next, response::Response};
 use colored::Colorize;
 use log::{debug, error};
 
+// TODO: don't log authentication username/password from (Open)Subsonic
 pub async fn log_errors(request: Request, next: Next) -> Response {
     let path = request.uri().path().to_owned();
     let query = request.uri().query().map(str::to_owned);
