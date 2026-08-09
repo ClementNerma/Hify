@@ -27,6 +27,7 @@ pub fn router() -> OpenSubsonicRouter {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlaylistsAnswer {
+    // TODO: spec says without songs
     pub playlist: Vec<PlaylistWithSongs>,
 }
 

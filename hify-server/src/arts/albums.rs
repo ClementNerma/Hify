@@ -24,6 +24,7 @@ use super::ArtsManager;
 static COVER_FILE_STEMS: &[&str] = &["cover", "folder"];
 static COVER_EXTENSIONS: &[&str] = &["jpg", "jpeg", "jfif", "png", "webp"];
 
+// TODO: find all image files, then match against album directories
 pub fn generate_album_arts(
     index_cache: &IndexCache,
     music_dir: &Path,
