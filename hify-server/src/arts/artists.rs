@@ -101,7 +101,7 @@ pub fn generate_artists_art(
                     top_right,
                     top_right,
                     top_left,
-                    LARGE_ART_SIDE_PX / 2,
+                    LARGE_ART_SIDE_PX,
                 )?,
 
                 [top_left, top_right, bottom_left] => assemble_four_images(
@@ -109,7 +109,7 @@ pub fn generate_artists_art(
                     top_right,
                     bottom_left,
                     top_left,
-                    LARGE_ART_SIDE_PX / 2,
+                    LARGE_ART_SIDE_PX,
                 )?,
 
                 [top_left, top_right, bottom_left, bottom_right] => assemble_four_images(
@@ -117,7 +117,7 @@ pub fn generate_artists_art(
                     top_right,
                     bottom_left,
                     bottom_right,
-                    LARGE_ART_SIDE_PX / 2,
+                    LARGE_ART_SIDE_PX,
                 )?,
 
                 [] | [_, _, _, _, ..] => unreachable!(),
