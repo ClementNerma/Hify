@@ -1,14 +1,11 @@
-use axum::{
-    extract::{Query, State},
-    http::StatusCode,
-};
+use axum::extract::{Query, State};
 use serde::Deserialize;
 
 use crate::{
     index::Rating,
     server::{
         HttpState,
-        opensubsonic::{OSEmptyResponse, OSError, types::CoverArtId},
+        opensubsonic::{OSEmptyResponse, OSError, OSResult, types::CoverArtId},
     },
 };
 
@@ -29,12 +26,9 @@ pub struct SetRatingParams {
 async fn set_rating(
     Query(SetRatingParams { id, rating }): Query<SetRatingParams>,
     State(state): State<HttpState>,
-) -> Result<OSEmptyResponse, OSError> {
+) -> OSResult<OSEmptyResponse> {
     let rating = if rating != 0 {
-        Some(
-            Rating::try_from(rating)
-                .map_err(|()| (StatusCode::BAD_REQUEST, "Invalid rating provided"))?,
-        )
+        Some(Rating::try_from(rating).map_err(|()| "Invalid rating provided")?)
     } else {
         None
     };
@@ -44,7 +38,7 @@ async fn set_rating(
     match id {
         CoverArtId::Track(track_id) => {
             if !index.tracks.contains_key(&track_id) {
-                return Err((StatusCode::NOT_FOUND, "Provided ID was not found"));
+                return Err(OSError("Provided ID was not found"));
             }
 
             match rating {
@@ -53,22 +47,23 @@ async fn set_rating(
                         .set_track_rating(track_id, rating)
                         // TODO: pass error message to returner
                         .await
-                        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to set rating"))?;
+                        .map_err(|_| "Failed to set rating")?;
                 }
 
                 None => {
-                    state.remove_track_rating(track_id).await.map_err(|_| {
-                        (StatusCode::INTERNAL_SERVER_ERROR, "Failed to remove rating")
-                    })?;
+                    state
+                        .remove_track_rating(track_id)
+                        .await
+                        .map_err(|_| "Failed to remove rating")?;
                 }
             }
 
             Ok(OSEmptyResponse)
         }
 
-        CoverArtId::Album(_) => Err((StatusCode::NOT_IMPLEMENTED, "TODO: albums")),
+        CoverArtId::Album(_) => Err(OSError("TODO: albums")),
 
-        CoverArtId::Artist(_) => Err((StatusCode::NOT_IMPLEMENTED, "TODO: artists")),
+        CoverArtId::Artist(_) => Err(OSError("TODO: artists")),
     }
 }
 

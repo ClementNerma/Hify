@@ -10,7 +10,7 @@ mod routes;
 mod types;
 
 use axum::{
-    http::{HeaderMap, HeaderValue, StatusCode},
+    http::{HeaderMap, HeaderValue},
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
@@ -19,11 +19,48 @@ use serde_json::json;
 pub use self::routes::router;
 
 /// Result of an `OpenSubsonic` request, which is either a successful response or a formatted error.
-type OSResult<T> = Result<OSNestedResponse<T>, OSError>;
+type OSResult<T> = Result<T, OSError>;
 
-type OSError = (StatusCode, &'static str);
+/// Result of an `OpenSubsonic` request, nested inside an object
+type OSResultNested<T> = OSResult<OSNestedResponse<T>>;
 
-/// `OpenSubsonic` response wrapper that nests the response in the expected JSON structure.
+pub struct OSError(&'static str);
+
+impl IntoResponse for OSError {
+    fn into_response(self) -> Response {
+        let Self(message) = self;
+
+        let response = json!({
+            "subsonic-response": {
+                "status": "failed",
+                "version": "1.16.1",
+                "type": "HifyServer",
+                "serverVersion": env!("CARGO_PKG_VERSION"),
+                "openSubsonic": true,
+                "error": {
+                    "code": 0,
+                    "message": message,
+                }
+            }
+        });
+
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            "Content-Type",
+            HeaderValue::from_str("application/json").unwrap(),
+        );
+
+        let body = serde_json::to_string(&response).unwrap();
+        (headers, body).into_response()
+    }
+}
+
+impl From<&'static str> for OSError {
+    fn from(message: &'static str) -> Self {
+        Self(message)
+    }
+}
+
 struct OSNestedResponse<T: Serialize>(&'static str, T);
 
 impl<T: Serialize> IntoResponse for OSNestedResponse<T> {

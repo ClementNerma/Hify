@@ -1,9 +1,5 @@
-use axum::{
-    extract::{Query, Request, State},
-    http::{Response, StatusCode},
-};
+use axum::extract::{Query, Request, State};
 use serde::Deserialize;
-use tower_http::services::fs::ServeFileSystemResponseBody;
 
 use crate::{
     arts::{ArtSize, LARGE_ART_SIDE_PX, MEDIUM_ART_SIDE_PX, SMALL_ART_SIDE_PX, TINY_ART_SIDE_PX},
@@ -11,8 +7,8 @@ use crate::{
     manager::Entity,
     server::{
         HttpState, OPENSUBSONIC_BASE_URI,
-        opensubsonic::{OSError, types::CoverArtId},
-        utils::files::serve_file,
+        opensubsonic::{OSError, OSResult, types::CoverArtId},
+        utils::files::{ServedFile, serve_file},
     },
 };
 
@@ -42,7 +38,7 @@ async fn stream(
     State(state): State<HttpState>,
     Query(params): Query<StreamParams>,
     req: Request,
-) -> Result<Response<ServeFileSystemResponseBody>, OSError> {
+) -> OSResult<ServedFile> {
     let StreamParams {
         id,
         #[allow(unused_variables)] //TODO
@@ -57,10 +53,7 @@ async fn stream(
 
     let index = state.index().await;
 
-    let track = index
-        .tracks
-        .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Track not found"))?;
+    let track = index.tracks.get(&id).ok_or("Track not found")?;
 
     Ok(serve_file(&state.music_dir().join(&track.relative_path), req).await)
 }
@@ -94,9 +87,8 @@ async fn get_cover_art(
         size,
     }): Query<GetCovertArtParams>,
     req: Request,
-) -> Result<Response<ServeFileSystemResponseBody>, OSError> {
-    let id =
-        CoverArtId::decode(&id).map_err(|()| (StatusCode::BAD_REQUEST, "Invalid ID provided"))?;
+) -> OSResult<ServedFile> {
+    let id = CoverArtId::decode(&id).map_err(|()| "Invalid ID provided")?;
 
     let art_size = match size {
         None => ArtSize::Large,
@@ -116,14 +108,11 @@ async fn get_cover_art(
     let index = state.index().await;
 
     match id {
-        CoverArtId::Track(_) => Err((
-            StatusCode::BAD_REQUEST,
-            "Track ID is not supported for cover art",
-        )),
+        CoverArtId::Track(_) => Err(OSError("Track ID is not supported for cover art")),
 
         CoverArtId::Album(id) => {
             if !index.albums.contains_key(&id) {
-                return Err((StatusCode::NOT_FOUND, "Provided album ID was not found"));
+                return Err(OSError("Provided album ID was not found"));
             }
 
             let art_path = state.get_art(Entity::Album(id), art_size).unwrap();
@@ -133,7 +122,7 @@ async fn get_cover_art(
 
         CoverArtId::Artist(id) => {
             if !index.artists.contains_key(&id) {
-                return Err((StatusCode::NOT_FOUND, "Provided artist ID was not found"));
+                return Err(OSError("Provided artist ID was not found"));
             }
 
             let art_path = state.get_art(Entity::Artist(id), art_size).unwrap();

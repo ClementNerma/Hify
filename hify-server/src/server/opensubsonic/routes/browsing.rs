@@ -1,7 +1,4 @@
-use axum::{
-    extract::{Query, State},
-    http::StatusCode,
-};
+use axum::extract::{Query, State};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -10,6 +7,7 @@ use crate::{
     server::{
         HttpState,
         opensubsonic::{
+            OSError,
             convert::{album_to_id3_with_songs, track_to_child},
             types::{
                 AlbumInfo, ArtistInfo2, Child, CoverArtId, Genre, MUSIC_FOLDER_ID, MusicFolder,
@@ -19,7 +17,7 @@ use crate::{
 };
 
 use super::{
-    super::{OSNestedResponse, OSResult, types::AlbumID3WithSongs},
+    super::{OSNestedResponse, OSResultNested, types::AlbumID3WithSongs},
     OpenSubsonicRouter,
     media::make_cover_art_uri,
 };
@@ -90,14 +88,14 @@ struct GetAlbumParams {
 async fn get_album(
     Query(GetAlbumParams { id }): Query<GetAlbumParams>,
     State(state): State<HttpState>,
-) -> OSResult<AlbumID3WithSongs> {
+) -> OSResultNested<AlbumID3WithSongs> {
     let index = state.index().await;
     let ratings = state.ratings().await;
 
     let album = index
         .albums
         .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Provided album ID was not found"))?;
+        .ok_or(OSError("Provided album ID was not found"))?;
 
     Ok(OSNestedResponse(
         "album",
@@ -113,13 +111,13 @@ struct GetSongParams {
 async fn get_song(
     Query(GetSongParams { id }): Query<GetSongParams>,
     State(state): State<HttpState>,
-) -> OSResult<Child> {
+) -> OSResultNested<Child> {
     let index = state.index().await;
 
     let track = index
         .tracks
         .get(&id)
-        .ok_or((StatusCode::NOT_FOUND, "Provided track ID was not found"))?;
+        .ok_or(OSError("Provided track ID was not found"))?;
 
     let ratings = state.ratings().await;
 
@@ -142,14 +140,11 @@ struct GetArtistInfo2Params {
 async fn get_artist_info2(
     Query(GetArtistInfo2Params { artist_id }): Query<GetArtistInfo2Params>,
     State(state): State<HttpState>,
-) -> OSResult<ArtistInfo2> {
+) -> OSResultNested<ArtistInfo2> {
     let index = state.index().await;
 
     if !index.artists.contains_key(&artist_id) {
-        return Err((
-            StatusCode::NOT_FOUND,
-            "The provided artist ID was not found",
-        ));
+        return Err(OSError("The provided artist ID was not found"));
     }
 
     let get_image_uri =
@@ -178,11 +173,11 @@ struct GetAlbumInfo2Params {
 async fn get_album_info2(
     Query(GetAlbumInfo2Params { album_id }): Query<GetAlbumInfo2Params>,
     State(state): State<HttpState>,
-) -> OSResult<AlbumInfo> {
+) -> OSResultNested<AlbumInfo> {
     let index = state.index().await;
 
     if !index.albums.contains_key(&album_id) {
-        return Err((StatusCode::NOT_FOUND, "The provided album ID was not found"));
+        return Err(OSError("The provided album ID was not found"));
     }
 
     let get_image_uri =

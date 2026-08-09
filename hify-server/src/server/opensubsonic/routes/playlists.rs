@@ -1,9 +1,6 @@
 use std::{collections::HashMap, time::SystemTime};
 
-use axum::{
-    extract::{Query, State},
-    http::StatusCode,
-};
+use axum::extract::{Query, State};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -11,7 +8,7 @@ use crate::{
     server::{
         HttpState,
         opensubsonic::{
-            OSNestedResponse, OSResult,
+            OSNestedResponse, OSResultNested,
             convert::{to_iso_8601, track_to_child},
             types::PlaylistWithSongs,
         },
@@ -57,14 +54,14 @@ struct GetPlaylistParams {
 async fn get_playlist(
     Query(GetPlaylistParams { id }): Query<GetPlaylistParams>,
     State(state): State<HttpState>,
-) -> OSResult<PlaylistWithSongs> {
+) -> OSResultNested<PlaylistWithSongs> {
     let index = state.index().await;
     let ratings = state.ratings().await;
 
     auto_playlists(&index, &ratings)
         .into_iter()
         .find(|playlist| playlist.id == id)
-        .ok_or((StatusCode::NOT_FOUND, "Provided playlist ID was not found"))?;
+        .ok_or("Provided playlist ID was not found")?;
 
     Ok(OSNestedResponse(
         "playlist",
