@@ -384,20 +384,22 @@ impl CoverArtId {
     }
 
     pub fn decode(str: &str) -> Result<Self, ()> {
-        str.strip_prefix("track:")
-            .and_then(|str| TrackID::decode(str).ok())
-            .map(Self::Track)
-            .or_else(|| {
-                str.strip_prefix("album:")
-                    .and_then(|str| AlbumID::decode(str).ok())
-                    .map(Self::Album)
-            })
-            .or_else(|| {
-                str.strip_prefix("artist:")
-                    .and_then(|str| ArtistID::decode(str).ok())
-                    .map(Self::Artist)
-            })
-            .ok_or(())
+        let mut parts = str.split(':');
+
+        let kind = parts.next().ok_or(())?;
+        let id = parts.next().ok_or(())?;
+
+        if parts.next().is_some() {
+            return Err(());
+        }
+
+        match kind {
+            "track" => TrackID::decode(id).map(Self::Track).map_err(|_| ()),
+            "album" => AlbumID::decode(id).map(Self::Album).map_err(|_| ()),
+            "artist" => ArtistID::decode(id).map(Self::Artist).map_err(|_| ()),
+
+            _ => Err(()),
+        }
     }
 }
 
