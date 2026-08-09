@@ -30,8 +30,14 @@ async fn set_rating(
     Query(SetRatingParams { id, rating }): Query<SetRatingParams>,
     State(state): State<HttpState>,
 ) -> Result<OSEmptyResponse, OSError> {
-    let rating = Rating::try_from(rating * 2)
-        .map_err(|()| (StatusCode::BAD_REQUEST, "Invalid rating provided"))?;
+    let rating = if rating != 0 {
+        Some(
+            Rating::try_from(rating)
+                .map_err(|()| (StatusCode::BAD_REQUEST, "Invalid rating provided"))?,
+        )
+    } else {
+        None
+    };
 
     let index = state.index().await;
 
@@ -41,11 +47,21 @@ async fn set_rating(
                 return Err((StatusCode::NOT_FOUND, "Provided ID was not found"));
             }
 
-            state
-                .set_track_rating(track_id, rating)
-                // TODO: pass error message to returner
-                .await
-                .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to set rating"))?;
+            match rating {
+                Some(rating) => {
+                    state
+                        .set_track_rating(track_id, rating)
+                        // TODO: pass error message to returner
+                        .await
+                        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to set rating"))?;
+                }
+
+                None => {
+                    state.remove_track_rating(track_id).await.map_err(|_| {
+                        (StatusCode::INTERNAL_SERVER_ERROR, "Failed to remove rating")
+                    })?;
+                }
+            }
 
             Ok(OSEmptyResponse)
         }
