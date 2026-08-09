@@ -149,6 +149,11 @@ impl DataManager {
             info!("--> Writing to disk...");
 
             fs::write(&self.index_path, index_str).context("Failed to write index file")?;
+
+            trace!("-> Updating memory...");
+
+            *self.index_cache.blocking_write() = index_cache.clone();
+            *self.index.blocking_write() = index.clone();
         }
 
         generate_album_arts(&index_cache, &self.music_dir, &self.album_arts)?;
@@ -165,13 +170,6 @@ impl DataManager {
                 )
                 .bright_yellow()
             );
-
-            info!("--> Updating memory...");
-
-            *self.index_cache.blocking_write() = index_cache;
-            *self.index.blocking_write() = index;
-
-            info!("-> Done.");
         }
 
         Ok(())

@@ -17,7 +17,7 @@ use super::{
 };
 
 /// Index cache, used to accelerate requests by pre-computing some results once after index generation.
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct IndexCache {
     //
     // === TRACKS ===
