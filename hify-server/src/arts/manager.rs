@@ -187,10 +187,12 @@ impl<I: IdType> ArtsManager<I> {
             let existing = self.arts.read().unwrap();
 
             if let Some(existing) = existing.get(&item_id) {
+                // If data didn't change, just do nothing
                 if existing.for_data == for_data {
                     return Ok(false);
                 }
 
+                // If data changed, remove the old art directory
                 if art_dir.exists() {
                     fs::remove_dir_all(&art_dir).with_context(|| {
                         format!(
@@ -202,7 +204,17 @@ impl<I: IdType> ArtsManager<I> {
             }
         }
 
+        // If the art directory already exists, it means that the art was already generated despite not being generated
+        // (e.g. old generation directory)
         if art_dir.exists() {
+            self.arts.write().unwrap().insert(
+                item_id,
+                ArtDirForItem {
+                    for_data,
+                    path: art_dir,
+                },
+            );
+
             return Ok(false);
         }
 
