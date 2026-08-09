@@ -104,7 +104,7 @@ export function tryFetchHistoryTracks(
           message: String(e),
         })
 
-        writePartialPersistentData({ historyTrackIds: [] })
+        // IDs are still kept in case this was just a temporary error, instead of clearing everything
 
         return []
       }),
