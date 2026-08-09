@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use log::error;
+use log::warn;
 
 use crate::{index::TrackMetadata, utils::TaskRunner};
 
@@ -42,7 +42,7 @@ pub fn may_be_audio_file(path: impl AsRef<Path>) -> bool {
         audio_ext.as_str(),
         "mpeg" | "mp4" | "webm" | "alac" | "aiff" | "dsf"
     ) {
-        error!(
+        warn!(
             "Warning: in file '{}': file format unsupported by web players: {audio_ext}",
             path.to_string_lossy()
         );
@@ -51,7 +51,7 @@ pub fn may_be_audio_file(path: impl AsRef<Path>) -> bool {
     }
 
     if matches!(audio_ext.as_str(), "aac" | "wav") {
-        error!(
+        warn!(
             "Warning: in file '{}': file format explicitly unsupported: {audio_ext}",
             path.to_string_lossy()
         );
