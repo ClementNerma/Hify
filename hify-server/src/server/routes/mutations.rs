@@ -56,7 +56,7 @@ async fn remove_track_rating(
     state
         .remove_track_rating(track_id)
         .await
-        .with_context(|| format!("Failed to set rating for track ID {track_id:?}"))?;
+        .with_context(|| format!("Failed to remove rating for track ID {track_id:?}"))?;
 
     Ok(ApiResponse(()))
 }
