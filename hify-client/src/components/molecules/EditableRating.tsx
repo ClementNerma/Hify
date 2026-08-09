@@ -85,7 +85,7 @@ export function EditableRating({ track, onUpdated }: EditableRatingProps) {
 
   // On back press + isEditing, leave edition WITHOUT saving
   return (
-    <div>
+    <span>
       <NavItem
         className={`p-1 ${isEditing ? 'bg-white text-black rounded' : ''}`}
         onPress={() => (isEditing ? saveNewRating() : setIsEditing(true))}
@@ -114,7 +114,7 @@ export function EditableRating({ track, onUpdated }: EditableRatingProps) {
       <span className="p-2">
         {ratingReplaceStatus !== 'success' && <MutationStatus status={ratingReplaceStatus} />}
       </span>
-    </div>
+    </span>
   )
 }
 
