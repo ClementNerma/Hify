@@ -29,6 +29,18 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         };
     }
 
+    macro_rules! get_tag_str {
+        ($tag:ident) => {
+            get_tag_str(stringify!($tag), &std_tags, tag_str_matcher!($tag))
+        };
+    }
+
+    macro_rules! require_tag_str {
+        ($tag:ident) => {
+            get_tag_str!($tag)?.context(concat!("Missing required tag: ", stringify!($tag)))
+        };
+    }
+
     // Shorthand macros to create closures that match a specific integer tag and return its value
     macro_rules! tag_int_matcher {
         ($tag:ident) => {
@@ -39,11 +51,16 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         };
     }
 
+    macro_rules! get_tag_int {
+        ($tag:ident) => {
+            get_tag_int(stringify!($tag), &std_tags, tag_int_matcher!($tag))
+        };
+    }
+
     // Collect all the tags used by this application
     let tags = TrackStrTags {
         // Track title
-        title: get_tag_str(&std_tags, tag_str_matcher!(TrackTitle))?
-            .context("Track title is missing")?,
+        title: require_tag_str!(TrackTitle)?,
 
         // Track artists
         artists: get_tag_str_array(&std_tags, tag_str_matcher!(Artist)),
@@ -52,25 +69,20 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
         composers: get_tag_str_array(&std_tags, tag_str_matcher!(Composer)),
 
         // Album name
-        album: get_tag_str(&std_tags, tag_str_matcher!(Album))?.context("Album name is missing")?,
+        album: require_tag_str!(Album)?,
 
         // Album artists
         album_artists: get_tag_str_array(&std_tags, tag_str_matcher!(AlbumArtist)),
 
         // Disc number
-        disc: get_tag_int(&std_tags, tag_int_matcher!(DiscNumber))?
-            .map(|disc| u16::try_from(disc).unwrap()),
+        disc: get_tag_int!(DiscNumber)?.map(|disc| u16::try_from(disc).unwrap()),
 
         // Track number (inside the disc)
-        track_no: get_tag_int(&std_tags, tag_int_matcher!(TrackNumber))?
-            .map(|track_no| u16::try_from(track_no).unwrap()),
+        track_no: get_tag_int!(TrackNumber)?.map(|track_no| u16::try_from(track_no).unwrap()),
 
         // Release date
-        date: get_tag_str(&std_tags, tag_str_matcher!(ReleaseDate))?
-            .or(get_tag_str(
-                &std_tags,
-                tag_str_matcher!(OriginalReleaseDate),
-            )?)
+        date: get_tag_str!(ReleaseDate)?
+            .or(get_tag_str!(OriginalReleaseDate)?)
             .map(|date| parse_date(&date))
             .transpose()?,
 
@@ -97,6 +109,7 @@ pub fn convert_symphonia_metadata(rev: &MetadataRevision) -> Result<TrackStrTags
 /// * Fails if the tag is provided multiple times (works if only one non-empty tag)
 /// * Fails if no tag is provided, or if they are all empty
 fn get_tag_str(
+    name: &'static str,
     standard_tags: &[&StandardTag],
     matcher: impl Fn(&&StandardTag) -> Option<String>,
 ) -> Result<Option<String>> {
@@ -111,7 +124,7 @@ fn get_tag_str(
     };
 
     if iter.next().is_some() {
-        bail!("Multiple values found for tag {:?}", stringify!($tag));
+        bail!("Multiple values found for tag: {name}");
     }
 
     Ok(Some(value))
@@ -156,6 +169,7 @@ fn get_tag_str_array(
 /// * Fails if the tag is provided multiple times
 /// * Fails if no tag is provided
 fn get_tag_int(
+    name: &'static str,
     standard_tags: &[&StandardTag],
     matcher: impl Fn(&&StandardTag) -> Option<u64>,
 ) -> Result<Option<u64>> {
@@ -166,7 +180,7 @@ fn get_tag_int(
     };
 
     if iter.next().is_some() {
-        bail!("Multiple values found for tag {:?}", stringify!($tag));
+        bail!("Multiple values found for tag: {name}");
     }
 
     Ok(Some(value))
