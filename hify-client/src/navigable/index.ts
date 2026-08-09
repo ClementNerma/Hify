@@ -324,7 +324,6 @@ export class NavigationManager<R extends UntypedNavigablesSet> {
       // => Unfocusing
       //
 
-      focused.extendedProps.onUnfocused?.()
       this.callHandlerMethod(focused, 'onUnfocused')
       this.findDomById(focused.id).removeAttribute(NAVIGABLE_DATA_FOCUSED_ATTR)
 
