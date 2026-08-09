@@ -17,11 +17,12 @@ impl ArtistCompleteInfos {
     pub fn new(artist: Artist, index: &IndexCache) -> Self {
         Self {
             albums_count: index.artists_albums.get(&artist.id).unwrap().len(),
-            tracks_count: index
-                .artists_track_participations
-                .get(&artist.id)
-                .unwrap()
-                .len(),
+            tracks_count: index.artists_tracks.get(&artist.id).unwrap().len()
+                + index
+                    .artists_track_participations
+                    .get(&artist.id)
+                    .unwrap()
+                    .len(),
             artist,
         }
     }
