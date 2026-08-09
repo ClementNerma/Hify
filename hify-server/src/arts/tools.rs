@@ -4,6 +4,10 @@ use anyhow::{Context, Result};
 use image::{GenericImage, RgbImage, imageops::FilterType};
 
 pub fn resize_image(image: &RgbImage, nwidth: u32, nheight: u32) -> RgbImage {
+    if image.width() == nwidth && image.height() == nheight {
+        return image.clone();
+    }
+
     image::imageops::resize(image, nwidth, nheight, FilterType::Lanczos3)
 }
 
