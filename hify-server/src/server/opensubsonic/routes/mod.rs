@@ -30,6 +30,7 @@ impl OpenSubsonicRouter {
         Self(Router::new())
     }
 
+    // TODO: spec requires form-encoded POST bodies support o top of query strings
     pub fn route<T: 'static>(
         mut self,
         path: &'static str,

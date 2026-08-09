@@ -38,6 +38,7 @@ pub struct DataManager {
 }
 
 impl DataManager {
+    // TODO: rename to 'load_blocking'?
     pub fn load(data_dir: &Path, music_dir: PathBuf) -> Result<Self> {
         info!("Starting up...");
 
@@ -128,6 +129,7 @@ impl DataManager {
     }
 
     // TODO: warn if dangling ratings
+    // TODO: rename to 'update_index_blocking'?
     pub fn update_index(&self) -> Result<()> {
         let _permit = self
             .index_update_barrier

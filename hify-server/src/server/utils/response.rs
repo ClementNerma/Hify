@@ -19,6 +19,7 @@ impl<T: Serialize> IntoResponse for ApiResponse<T> {
     }
 }
 
+// TODO: require a specific StatusCode instead of falling back to INTERNAL_SERVER_ERROR? (e.g. for 404s)
 pub struct ApiError(pub anyhow::Error);
 
 impl ApiError {
