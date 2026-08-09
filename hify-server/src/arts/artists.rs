@@ -46,14 +46,6 @@ pub fn generate_artists_art(
 
         assert!(!artist_in_albums.is_empty());
 
-        if artist_in_albums.is_empty() {
-            if artist_arts.has(*artist_id) {
-                artist_arts.delete(*artist_id)?;
-            }
-
-            continue;
-        }
-
         let img_hash = unordered_iter_stable_hash(
             artist_in_albums
                 .iter()
