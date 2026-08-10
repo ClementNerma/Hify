@@ -177,7 +177,7 @@ function TrackInfos({ track }: { track: TrackCompleteInfos }) {
       </span>
 
       <span>
-        <FaMicrophoneLines /> {artists[0].artist.name}
+        <FaMicrophoneLines /> {(artists.length > 0 ? artists[0] : album.artists[0]).artist.name}
       </span>
 
       <EditableRating
