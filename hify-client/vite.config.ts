@@ -14,6 +14,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
+    sourcemap: true,
     rolldownOptions: {
       output: {
         codeSplitting: false,
