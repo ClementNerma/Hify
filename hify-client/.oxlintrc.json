@@ -48,6 +48,7 @@
     "eslint/no-inline-comments": "off",
     "eslint/no-use-before-define": "off",
     "eslint/no-shadow": "off",
+    "eslint/one-var": "off",
 
     "import/exports-last": "off",
     "import/group-exports": "off",
