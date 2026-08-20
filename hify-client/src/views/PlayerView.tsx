@@ -172,13 +172,19 @@ function TrackInfos({ track }: { track: TrackCompleteInfos }) {
         <FaItunesNote /> {tags.title}
       </NavItem>
 
-      <span>
+      <NavItem onPress={() => navigate(routes.album, { albumId: album.album.id })}>
         <FaCompactDisc /> {album.album.name}
-      </span>
+      </NavItem>
 
-      <span>
+      <NavItem
+        onPress={() =>
+          navigate(routes.artist, {
+            artistId: artists.length > 0 ? artists[0].artist.id : album.artists[0].artist.id,
+          })
+        }
+      >
         <FaMicrophoneLines /> {(artists.length > 0 ? artists[0] : album.artists[0]).artist.name}
-      </span>
+      </NavItem>
 
       <EditableRating
         track={track}
